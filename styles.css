@@ -168,5 +168,16 @@ td {
     cursor: pointer;
 }
 
-.editCompanyBtn {
-    backg
+/* RESET FORM BUTTON STYLES */
+.secondary-btn {
+    background: #ddd;
+    color: #333;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.secondary-btn:hover {
+    background: #ccc;
+}
