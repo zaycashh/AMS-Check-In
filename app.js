@@ -528,37 +528,18 @@ document.getElementById("testSaveBtn").addEventListener("click", async () => {
 
     saveRecordToGitHub(testRecord);
 });
-function toggleOtherReason() {
-    const reasonSelect = document.getElementById("reasonSelect");
-    const otherWrapper = document.getElementById("otherReasonWrapper");
-    const otherInput = document.getElementById("otherReasonInput");
-
-    if (reasonSelect.value == "other") {
-        otherWrapper.style.display = "block";
-        otherInput.value = "";
-        otherInput.focus();
-    } else {
-        otherWrapper.style.display = "none";
-        otherInput.value = "";
-    }
-}
 function toggleOtherCompany() {
-    const companySelect = document.getElementById("companySelect");
-    const wrapper = document.getElementById("otherCompanyWrapper");
-    const input = document.getElementById("otherCompany");
+  const select = document.getElementById("companySelect");
+  const wrapper = document.getElementById("otherCompanyWrapper");
 
-    if (companySelect.value === "other") {
-        wrapper.style.display = "block";
-        input.value = "";
-        input.focus();
-    } else {
-        wrapper.style.display = "none";
-        input.value = "";
-    }
+  if (select.value === "other") {
+    wrapper.style.display = "block";
+  } else {
+    wrapper.style.display = "none";
+    document.getElementById("otherCompany").value = "";
+  }
 }
-/* =====================================================================
-   SHOW / HIDE OTHER REASON
-===================================================================== */
+
 function toggleOtherReason() {
   const select = document.getElementById("reasonSelect");
   const wrapper = document.getElementById("otherReasonWrapper");
