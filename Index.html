@@ -71,15 +71,24 @@
         <div class="section-divider"></div>
         <h3 class="section-subtitle">Services</h3>
 
-        <div class="checkbox-grid">
-            <label><input type="checkbox" id="drug_test"> Drug Test</label>
-            <label><input type="checkbox" id="alcohol_test"> Alcohol Test</label>
-            <label><input type="checkbox" id="vision_test"> Vision Test</label>
-            <label><input type="checkbox" id="dot_physical"> DOT Physical</label>
-            <label><input type="checkbox" id="dna_test"> DNA (Paternity Test)</label>
-            <label><input type="checkbox" id="other_service"> Other</label>
+<!-- SERVICES -->
+<div class="section-divider"></div>
+<h3 class="section-subtitle">Services</h3>
 
-        </div>
+<div class="checkbox-grid">
+    <label><input type="checkbox" id="srvDrug"> Drug Test</label>
+    <label><input type="checkbox" id="srvAlcohol"> Alcohol Test</label>
+    <label><input type="checkbox" id="srvVision"> Vision Test</label>
+    <label><input type="checkbox" id="srvDOT"> DOT Physical</label>
+    <label><input type="checkbox" id="srvDNA"> DNA (Paternity Test)</label>
+    <label><input type="checkbox" id="srvOther"> Other</label>
+</div>
+
+<div class="form-row" id="otherReasonWrapper" style="display:none;">
+    <label>Other Service</label>
+    <input id="srvOtherText" type="text" placeholder="Describe other service">
+</div>
+
 
         <div class="form-row" id="other_reason_wrapper" style="display:none;">
             <label>Other Service</label>
