@@ -181,6 +181,12 @@ td {
 .secondary-btn:hover {
     background: #ccc;
 }
+#otherCompany {
+    position: relative;
+    z-index: 20;
+    pointer-events: auto;
+}
+
 #otherReasonWrapper {
     position: relative;
     z-index: 10;
