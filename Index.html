@@ -35,19 +35,20 @@
         </div>
 
         <div class="form-row">
-            <label>Last Name</label>
-            <input id="lastName" type="text">
-        </div>
-
-        <div class="form-row">
             <label>Company</label>
-            <select id="companySelect"></select>
-        </div>
+            <select id="companySelect" onchange="toggleOtherCompany()">
+                <option value="">-- Select Company --</option>
+                <option value="Company A">Company A</option>
+                <option value="Company B">Company B</option>
+                <option value="other">Other (enter manually)</option>
+           </select>
+       </div>
 
-        <div id="otherCompanyWrapper" class="form-row" style="display:none;">
+       <div id="otherCompanyWrapper" class="form-row" style="display:none;">
             <label>Other Company</label>
             <input id="otherCompany" type="text">
-        </div>
+       </div>
+
 
         <div class="form-row">
             <label>Reason for Testing</label>
