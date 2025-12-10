@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AMS Check-In System</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- =========================================================
+         HEADER
+    ========================================================== -->
+    <header class="main-header">
+        <div class="header-left">
+            <img src="assets/logo.png" alt="Logo" class="header-logo">
+            <h1 class="header-title">AMS Check-In System</h1>
+        </div>
+
+        <button id="toggleAdminBtn" class="admin-btn">Admin Login</button>
+    </header>
+
+
+    <!-- =========================================================
+         MAIN CHECK-IN FORM (VISIBLE TO PUBLIC)
+    ========================================================== -->
+    <section id="checkInSection" class="section-card">
+
+        <h2 class="section-title">Donor Check-In</h2>
+
+        <div class="form-row">
+            <label>First Name</label>
+            <input id="firstName" type="text">
+        </div>
+
+        <div class="form-row">
+            <label>Last Name</label>
+            <input id="lastName" type="text">
+        </div>
+
+        <div class="form-row">
+            <label>Company</label>
+            <select id="companySelect"></select>
+        </div>
+
+        <div id="otherCompanyWrapper" class="form-row" style="display:none;">
+            <label>Other Company</label>
+            <input id="otherCompany" type="text">
+        </div>
+
+        <div class="form-row">
+            <label>Reason for Testing</label>
+            <select id="reasonSelect" onchange="toggleOtherReason()">
+                <option value="">-- Select reason --</option>
+                <option value="Pre-Employment">Pre-Employment</option>
+                <option value="Random">Random</option>
+                <option value="Post-Accident">Post-Accident</option>
+                <option value="Return-to-Duty">Return-to-Duty</option>
+                <option value="Follow-Up">Follow-Up</option>
+                <option value="Other Reason">Other (enter manually)</option>
+            </select>
+        </div>
+
+        <div id="otherReasonWrapper" class="form-row" style="display:none;">
+            <label>Other Reason</label>
+            <input id="otherReasonInput" type="text">
+        </div>
+
+        <!-- SERVICES -->
+        <div class="section-divider"></div>
+        <h3 class="section-subtitle">Services</h3>
+
+        <div class="checkbox-grid">
+            <label><input type="checkbox" name="service_drug"> Drug Test</label>
+            <label><input type="checkbox" name="service_dna"> DNA Test</label>
+            <label><input type="checkbox" name="service_vision"> Vision Test</label>
+            <label><input type="checkbox" name="service_alcohol"> Alcohol Test</label>
+            <label><input type="checkbox" name="service_dot"> DOT Physical</label>
+            <label><input type="checkbox" id="service_other" onclick="toggleOtherInput()"> Other</label>
+        </div>
+
+        <div class="form-row" id="other_reason_wrapper" style="display:none;">
+            <label>Other Service</label>
+            <input id="other_reason" type="text">
+        </div>
+
+        <!-- SIGNATURE PAD -->
+        <div class="section-divider"></div>
+        <h3 class="section-subtitle">Signature</h3>
+
+        <div class="signature-pad-wrapper">
+            <canvas id="signaturePad" class="sig-canvas"></canvas>
+            <div id="sigPlaceholder" class="sig-placeholder">Sign Here</div>
+        </div>
+
+        <button id="clearSigBtn" class="secondary-btn">Clear Signature</button>
+
+        <!-- SUBMIT + RESET -->
+        <div class="btn-row">
+            <button id="submitBtn" class="primary-btn">Submit Check-In</button>
+            <button id="resetFormBtn" class="secondary-btn" onclick="location.reload()">Reset Form</button>
+        </div>
+
+        <p id="submitMessage" class="submit-message"></p>
+
+    </section>
+
+
+    <!-- =========================================================
+         ADMIN PANEL (HIDDEN UNTIL PIN ENTERED)
+    ========================================================== -->
+    <section id="adminArea" style="display:none;">
+
+        <!-- TAB BAR -->
+        <div class="tab-bar">
+            <div class="tab active" data-tab="tabSearch">Search Log</div>
+            <div class="tab" data-tab="tabGeneral">General Report</div>
+            <div class="tab" data-tab="tabCompany">Detail Company Report</div>
+            <div class="tab" data-tab="tabRecent">Recent Check-Ins</div>
+            <div class="tab" data-tab="tabManage">Manage Companies</div>
+        </div>
+
+
+        <!-- =========================================================
+             TAB 1: SEARCH LOG
+        ========================================================== -->
+        <div id="tabSearch" class="tab-content active">
+
+            <h2>Search Log</h2>
+
+            <div class="search-grid">
+                <input id="searchName" type="text" placeholder="Search name">
+                <input id="searchCompany" type="text" placeholder="Search company">
+                <input id="searchDate" type="date">
+                <select id="searchReason">
+                    <option value="">-- Reason --</option>
+                    <option value="Pre-Employment">Pre-Employment</option>
+                    <option value="Random">Random</option>
+                    <option value="Post-Accident">Post-Accident</option>
+                </select>
+            </div>
+
+            <button id="searchBtn" class="primary-btn">Search</button>
+            <button id="clearFilterBtn" class="secondary-btn">Clear</button>
+
+            <table id="resultsTable" class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Time In</th>
+                        <th>First</th>
+                        <th>Last</th>
+                        <th>Company</th>
+                        <th>Reason</th>
+                        <th>Services</th>
+                        <th>Signature</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+
+        </div>
+
+
+        <!-- =========================================================
+             TAB 2: GENERAL REPORT
+        ========================================================== -->
+        <div id="tabGeneral" class="tab-content">
+
+            <h2>General Report</h2>
+
+            <div class="report-row">
+                <input id="reportStart" type="date">
+                <input id="reportEnd" type="date">
+            </div>
+
+            <button id="runReportBtn" class="primary-btn">Run Report</button>
+            <button id="clearReportBtn" class="secondary-btn">Clear</button>
+
+            <div id="reportSummary" class="summary-box" style="display:none;"></div>
+
+            <table id="reportTable" class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>First</th>
+                        <th>Last</th>
+                        <th>Company</th>
+                        <th>Reason</th>
+                        <th>Signature</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+
+            <button id="exportReportXlsBtn" class="primary-btn">Export XLS</button>
+            <button id="printReportBtn" class="secondary-btn">Print PDF</button>
+
+        </div>
+
+
+        <!-- =========================================================
+             TAB 3: DETAIL COMPANY REPORT
+        ========================================================== -->
+        <div id="tabCompany" class="tab-content">
+
+            <h2>Detail Company Report (Billing)</h2>
+
+            <div class="detail-grid">
+                <select id="companyReportSelect"></select>
+                <input id="companyReportManual" type="text" placeholder="Or type company name">
+            </div>
+
+            <div class="report-row">
+                <input id="companyReportStart" type="date">
+                <input id="companyReportEnd" type="date">
+            </div>
+
+            <button id="runCompanyReportBtn" class="primary-btn">Run Company Report</button>
+
+            <div id="companyReportSummary" class="summary-box" style="display:none;"></div>
+
+            <table id="companyReportTable" class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>First</th>
+                        <th>Last</th>
+                        <th>Reason</th>
+                        <th>Services</th>
+                        <th>Signature</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+
+            <div class="btn-row">
+                <button id="exportCompanyXlsBtn" class="primary-btn">Export XLS (2-sheet)</button>
+                <button id="printCompanyPdfBtn" class="secondary-btn">Print PDF</button>
+            </div>
+
+        </div>
+
+
+        <!-- =========================================================
+             TAB 4: RECENT CHECK-INS
+        ========================================================== -->
+        <div id="tabRecent" class="tab-content">
+
+            <h2>Recent Check-Ins</h2>
+
+            <table id="recentTable" class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>First</th>
+                        <th>Last</th>
+                        <th>Company</th>
+                        <th>Reason</th>
+                        <th>Services</th>
+                        <th>Signature</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+
+        </div>
+
+
+        <!-- =========================================================
+             TAB 5: MANAGE COMPANIES
+        ========================================================== -->
+        <div id="tabManage" class="tab-content">
+
+            <h2>Manage Companies</h2>
+
+            <div class="manage-top">
+                <input id="newCompany" type="text" placeholder="Add new company">
+                <button id="addCompanyBtn" class="primary-btn">Add</button>
+            </div>
+
+            <input id="companySearch" type="text" class="search-box" placeholder="Search companies">
+
+            <div id="companyListDisplay"></div>
+
+        </div>
+
+    </section>
+
+    <!-- JS FILE -->
+    <script src="app.js"></script>
+
+</body>
+</html>
