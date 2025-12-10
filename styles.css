@@ -186,3 +186,7 @@ td {
     z-index: 10;
     pointer-events: auto;
 }
+#otherReasonWrapper {
+    position: relative;
+    z-index: 10;
+}
