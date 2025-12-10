@@ -542,3 +542,17 @@ function toggleOtherReason() {
         otherInput.value = "";
     }
 }
+function toggleOtherCompany() {
+    const companySelect = document.getElementById("companySelect");
+    const wrapper = document.getElementById("otherCompanyWrapper");
+    const input = document.getElementById("otherCompany");
+
+    if (companySelect.value === "other") {
+        wrapper.style.display = "block";
+        input.value = "";
+        input.focus();
+    } else {
+        wrapper.style.display = "none";
+        input.value = "";
+    }
+}
