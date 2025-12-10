@@ -528,3 +528,17 @@ document.getElementById("testSaveBtn").addEventListener("click", async () => {
 
     saveRecordToGitHub(testRecord);
 });
+function toggleOtherReason() {
+    const reasonSelect = document.getElementById("reasonSelect");
+    const otherWrapper = document.getElementById("otherReasonWrapper");
+    const otherInput = document.getElementById("otherReasonInput");
+
+    if (reasonSelect.value === "Other Reason") {
+        otherWrapper.style.display = "block";
+        otherInput.value = "";
+        otherInput.focus();
+    } else {
+        otherWrapper.style.display = "none";
+        otherInput.value = "";
+    }
+}
