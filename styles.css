@@ -191,3 +191,14 @@ td {
     z-index: 10;
     pointer-events: auto;
 }
+/* FIX: Company dropdown stuck behind elements */
+#companySelect {
+    position: relative;
+    z-index: 20;
+    pointer-events: auto;
+}
+
+#otherCompanyWrapper {
+    position: relative;
+    z-index: 20;
+}
