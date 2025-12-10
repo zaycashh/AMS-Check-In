@@ -528,26 +528,3 @@ document.getElementById("testSaveBtn").addEventListener("click", async () => {
 
     saveRecordToGitHub(testRecord);
 });
-function toggleOtherCompany() {
-  const select = document.getElementById("companySelect");
-  const wrapper = document.getElementById("otherCompanyWrapper");
-
-  if (select.value === "other") {
-    wrapper.style.display = "block";
-  } else {
-    wrapper.style.display = "none";
-    document.getElementById("otherCompany").value = "";
-  }
-}
-
-function toggleOtherReason() {
-  const select = document.getElementById("reasonSelect");
-  const wrapper = document.getElementById("otherReasonWrapper");
-
-  if (select.value === "other") {
-    wrapper.style.display = "block";
-  } else {
-    wrapper.style.display = "none";
-    document.getElementById("otherReasonInput").value = "";
-  }
-}
