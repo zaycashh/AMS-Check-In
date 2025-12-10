@@ -517,3 +517,14 @@ function attachSignatureViewButtons() {
 document.getElementById("closeSignatureModal")?.addEventListener("click", () => {
     document.getElementById("signatureModal").style.display = "none";
 });
+// TEMPORARY TEST BUTTON — Confirm GitHub Save Works
+document.getElementById("testSaveBtn").addEventListener("click", async () => {
+    const testRecord = {
+        firstName: "Test",
+        lastName: "Save",
+        company: "Demo Company",
+        timestamp: new Date().toISOString()
+    };
+
+    saveRecordToGitHub(testRecord);
+});
