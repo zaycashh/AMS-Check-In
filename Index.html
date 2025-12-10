@@ -295,5 +295,40 @@
     <!-- JS FILE -->
     <script src="app.js"></script>
 
+    
+<!-- SIGNATURE VIEW MODAL -->
+<div id="signatureModal" style="
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.65);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+">
+    <div style="
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        max-width: 90%;
+        text-align: center;
+    ">
+        <h3>Signature</h3>
+        <img id="signatureModalImg" src="" alt="Signature" style="
+            max-width: 400px;
+            max-height: 400px;
+            border: 1px solid #ccc;
+        ">
+        <br><br>
+        <button id="closeSignatureModal" class="primary-btn">Close</button>
+    </div>
+</div>
+
+</body>
+</html>
+
+
 </body>
 </html>
