@@ -369,6 +369,26 @@ function setupSignaturePad() {
         }
     };
 }
+/* ============================================================
+   SHOW / HIDE OTHER SERVICE FIELD
+============================================================ */
+
+document.getElementById("srvOther")?.addEventListener("change", () => {
+    const wrapper = document.getElementById("otherReasonWrapper");
+    const box = document.getElementById("srvOther");
+
+    if (box.checked) {
+        wrapper.style.display = "block";
+    } else {
+        wrapper.style.display = "none";
+        document.getElementById("srvOtherText").value = "";
+    }
+});
+
+/* =====================================================================
+   SECTION 4 – SUBMIT HANDLER (VALIDATE / SAVE RECORD)
+===================================================================== */
+
 /* =====================================================================
    SECTION 4 – SUBMIT HANDLER (VALIDATE / SAVE RECORD)
 ===================================================================== */
