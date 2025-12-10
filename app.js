@@ -557,21 +557,6 @@ function toggleOtherCompany() {
     }
 }
 /* =====================================================================
-   SHOW / HIDE OTHER COMPANY
-===================================================================== */
-function toggleOtherCompany() {
-  const select = document.getElementById("companySelect");
-  const wrapper = document.getElementById("otherCompanyWrapper");
-
-  if (select.value === "other") {
-    wrapper.style.display = "block";
-  } else {
-    wrapper.style.display = "none";
-    document.getElementById("otherCompany").value = "";
-  }
-}
-
-/* =====================================================================
    SHOW / HIDE OTHER REASON
 ===================================================================== */
 function toggleOtherReason() {
