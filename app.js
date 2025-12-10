@@ -374,7 +374,7 @@ function setupSignaturePad() {
 ============================================================ */
 
 document.getElementById("srvOther")?.addEventListener("change", () => {
-    const wrapper = document.getElementById("otherReasonWrapper");
+    const wrapper = document.getElementById("otherServiceWrapper");
     const box = document.getElementById("srvOther");
 
     if (box.checked) {
