@@ -181,3 +181,8 @@ td {
 .secondary-btn:hover {
     background: #ccc;
 }
+#otherReasonInput {
+    position: relative;
+    z-index: 10;
+    pointer-events: auto;
+}
