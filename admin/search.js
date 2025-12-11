@@ -32,9 +32,9 @@ function getRange(range) {
             return { start: y, end: y };
 
         case "thisWeek":
-            const startW = new Date(today);
-            startW.setDate(today.getDate() - today.getDay());
-            return { start: startW, end: today };
+            const wStart = new Date(today);
+            wStart.setDate(today.getDate() - today.getDay());
+            return { start: wStart, end: today };
 
         case "lastWeek":
             const lwEnd = new Date(today);
@@ -76,7 +76,7 @@ function getRange(range) {
    FILTER + RESULTS
 ============================================================ */
 
-let filteredResults = []; // now exists!
+let filteredResults = [];
 
 function applyFilters() {
     const logs = getLogs();
@@ -107,6 +107,7 @@ function applyFilters() {
         if (companyFilter && log.company !== companyFilter) return false;
         if (start && logDate < start) return false;
         if (end && logDate > end) return false;
+
         return true;
     });
 
@@ -114,7 +115,7 @@ function applyFilters() {
 }
 
 /* --------------------------------------
-   RENDER RESULTS INTO #searchResults
+   RENDER RESULTS
 -------------------------------------- */
 function renderFilteredResults(list) {
     const tbody = document.getElementById("searchResults");
@@ -136,9 +137,8 @@ function renderFilteredResults(list) {
 }
 
 /* ============================================================
-   AUTO POPULATE COMPANY DROPDOWN
+   POPULATE COMPANY DROPDOWN
 ============================================================ */
-
 function populateCompanyDropdown() {
     const logs = getLogs();
     const unique = [...new Set(logs.map(l => l.company).filter(Boolean))];
@@ -157,7 +157,6 @@ function populateCompanyDropdown() {
 /* ============================================================
    EXPORT XLS
 ============================================================ */
-
 function exportToExcel() {
     if (!filteredResults.length) {
         alert("No records to export.");
@@ -201,24 +200,7 @@ function exportToExcel() {
 }
 
 /* ============================================================
-   EVENT INIT
-============================================================ */
-
-document.addEventListener("DOMContentLoaded", () => {
-    populateCompanyDropdown();
-    applyFilters();
-
-    document.getElementById("filterName").addEventListener("input", applyFilters);
-    document.getElementById("filterCompany").addEventListener("change", applyFilters);
-    document.getElementById("filterDateStart").addEventListener("change", applyFilters);
-    document.getElementById("filterDateEnd").addEventListener("change", applyFilters);
-    document.getElementById("filterDateRange").addEventListener("change", applyFilters);
-
-    const btn = document.getElementById("btnExportExcel");
-    if (btn) btn.addEventListener("click", exportToExcel);
-});
-/* ============================================================
-   EXPORT TO PDF (Professional PDF Report)
+   EXPORT PDF (PROFESSIONAL FORMAT)
 ============================================================ */
 async function exportToPDF() {
     const logs = filteredResults || getLogs();
@@ -227,7 +209,6 @@ async function exportToPDF() {
         return;
     }
 
-    // Convert signature images to base64
     async function getBase64(imgUrl) {
         return new Promise(resolve => {
             let img = new Image();
@@ -244,7 +225,6 @@ async function exportToPDF() {
         });
     }
 
-    // Build table body
     const tableBody = [
         [
             { text: "Date", bold: true },
@@ -258,7 +238,7 @@ async function exportToPDF() {
     ];
 
     for (let log of logs) {
-        const sigBase64 = log.signature ? await getBase64(log.signature) : null;
+        const sigBase64 = log.signature ? await getBase64(log.signature) : "";
 
         tableBody.push([
             log.date,
@@ -271,19 +251,12 @@ async function exportToPDF() {
         ]);
     }
 
-    // PDF Layout Definition
     const docDef = {
         pageOrientation: "landscape",
         pageSize: "LETTER",
         content: [
-            {
-                text: "AMS Check-In Report",
-                style: "header"
-            },
-            {
-                text: "Generated: " + new Date().toLocaleString(),
-                style: "subheader"
-            },
+            { text: "AMS Check-In Report", style: "header" },
+            { text: "Generated: " + new Date().toLocaleString(), style: "subheader" },
             {
                 table: {
                     headerRows: 1,
@@ -300,3 +273,24 @@ async function exportToPDF() {
 
     pdfMake.createPdf(docDef).download("AMS_Report.pdf");
 }
+
+/* ============================================================
+   INIT EVENT LISTENERS
+============================================================ */
+document.addEventListener("DOMContentLoaded", () => {
+
+    populateCompanyDropdown();
+    applyFilters();
+
+    document.getElementById("filterName").addEventListener("input", applyFilters);
+    document.getElementById("filterCompany").addEventListener("change", applyFilters);
+    document.getElementById("filterDateStart").addEventListener("change", applyFilters);
+    document.getElementById("filterDateEnd").addEventListener("change", applyFilters);
+    document.getElementById("filterDateRange").addEventListener("change", applyFilters);
+
+    const btnXLS = document.getElementById("btnExportExcel");
+    if (btnXLS) btnXLS.addEventListener("click", exportToExcel);
+
+    const btnPDF = document.getElementById("btnExportPDF");
+    if (btnPDF) btnPDF.addEventListener("click", exportToPDF);
+});
