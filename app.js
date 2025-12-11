@@ -17,15 +17,15 @@ function setupSignaturePad() {
 
     let drawing = false;
 
-    canvas.addEventListener("mousedown", () => {
-        drawing = true;
-        placeholder.style.display = "none";
-    });
+    canvas.addEventListener("mousedown", (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
 
-    // Hide placeholder when signing starts (mouse)
-canvas.addEventListener("mousedown", () => {
     drawing = true;
     placeholder.style.display = "none";
+    ctx.beginPath();
+    ctx.moveTo(x, y);
 });
 
 // Mouse up stops drawing
@@ -63,15 +63,19 @@ document.getElementById("clearSigBtn").addEventListener("click", () => {
     placeholder.style.display = "block";
 });
 
-   
-   
+
     function draw(e) {
-        if (!drawing) return;
-        ctx.lineTo(e.offsetX, e.offsetY);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(e.offsetX, e.offsetY);
-    }
+    if (!drawing) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    ctx.lineTo(x, y);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+}
 
     // Mobile support
     canvas.addEventListener("touchstart", (e) => {
