@@ -324,10 +324,35 @@ document.getElementById("submitBtn")?.addEventListener("click", () => {
     };
 
     addRecord(record);
+   
+// CLEAR FORM AFTER SUBMISSION
+document.getElementById("firstName").value = "";
+document.getElementById("lastName").value = "";
+
+document.getElementById("companySelect").value = "";
+document.getElementById("otherCompany").value = "";
+document.getElementById("otherCompanyWrapper").style.display = "none";
+
+document.getElementById("reasonSelect").value = "";
+document.getElementById("otherReasonInput").value = "";
+document.getElementById("otherReasonWrapper").style.display = "none";
+
+// Clear all service checkboxes
+document.getElementById("srvDrug").checked = false;
+document.getElementById("srvDNA").checked = false;
+document.getElementById("srvVision").checked = false;
+document.getElementById("srvAlcohol").checked = false;
+document.getElementById("srvDOT").checked = false;
+document.getElementById("srvOther").checked = false;
+
+document.getElementById("srvOtherText").value = "";
+document.getElementById("otherServiceWrapper").style.display = "none";
+
+// Clear signature
+sigPad.clear();
 
     alert("Donor successfully checked in!");
 
-    sigPad.clear();
     renderRecordsTable();
 });
 
