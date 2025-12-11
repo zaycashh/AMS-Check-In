@@ -1,18 +1,27 @@
 /* ============================================================
    GLOBAL CONSTANTS
 ============================================================ */
-
-const STORAGE_KEY = "drug_test_checkins_v3";
-const COMPANY_LIST_KEY = "drug_test_company_list_v3";
+const STORAGE_KEY = "ams_checkins_v1";
+const COMPANY_LIST_KEY = "ams_company_list_v1";
 const OTHER_COMPANY_VALUE = "__OTHER__";
 const ADMIN_PIN = "2468";
 
 /* ============================================================
-   LOAD & SAVE FUNCTIONS
+   DATE HELPERS
 ============================================================ */
+function formatDateTime(iso) {
+    const d = new Date(iso);
+    return {
+        date: d.toLocaleDateString(),
+        time: d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+    };
+}
 
+/* ============================================================
+   LOAD & SAVE RECORDS
+============================================================ */
 function loadRecords() {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
 }
 
 function saveRecords(list) {
@@ -25,68 +34,66 @@ function addRecord(record) {
     saveRecords(list);
 }
 
+/* ============================================================
+   COMPANY LIST MANAGEMENT
+============================================================ */
 function loadCompanyList() {
-    return JSON.parse(localStorage.getItem(COMPANY_LIST_KEY)) || [];
+    return JSON.parse(localStorage.getItem(COMPANY_LIST_KEY) || "[]");
 }
 
 function saveCompanyList(list) {
     localStorage.setItem(COMPANY_LIST_KEY, JSON.stringify(list));
 }
 
-/* ============================================================
-   COMPANY SELECT
-============================================================ */
-
 function renderCompanySelect() {
     const select = document.getElementById("companySelect");
-    if (!select) return;
-
     const companies = loadCompanyList();
 
     select.innerHTML = `<option value="">-- Select Company --</option>`;
 
-    companies.forEach(c => {
+    companies.forEach(name => {
         const opt = document.createElement("option");
-        opt.value = c;
-        opt.textContent = c;
+        opt.value = name;
+        opt.textContent = name;
         select.appendChild(opt);
     });
 
-    const other = document.createElement("option");
-    other.value = OTHER_COMPANY_VALUE;
-    other.textContent = "Other (enter manually)";
-    select.appendChild(other);
+    const otherOpt = document.createElement("option");
+    otherOpt.value = OTHER_COMPANY_VALUE;
+    otherOpt.textContent = "Other (enter manually)";
+    select.appendChild(otherOpt);
 }
 
 function renderCompanyListDisplay() {
     const container = document.getElementById("companyListDisplay");
-    const search = document.getElementById("companySearch").value.toLowerCase();
-    const companies = loadCompanyList();
+    const searchValue = document.getElementById("companySearch").value.toLowerCase();
+    const list = loadCompanyList().filter(c => c.toLowerCase().includes(searchValue));
 
-    let html = companies
-        .filter(c => c.toLowerCase().includes(search))
-        .map(c => `
-            <div class="company-item">
-                <span>${c}</span>
-                <div>
-                    <button class="editCompanyBtn" data-name="${c}">Edit</button>
-                    <button class="deleteCompanyBtn" data-name="${c}" style="background:#d9534f;color:white;">Delete</button>
-                </div>
+    container.innerHTML = "";
+
+    list.forEach(name => {
+        const row = document.createElement("div");
+        row.className = "company-item";
+        row.innerHTML = `
+            <span>${name}</span>
+            <div>
+                <button class="editCompanyBtn" data-name="${name}">Edit</button>
+                <button class="deleteCompanyBtn" data-name="${name}" style="background:#c0392b;color:#fff;">Delete</button>
             </div>
-        `)
-        .join("");
-
-    container.innerHTML = html || "<p>No companies found.</p>";
+        `;
+        container.appendChild(row);
+    });
 
     document.querySelectorAll(".editCompanyBtn").forEach(btn => {
         btn.onclick = () => {
-            const name = btn.dataset.name;
-            const updated = prompt("Edit company name:", name);
-            if (!updated) return;
+            const oldName = btn.dataset.name;
+            const newName = prompt("Edit company name:", oldName);
+            if (!newName) return;
 
-            let list = loadCompanyList();
-            const i = list.indexOf(name);
-            list[i] = updated.trim();
+            const list = loadCompanyList();
+            const index = list.indexOf(oldName);
+            if (index !== -1) list[index] = newName.trim();
+
             list.sort();
             saveCompanyList(list);
             renderCompanySelect();
@@ -97,10 +104,10 @@ function renderCompanyListDisplay() {
     document.querySelectorAll(".deleteCompanyBtn").forEach(btn => {
         btn.onclick = () => {
             const name = btn.dataset.name;
-            if (!confirm(`Delete ${name}?`)) return;
+            if (!confirm(`Delete "${name}"?`)) return;
 
-            let list = loadCompanyList().filter(n => n !== name);
-            saveCompanyList(list);
+            const updated = loadCompanyList().filter(c => c !== name);
+            saveCompanyList(updated);
             renderCompanySelect();
             renderCompanyListDisplay();
         };
@@ -108,21 +115,16 @@ function renderCompanyListDisplay() {
 }
 
 /* ============================================================
-   OTHER FIELD TOGGLES
+   TOGGLE "OTHER" FIELDS
 ============================================================ */
-
 function toggleOtherCompany() {
     document.getElementById("otherCompanyWrapper").style.display =
-        document.getElementById("companySelect").value === OTHER_COMPANY_VALUE
-            ? "block"
-            : "none";
+        document.getElementById("companySelect").value === OTHER_COMPANY_VALUE ? "block" : "none";
 }
 
 function toggleOtherReason() {
     document.getElementById("otherReasonWrapper").style.display =
-        document.getElementById("reasonSelect").value === "other"
-            ? "block"
-            : "none";
+        document.getElementById("reasonSelect").value === "other" ? "block" : "none";
 }
 
 function toggleOtherService() {
@@ -133,60 +135,56 @@ function toggleOtherService() {
 /* ============================================================
    SIGNATURE PAD
 ============================================================ */
-
 function setupSignaturePad() {
     const canvas = document.getElementById("signaturePad");
     const placeholder = document.getElementById("sigPlaceholder");
     const ctx = canvas.getContext("2d");
 
-    let drawing = false,
-        signed = false,
-        lastX = 0,
-        lastY = 0;
+    let drawing = false, signed = false, lastX = 0, lastY = 0;
 
     function resize() {
-        const rect = canvas.getBoundingClientRect();
-        canvas.width = rect.width;
-        canvas.height = rect.height;
+        canvas.width = canvas.offsetWidth;
+        canvas.height = canvas.offsetHeight;
     }
-
     resize();
-    window.addEventListener("resize", resize);
 
-    function getPos(e) {
-        const rect = canvas.getBoundingClientRect();
-        const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
-        const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+    function pos(e) {
+        const r = canvas.getBoundingClientRect();
+        const x = (e.touches ? e.touches[0].clientX : e.clientX) - r.left;
+        const y = (e.touches ? e.touches[0].clientY : e.clientY) - r.top;
         return { x, y };
     }
 
     function start(e) {
         drawing = true;
-        const p = getPos(e);
-        lastX = p.x;
-        lastY = p.y;
+        let p = pos(e);
+        lastX = p.x; lastY = p.y;
         placeholder.style.display = "none";
     }
 
-    function move(e) {
+    function draw(e) {
         if (!drawing) return;
-        const p = getPos(e);
+        const p = pos(e);
         ctx.beginPath();
         ctx.moveTo(lastX, lastY);
         ctx.lineTo(p.x, p.y);
+        ctx.strokeStyle = "#000";
+        ctx.lineWidth = 2;
         ctx.stroke();
         lastX = p.x;
         lastY = p.y;
         signed = true;
     }
 
-    canvas.addEventListener("mousedown", start);
-    canvas.addEventListener("mousemove", move);
-    window.addEventListener("mouseup", () => (drawing = false));
+    function end() { drawing = false; }
 
-    canvas.addEventListener("touchstart", start);
-    canvas.addEventListener("touchmove", move);
-    canvas.addEventListener("touchend", () => (drawing = false));
+    canvas.addEventListener("mousedown", start);
+    canvas.addEventListener("mousemove", draw);
+    window.addEventListener("mouseup", end);
+
+    canvas.addEventListener("touchstart", start, { passive: false });
+    canvas.addEventListener("touchmove", draw, { passive: false });
+    canvas.addEventListener("touchend", end);
 
     document.getElementById("clearSigBtn").onclick = () => {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -196,7 +194,7 @@ function setupSignaturePad() {
 
     window._sigPad = {
         hasSignature: () => signed,
-        getDataUrl: () => (signed ? canvas.toDataURL("image/png") : ""),
+        getDataUrl: () => signed ? canvas.toDataURL("image/png") : "",
         clear: () => {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             signed = false;
@@ -208,22 +206,23 @@ function setupSignaturePad() {
 /* ============================================================
    SUBMIT CHECK-IN
 ============================================================ */
+document.getElementById("submitBtn").addEventListener("click", () => {
 
-document.getElementById("submitBtn").onclick = () => {
-    const fn = firstName.value.trim();
-    const ln = lastName.value.trim();
-    let company = companySelect.value;
-    let reason = reasonSelect.value;
+    const first = document.getElementById("firstName").value.trim();
+    const last = document.getElementById("lastName").value.trim();
+    if (!first || !last) return alert("Enter first and last name.");
 
-    if (!fn || !ln) return alert("Enter first and last name.");
-
+    let company = document.getElementById("companySelect").value;
     if (company === OTHER_COMPANY_VALUE)
-        company = otherCompany.value.trim();
-    if (!company) return alert("Enter a company.");
+        company = document.getElementById("otherCompany").value.trim();
 
+    if (!company) return alert("Enter or select a company.");
+
+    let reason = document.getElementById("reasonSelect").value;
     if (reason === "other")
-        reason = otherReasonInput.value.trim();
-    if (!reason) return alert("Enter reason.");
+        reason = document.getElementById("otherReasonInput").value.trim();
+
+    if (!reason) return alert("Enter a reason for testing.");
 
     const services = {
         drug: srvDrug.checked,
@@ -236,37 +235,74 @@ document.getElementById("submitBtn").onclick = () => {
     };
 
     if (!Object.values(services).includes(true))
-        return alert("Select a service.");
+        return alert("Select at least one service.");
 
     if (services.other && !services.otherText)
-        return alert("Describe the other service.");
+        return alert("Describe the 'Other' service.");
 
-    if (!window._sigPad.hasSignature())
-        return alert("Signature required.");
+    const sig = window._sigPad;
+    if (!sig.hasSignature()) return alert("Signature required.");
 
-    addRecord({
-        firstName: fn,
-        lastName: ln,
-        employer: company,
+    const record = {
+        firstName: first,
+        lastName: last,
+        company,
         reason,
         services,
-        signature: window._sigPad.getDataUrl(),
+        signature: sig.getDataUrl(),
         date: new Date().toISOString()
-    });
+    };
 
-    alert("Donor checked in.");
-    window._sigPad.clear();
-    document.getElementById("checkInSection").reset?.(); // clean reset
-    location.reload();
-};
+    addRecord(record);
+    sig.clear();
+
+    document.getElementById("firstName").value = "";
+    document.getElementById("lastName").value = "";
+    document.getElementById("companySelect").value = "";
+    document.getElementById("reasonSelect").value = "";
+    document.getElementById("otherCompanyWrapper").style.display = "none";
+    document.getElementById("otherReasonWrapper").style.display = "none";
+    document.getElementById("otherServiceWrapper").style.display = "none";
+    srvDrug.checked = srvAlcohol.checked = srvVision.checked = srvDOT.checked = srvDNA.checked = srvOther.checked = false;
+    srvOtherText.value = "";
+
+    alert("Donor successfully checked in!");
+    renderRecentTable();
+});
 
 /* ============================================================
-   ADMIN LOGIN
+   RENDER RECENT CHECK-INS (TAB B)
 ============================================================ */
+function renderRecentTable() {
+    const tbody = document.querySelector("#recentTable tbody");
+    const list = loadRecords();
+    tbody.innerHTML = "";
 
+    list.slice().reverse().forEach(rec => {
+        const dt = formatDateTime(rec.date);
+        const row = document.createElement("tr");
+        row.innerHTML = `
+            <td>${dt.date}</td>
+            <td>${dt.time}</td>
+            <td>${rec.firstName} ${rec.lastName}</td>
+            <td>${rec.company}</td>
+            <td>${rec.reason}</td>
+            <td>${Object.keys(rec.services).filter(k => rec.services[k] && k !== "otherText").join(", ")}</td>
+            <td><button class="viewSigBtn">View</button></td>
+        `;
+        row.querySelector(".viewSigBtn").onclick = () => {
+            document.getElementById("signatureModalImg").src = rec.signature;
+            document.getElementById("signatureModal").style.display = "flex";
+        };
+        tbody.appendChild(row);
+    });
+}
+
+/* ============================================================
+   ADMIN LOGIN / EXIT
+============================================================ */
 document.getElementById("toggleAdminBtn").onclick = () => {
     const pin = prompt("Enter Admin PIN:");
-
     if (pin === ADMIN_PIN) {
         adminArea.style.display = "block";
         checkInSection.style.display = "none";
@@ -281,11 +317,11 @@ document.getElementById("exitAdminBtn").onclick = () => {
 };
 
 /* ============================================================
-   INIT
+   INITIALIZE
 ============================================================ */
-
 window.onload = () => {
     renderCompanySelect();
     renderCompanyListDisplay();
     setupSignaturePad();
+    renderRecentTable();
 };
