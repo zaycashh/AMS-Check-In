@@ -310,3 +310,12 @@ button {
     gap: 12px 20px;
     margin-bottom: 24px;
 }
+/* Expand check-in card to look more professional */
+.section-card {
+    max-width: 900px;   /* wider */
+    width: 95%;         /* fills most of screen */
+    margin: 30px auto;
+    padding: 30px 40px;
+    background: white;
+    border-radius: 12px;
+}
