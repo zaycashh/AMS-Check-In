@@ -148,23 +148,39 @@
     <h2>Search Log</h2>
 
 <!-- FILTER BAR -->
-<div class="filter-bar" style="margin: 15px 0; display:flex; flex-wrap:wrap; gap:10px;">
+<div class="filter-bar" style="margin:15px 0; display:flex; flex-wrap:wrap; gap:10px;">
 
-    <input type="text" id="filterName" placeholder="Search Name..." 
+    <!-- Search Name -->
+    <input type="text" id="filterName" placeholder="Search Name..."
         style="padding:8px; border:1px solid #ccc; border-radius:6px;">
 
-    <input type="date" id="filterDateStart" 
+    <!-- Company Filter -->
+    <select id="filterCompany"
         style="padding:8px; border:1px solid #ccc; border-radius:6px;">
-
-    <input type="date" id="filterDateEnd" 
-        style="padding:8px; border:1px solid #ccc; border-radius:6px;">
-
-    <select id="filterCompany" style="padding:8px; border:1px solid #ccc; border-radius:6px;">
         <option value="">All Companies</option>
     </select>
 
-    <button id="btnExportExcel" class="secondary-btn">Export Excel</button>
-    <button id="btnExportPDF" class="secondary-btn">Export PDF</button>
+    <!-- Start Date -->
+    <input type="date" id="filterDateStart"
+        style="padding:8px; border:1px solid #ccc; border-radius:6px;">
+
+    <!-- End Date -->
+    <input type="date" id="filterDateEnd"
+        style="padding:8px; border:1px solid #ccc; border-radius:6px;">
+
+    <!-- Date Range Dropdown -->
+    <select id="filterDateRange"
+        style="padding:8px; border:1px solid #ccc; border-radius:6px;">
+        <option value="">Date Range</option>
+        <option value="today">Today</option>
+        <option value="yesterday">Yesterday</option>
+        <option value="thisWeek">This Week</option>
+        <option value="lastWeek">Last Week</option>
+        <option value="thisMonth">This Month</option>
+        <option value="lastMonth">Last Month</option>
+        <option value="thisYear">This Year</option>
+        <option value="lastYear">Last Year</option>
+    </select>
 
 </div>
 
