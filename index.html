@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AMS Check-In System</title>
-
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -17,7 +16,6 @@
         <img src="logo.png" alt="Logo" class="header-logo">
         <h1 class="header-title">AMS Check-In System</h1>
     </div>
-
     <button id="toggleAdminBtn" class="admin-btn">Admin Login</button>
 </header>
 
@@ -28,19 +26,16 @@
 
     <h2 class="section-title">Donor Check-In</h2>
 
-    <!-- FIRST NAME -->
     <div class="form-row">
         <label>First Name</label>
         <input id="firstName" type="text">
     </div>
 
-    <!-- LAST NAME -->
     <div class="form-row">
         <label>Last Name</label>
         <input id="lastName" type="text">
     </div>
 
-    <!-- COMPANY -->
     <div class="form-row">
         <label>Company</label>
         <select id="companySelect" onchange="toggleOtherCompany()">
@@ -54,7 +49,6 @@
         <input id="otherCompany" type="text">
     </div>
 
-    <!-- REASON FOR TESTING -->
     <div class="form-row">
         <label>Reason for Testing</label>
         <select id="reasonSelect" onchange="toggleOtherReason()">
@@ -73,7 +67,6 @@
         <input id="otherReasonInput" type="text">
     </div>
 
-    <!-- SERVICES -->
     <div class="section-divider"></div>
     <h3 class="section-subtitle">Services</h3>
 
@@ -88,10 +81,9 @@
 
     <div id="otherServiceWrapper" class="form-row" style="display:none;">
         <label>Other Service</label>
-        <input id="srvOtherText" type="text" placeholder="Describe other service">
+        <input id="srvOtherText" type="text">
     </div>
 
-    <!-- SIGNATURE PAD -->
     <div class="section-divider"></div>
     <h3 class="section-subtitle">Signature</h3>
 
@@ -114,27 +106,20 @@
 
 </section>
 
-/* ============================================================
-   ADMIN LOGIN SYSTEM
-============================================================ */
+<!-- =========================================================
+     ADMIN PANEL (HIDDEN UNTIL LOGIN)
+========================================================= -->
+<section id="adminArea" style="display:none;">
 
-document.getElementById("toggleAdminBtn")?.addEventListener("click", () => {
-    const pin = prompt("Enter Admin PIN:");
+    <button id="exitAdminBtn" class="secondary-btn" style="margin:10px 0;">Exit Admin Mode</button>
 
-    if (pin === ADMIN_PIN) {
-        // SHOW ADMIN PANEL
-        document.getElementById("adminArea").style.display = "block";
-        document.getElementById("checkInSection").style.display = "none";
-    } else {
-        alert("Incorrect PIN.");
-    }
-});
-
-// EXIT ADMIN MODE BUTTON
-document.getElementById("exitAdminBtn")?.addEventListener("click", () => {
-    document.getElementById("adminArea").style.display = "none";
-    document.getElementById("checkInSection").style.display = "block";
-});
+    <div class="tab-bar">
+        <div class="tab active" data-tab="tabSearch">Search Log</div>
+        <div class="tab" data-tab="tabGeneral">General Report</div>
+        <div class="tab" data-tab="tabCompany">Detail Company Report</div>
+        <div class="tab" data-tab="tabRecent">Recent Check-Ins</div>
+        <div class="tab" data-tab="tabManage">Manage Companies</div>
+    </div>
 
     <!-- SEARCH LOG -->
     <div id="tabSearch" class="tab-content active">
@@ -269,7 +254,6 @@ document.getElementById("exitAdminBtn")?.addEventListener("click", () => {
         <input id="companySearch" type="text" class="search-box" placeholder="Search companies">
         <div id="companyListDisplay"></div>
     </div>
-
 </section>
 
 <!-- SIGNATURE MODAL -->
