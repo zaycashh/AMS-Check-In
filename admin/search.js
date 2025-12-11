@@ -217,3 +217,86 @@ document.addEventListener("DOMContentLoaded", () => {
     const btn = document.getElementById("btnExportExcel");
     if (btn) btn.addEventListener("click", exportToExcel);
 });
+/* ============================================================
+   EXPORT TO PDF (Professional PDF Report)
+============================================================ */
+async function exportToPDF() {
+    const logs = filteredResults || getLogs();
+    if (!logs.length) {
+        alert("No records to export.");
+        return;
+    }
+
+    // Convert signature images to base64
+    async function getBase64(imgUrl) {
+        return new Promise(resolve => {
+            let img = new Image();
+            img.crossOrigin = "Anonymous";
+            img.onload = function () {
+                let canvas = document.createElement("canvas");
+                canvas.width = img.width;
+                canvas.height = img.height;
+                let ctx = canvas.getContext("2d");
+                ctx.drawImage(img, 0, 0);
+                resolve(canvas.toDataURL("image/png"));
+            };
+            img.src = imgUrl;
+        });
+    }
+
+    // Build table body
+    const tableBody = [
+        [
+            { text: "Date", bold: true },
+            { text: "Time", bold: true },
+            { text: "Name", bold: true },
+            { text: "Company", bold: true },
+            { text: "Reason", bold: true },
+            { text: "Services", bold: true },
+            { text: "Signature", bold: true }
+        ]
+    ];
+
+    for (let log of logs) {
+        const sigBase64 = log.signature ? await getBase64(log.signature) : null;
+
+        tableBody.push([
+            log.date,
+            log.time,
+            `${log.first} ${log.last}`,
+            log.company,
+            log.reason,
+            log.services,
+            sigBase64 ? { image: sigBase64, width: 80 } : ""
+        ]);
+    }
+
+    // PDF Layout Definition
+    const docDef = {
+        pageOrientation: "landscape",
+        pageSize: "LETTER",
+        content: [
+            {
+                text: "AMS Check-In Report",
+                style: "header"
+            },
+            {
+                text: "Generated: " + new Date().toLocaleString(),
+                style: "subheader"
+            },
+            {
+                table: {
+                    headerRows: 1,
+                    widths: ["auto", "auto", "*", "*", "*", "*", 100],
+                    body: tableBody
+                }
+            }
+        ],
+        styles: {
+            header: { fontSize: 20, bold: true, margin: [0, 0, 0, 10] },
+            subheader: { fontSize: 12, margin: [0, 0, 0, 10] }
+        }
+    };
+
+    pdfMake.createPdf(docDef).download("AMS_Report.pdf");
+}
