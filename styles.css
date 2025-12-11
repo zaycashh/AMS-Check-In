@@ -297,40 +297,21 @@ body {
     border-radius: 8px !important;
 }
 
-/* =========================================================
-   FORCE FILTER BAR ELEMENTS TO UNIFORM SIZE & STYLE
-========================================================= */
+/* ============================================================
+   CLEAN & FINAL — UNIFIED FILTER BAR STYLE
+============================================================ */
 
-#filterName,
-#filterCompany,
-#filterDateStart,
-#filterDateEnd,
-#filterDateRange {
-    height: 38px !important;
-    padding: 6px 10px !important;
-    font-size: 15px !important;
-    border: 1px solid #cbd5e1 !important;
-    border-radius: 8px !important;
-    background: #ffffff !important;
-    color: #1f2937 !important;
-    outline: none !important;
-    min-width: 140px;
+/* Remove any previous filter styling conflicts */
+.filter-bar input,
+.filter-bar select {
+    all: unset;
+    box-sizing: border-box;
+    display: inline-block;
 }
 
-/* On focus (click) → green outline */
-#filterName:focus,
-#filterCompany:focus,
-#filterDateStart:focus,
-#filterDateEnd:focus,
-#filterDateRange:focus {
-    border-color: #4F8C47 !important;
-    box-shadow: 0 0 4px rgba(79,140,71,0.4) !important;
-}
-   /* =========================================================
-   MATCH SEARCH INPUTS TO "DATE RANGE" STYLE
-========================================================= */
-
+/* Main uniform style for every input */
 .uniform-filter {
+    appearance: none !important;
     height: 38px !important;
     padding: 6px 12px !important;
     font-size: 15px !important;
@@ -340,10 +321,19 @@ body {
     color: #1f2937 !important;
     outline: none !important;
     min-width: 150px;
+    display: inline-block;
 }
 
 /* Green focus glow */
 .uniform-filter:focus {
     border-color: #4F8C47 !important;
     box-shadow: 0 0 4px rgba(79,140,71,0.45) !important;
+}
+
+/* Make filter bar layout even */
+.filter-bar {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
 }
