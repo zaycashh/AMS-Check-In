@@ -426,13 +426,17 @@ window.onload = () => {
     renderRecordsTable();
 };
 /* ============================================================
-   ADMIN LOGIN SYSTEM
+   ADMIN LOGIN SYSTEM (FINAL VERSION)
 ============================================================ */
 
+const ADMIN_PIN = "2468";
+
+// OPEN ADMIN MODE
 document.getElementById("toggleAdminBtn")?.addEventListener("click", () => {
     const pin = prompt("Enter Admin PIN:");
 
     if (pin === ADMIN_PIN) {
+        // Show admin panel
         document.getElementById("adminArea").style.display = "block";
         document.getElementById("checkInSection").style.display = "none";
     } else {
@@ -440,7 +444,7 @@ document.getElementById("toggleAdminBtn")?.addEventListener("click", () => {
     }
 });
 
-// EXIT ADMIN MODE BUTTON
+// EXIT ADMIN MODE
 document.getElementById("exitAdminBtn")?.addEventListener("click", () => {
     document.getElementById("adminArea").style.display = "none";
     document.getElementById("checkInSection").style.display = "block";
