@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AMS Check-In System</title>
     <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
 
 <!-- =========================================================
@@ -38,7 +40,7 @@
 
     <div class="form-row">
         <label>Company</label>
-        <select id="companySelect" onchange="toggleOtherCompany()">
+        <select id="companySelect">
             <option value="">-- Select Company --</option>
             <option value="__OTHER__">Other (enter manually)</option>
         </select>
@@ -51,7 +53,7 @@
 
     <div class="form-row">
         <label>Reason for Testing</label>
-        <select id="reasonSelect" onchange="toggleOtherReason()">
+        <select id="reasonSelect">
             <option value="">-- Select reason --</option>
             <option value="Pre-Employment">Pre-Employment</option>
             <option value="Random">Random</option>
@@ -76,7 +78,7 @@
         <label><input type="checkbox" id="srvVision"> Vision Test</label>
         <label><input type="checkbox" id="srvDOT"> DOT Physical</label>
         <label><input type="checkbox" id="srvDNA"> DNA (Paternity Test)</label>
-        <label><input type="checkbox" id="srvOther" onchange="toggleOtherService()"> Other</label>
+        <label><input type="checkbox" id="srvOther"> Other</label>
     </div>
 
     <div id="otherServiceWrapper" class="form-row" style="display:none;">
@@ -102,8 +104,6 @@
         <button id="submitBtn" class="primary-btn">Submit Check-In</button>
     </div>
 
-    <p id="submitMessage" class="submit-message"></p>
-
 </section>
 
 <!-- =========================================================
@@ -121,25 +121,8 @@
         <div class="tab" data-tab="tabManage">Manage Companies</div>
     </div>
 
-    <!-- SEARCH LOG -->
     <div id="tabSearch" class="tab-content active">
         <h2>Search Log</h2>
-
-        <div class="search-grid">
-            <input id="searchName" type="text" placeholder="Search name">
-            <input id="searchCompany" type="text" placeholder="Search company">
-            <input id="searchDate" type="date">
-            <select id="searchReason">
-                <option value="">-- Reason --</option>
-                <option value="Pre-Employment">Pre-Employment</option>
-                <option value="Random">Random</option>
-                <option value="Post-Accident">Post-Accident</option>
-            </select>
-        </div>
-
-        <button id="searchBtn" class="primary-btn">Search</button>
-        <button id="clearFilterBtn" class="secondary-btn">Clear</button>
-
         <table id="resultsTable" class="admin-table">
             <thead>
                 <tr>
@@ -156,120 +139,13 @@
         </table>
     </div>
 
-    <!-- GENERAL REPORT -->
-    <div id="tabGeneral" class="tab-content">
-        <h2>General Report</h2>
-
-        <div class="report-row">
-            <input id="reportStart" type="date">
-            <input id="reportEnd" type="date">
-        </div>
-
-        <button id="runReportBtn" class="primary-btn">Run Report</button>
-        <button id="clearReportBtn" class="secondary-btn">Clear</button>
-
-        <div id="reportSummary" class="summary-box" style="display:none;"></div>
-
-        <table id="reportTable" class="admin-table">
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Time</th>
-                    <th>Name</th>
-                    <th>Company</th>
-                    <th>Reason</th>
-                    <th>Signature</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-
-        <button id="exportReportXlsBtn" class="primary-btn">Export XLS</button>
-        <button id="printReportBtn" class="secondary-btn">Print PDF</button>
-    </div>
-
-    <!-- DETAIL COMPANY REPORT -->
-    <div id="tabCompany" class="tab-content">
-        <h2>Detail Company Report</h2>
-
-        <div class="detail-grid">
-            <select id="companyReportSelect"></select>
-            <input id="companyReportManual" type="text" placeholder="Or type company name">
-        </div>
-
-        <div class="report-row">
-            <input id="companyReportStart" type="date">
-            <input id="companyReportEnd" type="date">
-        </div>
-
-        <button id="runCompanyReportBtn" class="primary-btn">Run Report</button>
-
-        <table id="companyReportTable" class="admin-table">
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Time</th>
-                    <th>Name</th>
-                    <th>Reason</th>
-                    <th>Services</th>
-                    <th>Signature</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-
-        <button id="exportCompanyXlsBtn" class="primary-btn">Export XLS</button>
-        <button id="printCompanyPdfBtn" class="secondary-btn">Print PDF</button>
-    </div>
-
-    <!-- RECENT -->
-    <div id="tabRecent" class="tab-content">
-        <h2>Recent Check-Ins</h2>
-
-        <table id="recentTable" class="admin-table">
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Time</th>
-                    <th>Name</th>
-                    <th>Company</th>
-                    <th>Reason</th>
-                    <th>Services</th>
-                    <th>Signature</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-    </div>
-
-    <!-- MANAGE COMPANIES -->
-    <div id="tabManage" class="tab-content">
-        <h2>Manage Companies</h2>
-
-        <div class="manage-top">
-            <input id="newCompany" type="text" placeholder="Add new company">
-            <button id="addCompanyBtn" class="primary-btn">Add</button>
-        </div>
-
-        <input id="companySearch" type="text" class="search-box" placeholder="Search companies">
-        <div id="companyListDisplay"></div>
-    </div>
 </section>
 
 <!-- SIGNATURE MODAL -->
-<div id="signatureModal" style="
-    position: fixed;
-    top: 0; left: 0;
-    width: 100vw; height: 100vh;
-    background: rgba(0,0,0,0.65);
-    display: none;
-    justify-content: center;
-    align-items: center;
-">
-    <div style="background:white; padding:20px; border-radius:8px; text-align:center;">
+<div id="signatureModal" class="sig-modal">
+    <div class="sig-modal-inner">
         <h3>Signature</h3>
-        <img id="signatureModalImg" style="max-width:400px; max-height:400px; border:1px solid #ccc;">
-        <br><br>
+        <img id="signatureModalImg">
         <button id="closeSignatureModal" class="primary-btn">Close</button>
     </div>
 </div>
