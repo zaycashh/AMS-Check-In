@@ -1,6 +1,6 @@
-/* ===================================================================
+/* ============================================================
    GLOBAL BASE STYLES
-=================================================================== */
+============================================================ */
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -10,20 +10,25 @@ body {
     color: #222;
 }
 
-h1, h2 {
-    margin-bottom: 15px;
+h1, h2, h3 {
     color: #1E3A59;
+    margin-bottom: 12px;
 }
 
-/* ===================================================================
+.section-title {
+    font-size: 1.4rem;
+    font-weight: bold;
+}
+
+/* ============================================================
    HEADER
-=================================================================== */
+============================================================ */
 
 header.main-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 16px;
+    padding: 14px 18px;
     background: #ffffff;
     border-bottom: 4px solid #4F8C47;
 }
@@ -31,7 +36,7 @@ header.main-header {
 .header-left {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
 }
 
 .header-logo {
@@ -39,41 +44,172 @@ header.main-header {
 }
 
 .header-title {
-    font-size: 1.4rem;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+/* ============================================================
+   ADMIN LOGIN BUTTON
+============================================================ */
+
+.admin-btn {
+    background: #1E3A59;
+    color: white;
+    padding: 10px 18px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.admin-btn:hover {
+    background: #14243d;
+}
+
+/* ============================================================
+   SECTION CARD (WHITE BLOCKS)
+============================================================ */
+
+.section-card {
+    background: white;
+    padding: 24px;
+    margin: 22px;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+/* ============================================================
+   FORM ROWS
+============================================================ */
+
+.form-row {
+    margin-bottom: 18px;
+}
+
+input[type="text"],
+input[type="date"],
+input[type="time"],
+select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #bbb;
+    border-radius: 6px;
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+
+/* ============================================================
+   CHECKBOX GRID
+============================================================ */
+
+.checkbox-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 10px;
+}
+
+/* ============================================================
+   SECTION DIVIDER
+============================================================ */
+
+.section-divider {
+    height: 2px;
+    background: #ddd;
+    margin: 24px 0;
+}
+
+/* ============================================================
+   SIGNATURE PAD
+============================================================ */
+
+.signature-pad-wrapper {
+    width: 100%;
+    height: 200px;
+    border: 2px dashed #999;
+    border-radius: 8px;
+    position: relative;
+}
+
+.sig-canvas {
+    width: 100%;
+    height: 100%;
+}
+
+.sig-placeholder {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #777;
+    font-size: 1rem;
+    pointer-events: none;
+}
+
+/* ============================================================
+   BUTTON STYLES
+============================================================ */
+
+.primary-btn {
+    background: #4F8C47;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.primary-btn:hover {
+    background: #3d6d38;
+}
+
+.secondary-btn {
+    background: #ddd;
+    color: #333;
+    padding: 10px 18px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+}
+
+.secondary-btn:hover {
+    background: #ccc;
+}
+
+.btn-row {
+    text-align: center;
+    margin-top: 20px;
+}
+
+/* ============================================================
+   TAB BAR (ADMIN)
+============================================================ */
+
+.tab-bar {
+    display: flex;
+    background: white;
+    padding: 8px;
+    border-bottom: 2px solid #ddd;
+    gap: 8px;
+}
+
+.tab {
+    padding: 10px 16px;
+    border: 1px solid #4F8C47;
+    border-radius: 6px;
+    cursor: pointer;
     font-weight: bold;
     color: #1E3A59;
 }
 
-/* ===================================================================
-   TAB NAVIGATION
-=================================================================== */
-
-.tab-buttons {
-    display: flex;
-    gap: 10px;
-    padding: 10px;
-    background: #ffffff;
-    border-bottom: 2px solid #ddd;
-}
-
-.tab-btn {
-    padding: 10px 16px;
-    border: 1px solid #4F8C47;
-    background: #ffffff;
-    font-weight: 600;
-    color: #1E3A59;
-    border-radius: 6px;
-    cursor: pointer;
-}
-
-.tab-btn.active {
+.tab.active {
     background: #4F8C47;
     color: white;
 }
 
-/* ===================================================================
+/* ============================================================
    TAB CONTENT
-=================================================================== */
+============================================================ */
 
 .tab-content {
     display: none;
@@ -84,54 +220,14 @@ header.main-header {
     display: block;
 }
 
-/* ===================================================================
-   FORM FIELDS
-=================================================================== */
-
-input[type="text"],
-input[type="date"],
-input[type="time"],
-select {
-    width: 100%;
-    padding: 10px;
-    margin-top: 6px;
-    margin-bottom: 12px;
-    border: 1px solid #bbb;
-    border-radius: 6px;
-    font-size: 1rem;
-}
-
-button.primary-btn {
-    background: #4F8C47;
-    color: white;
-    padding: 10px 18px;
-    border: none;
-    border-radius: 6px;
-    font-size: 1rem;
-    cursor: pointer;
-}
-
-button.primary-btn:hover {
-    background: #3d6d38;
-}
-
-button.secondary {
-    background: #1E3A59;
-    color: white;
-    padding: 8px 14px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-}
-
-/* ===================================================================
-   TABLE STYLES
-=================================================================== */
+/* ============================================================
+   TABLES
+============================================================ */
 
 table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 15px;
+    margin-top: 18px;
     background: white;
 }
 
@@ -139,45 +235,64 @@ th {
     background: #1E3A59;
     color: white;
     padding: 10px;
-    font-size: 0.9rem;
+    text-align: left;
+    font-size: 0.95rem;
 }
 
 td {
     padding: 10px;
     border-bottom: 1px solid #ccc;
+    font-size: 0.9rem;
 }
 
-/* ===================================================================
-   COMPANY LIST
-=================================================================== */
+.admin-table button {
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+/* ============================================================
+   COMPANY LIST ITEMS
+============================================================ */
 
 .company-item {
-    padding: 8px 10px;
+    padding: 10px;
     background: #ffffff;
-    border: 1px solid #ddd;
+    border: 1px solid #ccc;
     border-radius: 6px;
-    margin-bottom: 6px;
+    margin-bottom: 8px;
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
 .company-item button {
-    padding: 5px 10px;
+    padding: 6px 12px;
     border-radius: 6px;
     cursor: pointer;
 }
 
-/* RESET FORM BUTTON STYLES */
-.secondary-btn {
-    background: #ddd;
-    color: #333;
-    padding: 8px 16px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
+/* ============================================================
+   SIGNATURE MODAL
+============================================================ */
+
+#signatureModal {
+    position: fixed;
+    top: 0; 
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.65);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
 }
 
-.secondary-btn:hover {
-    background: #ccc;
+#signatureModal img {
+    max-width: 400px;
+    max-height: 400px;
+    border: 1px solid #ccc;
 }
+
