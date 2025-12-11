@@ -120,20 +120,19 @@ input, select {
     max-height:400px;
     border:1px solid #ccc;
 }
-/* ===== BLUE THEME FOR HEADERS ===== */
+/* ===== FORCE BLUE HEADERS ===== */
 
-/* Top Header Title */
-.header-title {
-    color: #1E90FF !important;  /* Blue like your screenshot */
+/* AMS Check-In System Title */
+header .header-title {
+    color: #1E90FF !important;
 }
 
-/* Top Header Underline */
-.main-header {
+/* Blue underline */
+header.main-header {
     border-bottom: 4px solid #1E90FF !important;
 }
 
 /* Donor Check-In Title */
-.section-title {
+section#checkInSection h2.section-title {
     color: #1E90FF !important;
-    font-weight: 600;
 }
