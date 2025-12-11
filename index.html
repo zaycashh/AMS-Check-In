@@ -22,100 +22,98 @@
     <button id="toggleAdminBtn" class="admin-btn">Admin Login</button>
 </header>
 
-    <!-- =========================================================
-         MAIN CHECK-IN FORM (VISIBLE TO PUBLIC)
-    ========================================================== -->
-    <section id="checkInSection" class="section-card">
+<!-- =========================================================
+     MAIN CHECK-IN FORM (VISIBLE TO PUBLIC)
+========================================================= -->
+<section id="checkInSection" class="section-card">
 
-        <h2 class="section-title">Donor Check-In</h2>
+    <h2 class="section-title">Donor Check-In</h2>
 
-        <div class="form-row">
-            <label>First Name</label>
-            <input id="firstName" type="text">
-        </div>
+    <!-- FIRST / LAST NAME -->
+    <div class="form-row">
+        <label>First Name</label>
+        <input id="firstName" type="text">
+    </div>
 
-        <div class="form-row">
-    <label>Company</label>
-    <select id="companySelect" onchange="toggleOtherCompany()">
-        <option value="">-- Select Company --</option>
-        <option value="other">Other (enter manually)</option>
-    </select>
-</div>   <!-- THIS closes the form row correctly -->
+    <div class="form-row">
+        <label>Last Name</label>
+        <input id="lastName" type="text">
+    </div>
 
-<div id="otherCompanyWrapper" class="form-row" style="display:none;">
-    <label>Other Company</label>
-    <input id="otherCompany" type="text">
-</div><div id="otherReasonWrapper" class="form-row" style="display:none;">
-    <label>Other Reason</label>
-    <input id="otherReasonInput" type="text" placeholder="Enter reason manually">
-</div>
+    <!-- COMPANY -->
+    <div class="form-row">
+        <label>Company</label>
+        <select id="companySelect" onchange="toggleOtherCompany()">
+            <option value="">-- Select Company --</option>
+            <option value="other">Other (enter manually)</option>
+        </select>
+    </div>
 
+    <div id="otherCompanyWrapper" class="form-row" style="display:none;">
+        <label>Enter Company</label>
+        <input id="otherCompany" type="text">
+    </div>
 
+    <!-- REASON FOR TESTING -->
+    <div class="form-row">
+        <label>Reason for Testing</label>
+        <select id="reasonSelect" onchange="toggleOtherReason()">
+            <option value="">-- Select reason --</option>
+            <option value="Pre-Employment">Pre-Employment</option>
+            <option value="Random">Random</option>
+            <option value="Post-Accident">Post-Accident</option>
+            <option value="Return-to-Duty">Return-to-Duty</option>
+            <option value="Follow-Up">Follow-Up</option>
+            <option value="other">Other (enter manually)</option>
+        </select>
+    </div>
 
+    <div id="otherReasonWrapper" class="form-row" style="display:none;">
+        <label>Enter Reason</label>
+        <input id="otherReasonInput" type="text">
+    </div>
 
-        <div class="form-row">
-            <label>Reason for Testing</label>
-            <select id="reasonSelect" onchange="toggleOtherReason()">
-                <option value="">-- Select reason --</option>
-                <option value="Pre-Employment">Pre-Employment</option>
-                <option value="Random">Random</option>
-                <option value="Post-Accident">Post-Accident</option>
-                <option value="Return-to-Duty">Return-to-Duty</option>
-                <option value="Follow-Up">Follow-Up</option>
-                <option value="other">Other (enter manually)</option>
-            </select>
-        </div>
-        
-        <div id="otherReasonWrapper" class="form-row" style="display:none;">
-            <label>Other Reason</label>
-            <input id="otherReasonInput" type="text" placeholder="Enter reason manually">
-       </div>
+    <!-- SERVICES -->
+    <div class="section-divider"></div>
+    <h3 class="section-subtitle">Services</h3>
 
-        <!-- SERVICES -->
-        <div class="section-divider"></div>
-        <h3 class="section-subtitle">Services</h3>
+    <div class="checkbox-grid">
+        <label><input type="checkbox" id="srvDrug"> Drug Test</label>
+        <label><input type="checkbox" id="srvAlcohol"> Alcohol Test</label>
+        <label><input type="checkbox" id="srvVision"> Vision Test</label>
+        <label><input type="checkbox" id="srvDOT"> DOT Physical</label>
+        <label><input type="checkbox" id="srvDNA"> DNA (Paternity Test)</label>
+        <label><input type="checkbox" id="srvOther"> Other</label>
+    </div>
 
-<!-- SERVICES -->
-<div class="section-divider"></div>
-<h3 class="section-subtitle">Services</h3>
+    <div id="otherServiceWrapper" class="form-row" style="display:none;">
+        <label>Other Service</label>
+        <input id="srvOtherText" type="text" placeholder="Describe other service">
+    </div>
 
-<div class="checkbox-grid">
-    <label><input type="checkbox" id="srvDrug"> Drug Test</label>
-    <label><input type="checkbox" id="srvAlcohol"> Alcohol Test</label>
-    <label><input type="checkbox" id="srvVision"> Vision Test</label>
-    <label><input type="checkbox" id="srvDOT"> DOT Physical</label>
-    <label><input type="checkbox" id="srvDNA"> DNA (Paternity Test)</label>
-    <label><input type="checkbox" id="srvOther"> Other</label>
-</div>
+    <!-- SIGNATURE PAD -->
+    <div class="section-divider"></div>
+    <h3 class="section-subtitle">Signature</h3>
 
-<div class="form-row" id="otherServiceWrapper" style="display:none;">
-    <label>Other Service</label>
-    <input id="srvOtherText" type="text" placeholder="Describe other service">
-</div>
+    <div class="signature-pad-wrapper">
+        <canvas id="signaturePad" class="sig-canvas"></canvas>
+        <div id="sigPlaceholder" class="sig-placeholder">Sign Here</div>
+    </div>
 
-        <!-- SIGNATURE PAD -->
-        <div class="section-divider"></div>
-        <h3 class="section-subtitle">Signature</h3>
+    <button id="clearSigBtn" class="secondary-btn">Clear Signature</button>
 
-        <div class="signature-pad-wrapper">
-            <canvas id="signaturePad" class="sig-canvas"></canvas>
-            <div id="sigPlaceholder" class="sig-placeholder">Sign Here</div>
-        </div>
+    <div style="display:flex; justify-content:flex-end; margin-top:10px;">
+        <button id="resetFormBtn" class="secondary-btn" onclick="location.reload()">Reset Form</button>
+    </div>
 
-        <button id="clearSigBtn" class="secondary-btn">Clear Signature</button>
-        
-        <div style="display:flex; justify-content:flex-end; margin-top:10px;">
-            <button id="resetFormBtn" class="secondary-btn" onclick="location.reload()">Reset Form</button>
-        </div>
+    <div class="btn-row">
+        <button id="submitBtn" class="primary-btn">Submit Check-In</button>
+    </div>
 
-        <!-- SUBMIT + RESET -->
-        <div class="btn-row">
-            <button id="submitBtn" class="primary-btn">Submit Check-In</button>
-        </div>
+    <p id="submitMessage" class="submit-message"></p>
 
-        <p id="submitMessage" class="submit-message"></p>
+</section>
 
-    </section>
 
 
     <!-- =========================================================
