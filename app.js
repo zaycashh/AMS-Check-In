@@ -447,26 +447,3 @@ document.getElementById("exitAdminBtn")?.addEventListener("click", () => {
     document.getElementById("adminPanel").style.display = "none";
     document.getElementById("checkInSection").style.display = "block";
 });
-/* ============================================================
-   ADMIN LOGIN SYSTEM
-============================================================ */
-
-document.getElementById("toggleAdminBtn")?.addEventListener("click", () => {
-    const pin = prompt("Enter Admin PIN:");
-
-    if (pin === ADMIN_PIN) {
-        // SHOW ADMIN PANEL
-        document.getElementById("adminArea").style.display = "block";
-        document.getElementById("checkInSection").style.display = "none";
-
-        alert("Admin mode activated.");
-    } else {
-        alert("Incorrect PIN.");
-    }
-});
-
-// EXIT ADMIN MODE BUTTON
-document.getElementById("exitAdminBtn")?.addEventListener("click", () => {
-    document.getElementById("adminArea").style.display = "none";
-    document.getElementById("checkInSection").style.display = "block";
-});
