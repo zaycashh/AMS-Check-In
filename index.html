@@ -1,13 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AMS Check-In System</title>
     <link rel="stylesheet" href="styles.css">
 </head>
-
 <body>
 
 <!-- =========================================================
@@ -96,10 +94,6 @@
 
     <button id="clearSigBtn" class="secondary-btn">Clear Signature</button>
 
-    <div style="display:flex; justify-content:flex-end; margin-top:10px;">
-        <button id="resetFormBtn" class="secondary-btn" onclick="location.reload()">Reset Form</button>
-    </div>
-
     <div class="btn-row">
         <button id="submitBtn" class="primary-btn">Submit Check-In</button>
     </div>
@@ -107,7 +101,7 @@
 </section>
 
 <!-- =========================================================
-     ADMIN PANEL (HIDDEN UNTIL LOGIN)
+     ADMIN PANEL (HIDDEN)
 ========================================================= -->
 <section id="adminArea" style="display:none;">
 
@@ -121,6 +115,7 @@
         <div class="tab" data-tab="tabManage">Manage Companies</div>
     </div>
 
+    <!-- SEARCH LOG -->
     <div id="tabSearch" class="tab-content active">
         <h2>Search Log</h2>
         <table id="resultsTable" class="admin-table">
@@ -142,8 +137,8 @@
 </section>
 
 <!-- SIGNATURE MODAL -->
-<div id="signatureModal" class="sig-modal">
-    <div class="sig-modal-inner">
+<div id="signatureModal" class="modal-bg">
+    <div class="modal-box">
         <h3>Signature</h3>
         <img id="signatureModalImg">
         <button id="closeSignatureModal" class="primary-btn">Close</button>
