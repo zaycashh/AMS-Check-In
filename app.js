@@ -1,17 +1,16 @@
 /* =========================================================
-   GLOBAL VARIABLES + CONSTANTS
+   GLOBAL VARIABLES
 ========================================================= */
-const ADMIN_PIN = "2468";   // Admin PIN
-let signaturePad = null;
+const ADMIN_PIN = "2468";
 
 /* =========================================================
-   SIGNATURE PAD INIT (FIXED & UPDATED)
+   SIGNATURE PAD INITIALIZATION
 ========================================================= */
 function setupSignaturePad() {
     const canvas = document.getElementById("signaturePad");
     const placeholder = document.getElementById("sigPlaceholder");
 
-    /* FIX CANVAS INTERNAL SIZE */
+    // Fix canvas resolution
     canvas.width = canvas.offsetWidth;
     canvas.height = canvas.offsetHeight;
 
@@ -21,29 +20,19 @@ function setupSignaturePad() {
 
     let drawing = false;
 
-    /* -------- Mouse Position Function -------- */
     function getMousePos(e) {
         const rect = canvas.getBoundingClientRect();
-        return {
-            x: e.clientX - rect.left,
-            y: e.clientY - rect.top
-        };
+        return { x: e.clientX - rect.left, y: e.clientY - rect.top };
     }
 
-    /* -------- Touch Position Function -------- */
     function getTouchPos(e) {
         const rect = canvas.getBoundingClientRect();
-        const touch = e.touches[0];
-        return {
-            x: touch.clientX - rect.left,
-            y: touch.clientY - rect.top
-        };
+        const t = e.touches[0];
+        return { x: t.clientX - rect.left, y: t.clientY - rect.top };
     }
 
-    /* -------- DRAW FUNCTION -------- */
     function draw(e) {
         if (!drawing) return;
-
         const pos = e.touches ? getTouchPos(e) : getMousePos(e);
 
         ctx.lineTo(pos.x, pos.y);
@@ -55,11 +44,10 @@ function setupSignaturePad() {
         if (e.touches) e.preventDefault();
     }
 
-    /* -------- MOUSE EVENTS -------- */
+    // Mouse Controls
     canvas.addEventListener("mousedown", (e) => {
         drawing = true;
         placeholder.style.display = "none";
-
         const pos = getMousePos(e);
         ctx.beginPath();
         ctx.moveTo(pos.x, pos.y);
@@ -72,15 +60,13 @@ function setupSignaturePad() {
 
     canvas.addEventListener("mousemove", draw);
 
-    /* -------- TOUCH EVENTS -------- */
+    // Touch Controls
     canvas.addEventListener("touchstart", (e) => {
         drawing = true;
         placeholder.style.display = "none";
-
         const pos = getTouchPos(e);
         ctx.beginPath();
         ctx.moveTo(pos.x, pos.y);
-
         e.preventDefault();
     });
 
@@ -91,7 +77,7 @@ function setupSignaturePad() {
 
     canvas.addEventListener("touchmove", draw);
 
-    /* -------- CLEAR BUTTON -------- */
+    // Clear Button
     document.getElementById("clearSigBtn").addEventListener("click", () => {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         placeholder.style.display = "block";
@@ -117,7 +103,7 @@ document.getElementById("reasonSelect").addEventListener("change", () => {
 });
 
 /* =========================================================
-   SERVICES — HANDLE "OTHER"
+   SERVICES "OTHER" LOGIC
 ========================================================= */
 document.querySelector('input[value="Other"]').addEventListener("change", (e) => {
     document.getElementById("otherServiceWrapper").style.display =
@@ -125,10 +111,9 @@ document.querySelector('input[value="Other"]').addEventListener("change", (e) =>
 });
 
 /* =========================================================
-   FORM SUBMISSION
+   SUBMIT FORM
 ========================================================= */
 document.getElementById("submitBtn").addEventListener("click", () => {
-
     const first = document.getElementById("firstName").value.trim();
     const last = document.getElementById("lastName").value.trim();
     const company = document.getElementById("companySelect").value;
@@ -139,28 +124,24 @@ document.getElementById("submitBtn").addEventListener("click", () => {
         return;
     }
 
-    let finalCompany = company;
-    if (company === "__OTHER__") {
-        finalCompany = document.getElementById("otherCompany").value.trim();
-    }
+    let finalCompany = company === "__OTHER__"
+        ? document.getElementById("otherCompany").value.trim()
+        : company;
 
-    let finalReason = reason;
-    if (reason === "other") {
-        finalReason = document.getElementById("otherReasonInput").value.trim();
-    }
+    let finalReason = reason === "other"
+        ? document.getElementById("otherReasonInput").value.trim()
+        : reason;
 
-    // Collect selected services
     const services = Array.from(
         document.querySelectorAll('input[name="services"]:checked')
     ).map(cb => cb.value);
 
-    // Add "Other service text"
     if (services.includes("Other")) {
         const custom = document.getElementById("srvOtherText").value.trim();
         if (custom) services.push(custom);
     }
 
-    // Capture signature
+    // Signature
     const canvas = document.getElementById("signaturePad");
     const signature = canvas.toDataURL();
 
@@ -176,7 +157,6 @@ document.getElementById("submitBtn").addEventListener("click", () => {
         signature
     };
 
-    // Save to localStorage
     let logs = JSON.parse(localStorage.getItem("ams_logs") || "[]");
     logs.push(record);
     localStorage.setItem("ams_logs", JSON.stringify(logs));
@@ -186,7 +166,7 @@ document.getElementById("submitBtn").addEventListener("click", () => {
 });
 
 /* =========================================================
-   RESET FORM BUTTON
+   RESET FORM
 ========================================================= */
 document.getElementById("resetFormBtn").addEventListener("click", () => {
     location.reload();
@@ -197,62 +177,30 @@ document.getElementById("resetFormBtn").addEventListener("click", () => {
 ========================================================= */
 document.getElementById("toggleAdminBtn").addEventListener("click", () => {
     const pin = prompt("Enter Admin PIN:");
+
     if (pin === ADMIN_PIN) {
         document.getElementById("adminArea").style.display = "block";
         document.getElementById("checkInSection").style.display = "none";
-        renderAdminRecords();
+
+        // NEW → Search module handles rendering now
+        if (typeof applyFilters === "function") {
+            applyFilters();
+        }
     } else {
         alert("Incorrect PIN.");
     }
 });
 
-/* EXIT ADMIN */
+/* =========================================================
+   EXIT ADMIN MODE
+========================================================= */
 document.getElementById("exitAdminBtn").addEventListener("click", () => {
     document.getElementById("adminArea").style.display = "none";
     document.getElementById("checkInSection").style.display = "block";
 });
 
 /* =========================================================
-   RENDER ADMIN TABLE
-========================================================= */
-function renderAdminRecords() {
-    const logs = JSON.parse(localStorage.getItem("ams_logs") || "[]");
-    const tbody = document.querySelector("#resultsTable tbody");
-    tbody.innerHTML = "";
-
-    logs.forEach(log => {
-        const row = document.createElement("tr");
-
-        row.innerHTML = `
-            <td>${log.date}</td>
-            <td>${log.time}</td>
-            <td>${log.first} ${log.last}</td>
-            <td>${log.company}</td>
-            <td>${log.reason}</td>
-            <td>${log.services}</td>
-            <td><img src="${log.signature}" class="sig-thumb" data-img="${log.signature}"></td>
-        `;
-
-        tbody.appendChild(row);
-    });
-
-    // Click signature → full modal
-    document.querySelectorAll(".sig-thumb").forEach(img => {
-        img.addEventListener("click", () => {
-            document.getElementById("signatureModalImg").src =
-                img.getAttribute("data-img");
-            document.getElementById("signatureModal").style.display = "flex";
-        });
-    });
-}
-
-/* CLOSE SIGNATURE MODAL */
-document.getElementById("closeSignatureModal").addEventListener("click", () => {
-    document.getElementById("signatureModal").style.display = "none";
-});
-
-/* =========================================================
-   INITIAL PAGE LOAD
+   PAGE LOAD
 ========================================================= */
 window.onload = () => {
     setupSignaturePad();
