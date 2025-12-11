@@ -1,116 +1,101 @@
 /* =========================================================
    GLOBAL VARIABLES + CONSTANTS
 ========================================================= */
-const ADMIN_PIN = "2468";   // Admin PIN
+const ADMIN_PIN = "2468"; 
 let signaturePad = null;
 
 /* =========================================================
-   SIGNATURE PAD INIT
+   SIGNATURE PAD INIT (FIXED & UPDATED)
 ========================================================= */
 function setupSignaturePad() {
     const canvas = document.getElementById("signaturePad");
     const placeholder = document.getElementById("sigPlaceholder");
-
     const ctx = canvas.getContext("2d");
+
     ctx.lineWidth = 2;
     ctx.lineCap = "round";
 
     let drawing = false;
 
-canvas.addEventListener("mousedown", (e) => {
-    const rect = canvas.getBoundingClientRect();
-    const borderWidth = 2;
+    /* ------------ Unified Mouse Position Function ------------ */
+    function getMousePos(e) {
+        const rect = canvas.getBoundingClientRect();
+        return {
+            x: e.clientX - rect.left,
+            y: e.clientY - rect.top
+        };
+    }
 
-    const x = e.clientX - rect.left - borderWidth;
-    const y = e.clientY - rect.top - borderWidth;
+    /* ------------ Unified Touch Position Function ------------ */
+    function getTouchPos(e) {
+        const rect = canvas.getBoundingClientRect();
+        const t = e.touches[0];
+        return {
+            x: t.clientX - rect.left,
+            y: t.clientY - rect.top
+        };
+    }
 
-    drawing = true;
-    placeholder.style.display = "none";
-
-    ctx.beginPath();
-    ctx.moveTo(x, y);
-});
-
-// Mouse up stops drawing
-canvas.addEventListener("mouseup", () => { 
-    drawing = false; 
-    ctx.beginPath(); 
-});
-
-// Mouse move draws
-canvas.addEventListener("mousemove", draw);
-
-// Hide placeholder on touchscreen start
-canvas.addEventListener("touchstart", (e) => {
-    drawing = true;
-    placeholder.style.display = "none";
-    ctx.beginPath();
-});
-
-// Mobile drawing support
-canvas.addEventListener("mousedown", (e) => {
-    const rect = canvas.getBoundingClientRect();
-    const borderWidth = 2;
-
-    const x = e.clientX - rect.left - borderWidth;
-    const y = e.clientY - rect.top - borderWidth;
-
-    drawing = true;
-    placeholder.style.display = "none";
-
-    ctx.beginPath();
-    ctx.moveTo(x, y);
-});
-   
-// Restore placeholder when signature is cleared
-document.getElementById("clearSigBtn").addEventListener("click", () => {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    placeholder.style.display = "block";
-});
-
-
-    function draw(e) {
-    if (!drawing) return;
-
-    const rect = canvas.getBoundingClientRect();
-    const borderWidth = 2; // signature border size
-
-    const x = e.clientX - rect.left - borderWidth;
-    const y = e.clientY - rect.top - borderWidth;
-
-
-    ctx.lineTo(x, y);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(x, y);
-}
-
-    // Mobile support
-    canvas.addEventListener("touchstart", (e) => {
+    /* =========================================================
+       MOUSE EVENTS — PERFECT ALIGNMENT
+    ========================================================== */
+    canvas.addEventListener("mousedown", (e) => {
+        const pos = getMousePos(e);
         drawing = true;
         placeholder.style.display = "none";
+        ctx.beginPath();
+        ctx.moveTo(pos.x, pos.y);
     });
 
-    canvas.addEventListener("touchend", () => { drawing = false; ctx.beginPath(); });
+    canvas.addEventListener("mousemove", (e) => {
+        if (!drawing) return;
+        const pos = getMousePos(e);
+        ctx.lineTo(pos.x, pos.y);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(pos.x, pos.y);
+    });
+
+    canvas.addEventListener("mouseup", () => {
+        drawing = false;
+        ctx.beginPath();
+    });
+
+    /* =========================================================
+       TOUCH EVENTS — PERFECT ALIGNMENT
+    ========================================================== */
+    canvas.addEventListener("touchstart", (e) => {
+        e.preventDefault();
+        const pos = getTouchPos(e);
+        drawing = true;
+        placeholder.style.display = "none";
+        ctx.beginPath();
+        ctx.moveTo(pos.x, pos.y);
+    }, { passive: false });
 
     canvas.addEventListener("touchmove", (e) => {
-        const rect = canvas.getBoundingClientRect();
-        const borderWidth = 2;
-
-        const x = e.clientX - rect.left - borderWidth;
-        const y = e.clientY - rect.top - borderWidth;
-
         e.preventDefault();
+        if (!drawing) return;
+        const pos = getTouchPos(e);
+        ctx.lineTo(pos.x, pos.y);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(pos.x, pos.y);
+    }, { passive: false });
+
+    canvas.addEventListener("touchend", () => {
+        drawing = false;
+        ctx.beginPath();
+    });
+
+    /* =========================================================
+       CLEAR SIGNATURE
+    ========================================================== */
+    document.getElementById("clearSigBtn").addEventListener("click", () => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        placeholder.style.display = "block";
     });
 }
-
-/* CLEAR SIGNATURE */
-document.getElementById("clearSigBtn").addEventListener("click", () => {
-    const canvas = document.getElementById("signaturePad");
-    const ctx = canvas.getContext("2d");
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    document.getElementById("sigPlaceholder").style.display = "block";
-});
 
 /* =========================================================
    COMPANY "OTHER" LOGIC
@@ -163,18 +148,15 @@ document.getElementById("submitBtn").addEventListener("click", () => {
         finalReason = document.getElementById("otherReasonInput").value.trim();
     }
 
-    // Collect selected services
     const services = Array.from(
         document.querySelectorAll('input[name="services"]:checked')
     ).map(cb => cb.value);
 
-    // Add "Other service text"
     if (services.includes("Other")) {
         const custom = document.getElementById("srvOtherText").value.trim();
         if (custom) services.push(custom);
     }
 
-    // Capture signature
     const canvas = document.getElementById("signaturePad");
     const signature = canvas.toDataURL();
 
@@ -190,7 +172,6 @@ document.getElementById("submitBtn").addEventListener("click", () => {
         signature
     };
 
-    // Save to localStorage
     let logs = JSON.parse(localStorage.getItem("ams_logs") || "[]");
     logs.push(record);
     localStorage.setItem("ams_logs", JSON.stringify(logs));
@@ -220,7 +201,6 @@ document.getElementById("toggleAdminBtn").addEventListener("click", () => {
     }
 });
 
-/* EXIT ADMIN */
 document.getElementById("exitAdminBtn").addEventListener("click", () => {
     document.getElementById("adminArea").style.display = "none";
     document.getElementById("checkInSection").style.display = "block";
@@ -250,7 +230,6 @@ function renderAdminRecords() {
         tbody.appendChild(row);
     });
 
-    // Click signature → full modal
     document.querySelectorAll(".sig-thumb").forEach(img => {
         img.addEventListener("click", () => {
             document.getElementById("signatureModalImg").src =
@@ -271,4 +250,3 @@ document.getElementById("closeSignatureModal").addEventListener("click", () => {
 window.onload = () => {
     setupSignaturePad();
 };
-
