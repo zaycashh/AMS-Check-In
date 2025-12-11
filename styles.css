@@ -286,6 +286,17 @@ body {
         grid-template-columns: 1fr;
         gap: 10px;
     }
+   /* ============================================================
+   ADMIN FILTER BAR — Bigger Inputs & Dropdowns
+============================================================ */
+.filter-bar input,
+.filter-bar select {
+    height: 42px !important;
+    padding: 8px 12px !important;
+    font-size: 15px;
+    border-radius: 6px;
+}
+
 
     .export-bar {
         justify-content: center;
