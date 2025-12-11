@@ -303,3 +303,27 @@ body {
 #filterDateStart,
 #filterDateEnd { width: 140px !important; }
 #filterDateRange { width: 140px !important; }
+
+/* =========================================================
+   UNIFY FILTER BAR INPUT STYLES
+========================================================= */
+
+.filter-bar input[type="text"],
+.filter-bar input[type="date"],
+.filter-bar select {
+    height: 36px;
+    padding: 6px 10px;
+    font-size: 14px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #1f2937;
+    outline: none;
+}
+
+.filter-bar input[type="text"]:focus,
+.filter-bar input[type="date"]:focus,
+.filter-bar select:focus {
+    border-color: #4F8C47;
+    box-shadow: 0 0 3px rgba(79,140,71,0.4);
+}
