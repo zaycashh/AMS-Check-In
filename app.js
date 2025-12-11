@@ -17,13 +17,16 @@ function setupSignaturePad() {
 
     let drawing = false;
 
-    canvas.addEventListener("mousedown", (e) => {
+canvas.addEventListener("mousedown", (e) => {
     const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const borderWidth = 2;
+
+    const x = e.clientX - rect.left - borderWidth;
+    const y = e.clientY - rect.top - borderWidth;
 
     drawing = true;
     placeholder.style.display = "none";
+
     ctx.beginPath();
     ctx.moveTo(x, y);
 });
@@ -45,18 +48,20 @@ canvas.addEventListener("touchstart", (e) => {
 });
 
 // Mobile drawing support
-canvas.addEventListener("touchmove", (e) => {
+canvas.addEventListener("mousedown", (e) => {
     const rect = canvas.getBoundingClientRect();
-    const touch = e.touches[0];
-    const x = touch.clientX - rect.left;
-    const y = touch.clientY - rect.top;
+    const borderWidth = 2;
 
-    ctx.lineTo(x, y);
-    ctx.stroke();
+    const x = e.clientX - rect.left - borderWidth;
+    const y = e.clientY - rect.top - borderWidth;
+
+    drawing = true;
+    placeholder.style.display = "none";
+
     ctx.beginPath();
     ctx.moveTo(x, y);
 });
-
+   
 // Restore placeholder when signature is cleared
 document.getElementById("clearSigBtn").addEventListener("click", () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -68,8 +73,11 @@ document.getElementById("clearSigBtn").addEventListener("click", () => {
     if (!drawing) return;
 
     const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const borderWidth = 2; // signature border size
+
+    const x = e.clientX - rect.left - borderWidth;
+    const y = e.clientY - rect.top - borderWidth;
+
 
     ctx.lineTo(x, y);
     ctx.stroke();
@@ -87,11 +95,11 @@ document.getElementById("clearSigBtn").addEventListener("click", () => {
 
     canvas.addEventListener("touchmove", (e) => {
         const rect = canvas.getBoundingClientRect();
-        const touch = e.touches[0];
-        draw({
-            offsetX: touch.clientX - rect.left,
-            offsetY: touch.clientY - rect.top
-        });
+        const borderWidth = 2;
+
+        const x = e.clientX - rect.left - borderWidth;
+        const y = e.clientY - rect.top - borderWidth;
+
         e.preventDefault();
     });
 }
