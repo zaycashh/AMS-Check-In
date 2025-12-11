@@ -149,6 +149,25 @@
 
 <!-- FILTER BAR -->
 <div class="filter-bar" style="margin:15px 0; display:flex; flex-wrap:wrap; gap:10px;">
+    </div>   <!-- end filter bar -->
+
+<!-- SEARCH RESULTS TABLE -->
+<table class="log-table" style="width:100%; border-collapse:collapse; margin-top:15px;">
+    <thead>
+        <tr style="background:#e6e6e6; font-weight:bold;">
+            <th style="padding:8px; border:1px solid #ccc;">Date</th>
+            <th style="padding:8px; border:1px solid #ccc;">Time</th>
+            <th style="padding:8px; border:1px solid #ccc;">Name</th>
+            <th style="padding:8px; border:1px solid #ccc;">Company</th>
+            <th style="padding:8px; border:1px solid #ccc;">Reason</th>
+            <th style="padding:8px; border:1px solid #ccc;">Services</th>
+            <th style="padding:8px; border:1px solid #ccc;">Signature</th>
+        </tr>
+    </thead>
+
+    <!-- The admin search.js writes rows INTO this <tbody> -->
+    <tbody id="searchResults"></tbody>
+</table>
 
     <!-- Search Name -->
     <input type="text" id="filterName" placeholder="Search Name..."
