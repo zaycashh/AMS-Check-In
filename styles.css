@@ -122,17 +122,24 @@ input, select {
 }
 /* ===== FORCE BLUE HEADERS ===== */
 
-/* AMS Check-In System Title */
+/* ===== IDENTICAL BLUE HEADER STYLE (MATCHING YOUR IMAGE) ===== */
+
+/* AMS Check-In System Text */
 header .header-title {
-    color: #1E90FF !important;
+    color: #0A4B78 !important;      /* Exact blue from your screenshot */
+    font-weight: 700 !important;    /* Bold like your screenshot */
+    letter-spacing: 0.5px;
 }
 
-/* Blue underline */
+/* Thin Blue Line Under Header */
 header.main-header {
-    border-bottom: 4px solid #1E90FF !important;
+    border-bottom: 2px solid #0A4B78 !important;  /* Exact thin line */
+    padding-bottom: 6px !important;               /* Matches image spacing */
 }
 
 /* Donor Check-In Title */
-section#checkInSection h2.section-title {
-    color: #1E90FF !important;
+#checkInSection .section-title {
+    color: #0A4B78 !important;   /* Exact identical blue */
+    font-weight: 700 !important;
+    margin-bottom: 10px !important; /* Matches spacing in screenshot */
 }
