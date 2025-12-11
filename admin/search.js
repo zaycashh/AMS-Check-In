@@ -1,32 +1,19 @@
-/* =========================================================
-   SEARCH LOG MODULE (ADMIN ONLY)
-   This file is safe & does NOT modify your main system.
-========================================================= */
+/* ============================================================
+   ADMIN SEARCH MODULE – CLEAN + FULLY WORKING
+============================================================ */
 
 console.log("Admin Search Module Loaded");
 
-// This function will later handle filters and exporting
-function initAdminSearch() {
-    console.log("Search module ready");
-}
-
-// Load automatically when admin enters the Search tab
-document.addEventListener("DOMContentLoaded", () => {
-    initAdminSearch();
-});
-/* ===========================================================
-   ADMIN SEARCH MODULE – FILTERING + DATE RANGE LOGIC
-   This code safely handles filters without touching main app.js
-=========================================================== */
-
-console.log("Admin Search Module Loaded");
-
-/* Utility: Load stored logs */
+/* --------------------------------------
+   LOAD LOGS
+-------------------------------------- */
 function getLogs() {
     return JSON.parse(localStorage.getItem("ams_logs") || "[]");
 }
 
-/* DATE HELPERS */
+/* --------------------------------------
+   DATE HELPERS
+-------------------------------------- */
 function toDate(d) {
     const dt = new Date(d);
     dt.setHours(0, 0, 0, 0);
@@ -37,8 +24,7 @@ function getRange(range) {
     const today = toDate(new Date());
 
     switch (range) {
-        case "today":
-            return { start: today, end: today };
+        case "today": return { start: today, end: today };
 
         case "yesterday":
             const y = new Date(today);
@@ -46,44 +32,51 @@ function getRange(range) {
             return { start: y, end: y };
 
         case "thisWeek":
-            const wStart = new Date(today);
-            wStart.setDate(today.getDate() - today.getDay()); // Sunday
-            return { start: wStart, end: today };
+            const startW = new Date(today);
+            startW.setDate(today.getDate() - today.getDay());
+            return { start: startW, end: today };
 
         case "lastWeek":
             const lwEnd = new Date(today);
             lwEnd.setDate(today.getDate() - today.getDay() - 1);
-
             const lwStart = new Date(lwEnd);
             lwStart.setDate(lwEnd.getDate() - 6);
             return { start: lwStart, end: lwEnd };
 
         case "thisMonth":
-            const mStart = new Date(today.getFullYear(), today.getMonth(), 1);
-            return { start: mStart, end: today };
+            return {
+                start: new Date(today.getFullYear(), today.getMonth(), 1),
+                end: today
+            };
 
         case "lastMonth":
-            const lmStart = new Date(today.getFullYear(), today.getMonth() - 1, 1);
-            const lmEnd = new Date(today.getFullYear(), today.getMonth(), 0);
-            return { start: lmStart, end: lmEnd };
+            return {
+                start: new Date(today.getFullYear(), today.getMonth() - 1, 1),
+                end: new Date(today.getFullYear(), today.getMonth(), 0)
+            };
 
         case "thisYear":
-            const yStart = new Date(today.getFullYear(), 0, 1);
-            return { start: yStart, end: today };
+            return {
+                start: new Date(today.getFullYear(), 0, 1),
+                end: today
+            };
 
         case "lastYear":
-            const lyStart = new Date(today.getFullYear() - 1, 0, 1);
-            const lyEnd = new Date(today.getFullYear() - 1, 11, 31);
-            return { start: lyStart, end: lyEnd };
+            return {
+                start: new Date(today.getFullYear() - 1, 0, 1),
+                end: new Date(today.getFullYear() - 1, 11, 31)
+            };
 
         default:
             return null;
     }
 }
 
-/* ===========================================================
-   APPLY FILTERS
-=========================================================== */
+/* ============================================================
+   FILTER + RESULTS
+============================================================ */
+
+let filteredResults = []; // now exists!
 
 function applyFilters() {
     const logs = getLogs();
@@ -94,41 +87,37 @@ function applyFilters() {
     const endDate = document.getElementById("filterDateEnd").value;
     const range = document.getElementById("filterDateRange").value;
 
-    let { start, end } = { start: null, end: null };
+    let start = null;
+    let end = null;
 
-    // If preset range selected → override custom fields
     if (range) {
         const r = getRange(range);
         start = r.start;
         end = r.end;
     } else {
-        // Use Start/End fields
         if (startDate) start = toDate(startDate);
         if (endDate) end = toDate(endDate);
     }
 
-    const results = logs.filter(log => {
+    filteredResults = logs.filter(log => {
         const fullName = `${log.first} ${log.last}`.toLowerCase();
         const logDate = toDate(log.date);
 
         if (nameFilter && !fullName.includes(nameFilter)) return false;
         if (companyFilter && log.company !== companyFilter) return false;
-
         if (start && logDate < start) return false;
         if (end && logDate > end) return false;
-
         return true;
     });
 
-    renderFilteredResults(results);
+    renderFilteredResults(filteredResults);
 }
 
-/* ===========================================================
-   RENDER RESULTS
-=========================================================== */
-
+/* --------------------------------------
+   RENDER RESULTS INTO #searchResults
+-------------------------------------- */
 function renderFilteredResults(list) {
-    const tbody = document.querySelector("#resultsTable tbody");
+    const tbody = document.getElementById("searchResults");
     tbody.innerHTML = "";
 
     list.forEach(log => {
@@ -146,27 +135,31 @@ function renderFilteredResults(list) {
     });
 }
 
-/* ===========================================================
-   BIND FILTER EVENTS
-=========================================================== */
+/* ============================================================
+   AUTO POPULATE COMPANY DROPDOWN
+============================================================ */
 
-document.getElementById("filterName").addEventListener("input", applyFilters);
-document.getElementById("filterCompany").addEventListener("change", applyFilters);
-document.getElementById("filterDateStart").addEventListener("change", applyFilters);
-document.getElementById("filterDateEnd").addEventListener("change", applyFilters);
-document.getElementById("filterDateRange").addEventListener("change", applyFilters);
+function populateCompanyDropdown() {
+    const logs = getLogs();
+    const unique = [...new Set(logs.map(l => l.company).filter(Boolean))];
 
-/* Run once on load */
-document.addEventListener("DOMContentLoaded", applyFilters);
+    const select = document.getElementById("filterCompany");
+    select.innerHTML = `<option value="">All Companies</option>`;
+
+    unique.forEach(c => {
+        const opt = document.createElement("option");
+        opt.value = c;
+        opt.textContent = c;
+        select.appendChild(opt);
+    });
+}
 
 /* ============================================================
-   EXPORT TO XLS (NOT CSV)
-   ============================================================ */
-/* ========== EXPORT XLS (Styled Excel Report) ========== */
+   EXPORT XLS
+============================================================ */
 
-document.getElementById("btnExportExcel").addEventListener("click", () => {
-    const logs = filteredResults || getLogs();
-    if (!logs.length) {
+function exportToExcel() {
+    if (!filteredResults.length) {
         alert("No records to export.");
         return;
     }
@@ -174,7 +167,7 @@ document.getElementById("btnExportExcel").addEventListener("click", () => {
     let table = `
         <table border="1">
             <thead>
-                <tr style="font-weight:bold; background:#e6e6e6;">
+                <tr style="background:#e6e6e6; font-weight:bold;">
                     <th>Date</th>
                     <th>Time</th>
                     <th>Name</th>
@@ -182,11 +175,10 @@ document.getElementById("btnExportExcel").addEventListener("click", () => {
                     <th>Reason</th>
                     <th>Services</th>
                 </tr>
-            </thead>
-            <tbody>
+            </thead><tbody>
     `;
 
-    logs.forEach(log => {
+    filteredResults.forEach(log => {
         table += `
             <tr>
                 <td>${log.date}</td>
@@ -199,35 +191,29 @@ document.getElementById("btnExportExcel").addEventListener("click", () => {
         `;
     });
 
-    table += `</tbody></table>`;
+    table += "</tbody></table>";
 
-    let blob = new Blob([table], {
-        type: "application/vnd.ms-excel"
-    });
-
-    let a = document.createElement("a");
+    const blob = new Blob([table], { type: "application/vnd.ms-excel" });
+    const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
     a.download = "AMS_Search_Report.xls";
     a.click();
-});
+}
 
 /* ============================================================
-   EVENT LISTENERS
-   ============================================================ */
+   EVENT INIT
+============================================================ */
+
 document.addEventListener("DOMContentLoaded", () => {
+    populateCompanyDropdown();
+    applyFilters();
 
-    console.log("Search module ready");
-
-    /* Live Filters */
     document.getElementById("filterName").addEventListener("input", applyFilters);
+    document.getElementById("filterCompany").addEventListener("change", applyFilters);
     document.getElementById("filterDateStart").addEventListener("change", applyFilters);
     document.getElementById("filterDateEnd").addEventListener("change", applyFilters);
-    document.getElementById("filterCompany").addEventListener("change", applyFilters);
+    document.getElementById("filterDateRange").addEventListener("change", applyFilters);
 
-    /* Export Buttons */
-    document.getElementById("btnExportExcel").addEventListener("click", exportToExcel);
-    document.getElementById("btnExportPDF").addEventListener("click", exportToPDF);
-
-    /* Initial load */
-    applyFilters();
+    const btn = document.getElementById("btnExportExcel");
+    if (btn) btn.addEventListener("click", exportToExcel);
 });
