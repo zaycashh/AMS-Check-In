@@ -319,3 +319,37 @@ body {
   font-size: 20px;
   pointer-events: none;
 }
+/* EXPORT BUTTON AREA */
+.export-bar {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin: 10px 0 5px 0;
+}
+
+.export-btn {
+    padding: 8px 16px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    color: white;
+    transition: 0.2s ease-in-out;
+}
+
+/* XLS button (green) */
+.export-btn.excel {
+    background: #4F8C47;
+}
+.export-btn.excel:hover {
+    background: #3d6e37;
+}
+
+/* PDF button (dark navy) */
+.export-btn.pdf {
+    background: #1e2a38;
+}
+.export-btn.pdf:hover {
+    background: #131b24;
+}
