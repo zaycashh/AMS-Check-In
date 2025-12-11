@@ -1,56 +1,18 @@
 /* ============================================================
-   SECTION 1 — GLOBAL CONSTANTS & BASIC HELPERS
+   GLOBAL CONSTANTS
 ============================================================ */
 
-const STORAGE_KEY = 'drug_test_checkins_v3';
-const COMPANY_LIST_KEY = 'drug_test_company_list_v3';
+const STORAGE_KEY = "drug_test_checkins_v3";
+const COMPANY_LIST_KEY = "drug_test_company_list_v3";
 const OTHER_COMPANY_VALUE = "__OTHER__";
-
-// ADMIN PIN
 const ADMIN_PIN = "2468";
 
-/* ------------------ DATE HELPERS ------------------ */
-
-function getLocalDateString(d) {
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, '0');
-    const da = String(d.getDate()).padStart(2, '0');
-    return `${y}-${m}-${da}`;
-}
-
-function formatDateTime(isoString) {
-    const d = new Date(isoString);
-    if (isNaN(d)) return { date: "", time: "" };
-
-    return {
-        date: d.toLocaleDateString(),
-        time: d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
-    };
-}
-
-/* ------------------ SERVICE FORMATTER ------------------ */
-function formatServices(s) {
-    if (!s) return "";
-    const list = [];
-    if (s.drug) list.push("Drug");
-    if (s.dna) list.push("DNA");
-    if (s.vision) list.push("Vision");
-    if (s.alcohol) list.push("Alcohol");
-    if (s.dot) list.push("DOT Physical");
-    if (s.other && s.otherText) list.push(`Other: ${s.otherText}`);
-    return list.join(", ");
-}
-
 /* ============================================================
-   SECTION 2 — LOCAL STORAGE ENGINE
+   LOAD & SAVE FUNCTIONS
 ============================================================ */
 
 function loadRecords() {
-    try {
-        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-    } catch {
-        return [];
-    }
+    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
 }
 
 function saveRecords(list) {
@@ -63,156 +25,152 @@ function addRecord(record) {
     saveRecords(list);
 }
 
-/* ============================================================
-   SECTION 3 — COMPANY LIST MANAGEMENT
-============================================================ */
-
 function loadCompanyList() {
-    try {
-        return JSON.parse(localStorage.getItem(COMPANY_LIST_KEY)) || [];
-    } catch {
-        return [];
-    }
+    return JSON.parse(localStorage.getItem(COMPANY_LIST_KEY)) || [];
 }
 
 function saveCompanyList(list) {
     localStorage.setItem(COMPANY_LIST_KEY, JSON.stringify(list));
 }
 
-/* Populate dropdown */
+/* ============================================================
+   COMPANY SELECT
+============================================================ */
+
 function renderCompanySelect() {
     const select = document.getElementById("companySelect");
     if (!select) return;
 
     const companies = loadCompanyList();
 
-    select.innerHTML = `<option value="">-- Select company --</option>`;
+    select.innerHTML = `<option value="">-- Select Company --</option>`;
 
-    companies.forEach(name => {
-        let opt = document.createElement("option");
-        opt.value = name;
-        opt.textContent = name;
+    companies.forEach(c => {
+        const opt = document.createElement("option");
+        opt.value = c;
+        opt.textContent = c;
         select.appendChild(opt);
     });
 
-    // "Other"
-    const otherOpt = document.createElement("option");
-    otherOpt.value = OTHER_COMPANY_VALUE;
-    otherOpt.textContent = "Other (type manually)";
-    select.appendChild(otherOpt);
+    const other = document.createElement("option");
+    other.value = OTHER_COMPANY_VALUE;
+    other.textContent = "Other (enter manually)";
+    select.appendChild(other);
 }
 
-/* RENDER COMPANY LIST IN ADMIN PANEL */
 function renderCompanyListDisplay() {
     const container = document.getElementById("companyListDisplay");
-    const searchValue = (document.getElementById("companySearch")?.value || "").toLowerCase();
-    let companies = loadCompanyList();
+    const search = document.getElementById("companySearch").value.toLowerCase();
+    const companies = loadCompanyList();
 
-    if (!companies.length) {
-        container.innerHTML = "<p>No companies added yet.</p>";
-        return;
-    }
-
-    const filtered = companies.filter(c => c.toLowerCase().includes(searchValue));
-
-    container.innerHTML = filtered.map(c => `
-        <div class="company-item" style="display:flex; justify-content:space-between; margin:5px 0;">
-            <span>${c}</span>
-            <div>
-                <button class="editCompanyBtn" data-name="${c}">Edit</button>
-                <button class="deleteCompanyBtn" data-name="${c}" style="background:#d9534f; color:white;">Delete</button>
+    let html = companies
+        .filter(c => c.toLowerCase().includes(search))
+        .map(c => `
+            <div class="company-item">
+                <span>${c}</span>
+                <div>
+                    <button class="editCompanyBtn" data-name="${c}">Edit</button>
+                    <button class="deleteCompanyBtn" data-name="${c}" style="background:#d9534f;color:white;">Delete</button>
+                </div>
             </div>
-        </div>
-    `).join("");
+        `)
+        .join("");
 
-    /* Edit buttons */
+    container.innerHTML = html || "<p>No companies found.</p>";
+
     document.querySelectorAll(".editCompanyBtn").forEach(btn => {
-        btn.addEventListener("click", () => {
-            const old = btn.dataset.name;
-            const updated = prompt("Edit company name:", old);
+        btn.onclick = () => {
+            const name = btn.dataset.name;
+            const updated = prompt("Edit company name:", name);
             if (!updated) return;
 
-            const list = loadCompanyList();
-            const i = list.indexOf(old);
+            let list = loadCompanyList();
+            const i = list.indexOf(name);
             list[i] = updated.trim();
             list.sort();
             saveCompanyList(list);
             renderCompanySelect();
             renderCompanyListDisplay();
-        });
+        };
     });
 
-    /* Delete buttons */
     document.querySelectorAll(".deleteCompanyBtn").forEach(btn => {
-        btn.addEventListener("click", () => {
+        btn.onclick = () => {
             const name = btn.dataset.name;
-            if (!confirm(`Remove ${name}?`)) return;
+            if (!confirm(`Delete ${name}?`)) return;
 
-            let list = loadCompanyList().filter(c => c !== name);
+            let list = loadCompanyList().filter(n => n !== name);
             saveCompanyList(list);
             renderCompanySelect();
             renderCompanyListDisplay();
-        });
+        };
     });
 }
 
 /* ============================================================
-   SECTION 4 — TOGGLE "OTHER" FIELDS
+   OTHER FIELD TOGGLES
 ============================================================ */
 
-function toggleOtherReason() {
-    const show = document.getElementById("reasonSelect").value === "other";
-    document.getElementById("otherReasonWrapper").style.display = show ? "block" : "none";
+function toggleOtherCompany() {
+    document.getElementById("otherCompanyWrapper").style.display =
+        document.getElementById("companySelect").value === OTHER_COMPANY_VALUE
+            ? "block"
+            : "none";
 }
 
-function toggleOtherCompany() {
-    const show = document.getElementById("companySelect").value === OTHER_COMPANY_VALUE;
-    document.getElementById("otherCompanyWrapper").style.display = show ? "block" : "none";
+function toggleOtherReason() {
+    document.getElementById("otherReasonWrapper").style.display =
+        document.getElementById("reasonSelect").value === "other"
+            ? "block"
+            : "none";
 }
 
 function toggleOtherService() {
-    const show = document.getElementById("srvOther").checked;
-    document.getElementById("otherServiceWrapper").style.display = show ? "block" : "none";
+    document.getElementById("otherServiceWrapper").style.display =
+        document.getElementById("srvOther").checked ? "block" : "none";
 }
 
 /* ============================================================
-   SECTION 5 — SIGNATURE PAD
+   SIGNATURE PAD
 ============================================================ */
 
 function setupSignaturePad() {
     const canvas = document.getElementById("signaturePad");
     const placeholder = document.getElementById("sigPlaceholder");
-    if (!canvas) return;
-
     const ctx = canvas.getContext("2d");
-    let drawing = false, lastX = 0, lastY = 0, signed = false;
+
+    let drawing = false,
+        signed = false,
+        lastX = 0,
+        lastY = 0;
 
     function resize() {
-        const r = canvas.getBoundingClientRect();
-        canvas.width = r.width;
-        canvas.height = r.height;
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = rect.width;
+        canvas.height = rect.height;
     }
 
     resize();
     window.addEventListener("resize", resize);
 
-    function pos(e) {
-        const r = canvas.getBoundingClientRect();
-        const x = (e.touches ? e.touches[0].clientX : e.clientX) - r.left;
-        const y = (e.touches ? e.touches[0].clientY : e.clientY) - r.top;
+    function getPos(e) {
+        const rect = canvas.getBoundingClientRect();
+        const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+        const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
         return { x, y };
     }
 
     function start(e) {
         drawing = true;
-        const p = pos(e);
-        lastX = p.x; lastY = p.y;
+        const p = getPos(e);
+        lastX = p.x;
+        lastY = p.y;
         placeholder.style.display = "none";
     }
 
     function move(e) {
         if (!drawing) return;
-        const p = pos(e);
+        const p = getPos(e);
         ctx.beginPath();
         ctx.moveTo(lastX, lastY);
         ctx.lineTo(p.x, p.y);
@@ -224,228 +182,110 @@ function setupSignaturePad() {
 
     canvas.addEventListener("mousedown", start);
     canvas.addEventListener("mousemove", move);
-    window.addEventListener("mouseup", () => drawing = false);
+    window.addEventListener("mouseup", () => (drawing = false));
 
-    canvas.addEventListener("touchstart", start, { passive: false });
-    canvas.addEventListener("touchmove", move, { passive: false });
-    canvas.addEventListener("touchend", () => drawing = false);
+    canvas.addEventListener("touchstart", start);
+    canvas.addEventListener("touchmove", move);
+    canvas.addEventListener("touchend", () => (drawing = false));
 
-    document.getElementById("clearSigBtn")?.addEventListener("click", () => {
+    document.getElementById("clearSigBtn").onclick = () => {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        placeholder.style.display = "block";
         signed = false;
-    });
+        placeholder.style.display = "block";
+    };
 
     window._sigPad = {
         hasSignature: () => signed,
-        getDataUrl: () => signed ? canvas.toDataURL("image/png") : "",
+        getDataUrl: () => (signed ? canvas.toDataURL("image/png") : ""),
         clear: () => {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            placeholder.style.display = "block";
             signed = false;
+            placeholder.style.display = "block";
         }
     };
 }
 
 /* ============================================================
-   SECTION 6 — SUBMIT HANDLER
+   SUBMIT CHECK-IN
 ============================================================ */
 
-document.getElementById("submitBtn")?.addEventListener("click", () => {
+document.getElementById("submitBtn").onclick = () => {
+    const fn = firstName.value.trim();
+    const ln = lastName.value.trim();
+    let company = companySelect.value;
+    let reason = reasonSelect.value;
 
-    const firstName = document.getElementById("firstName").value.trim();
-    const lastName = document.getElementById("lastName").value.trim();
+    if (!fn || !ln) return alert("Enter first and last name.");
 
-    if (!firstName || !lastName) {
-        alert("Please enter the donor’s first and last name.");
-        return;
-    }
+    if (company === OTHER_COMPANY_VALUE)
+        company = otherCompany.value.trim();
+    if (!company) return alert("Enter a company.");
 
-    // REASON
-    let reason = document.getElementById("reasonSelect").value;
-    if (reason === "other") {
-        reason = document.getElementById("otherReasonInput").value.trim();
-    }
+    if (reason === "other")
+        reason = otherReasonInput.value.trim();
+    if (!reason) return alert("Enter reason.");
 
-    if (!reason) {
-        alert("Please enter a reason for testing.");
-        return;
-    }
-
-    // COMPANY
-    let employer = document.getElementById("companySelect").value;
-    if (employer === OTHER_COMPANY_VALUE) {
-        employer = document.getElementById("otherCompany").value.trim();
-    }
-
-    if (!employer) {
-        alert("Please choose or enter a company.");
-        return;
-    }
-
-    // SERVICES
     const services = {
-        drug: document.getElementById("srvDrug").checked,
-        dna: document.getElementById("srvDNA").checked,
-        vision: document.getElementById("srvVision").checked,
-        alcohol: document.getElementById("srvAlcohol").checked,
-        dot: document.getElementById("srvDOT").checked,
-        other: document.getElementById("srvOther").checked,
-        otherText: document.getElementById("srvOtherText").value.trim()
+        drug: srvDrug.checked,
+        alcohol: srvAlcohol.checked,
+        vision: srvVision.checked,
+        dot: srvDOT.checked,
+        dna: srvDNA.checked,
+        other: srvOther.checked,
+        otherText: srvOtherText.value.trim()
     };
 
-    if (!Object.values(services).includes(true)) {
-        alert("Please select at least one service.");
-        return;
-    }
+    if (!Object.values(services).includes(true))
+        return alert("Select a service.");
 
-    if (services.other && !services.otherText) {
-        alert("Please describe the 'Other' service.");
-        return;
-    }
+    if (services.other && !services.otherText)
+        return alert("Describe the other service.");
 
-    // SIGNATURE
-    const sigPad = window._sigPad;
-    if (!sigPad?.hasSignature()) {
-        alert("Signature is required.");
-        return;
-    }
+    if (!window._sigPad.hasSignature())
+        return alert("Signature required.");
 
-    const now = new Date().toISOString();
-
-    const record = {
-        firstName,
-        lastName,
-        employer,
+    addRecord({
+        firstName: fn,
+        lastName: ln,
+        employer: company,
         reason,
         services,
-        signature: sigPad.getDataUrl(),
-        date: now
-    };
+        signature: window._sigPad.getDataUrl(),
+        date: new Date().toISOString()
+    });
 
-    addRecord(record);
-   
-// CLEAR FORM AFTER SUBMISSION
-document.getElementById("firstName").value = "";
-document.getElementById("lastName").value = "";
-
-document.getElementById("companySelect").value = "";
-document.getElementById("otherCompany").value = "";
-document.getElementById("otherCompanyWrapper").style.display = "none";
-
-document.getElementById("reasonSelect").value = "";
-document.getElementById("otherReasonInput").value = "";
-document.getElementById("otherReasonWrapper").style.display = "none";
-
-// Clear all service checkboxes
-document.getElementById("srvDrug").checked = false;
-document.getElementById("srvDNA").checked = false;
-document.getElementById("srvVision").checked = false;
-document.getElementById("srvAlcohol").checked = false;
-document.getElementById("srvDOT").checked = false;
-document.getElementById("srvOther").checked = false;
-
-document.getElementById("srvOtherText").value = "";
-document.getElementById("otherServiceWrapper").style.display = "none";
-
-// Clear signature
-sigPad.clear();
-
-    alert("Donor successfully checked in!");
-
-    renderRecordsTable();
-});
+    alert("Donor checked in.");
+    window._sigPad.clear();
+    document.getElementById("checkInSection").reset?.(); // clean reset
+    location.reload();
+};
 
 /* ============================================================
-   SECTION 7 — RENDER TABLE
+   ADMIN LOGIN
 ============================================================ */
 
-function renderRecordsTable() {
-    const tbody = document.getElementById("recordsTableBody");
-    if (!tbody) return;
+document.getElementById("toggleAdminBtn").onclick = () => {
+    const pin = prompt("Enter Admin PIN:");
 
-    const records = loadRecords();
-    tbody.innerHTML = "";
-
-    if (!records.length) {
-        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;">No records found.</td></tr>`;
-        return;
+    if (pin === ADMIN_PIN) {
+        adminArea.style.display = "block";
+        checkInSection.style.display = "none";
+    } else {
+        alert("Incorrect PIN.");
     }
+};
 
-    records.forEach((rec, i) => {
-        const dt = formatDateTime(rec.date);
-        tbody.insertAdjacentHTML("beforeend", `
-            <tr>
-                <td>${dt.date}</td>
-                <td>${dt.time}</td>
-                <td>${rec.firstName} ${rec.lastName}</td>
-                <td>${rec.employer}</td>
-                <td>${rec.reason}</td>
-                <td>${formatServices(rec.services)}</td>
-                <td><button class="viewSigBtn" data-index="${i}">View</button></td>
-            </tr>
-        `);
-    });
-
-    attachSignatureViewButtons();
-}
+document.getElementById("exitAdminBtn").onclick = () => {
+    adminArea.style.display = "none";
+    checkInSection.style.display = "block";
+};
 
 /* ============================================================
-   SECTION 8 — SIGNATURE MODAL
-============================================================ */
-
-function attachSignatureViewButtons() {
-    document.querySelectorAll(".viewSigBtn").forEach(btn => {
-        btn.addEventListener("click", () => {
-            const i = btn.dataset.index;
-            const rec = loadRecords()[i];
-
-            if (!rec.signature) {
-                alert("No signature saved.");
-                return;
-            }
-
-            document.getElementById("signatureModalImg").src = rec.signature;
-            document.getElementById("signatureModal").style.display = "flex";
-        });
-    });
-}
-
-document.getElementById("closeSignatureModal")?.addEventListener("click", () => {
-    document.getElementById("signatureModal").style.display = "none";
-});
-
-/* ============================================================
-   SECTION 9 — INIT
+   INIT
 ============================================================ */
 
 window.onload = () => {
     renderCompanySelect();
     renderCompanyListDisplay();
     setupSignaturePad();
-    renderRecordsTable();
 };
-/* ============================================================
-   ADMIN LOGIN SYSTEM (FINAL VERSION)
-============================================================ */
-
-const ADMIN_PIN = "2468";
-
-// OPEN ADMIN MODE
-document.getElementById("toggleAdminBtn")?.addEventListener("click", () => {
-    const pin = prompt("Enter Admin PIN:");
-
-    if (pin === ADMIN_PIN) {
-        // Show admin panel
-        document.getElementById("adminArea").style.display = "block";
-        document.getElementById("checkInSection").style.display = "none";
-    } else {
-        alert("Incorrect PIN.");
-    }
-});
-
-// EXIT ADMIN MODE
-document.getElementById("exitAdminBtn")?.addEventListener("click", () => {
-    document.getElementById("adminArea").style.display = "none";
-    document.getElementById("checkInSection").style.display = "block";
-});
