@@ -181,30 +181,3 @@ td {
 .secondary-btn:hover {
     background: #ccc;
 }
-#otherCompany {
-    position: relative;
-    z-index: 20;
-    pointer-events: auto;
-}
-
-#otherReasonWrapper {
-    position: relative;
-    z-index: 10;
-}
-
-#otherReasonInput {
-    position: relative;
-    z-index: 10;
-    pointer-events: auto;
-}
-/* FIX: Company dropdown stuck behind elements */
-#companySelect {
-    position: relative;
-    z-index: 20;
-    pointer-events: auto;
-}
-
-#otherCompanyWrapper {
-    position: relative;
-    z-index: 20;
-}
