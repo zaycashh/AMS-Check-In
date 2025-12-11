@@ -127,17 +127,19 @@ body {
    SIGNATURE PAD
 =================================================================== */
 .signature-pad-wrapper {
+    position: relative;
     width: 100%;
     height: 220px;
-    border: 2px dashed #9ca3af;
+    border: 2px dashed #999; /* single border here */
     border-radius: 10px;
-    background: #f9fafb;
-    position: relative;
+    overflow: hidden; /* prevents canvas overlap */
 }
 
 .sig-canvas {
-    width: 100%;
-    height: 100%;
+    width: 100% !important;
+    height: 100% !important;
+    border: none !important; /* removes second border */
+    display: block;
 }
 
 .sig-placeholder {
