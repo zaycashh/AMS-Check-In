@@ -1,7 +1,7 @@
 /* =========================================================
    GLOBAL VARIABLES + CONSTANTS
 ========================================================= */
-const ADMIN_PIN = "2468"; 
+const ADMIN_PIN = "2468";   // Admin PIN
 let signaturePad = null;
 
 /* =========================================================
@@ -10,14 +10,18 @@ let signaturePad = null;
 function setupSignaturePad() {
     const canvas = document.getElementById("signaturePad");
     const placeholder = document.getElementById("sigPlaceholder");
-    const ctx = canvas.getContext("2d");
 
+    /* FIX CANVAS INTERNAL SIZE */
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+
+    const ctx = canvas.getContext("2d");
     ctx.lineWidth = 2;
     ctx.lineCap = "round";
 
     let drawing = false;
 
-    /* ------------ Unified Mouse Position Function ------------ */
+    /* -------- Mouse Position Function -------- */
     function getMousePos(e) {
         const rect = canvas.getBoundingClientRect();
         return {
@@ -26,32 +30,37 @@ function setupSignaturePad() {
         };
     }
 
-    /* ------------ Unified Touch Position Function ------------ */
+    /* -------- Touch Position Function -------- */
     function getTouchPos(e) {
         const rect = canvas.getBoundingClientRect();
-        const t = e.touches[0];
+        const touch = e.touches[0];
         return {
-            x: t.clientX - rect.left,
-            y: t.clientY - rect.top
+            x: touch.clientX - rect.left,
+            y: touch.clientY - rect.top
         };
     }
 
-    /* =========================================================
-       MOUSE EVENTS — PERFECT ALIGNMENT
-    ========================================================== */
-    canvas.addEventListener("mousedown", (e) => {
-        const pos = getMousePos(e);
-        drawing = true;
-        placeholder.style.display = "none";
-        ctx.beginPath();
-        ctx.moveTo(pos.x, pos.y);
-    });
-
-    canvas.addEventListener("mousemove", (e) => {
+    /* -------- DRAW FUNCTION -------- */
+    function draw(e) {
         if (!drawing) return;
-        const pos = getMousePos(e);
+
+        const pos = e.touches ? getTouchPos(e) : getMousePos(e);
+
         ctx.lineTo(pos.x, pos.y);
         ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(pos.x, pos.y);
+
+        if (e.touches) e.preventDefault();
+    }
+
+    /* -------- MOUSE EVENTS -------- */
+    canvas.addEventListener("mousedown", (e) => {
+        drawing = true;
+        placeholder.style.display = "none";
+
+        const pos = getMousePos(e);
         ctx.beginPath();
         ctx.moveTo(pos.x, pos.y);
     });
@@ -61,36 +70,28 @@ function setupSignaturePad() {
         ctx.beginPath();
     });
 
-    /* =========================================================
-       TOUCH EVENTS — PERFECT ALIGNMENT
-    ========================================================== */
+    canvas.addEventListener("mousemove", draw);
+
+    /* -------- TOUCH EVENTS -------- */
     canvas.addEventListener("touchstart", (e) => {
-        e.preventDefault();
-        const pos = getTouchPos(e);
         drawing = true;
         placeholder.style.display = "none";
-        ctx.beginPath();
-        ctx.moveTo(pos.x, pos.y);
-    }, { passive: false });
 
-    canvas.addEventListener("touchmove", (e) => {
-        e.preventDefault();
-        if (!drawing) return;
         const pos = getTouchPos(e);
-        ctx.lineTo(pos.x, pos.y);
-        ctx.stroke();
         ctx.beginPath();
         ctx.moveTo(pos.x, pos.y);
-    }, { passive: false });
+
+        e.preventDefault();
+    });
 
     canvas.addEventListener("touchend", () => {
         drawing = false;
         ctx.beginPath();
     });
 
-    /* =========================================================
-       CLEAR SIGNATURE
-    ========================================================== */
+    canvas.addEventListener("touchmove", draw);
+
+    /* -------- CLEAR BUTTON -------- */
     document.getElementById("clearSigBtn").addEventListener("click", () => {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         placeholder.style.display = "block";
@@ -148,15 +149,18 @@ document.getElementById("submitBtn").addEventListener("click", () => {
         finalReason = document.getElementById("otherReasonInput").value.trim();
     }
 
+    // Collect selected services
     const services = Array.from(
         document.querySelectorAll('input[name="services"]:checked')
     ).map(cb => cb.value);
 
+    // Add "Other service text"
     if (services.includes("Other")) {
         const custom = document.getElementById("srvOtherText").value.trim();
         if (custom) services.push(custom);
     }
 
+    // Capture signature
     const canvas = document.getElementById("signaturePad");
     const signature = canvas.toDataURL();
 
@@ -172,6 +176,7 @@ document.getElementById("submitBtn").addEventListener("click", () => {
         signature
     };
 
+    // Save to localStorage
     let logs = JSON.parse(localStorage.getItem("ams_logs") || "[]");
     logs.push(record);
     localStorage.setItem("ams_logs", JSON.stringify(logs));
@@ -201,6 +206,7 @@ document.getElementById("toggleAdminBtn").addEventListener("click", () => {
     }
 });
 
+/* EXIT ADMIN */
 document.getElementById("exitAdminBtn").addEventListener("click", () => {
     document.getElementById("adminArea").style.display = "none";
     document.getElementById("checkInSection").style.display = "block";
@@ -230,6 +236,7 @@ function renderAdminRecords() {
         tbody.appendChild(row);
     });
 
+    // Click signature → full modal
     document.querySelectorAll(".sig-thumb").forEach(img => {
         img.addEventListener("click", () => {
             document.getElementById("signatureModalImg").src =
