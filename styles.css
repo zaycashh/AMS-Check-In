@@ -342,9 +342,8 @@ body {
     min-width: 150px;
 }
 
-/* Green focus effect like Date Range */
+/* Green focus glow */
 .uniform-filter:focus {
     border-color: #4F8C47 !important;
     box-shadow: 0 0 4px rgba(79,140,71,0.45) !important;
 }
-
