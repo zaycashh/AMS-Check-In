@@ -287,12 +287,19 @@ body {
         gap: 10px;
     }
 /* ============================================================
-   ADMIN FILTER BAR — Medium Size Inputs & Dropdowns
+   ADMIN FILTER BAR — Force Medium Input Size
 ============================================================ */
 .filter-bar input,
 .filter-bar select {
-    height: 48px !important;     /* Medium height */
-    padding: 10px 14px !important;
-    font-size: 16px;
-    border-radius: 8px;
+    height: 44px !important;      /* Medium height */
+    font-size: 15px !important;   /* Medium text */
+    padding: 8px 12px !important; /* Medium padding */
+    border-radius: 8px !important;
 }
+
+/* Optional: Make fields a bit wider for better spacing */
+#filterName { width: 180px !important; }
+#filterCompany { width: 150px !important; }
+#filterDateStart,
+#filterDateEnd { width: 140px !important; }
+#filterDateRange { width: 140px !important; }
