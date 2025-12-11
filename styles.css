@@ -283,3 +283,39 @@ body {
     user-select: none;
     opacity: 0.6;
 }
+/* ================================================================
+   FIX SIGNATURE BOX DOUBLE BORDER / OVERLAP
+================================================================ */
+
+.signature-container {
+  width: 100%;
+}
+
+.signature-pad-wrapper {
+  position: relative;
+  width: 100%;
+  height: 220px;
+  border: 2px dashed #999; /* The ONLY border */
+  border-radius: 10px;
+  overflow: hidden;  /* Stops canvas from overflowing */
+  background: #fff; /* Keep clean background */
+}
+
+.sig-canvas {
+  width: 100% !important;
+  height: 100% !important;
+  border: none !important; /* REMOVE canvas border completely */
+  outline: none !important;
+  display: block;
+  box-sizing: border-box;
+}
+
+.sig-placeholder {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #9ca3af;
+  font-size: 20px;
+  pointer-events: none;
+}
