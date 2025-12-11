@@ -297,33 +297,32 @@ body {
     border-radius: 8px !important;
 }
 
-/* Optional: Make fields a bit wider for better spacing */
-#filterName { width: 180px !important; }
-#filterCompany { width: 150px !important; }
-#filterDateStart,
-#filterDateEnd { width: 140px !important; }
-#filterDateRange { width: 140px !important; }
-
 /* =========================================================
-   UNIFY FILTER BAR INPUT STYLES
+   FORCE FILTER BAR ELEMENTS TO UNIFORM SIZE & STYLE
 ========================================================= */
 
-.filter-bar input[type="text"],
-.filter-bar input[type="date"],
-.filter-bar select {
-    height: 36px;
-    padding: 6px 10px;
-    font-size: 14px;
-    border: 1px solid #cbd5e1;
-    border-radius: 8px;
-    background: #ffffff;
-    color: #1f2937;
-    outline: none;
+#filterName,
+#filterCompany,
+#filterDateStart,
+#filterDateEnd,
+#filterDateRange {
+    height: 38px !important;
+    padding: 6px 10px !important;
+    font-size: 15px !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 8px !important;
+    background: #ffffff !important;
+    color: #1f2937 !important;
+    outline: none !important;
+    min-width: 140px;
 }
 
-.filter-bar input[type="text"]:focus,
-.filter-bar input[type="date"]:focus,
-.filter-bar select:focus {
-    border-color: #4F8C47;
-    box-shadow: 0 0 3px rgba(79,140,71,0.4);
+/* On focus (click) → green outline */
+#filterName:focus,
+#filterCompany:focus,
+#filterDateStart:focus,
+#filterDateEnd:focus,
+#filterDateRange:focus {
+    border-color: #4F8C47 !important;
+    box-shadow: 0 0 4px rgba(79,140,71,0.4) !important;
 }
