@@ -22,9 +22,49 @@ function setupSignaturePad() {
         placeholder.style.display = "none";
     });
 
-    canvas.addEventListener("mouseup", () => { drawing = false; ctx.beginPath(); });
-    canvas.addEventListener("mousemove", draw);
+    // Hide placeholder when signing starts (mouse)
+canvas.addEventListener("mousedown", () => {
+    drawing = true;
+    placeholder.style.display = "none";
+});
 
+// Mouse up stops drawing
+canvas.addEventListener("mouseup", () => { 
+    drawing = false; 
+    ctx.beginPath(); 
+});
+
+// Mouse move draws
+canvas.addEventListener("mousemove", draw);
+
+// Hide placeholder on touchscreen start
+canvas.addEventListener("touchstart", (e) => {
+    drawing = true;
+    placeholder.style.display = "none";
+    ctx.beginPath();
+});
+
+// Mobile drawing support
+canvas.addEventListener("touchmove", (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const touch = e.touches[0];
+    const x = touch.clientX - rect.left;
+    const y = touch.clientY - rect.top;
+
+    ctx.lineTo(x, y);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+});
+
+// Restore placeholder when signature is cleared
+document.getElementById("clearSigBtn").addEventListener("click", () => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    placeholder.style.display = "block";
+});
+
+   
+   
     function draw(e) {
         if (!drawing) return;
         ctx.lineTo(e.offsetX, e.offsetY);
