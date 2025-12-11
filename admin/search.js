@@ -1,5 +1,5 @@
 /* ============================================================
-   ADMIN SEARCH MODULE – CLEAN + FULLY WORKING
+   ADMIN SEARCH MODULE – PREMIUM VERSION (NO DUPLICATES)
 ============================================================ */
 
 console.log("Admin Search Module Loaded");
@@ -115,7 +115,7 @@ function applyFilters() {
 }
 
 /* --------------------------------------
-   RENDER RESULTS
+   RENDER RESULTS INTO TABLE
 -------------------------------------- */
 function renderFilteredResults(list) {
     const tbody = document.getElementById("searchResults");
@@ -137,7 +137,7 @@ function renderFilteredResults(list) {
 }
 
 /* ============================================================
-   POPULATE COMPANY DROPDOWN
+   POPULATE DROPDOWN
 ============================================================ */
 function populateCompanyDropdown() {
     const logs = getLogs();
@@ -200,7 +200,7 @@ function exportToExcel() {
 }
 
 /* ============================================================
-   EXPORT PDF (PROFESSIONAL FORMAT)
+   EXPORT PDF (PREMIUM FORMAT)
 ============================================================ */
 async function exportToPDF() {
     const logs = filteredResults || getLogs();
@@ -214,12 +214,11 @@ async function exportToPDF() {
             let img = new Image();
             img.crossOrigin = "Anonymous";
             img.onload = function () {
-                let canvas = document.createElement("canvas");
-                canvas.width = img.width;
-                canvas.height = img.height;
-                let ctx = canvas.getContext("2d");
-                ctx.drawImage(img, 0, 0);
-                resolve(canvas.toDataURL("image/png"));
+                const c = document.createElement("canvas");
+                c.width = img.width;
+                c.height = img.height;
+                c.getContext("2d").drawImage(img, 0, 0);
+                resolve(c.toDataURL("image/png"));
             };
             img.src = imgUrl;
         });
@@ -238,7 +237,7 @@ async function exportToPDF() {
     ];
 
     for (let log of logs) {
-        const sigBase64 = log.signature ? await getBase64(log.signature) : "";
+        const sig = log.signature ? await getBase64(log.signature) : "";
 
         tableBody.push([
             log.date,
@@ -247,16 +246,30 @@ async function exportToPDF() {
             log.company,
             log.reason,
             log.services,
-            sigBase64 ? { image: sigBase64, width: 80 } : ""
+            sig ? { image: sig, width: 80 } : ""
         ]);
     }
 
     const docDef = {
         pageOrientation: "landscape",
         pageSize: "LETTER",
+
+        header: {
+            columns: [
+                { text: "AMS Check-In Report", fontSize: 16, bold: true, margin: [20, 10] },
+                { text: new Date().toLocaleDateString(), alignment: "right", margin: [0, 10, 20, 0] }
+            ]
+        },
+
+        footer: function (currentPage, pageCount) {
+            return {
+                text: `Page ${currentPage} of ${pageCount}`,
+                alignment: "center",
+                margin: [0, 10, 0, 0]
+            };
+        },
+
         content: [
-            { text: "AMS Check-In Report", style: "header" },
-            { text: "Generated: " + new Date().toLocaleString(), style: "subheader" },
             {
                 table: {
                     headerRows: 1,
@@ -264,11 +277,7 @@ async function exportToPDF() {
                     body: tableBody
                 }
             }
-        ],
-        styles: {
-            header: { fontSize: 20, bold: true, margin: [0, 0, 0, 10] },
-            subheader: { fontSize: 12, margin: [0, 0, 0, 10] }
-        }
+        ]
     };
 
     pdfMake.createPdf(docDef).download("AMS_Report.pdf");
@@ -278,7 +287,6 @@ async function exportToPDF() {
    INIT EVENT LISTENERS
 ============================================================ */
 document.addEventListener("DOMContentLoaded", () => {
-
     populateCompanyDropdown();
     applyFilters();
 
