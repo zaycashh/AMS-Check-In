@@ -73,33 +73,22 @@
 
     <div class="services-group">
         <label class="service-item">
-            <input type="checkbox" name="services" value="Drug Test">
-            Drug Test
+            <input type="checkbox" name="services" value="Drug Test"> Drug Test
         </label>
-
         <label class="service-item">
-            <input type="checkbox" name="services" value="Alcohol Test">
-            Alcohol Test
+            <input type="checkbox" name="services" value="Alcohol Test"> Alcohol Test
         </label>
-
         <label class="service-item">
-            <input type="checkbox" name="services" value="Vision Test">
-            Vision Test
+            <input type="checkbox" name="services" value="Vision Test"> Vision Test
         </label>
-
         <label class="service-item">
-            <input type="checkbox" name="services" value="DOT Physical">
-            DOT Physical
+            <input type="checkbox" name="services" value="DOT Physical"> DOT Physical
         </label>
-
         <label class="service-item">
-            <input type="checkbox" name="services" value="DNA (Paternity Test)">
-            DNA (Paternity Test)
+            <input type="checkbox" name="services" value="DNA (Paternity Test)"> DNA (Paternity Test)
         </label>
-
         <label class="service-item">
-            <input type="checkbox" name="services" value="Other">
-            Other
+            <input type="checkbox" name="services" value="Other"> Other
         </label>
     </div>
 
@@ -118,7 +107,7 @@
     </div>
 
     <button id="clearSigBtn" class="secondary-btn">Clear Signature</button>
-    
+
     <div style="display:flex; justify-content:flex-end; margin-top:10px;">
         <button id="resetFormBtn" class="secondary-btn">Reset Form</button>
     </div>
@@ -148,24 +137,17 @@
     <h2>Search Log</h2>
 
     <!-- FILTER BAR -->
-    <div class="filter-bar" style="margin:15px 0; display:flex; flex-wrap:wrap; gap:10px;">
+    <div class="filter-bar">
+        <input type="text" id="filterName" placeholder="Search Name..." class="filter-input">
 
-        <input type="text" id="filterName" placeholder="Search Name..."
-            style="padding:8px; border:1px solid #ccc; border-radius:6px;">
-
-        <select id="filterCompany"
-            style="padding:8px; border:1px solid #ccc; border-radius:6px;">
+        <select id="filterCompany" class="filter-input">
             <option value="">All Companies</option>
         </select>
 
-        <input type="date" id="filterDateStart"
-            style="padding:8px; border:1px solid #ccc; border-radius:6px;">
+        <input type="date" id="filterDateStart" class="filter-input">
+        <input type="date" id="filterDateEnd" class="filter-input">
 
-        <input type="date" id="filterDateEnd"
-            style="padding:8px; border:1px solid #ccc; border-radius:6px;">
-
-        <select id="filterDateRange"
-            style="padding:8px; border:1px solid #ccc; border-radius:6px;">
+        <select id="filterDateRange" class="filter-input">
             <option value="">Date Range</option>
             <option value="today">Today</option>
             <option value="yesterday">Yesterday</option>
@@ -176,27 +158,25 @@
             <option value="thisYear">This Year</option>
             <option value="lastYear">Last Year</option>
         </select>
-
     </div>
-    
-<!-- EXPORT BUTTONS -->
-<div class="export-bar">
-    <button id="btnExportExcel" class="export-btn excel">Export XLS</button>
-    <button id="btnExportPDF" class="export-btn pdf">Export PDF</button>
-</div>
 
+    <!-- EXPORT BUTTONS -->
+    <div class="export-bar">
+        <button id="btnExportExcel" class="export-btn excel">Export XLS</button>
+        <button id="btnExportPDF" class="export-btn pdf">Export PDF</button>
+    </div>
 
-    <!-- SEARCH RESULTS TABLE -->
-    <table class="log-table" style="width:100%; border-collapse:collapse; margin-top:15px;">
+    <!-- RESULTS TABLE -->
+    <table class="log-table">
         <thead>
-            <tr style="background:#e6e6e6; font-weight:bold;">
-                <th style="padding:8px; border:1px solid #ccc;">Date</th>
-                <th style="padding:8px; border:1px solid #ccc;">Time</th>
-                <th style="padding:8px; border:1px solid #ccc;">Name</th>
-                <th style="padding:8px; border:1px solid #ccc;">Company</th>
-                <th style="padding:8px; border:1px solid #ccc;">Reason</th>
-                <th style="padding:8px; border:1px solid #ccc;">Services</th>
-                <th style="padding:8px; border:1px solid #ccc;">Signature</th>
+            <tr>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Name</th>
+                <th>Company</th>
+                <th>Reason</th>
+                <th>Services</th>
+                <th>Signature</th>
             </tr>
         </thead>
         <tbody id="searchResults"></tbody>
@@ -213,11 +193,15 @@
     </div>
 </div>
 
-<!-- PDF Library -->
+<!-- PDF Libraries -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+
+<!-- APP SCRIPTS -->
 <script src="app.js"></script>
 <script src="admin/search.js"></script>
 <script src="admin/general.js"></script>
+
 </body>
 </html>
+
