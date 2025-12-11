@@ -394,9 +394,19 @@ document.getElementById("srvOther")?.addEventListener("change", () => {
 ===================================================================== */
 
 document.getElementById("submitBtn")?.addEventListener("click", () => {
-    const reason = document.getElementById("reason").value.trim();
-    const employer = document.getElementById("companySelect").value.trim();
 
+    // REASON SELECTION
+    let reason = document.getElementById("reasonSelect").value.trim();
+    if (reason === "other") {
+        reason = document.getElementById("otherReasonInput").value.trim();
+    }
+
+    // EMPLOYER SELECTION
+    let employer = document.getElementById("companySelect").value.trim();
+    if (employer === "other") {
+        employer = document.getElementById("otherCompany").value.trim();
+    }
+   
     // SERVICE CHECKBOXES
     const services = {
         drug: document.getElementById("srvDrug").checked,
