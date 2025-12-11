@@ -232,28 +232,23 @@ body {
    MOBILE RESPONSIVE
 =================================================================== */
 @media (max-width: 600px) {
-    .section-card {
-        padding: 25px;
-    }
-/* ==========================================================
-   RESET BUTTON — RED STYLE
-========================================================== */
+  .section-card {
+      padding: 25px;
+  }
+}
+
+/* --- MAKE RESET BUTTON RED --- */
 #resetFormBtn {
-    background: #b91c1c !important; /* AMS-friendly red */
-    color: white !important;
-    border-radius: 8px;
-    padding: 10px 16px;
-    font-size: 16px;
-    cursor: pointer;
-    border: none;
-    transition: 0.2s ease-in-out;
+  background: #dc2626 !important;
+  color: white !important;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-size: 16px;
+  cursor: pointer;
+  border: none;
+  transition: 0.2s ease-in-out;
 }
 
 #resetFormBtn:hover {
-    background: #991b1b; /* darker red hover */
-}
-
-    .services-group {
-        grid-template-columns: 1fr;
-    }
+  background: #b91c1c !important;
 }
