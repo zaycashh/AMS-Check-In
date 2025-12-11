@@ -149,7 +149,40 @@
 
 <!-- FILTER BAR -->
 <div class="filter-bar" style="margin:15px 0; display:flex; flex-wrap:wrap; gap:10px;">
-    </div>   <!-- end filter bar -->
+
+    <!-- Search Name -->
+    <input type="text" id="filterName" placeholder="Search Name..."
+        style="padding:8px; border:1px solid #ccc; border-radius:6px;">
+
+    <!-- Company Filter -->
+    <select id="filterCompany"
+        style="padding:8px; border:1px solid #ccc; border-radius:6px;">
+        <option value="">All Companies</option>
+    </select>
+
+    <!-- Start Date -->
+    <input type="date" id="filterDateStart"
+        style="padding:8px; border:1px solid #ccc; border-radius:6px;">
+
+    <!-- End Date -->
+    <input type="date" id="filterDateEnd"
+        style="padding:8px; border:1px solid #ccc; border-radius:6px;">
+
+    <!-- Date Range Dropdown -->
+    <select id="filterDateRange"
+        style="padding:8px; border:1px solid #ccc; border-radius:6px;">
+        <option value="">Date Range</option>
+        <option value="today">Today</option>
+        <option value="yesterday">Yesterday</option>
+        <option value="thisWeek">This Week</option>
+        <option value="lastWeek">Last Week</option>
+        <option value="thisMonth">This Month</option>
+        <option value="lastMonth">Last Month</option>
+        <option value="thisYear">This Year</option>
+        <option value="lastYear">Last Year</option>
+    </select>
+
+</div> 
 
 <!-- SEARCH RESULTS TABLE -->
 <table class="log-table" style="width:100%; border-collapse:collapse; margin-top:15px;">
