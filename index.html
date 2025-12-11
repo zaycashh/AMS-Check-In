@@ -145,23 +145,28 @@
     </div>
 
     <!-- SEARCH LOG -->
-    <div id="tabSearch" class="tab-content active">
-        <h2>Search Log</h2>
-        <table id="resultsTable" class="admin-table">
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Time</th>
-                    <th>Name</th>
-                    <th>Company</th>
-                    <th>Reason</th>
-                    <th>Services</th>
-                    <th>Signature</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-    </div>
+    <h2>Search Log</h2>
+
+<!-- FILTER BAR -->
+<div class="filter-bar" style="margin: 15px 0; display:flex; flex-wrap:wrap; gap:10px;">
+
+    <input type="text" id="filterName" placeholder="Search Name..." 
+        style="padding:8px; border:1px solid #ccc; border-radius:6px;">
+
+    <input type="date" id="filterDateStart" 
+        style="padding:8px; border:1px solid #ccc; border-radius:6px;">
+
+    <input type="date" id="filterDateEnd" 
+        style="padding:8px; border:1px solid #ccc; border-radius:6px;">
+
+    <select id="filterCompany" style="padding:8px; border:1px solid #ccc; border-radius:6px;">
+        <option value="">All Companies</option>
+    </select>
+
+    <button id="btnExportExcel" class="secondary-btn">Export Excel</button>
+    <button id="btnExportPDF" class="secondary-btn">Export PDF</button>
+
+</div>
 
 </section>
 
