@@ -251,3 +251,8 @@ window.onload = () => {
     renderCompanySelect();
     setupSignaturePad();
 };
+
+// RESET FORM BUTTON
+document.getElementById("resetFormBtn")?.addEventListener("click", () => {
+    location.reload();
+});
