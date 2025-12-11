@@ -143,3 +143,39 @@ header.main-header {
     font-weight: 700 !important;
     margin-bottom: 10px !important; /* Matches spacing in screenshot */
 }
+/* ===== CLEAN MODERN CLINIC FORM STYLE ===== */
+
+/* Make the main card narrower and centered */
+.section-card {
+    max-width: 480px !important;      /* Perfect medium size */
+    margin: 20px auto !important;
+    padding: 22px !important;
+    border-radius: 12px !important;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+/* Input and dropdown fields: medium, centered */
+.section-card input[type="text"],
+.section-card select {
+    width: 100% !important;
+    max-width: 420px !important;
+    margin: 0 auto !important;
+    display: block !important;
+}
+
+/* Section title cleaner */
+.section-title {
+    font-size: 1.3rem !important;
+    font-weight: 700 !important;
+    margin-bottom: 14px !important;
+}
+
+/* Smaller Signature Canvas */
+#signaturePad {
+    width: 100% !important;
+    max-width: 420px !important;
+    height: 180px !important;
+    margin: 0 auto !important;
+    display: block !important;
+    border-radius: 10px;
+}
