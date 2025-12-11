@@ -114,20 +114,27 @@
 
 </section>
 
-<!-- =========================================================
-     ADMIN PANEL (HIDDEN UNTIL LOGIN)
-========================================================= -->
-<section id="adminArea" style="display:none;">
+/* ============================================================
+   ADMIN LOGIN SYSTEM
+============================================================ */
 
-    <button id="exitAdminBtn" class="secondary-btn" style="margin:10px 0;">Exit Admin Mode</button>
+document.getElementById("toggleAdminBtn")?.addEventListener("click", () => {
+    const pin = prompt("Enter Admin PIN:");
 
-    <div class="tab-bar">
-        <div class="tab active" data-tab="tabSearch">Search Log</div>
-        <div class="tab" data-tab="tabGeneral">General Report</div>
-        <div class="tab" data-tab="tabCompany">Detail Company Report</div>
-        <div class="tab" data-tab="tabRecent">Recent Check-Ins</div>
-        <div class="tab" data-tab="tabManage">Manage Companies</div>
-    </div>
+    if (pin === ADMIN_PIN) {
+        // SHOW ADMIN PANEL
+        document.getElementById("adminArea").style.display = "block";
+        document.getElementById("checkInSection").style.display = "none";
+    } else {
+        alert("Incorrect PIN.");
+    }
+});
+
+// EXIT ADMIN MODE BUTTON
+document.getElementById("exitAdminBtn")?.addEventListener("click", () => {
+    document.getElementById("adminArea").style.display = "none";
+    document.getElementById("checkInSection").style.display = "block";
+});
 
     <!-- SEARCH LOG -->
     <div id="tabSearch" class="tab-content active">
