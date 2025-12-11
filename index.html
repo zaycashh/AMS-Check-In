@@ -136,20 +136,24 @@
     <!-- SEARCH LOG -->
     <h2>Search Log</h2>
 
-    <!-- FILTER BAR -->
-    <div class="filter-bar">
-        <input type="text" id="filterName" placeholder="Search Name..." class="filter-input">
+<!-- FILTER BAR -->
+<div class="filter-bar">
 
-        <select id="filterCompany" class="filter-input">
-            <option value="">All Companies</option>
-        </select>
+    <input type="text" id="filterName" class="uniform-filter" placeholder="Search Name...">
 
-        <input type="date" id="filterDateStart" class="filter-input">
-        <input type="date" id="filterDateEnd" class="filter-input">
+    <select id="filterCompany" class="uniform-filter">
+        <option value="">All Companies</option>
+    </select>
 
-<select id="filterDateRange"
-    style="padding:8px; border:1px solid #ccc; border-radius:6px;">
-    <option value="">Date Range</option>
+    <input type="date" id="filterDateStart" class="uniform-filter">
+    <input type="date" id="filterDateEnd" class="uniform-filter">
+
+    <select id="filterDateRange" class="uniform-filter">
+        <option value="">Date Range</option>
+    </select>
+
+</div>
+
 
     <!-- Proper Order -->
     <option value="today">Today</option>
