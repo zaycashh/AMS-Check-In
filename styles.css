@@ -1,351 +1,5 @@
-/* ===== FINAL OVERRIDE: MAKE FORM COMPACT LIKE THE SCREENSHOT ===== */
-
-#checkInSection {
-    max-width: 480px !important;
-    margin: 20px auto !important;
-    padding: 20px !important;
-}
-
-/* Make input fields medium-sized and not full width */
-#checkInSection .form-row input,
-#checkInSection .form-row select {
-    width: 100% !important;
-    max-width: 420px !important;
-    margin: 0 auto !important;
-    display: block !important;
-}
-
-/* Make the entire card rounded and compact */
-.section-card {
-    max-width: 500px !important;
-    margin: 20px auto !important;
-    padding: 22px !important;
-    border-radius: 14px !important;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-
-/* Signature canvas smaller */
-#signaturePad {
-    width: 100% !important;
-    max-width: 420px !important;
-    height: 180px !important;
-    display: block !important;
-    margin: 0 auto !important;
-    border-radius: 10px;
-}
-body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background: #f5f5f5;
-    margin: 0;
-}
-
-header.main-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px;
-    background: #fff;
-    border-bottom: 4px solid #4F8C47;
-}
-
-.header-left {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.header-logo {
-    height: 50px;
-}
-
-.admin-btn, .primary-btn, .secondary-btn {
-    padding: 10px 16px;
-    border-radius: 6px;
-    cursor: pointer;
-    border: none;
-}
-
-.primary-btn {
-    background: #4F8C47;
-    color: white;
-}
-
-.secondary-btn {
-    background: #1E3A59;
-    color: white;
-}
-
-.section-card {
-    padding: 20px;
-}
-
-.form-row {
-    margin-bottom: 12px;
-}
-
-input, select {
-    width: 100%;
-    padding: 10px;
-    border-radius: 6px;
-    border: 1px solid #bbb;
-}
-
-.checkbox-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-}
-
-/* SIGNATURE PAD */
-.signature-pad-wrapper {
-    border: 2px dashed #1E3A59;
-    height: 200px;
-    position: relative;
-}
-
-.sig-canvas {
-    width: 100%;
-    height: 100%;
-}
-
-.sig-placeholder {
-    position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    color: #777;
-}
-
-/* ADMIN TABLE */
-.admin-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.admin-table th {
-    background: #1E3A59;
-    color: white;
-    padding: 10px;
-}
-
-.admin-table td {
-    border-bottom: 1px solid #ccc;
-    padding: 10px;
-}
-
-/* MODAL */
-.modal-bg {
-    position: fixed;
-    top:0; left:0;
-    width:100%; height:100%;
-    background: rgba(0,0,0,0.7);
-    display:none;
-    justify-content:center;
-    align-items:center;
-}
-
-.modal-box {
-    background:white;
-    padding:20px;
-    border-radius:8px;
-    text-align:center;
-}
-
-.modal-box img {
-    max-width:400px;
-    max-height:400px;
-    border:1px solid #ccc;
-}
-/* ===== FORCE BLUE HEADERS ===== */
-
-/* ===== IDENTICAL BLUE HEADER STYLE (MATCHING YOUR IMAGE) ===== */
-
-/* AMS Check-In System Text */
-header .header-title {
-    color: #0A4B78 !important;      /* Exact blue from your screenshot */
-    font-weight: 700 !important;    /* Bold like your screenshot */
-    letter-spacing: 0.5px;
-}
-
-/* Thin Blue Line Under Header */
-header.main-header {
-    border-bottom: 2px solid #0A4B78 !important;  /* Exact thin line */
-    padding-bottom: 6px !important;               /* Matches image spacing */
-}
-
-/* Donor Check-In Title */
-#checkInSection .section-title {
-    color: #0A4B78 !important;   /* Exact identical blue */
-    font-weight: 700 !important;
-    margin-bottom: 10px !important; /* Matches spacing in screenshot */
-}
-/* ===== CLEAN MODERN CLINIC FORM STYLE ===== */
-
-/* Make the main card narrower and centered */
-.section-card {
-    max-width: 480px !important;      /* Perfect medium size */
-    margin: 20px auto !important;
-    padding: 22px !important;
-    border-radius: 12px !important;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-}
-
-/* Input and dropdown fields: medium, centered */
-.section-card input[type="text"],
-.section-card select {
-    width: 100% !important;
-    max-width: 420px !important;
-    margin: 0 auto !important;
-    display: block !important;
-}
-
-/* Section title cleaner */
-.section-title {
-    font-size: 1.3rem !important;
-    font-weight: 700 !important;
-    margin-bottom: 14px !important;
-}
-
-/* Smaller Signature Canvas */
-#signaturePad {
-    width: 100% !important;
-    max-width: 420px !important;
-    height: 180px !important;
-    margin: 0 auto !important;
-    display: block !important;
-    border-radius: 10px;
-}
-/* ============================================================
-   PROFESSIONAL MEDICAL CHECK-IN REDESIGN
-   (Clean, Centered, Modern, Clinic-Grade)
-============================================================ */
-
-/* Center the entire check-in card */
-#checkInSection {
-    max-width: 640px;
-    margin: 40px auto !important;
-    padding: 0 16px;
-}
-
-/* Main card styling */
-.section-card {
-    background: #ffffff;
-    border-radius: 14px;
-    padding: 32px 28px;
-    box-shadow: 0 4px 14px rgba(0,0,0,0.08);
-    border: 1px solid #e3e5e8;
-}
-
-/* Donor Check-In title */
-.section-title {
-    font-size: 1.6rem !important;
-    font-weight: 700 !important;
-    text-align: center !important;
-    margin-bottom: 22px !important;
-    color: #0A4B78 !important;
-}
-
-/* Field labels */
-.form-row label {
-    font-weight: 600;
-    color: #2a2a2a;
-    margin-bottom: 6px;
-    display: block;
-}
-
-/* Modern input + select style */
-.form-row input[type="text"],
-.form-row select {
-    width: 100% !important;
-    max-width: 560px;
-    padding: 12px 14px;
-    border-radius: 10px;
-    border: 1px solid #c8c8c8;
-    background: #fbfbfb;
-    font-size: 1rem;
-    margin-bottom: 16px;
-    transition: 0.2s ease;
-}
-
-.form-row input[type="text"]:focus,
-.form-row select:focus {
-    border-color: #0A4B78;
-    box-shadow: 0 0 0 3px rgba(10,75,120,0.15);
-    outline: none;
-}
-
-/* Checkbox section layout */
-.checkbox-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px 20px;
-    margin-bottom: 24px;
-}
-
-.checkbox-grid label {
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-/* Signature pad */
-#signaturePad {
-    width: 100% !important;
-    max-width: 560px;
-    height: 200px !important;
-    margin: 0 auto 8px auto;
-    display: block;
-    border-radius: 12px;
-    border: 2px solid #0A4B78 !important;
-    background: #fdfdfd;
-}
-
-/* Signature buttons */
-button {
-    border-radius: 10px !important;
-    font-weight: 600 !important;
-.checkbox-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px 20px;
-    margin-bottom: 24px;
-}
-/* Expand check-in card to look more professional */
-.section-card {
-    max-width: 900px;   /* wider */
-    width: 95%;         /* fills most of screen */
-    margin: 30px auto;
-    padding: 30px 40px;
-    background: white;
-    border-radius: 12px;
-}
-/* Improve checkbox layout and alignment */
-.services-group {
-    display: grid;
-    grid-template-columns: 1fr 1fr;  /* 2 columns */
-    gap: 12px 30px;
-    padding-left: 0; /* remove weird indent */
-    margin-top: 10px;
-}
-
-.service-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 16px;
-    color: #333;
-}
-.service-item input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
-    margin: 0;
-    transform: translateY(1px); /* aligns vertically */
-}
-.section-subtitle {
-    margin-bottom: 8px;
-}
 /* ===================================================================
-   GLOBAL RESET & BASE STYLING
+   GLOBAL RESET & BASE
 =================================================================== */
 * {
     box-sizing: border-box;
@@ -357,7 +11,7 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     background: #f3f4f6;
     color: #1f2937;
-    padding-bottom: 50px;
+    padding-bottom: 40px;
 }
 
 /* ===================================================================
@@ -365,7 +19,7 @@ body {
 =================================================================== */
 .main-header {
     background: #ffffff;
-    padding: 18px 28px;
+    padding: 16px 26px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -389,23 +43,23 @@ body {
 }
 
 /* ===================================================================
-   FORM WRAPPER CARD
+   CHECK-IN CARD
 =================================================================== */
 .section-card {
     max-width: 900px;
     width: 96%;
-    background: #ffffff;
     margin: 40px auto;
+    background: #ffffff;
     padding: 40px 50px;
-    border-radius: 12px;
+    border-radius: 14px;
     box-shadow: 0px 4px 12px rgba(0,0,0,0.08);
 }
 
 /* ===================================================================
-   FORM TITLES
+   TITLES
 =================================================================== */
 .section-title {
-    font-size: 26px;
+    font-size: 28px;
     font-weight: 700;
     color: #0b3c67;
     text-align: center;
@@ -415,18 +69,17 @@ body {
 .section-subtitle {
     font-size: 20px;
     font-weight: 700;
-    margin: 25px 0 10px 0;
+    margin: 20px 0 10px 0;
 }
 
-/* Divider Line */
 .section-divider {
     height: 2px;
     background: #e5e7eb;
-    margin: 25px 0;
+    margin: 30px 0;
 }
 
 /* ===================================================================
-   FORM ELEMENTS
+   FORM FIELDS
 =================================================================== */
 .form-row {
     display: flex;
@@ -442,27 +95,27 @@ body {
 .form-row input,
 .form-row select {
     height: 48px;
-    padding: 10px 14px;
     font-size: 16px;
+    padding: 10px 14px;
     border: 1px solid #d1d5db;
     border-radius: 8px;
 }
 
 /* ===================================================================
-   SERVICES CHECKBOXES — POLISHED
+   SERVICES CHECKBOX LAYOUT
 =================================================================== */
 .services-group {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 14px 50px;
-    margin-top: 10px;
+    gap: 14px 60px;
+    margin-top: 12px;
 }
 
 .service-item {
     display: flex;
     align-items: center;
-    gap: 10px;
     font-size: 16px;
+    gap: 10px;
 }
 
 .service-item input[type="checkbox"] {
@@ -471,7 +124,7 @@ body {
 }
 
 /* ===================================================================
-   SIGNATURE BOX — CLEAN + MODERN
+   SIGNATURE PAD
 =================================================================== */
 .signature-pad-wrapper {
     width: 100%;
@@ -521,10 +174,6 @@ body {
     cursor: pointer;
 }
 
-.btn-row {
-    margin-top: 20px;
-}
-
 /* ===================================================================
    ADMIN TABLE
 =================================================================== */
@@ -545,7 +194,7 @@ body {
     font-weight: 700;
 }
 
-/* SIGNATURE THUMBNAIL */
+/* Clickable signature preview */
 .sig-thumb {
     width: 90px;
     border: 1px solid #ccc;
@@ -572,7 +221,6 @@ body {
     padding: 20px;
     border-radius: 12px;
     max-width: 90%;
-    text-align: center;
 }
 
 .modal-box img {
@@ -587,6 +235,7 @@ body {
     .section-card {
         padding: 25px;
     }
+
     .services-group {
         grid-template-columns: 1fr;
     }
