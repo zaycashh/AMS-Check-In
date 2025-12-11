@@ -14,7 +14,7 @@
 .filter-bar {
     display: flex;
     gap: 10px;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;      /* <<< Forces ALL inputs to stay in one row */
     align-items: center;
 }
 
