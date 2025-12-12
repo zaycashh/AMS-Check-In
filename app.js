@@ -175,6 +175,7 @@ document.getElementById("resetFormBtn").addEventListener("click", () => {
 /* =========================================================
    ADMIN LOGIN
 ========================================================= */
+
 document.getElementById("toggleAdminBtn").addEventListener("click", () => {
     const pin = prompt("Enter Admin PIN:");
 
@@ -182,10 +183,27 @@ document.getElementById("toggleAdminBtn").addEventListener("click", () => {
         document.getElementById("adminArea").style.display = "block";
         document.getElementById("checkInSection").style.display = "none";
 
-        // NEW → Search module handles rendering now
+        /* ---------------------------------------------------
+           DEFAULT TAB = Recent Check-Ins
+        --------------------------------------------------- */
+
+        // Remove active from all tabs
+        document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+
+        // Set Recent Check-Ins tab active
+        document.querySelector('.tab[data-tab="tabRecent"]').classList.add("active");
+
+        // Hide all tab contents
+        document.querySelectorAll(".tab-content").forEach(c => c.style.display = "none");
+
+        // Show Recent Check-Ins content
+        document.getElementById("tabRecent").style.display = "block";
+
+        // Apply filters (if exists)
         if (typeof applyFilters === "function") {
             applyFilters();
         }
+
     } else {
         alert("Incorrect PIN.");
     }
