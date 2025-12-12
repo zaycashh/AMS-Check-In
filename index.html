@@ -4,22 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AMS Check-In System</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css?v=23">
 </head>
-
 <body>
 
+<!-- =========================================================
+     HEADER
+========================================================= -->
 <header class="main-header">
     <div class="header-left">
-        <img src="logo.png" class="header-logo" alt="Logo">
+        <img src="logo.png" alt="Logo" class="header-logo">
         <h1 class="header-title">AMS Check-In System</h1>
     </div>
-
     <button id="toggleAdminBtn" class="admin-btn">Admin Login</button>
 </header>
 
 <!-- =========================================================
-     MAIN CHECK-IN FORM (PUBLIC AREA)
+     MAIN CHECK-IN FORM
 ========================================================= -->
 <section id="checkInSection" class="section-card">
 
@@ -27,46 +28,97 @@
 
     <div class="form-row">
         <label>First Name</label>
-        <input type="text" id="firstName">
+        <input id="firstName" type="text">
     </div>
 
     <div class="form-row">
         <label>Last Name</label>
-        <input type="text" id="lastName">
+        <input id="lastName" type="text">
     </div>
 
     <div class="form-row">
-        <label>Select Company</label>
-        <select id="companySelect"></select>
-    </div>
-
-    <div class="form-row">
-        <label>Reason</label>
-        <select id="reasonSelect">
-            <option value="">Select</option>
-            <option value="Pre-Employment">Pre-Employment</option>
-            <option value="Random">Random</option>
-            <option value="Post-Accident">Post-Accident</option>
-            <option value="Follow-Up">Follow-Up</option>
-            <option value="Return-To-Duty">Return-To-Duty</option>
-            <option value="Non-DOT">Non-DOT</option>
+        <label>Company</label>
+        <select id="companySelect">
+            <option value="">-- Select Company --</option>
+            <option value="__OTHER__">Other (enter manually)</option>
         </select>
     </div>
 
-    <div class="signature-container">
-        <p>Signature:</p>
-        <canvas id="signaturePad"></canvas>
-        <div id="sigPlaceholder">Sign Here</div>
-        <button id="clearSignatureBtn" class="secondary-btn">Clear</button>
+    <div id="otherCompanyWrapper" class="form-row" style="display:none;">
+        <label>Enter Company</label>
+        <input id="otherCompany" type="text">
     </div>
 
-    <button id="submitBtn" class="primary-btn">Submit Check-In</button>
+    <div class="form-row">
+        <label>Reason for Testing</label>
+        <select id="reasonSelect">
+            <option value="">-- Select reason --</option>
+            <option value="Pre-Employment">Pre-Employment</option>
+            <option value="Random">Random</option>
+            <option value="Post-Accident">Post-Accident</option>
+            <option value="Return-to-Duty">Return-to-Duty</option>
+            <option value="Follow-Up">Follow-Up</option>
+            <option value="other">Other (enter manually)</option>
+        </select>
+    </div>
+
+    <div id="otherReasonWrapper" class="form-row" style="display:none;">
+        <label>Enter Reason</label>
+        <input id="otherReasonInput" type="text">
+    </div>
+
+    <!-- SERVICES -->
+    <div class="section-divider"></div>
+    <h3 class="section-subtitle">Services</h3>
+
+    <div class="services-group">
+        <label class="service-item">
+            <input type="checkbox" name="services" value="Drug Test"> Drug Test
+        </label>
+        <label class="service-item">
+            <input type="checkbox" name="services" value="Alcohol Test"> Alcohol Test
+        </label>
+        <label class="service-item">
+            <input type="checkbox" name="services" value="Vision Test"> Vision Test
+        </label>
+        <label class="service-item">
+            <input type="checkbox" name="services" value="DOT Physical"> DOT Physical
+        </label>
+        <label class="service-item">
+            <input type="checkbox" name="services" value="DNA (Paternity Test)"> DNA (Paternity Test)
+        </label>
+        <label class="service-item">
+            <input type="checkbox" name="services" value="Other"> Other
+        </label>
+    </div>
+
+    <div id="otherServiceWrapper" class="form-row" style="display:none;">
+        <label>Other Service</label>
+        <input id="srvOtherText" type="text">
+    </div>
+
+    <!-- SIGNATURE -->
+    <div class="section-divider"></div>
+    <h3 class="section-subtitle">Signature</h3>
+
+    <div class="signature-pad-wrapper">
+        <canvas id="signaturePad" class="sig-canvas"></canvas>
+        <div id="sigPlaceholder" class="sig-placeholder">Sign Here</div>
+    </div>
+
+    <button id="clearSigBtn" class="secondary-btn">Clear Signature</button>
+
+    <div style="display:flex; justify-content:flex-end; margin-top:10px;">
+        <button id="resetFormBtn" class="secondary-btn">Reset Form</button>
+    </div>
+
+    <div class="btn-row">
+        <button id="submitBtn" class="primary-btn">Submit Check-In</button>
+    </div>
 
 </section>
 
-<!-- =========================================================
-     ADMIN PANEL
-========================================================= -->
+<!-- ADMIN PANEL -->
 <section id="adminArea" style="display:none;">
 
     <button id="exitAdminBtn" class="secondary-btn" style="margin:10px 0;">
@@ -80,38 +132,34 @@
         <div class="tab" data-tab="tabRecent">Recent Check-Ins</div>
         <div class="tab" data-tab="tabManage">Manage Companies</div>
     </div>
+    
+    <!-- TAB CONTENT AREAS MUST EXIST BELOW -->
+<div id="tabSearch" class="tab-content" style="display:block;">
+    <!-- Search Log will be shown here -->
+</div>
 
-    <!-- ======================================================
-         REQUIRED TAB CONTENT AREAS
-    ========================================================== -->
+<div id="tabGeneral" class="tab-content" style="display:none;">
+    <!-- General Report -->
+</div>
 
-    <div id="tabSearch" class="tab-content" style="display:block;">
-        <!-- Search Log will be inserted here -->
-    </div>
+<div id="tabCompany" class="tab-content" style="display:none;">
+    <!-- Detail Company Report -->
+</div>
 
-    <div id="tabGeneral" class="tab-content" style="display:none;">
-        <!-- General Report Content -->
-    </div>
+<div id="tabRecent" class="tab-content" style="display:none;">
+    <!-- Recent Check-Ins -->
+</div>
 
-    <div id="tabCompany" class="tab-content" style="display:none;">
-        <!-- Detail Company Report Content -->
-    </div>
+<div id="tabManage" class="tab-content" style="display:none;">
+    <!-- Manage Companies -->
+</div>
 
-    <div id="tabRecent" class="tab-content" style="display:none;">
-        <!-- Recent Check-Ins Content -->
-    </div>
 
-    <div id="tabManage" class="tab-content" style="display:none;">
-        <!-- Manage Companies Content -->
-    </div>
 
-</section>
+    <!-- SEARCH LOG -->
+    <h2>Search Log</h2>
 
-<!-- =========================================================
-     SEARCH LOG TABLE (PUBLIC + ADMIN DEFAULT VIEW)
-========================================================= -->
-<h2>Search Log</h2>
-
+<!-- FILTER BAR -->
 <div class="filter-bar">
 
     <input type="text" id="filterName" class="uniform-filter" placeholder="Search Name...">
@@ -124,40 +172,61 @@
     <input type="date" id="filterDateEnd" class="uniform-filter">
 
     <select id="filterDateRange" class="uniform-filter">
-        <option value="">Date Range</option>
-        <option value="today">Today</option>
-        <option value="thisWeek">This Week</option>
-        <option value="thisMonth">This Month</option>
-        <option value="thisYear">This Year</option>
-        <option value="yesterday">Yesterday</option>
-        <option value="lastWeek">Last Week</option>
-        <option value="lastMonth">Last Month</option>
-        <option value="lastYear">Last Year</option>
-    </select>
+    <option value="">Date Range</option>
+    <option value="today">Today</option>
+    <option value="thisWeek">This Week</option>
+    <option value="thisMonth">This Month</option>
+    <option value="thisYear">This Year</option>
+    <option value="yesterday">Yesterday</option>
+    <option value="lastWeek">Last Week</option>
+    <option value="lastMonth">Last Month</option>
+    <option value="lastYear">Last Year</option>
+</select>
+
 
 </div>
 
-<div class="export-bar">
-    <button id="btnExportExcel" class="export-btn excel">Export XLS</button>
-    <button id="btnExportPDF" class="export-btn pdf">Export PDF</button>
+    <!-- EXPORT BUTTONS -->
+    <div class="export-bar">
+        <button id="btnExportExcel" class="export-btn excel">Export XLS</button>
+        <button id="btnExportPDF" class="export-btn pdf">Export PDF</button>
+    </div>
+
+    <!-- RESULTS TABLE -->
+    <table class="log-table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Name</th>
+                <th>Company</th>
+                <th>Reason</th>
+                <th>Services</th>
+                <th>Signature</th>
+            </tr>
+        </thead>
+        <tbody id="searchResults"></tbody>
+    </table>
+
+</section>
+
+<!-- SIGNATURE MODAL -->
+<div id="signatureModal" class="modal-bg">
+    <div class="modal-box">
+        <h3>Signature</h3>
+        <img id="signatureModalImg">
+        <button id="closeSignatureModal" class="primary-btn">Close</button>
+    </div>
 </div>
 
-<table id="logTable">
-    <thead>
-        <tr>
-            <th>Date</th>
-            <th>Time</th>
-            <th>Name</th>
-            <th>Company</th>
-            <th>Reason</th>
-            <th>Services</th>
-            <th>Signature</th>
-        </tr>
-    </thead>
-    <tbody></tbody>
-</table>
+<!-- PDF Libraries -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
 
+<!-- APP SCRIPTS -->
 <script src="app.js"></script>
+<script src="admin/search.js"></script>
+<script src="admin/general.js"></script>
 
 </body>
 </html>
