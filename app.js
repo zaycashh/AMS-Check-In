@@ -205,3 +205,30 @@ document.getElementById("exitAdminBtn").addEventListener("click", () => {
 window.onload = () => {
     setupSignaturePad();
 };
+/* ============================================================
+   ADMIN TAB CLICK LOGIC
+============================================================ */
+document.querySelectorAll(".tab").forEach(tab => {
+    tab.addEventListener("click", () => {
+
+        // Remove highlight from all tabs
+        document.querySelectorAll(".tab").forEach(t => {
+            t.classList.remove("active");
+        });
+
+        // Highlight the clicked tab
+        tab.classList.add("active");
+
+        // Hide all admin content areas
+        document.querySelectorAll(".tab-content").forEach(content => {
+            content.style.display = "none";
+        });
+
+        // Show selected content area
+        const target = tab.getAttribute("data-tab");
+        if (document.getElementById(target)) {
+            document.getElementById(target).style.display = "block";
+        }
+    });
+});
+
