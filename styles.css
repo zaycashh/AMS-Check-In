@@ -287,3 +287,8 @@ body {
         gap: 10px;
     }
 }
+/* Fix Date Range being pushed right */
+#filterDateRange {
+    margin-left: 0 !important;
+}
+
