@@ -202,9 +202,10 @@ document.getElementById("exitAdminBtn").addEventListener("click", () => {
 /* =========================================================
    PAGE LOAD
 ========================================================= */
-window.onload = () => {
+document.addEventListener("DOMContentLoaded", () => {
     setupSignaturePad();
-};
+});
+
 /* =========================================================
    ADMIN TAB CLICK LOGIC — FINAL WORKING VERSION
 ========================================================= */
