@@ -209,7 +209,7 @@ window.onload = () => {
    ADMIN TAB CLICK LOGIC — FINAL WORKING VERSION
 ========================================================= */
 
-document.addEventListener("DOMContentLoaded", () => {
+window.onload = () => {
     const tabs = document.querySelectorAll(".tab");
     const contents = document.querySelectorAll(".tab-content");
 
