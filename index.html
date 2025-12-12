@@ -118,12 +118,12 @@
 
 </section>
 
-<!-- =========================================================
-     ADMIN PANEL
-========================================================= -->
+<!-- ADMIN PANEL -->
 <section id="adminArea" style="display:none;">
 
-    <button id="exitAdminBtn" class="secondary-btn" style="margin:10px 0;">Exit Admin Mode</button>
+    <button id="exitAdminBtn" class="secondary-btn" style="margin:10px 0;">
+        Exit Admin Mode
+    </button>
 
     <div class="sidebar-menu">
         <div class="tab" data-tab="tabSearch">Search Log</div>
@@ -132,6 +132,15 @@
         <div class="tab" data-tab="tabRecent">Recent Check-Ins</div>
         <div class="tab" data-tab="tabManage">Manage Companies</div>
     </div>
+
+    <!-- TAB CONTENT AREAS MUST EXIST BELOW -->
+    <div id="tabSearch" class="tab-content"></div>
+    <div id="tabGeneral" class="tab-content" style="display:none;"></div>
+    <div id="tabCompany" class="tab-content" style="display:none;"></div>
+    <div id="tabRecent" class="tab-content" style="display:none;"></div>
+    <div id="tabManage" class="tab-content" style="display:none;"></div>
+
+</section>
 
     <!-- SEARCH LOG -->
     <h2>Search Log</h2>
