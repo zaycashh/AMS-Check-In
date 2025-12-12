@@ -118,10 +118,8 @@
 
 </section>
 
-<!-- =========================================================
-     ADMIN PANEL (HIDDEN UNTIL LOGIN)
-========================================================= -->
-    <section id="adminArea" style="display:none;">
+<!-- ADMIN PANEL -->
+<section id="adminArea" style="display:none;">
 
     <button id="exitAdminBtn" class="secondary-btn" style="margin:10px 0;">
         Exit Admin Mode
@@ -131,33 +129,30 @@
         <div class="tab" data-tab="tabSearch">Search Log</div>
         <div class="tab" data-tab="tabGeneral">General Report</div>
         <div class="tab" data-tab="tabCompany">Detail Company Report</div>
-        <div class="tab" data-tab="tabRecent" style="display:none;">Recent Check-Ins</div>
+        <div class="tab" data-tab="tabRecent">Recent Check-Ins</div>
         <div class="tab" data-tab="tabManage">Manage Companies</div>
     </div>
+    
+    <!-- TAB CONTENT AREAS MUST EXIST BELOW -->
+<div id="tabSearch" class="tab-content" style="display:block;">
+    <!-- Search Log will be shown here -->
+</div>
 
-    <!-- TAB CONTENT AREAS -->
-    <div id="tabSearch" class="tab-content" style="display:none;">
+<div id="tabGeneral" class="tab-content" style="display:none;">
+    <!-- General Report -->
+</div>
 
-        <!-- Search Log content will be rendered by JS -->
-    </div>
+<div id="tabCompany" class="tab-content" style="display:none;">
+    <!-- Detail Company Report -->
+</div>
 
-    <div id="tabGeneral" class="tab-content" style="display:none;">
-        <!-- General Report -->
-    </div>
-
-    <div id="tabCompany" class="tab-content" style="display:none;">
-        <!-- Detail Company Report -->
-    </div>
-
-    <div class="tab active" data-tab="tabRecent">Recent Check-Ins</div>
+<div id="tabRecent" class="tab-content" style="display:none;">
     <!-- Recent Check-Ins -->
 </div>
 
 <div id="tabManage" class="tab-content" style="display:none;">
     <!-- Manage Companies -->
 </div>
-
-</section>
 
 
 
