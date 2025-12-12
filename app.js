@@ -209,7 +209,7 @@ window.onload = () => {
    ADMIN TAB CLICK LOGIC — FINAL WORKING VERSION
 ========================================================= */
 
-window.onload = () => {
+document.addEventListener("DOMContentLoaded", () => {
     const tabs = document.querySelectorAll(".tab");
     const contents = document.querySelectorAll(".tab-content");
 
@@ -237,4 +237,4 @@ window.onload = () => {
             }
         });
     });
-};
+});
