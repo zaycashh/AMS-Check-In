@@ -205,13 +205,16 @@ document.getElementById("exitAdminBtn").addEventListener("click", () => {
 window.onload = () => {
     setupSignaturePad();
 };
-/* ============================================================
-   ADMIN TAB CLICK LOGIC — WORKING VERSION
-============================================================ */
-window.addEventListener("DOMContentLoaded", () => {
+/* =========================================================
+   ADMIN TAB CLICK LOGIC — FINAL WORKING VERSION
+========================================================= */
 
+window.onload = () => {
     const tabs = document.querySelectorAll(".tab");
     const contents = document.querySelectorAll(".tab-content");
+
+    console.log("Tabs found:", tabs.length);
+    console.log("Content areas found:", contents.length);
 
     tabs.forEach(tab => {
         tab.addEventListener("click", () => {
@@ -219,13 +222,13 @@ window.addEventListener("DOMContentLoaded", () => {
             // Remove highlight from all tabs
             tabs.forEach(t => t.classList.remove("active"));
 
-            // Highlight the clicked tab
+            // Highlight clicked tab
             tab.classList.add("active");
 
             // Hide all content areas
             contents.forEach(c => c.style.display = "none");
 
-            // Show correct panel
+            // Show clicked panel
             const target = tab.getAttribute("data-tab");
             const section = document.getElementById(target);
 
@@ -234,5 +237,4 @@ window.addEventListener("DOMContentLoaded", () => {
             }
         });
     });
-
-});
+};
