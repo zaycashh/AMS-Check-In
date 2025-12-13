@@ -3,8 +3,8 @@
 ========================================================= */
 const ADMIN_PIN = "2468";
 
-const searchPanel = document.getElementById("searchPanel");
-const searchOverlay = document.getElementById("searchPanelOverlay");
+let searchPanel;
+let searchOverlay;
 /* =========================================================
    SIGNATURE PAD INITIALIZATION
 ========================================================= */
@@ -242,9 +242,11 @@ document.getElementById("exitAdminBtn").addEventListener("click", () => {
    PAGE LOAD
 ========================================================= */
 document.addEventListener("DOMContentLoaded", () => {
+    searchPanel = document.getElementById("searchPanel");
+    searchOverlay = document.getElementById("searchPanelOverlay");
+
     setupSignaturePad();
 });
-
 /* =========================================================
    ADMIN TAB CLICK LOGIC — FINAL WORKING VERSION
 ========================================================= */
