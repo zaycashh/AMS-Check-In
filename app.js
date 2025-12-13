@@ -205,6 +205,43 @@ document.getElementById("toggleAdminBtn").addEventListener("click", () => {
         alert("Incorrect PIN");
     }
 });
+/* =========================================================
+   ADMIN TAB NAVIGATION (CLICKABLE SIDEBAR)
+========================================================= */
+
+document.querySelectorAll(".tab").forEach(tab => {
+  tab.addEventListener("click", () => {
+    const targetId = tab.dataset.tab;
+
+    // Remove active state from all tabs
+    document.querySelectorAll(".tab").forEach(t =>
+      t.classList.remove("active")
+    );
+
+    // Hide all tab content areas
+    document.querySelectorAll(".tab-content").forEach(c =>
+      c.style.display = "none"
+    );
+
+    // Activate clicked tab
+    tab.classList.add("active");
+
+    // Show selected content
+    const targetContent = document.getElementById(targetId);
+    if (targetContent) {
+      targetContent.style.display = "block";
+    }
+
+    // Lazy-load Recent Check-Ins only once
+    if (targetId === "tabRecent" && typeof renderRecentCheckIns === "function") {
+      if (!window.__recentLoaded) {
+        renderRecentCheckIns();
+        window.__recentLoaded = true;
+      }
+    }
+  });
+});
+
 
 
 /* =========================================================
