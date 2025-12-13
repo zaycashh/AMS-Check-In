@@ -1,266 +1,104 @@
-/* =========================================================
-   GLOBAL VARIABLES
-========================================================= */
-const ADMIN_PIN = "2468";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AMS Check-In System</title>
 
-/* =========================================================
-   SIGNATURE PAD INITIALIZATION
-========================================================= */
-function setupSignaturePad() {
-    const canvas = document.getElementById("signaturePad");
-    const placeholder = document.getElementById("sigPlaceholder");
+    <!-- CSS -->
+    <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
 
-    // Fix canvas resolution
-    canvas.width = canvas.offsetWidth;
-    canvas.height = canvas.offsetHeight;
+<!-- =========================================================
+     HEADER
+========================================================= -->
+<header class="main-header">
+    <div class="header-left">
+        <h1 class="header-title">AMS Check-In System</h1>
+    </div>
+    <button id="toggleAdminBtn" class="admin-btn">Admin Login</button>
+</header>
 
-    const ctx = canvas.getContext("2d");
-    ctx.lineWidth = 2;
-    ctx.lineCap = "round";
+<!-- =========================================================
+     DONOR CHECK-IN SECTION
+========================================================= -->
+<section id="checkInSection" class="section-card">
+    <h2>Donor Check-In</h2>
 
-    let drawing = false;
+    <div class="form-row">
+        <label>First Name</label>
+        <input type="text" id="firstName" />
+    </div>
 
-    function getMousePos(e) {
-        const rect = canvas.getBoundingClientRect();
-        return { x: e.clientX - rect.left, y: e.clientY - rect.top };
-    }
+    <div class="form-row">
+        <label>Last Name</label>
+        <input type="text" id="lastName" />
+    </div>
 
-    function getTouchPos(e) {
-        const rect = canvas.getBoundingClientRect();
-        const t = e.touches[0];
-        return { x: t.clientX - rect.left, y: t.clientY - rect.top };
-    }
+    <div class="form-row">
+        <label>Company</label>
+        <select id="companySelect">
+            <option value="">Select Company</option>
+            <option value="Company A">Company A</option>
+            <option value="Company B">Company B</option>
+        </select>
+    </div>
 
-    function draw(e) {
-        if (!drawing) return;
-        const pos = e.touches ? getTouchPos(e) : getMousePos(e);
+    <div class="form-row">
+        <label>Reason</label>
+        <select id="reasonSelect">
+            <option value="">Select Reason</option>
+            <option value="Pre-Employment">Pre-Employment</option>
+            <option value="Random">Random</option>
+        </select>
+    </div>
 
-        ctx.lineTo(pos.x, pos.y);
-        ctx.stroke();
+    <div class="signature-wrapper">
+        <label>Signature</label>
+        <div id="sigPlaceholder">Sign Here</div>
+        <canvas id="signaturePad"></canvas>
+        <button type="button" id="clearSigBtn">Clear Signature</button>
+    </div>
 
-        ctx.beginPath();
-        ctx.moveTo(pos.x, pos.y);
+    <div class="form-actions">
+        <button id="submitBtn">Submit Check-In</button>
+        <button id="resetFormBtn" type="button">Reset</button>
+    </div>
+</section>
 
-        if (e.touches) e.preventDefault();
-    }
+<!-- =========================================================
+     ADMIN AREA (HIDDEN BY DEFAULT)
+========================================================= -->
+<section id="adminArea" style="display:none">
 
-    // Mouse Controls
-    canvas.addEventListener("mousedown", (e) => {
-        drawing = true;
-        placeholder.style.display = "none";
-        const pos = getMousePos(e);
-        ctx.beginPath();
-        ctx.moveTo(pos.x, pos.y);
-    });
+    <header class="admin-header">
+        <h2>Admin Dashboard</h2>
+        <button id="exitAdminBtn">Exit Admin</button>
+    </header>
 
-    canvas.addEventListener("mouseup", () => {
-        drawing = false;
-        ctx.beginPath();
-    });
+    <!-- ADMIN TABS -->
+    <nav class="admin-tabs">
+        <button class="tab active" data-tab="tabRecent">Recent Check-Ins</button>
+        <button class="tab" data-tab="tabLogs">Logs</button>
+        <!-- Search Log intentionally NOT wired here yet -->
+    </nav>
 
-    canvas.addEventListener("mousemove", draw);
+    <!-- TAB CONTENT -->
+    <div id="tabRecent" class="tab-content">
+        <p>Recent check-ins will appear here.</p>
+    </div>
 
-    // Touch Controls
-    canvas.addEventListener("touchstart", (e) => {
-        drawing = true;
-        placeholder.style.display = "none";
-        const pos = getTouchPos(e);
-        ctx.beginPath();
-        ctx.moveTo(pos.x, pos.y);
-        e.preventDefault();
-    });
+    <div id="tabLogs" class="tab-content" style="display:none">
+        <p>All logs will appear here.</p>
+    </div>
 
-    canvas.addEventListener("touchend", () => {
-        drawing = false;
-        ctx.beginPath();
-    });
+</section>
 
-    canvas.addEventListener("touchmove", draw);
+<!-- =========================================================
+     JS
+========================================================= -->
+<script src="app.js"></script>
 
-    // Clear Button
-    document.getElementById("clearSigBtn").addEventListener("click", () => {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        placeholder.style.display = "block";
-    });
-}
-
-/* =========================================================
-   COMPANY "OTHER" LOGIC
-========================================================= */
-document.getElementById("companySelect").addEventListener("change", () => {
-    const value = document.getElementById("companySelect").value;
-    document.getElementById("otherCompanyWrapper").style.display =
-        value === "__OTHER__" ? "block" : "none";
-});
-
-/* =========================================================
-   REASON "OTHER" LOGIC
-========================================================= */
-document.getElementById("reasonSelect").addEventListener("change", () => {
-    const value = document.getElementById("reasonSelect").value;
-    document.getElementById("otherReasonWrapper").style.display =
-        value === "other" ? "block" : "none";
-});
-
-/* =========================================================
-   SERVICES "OTHER" LOGIC
-========================================================= */
-document.querySelector('input[value="Other"]').addEventListener("change", (e) => {
-    document.getElementById("otherServiceWrapper").style.display =
-        e.target.checked ? "block" : "none";
-});
-
-/* =========================================================
-   SUBMIT FORM
-========================================================= */
-document.getElementById("submitBtn").addEventListener("click", () => {
-    const first = document.getElementById("firstName").value.trim();
-    const last = document.getElementById("lastName").value.trim();
-    const company = document.getElementById("companySelect").value;
-    const reason = document.getElementById("reasonSelect").value;
-
-    if (!first || !last) {
-        alert("Please enter first and last name.");
-        return;
-    }
-
-    let finalCompany = company === "__OTHER__"
-        ? document.getElementById("otherCompany").value.trim()
-        : company;
-
-    let finalReason = reason === "other"
-        ? document.getElementById("otherReasonInput").value.trim()
-        : reason;
-
-    const services = Array.from(
-        document.querySelectorAll('input[name="services"]:checked')
-    ).map(cb => cb.value);
-
-    if (services.includes("Other")) {
-        const custom = document.getElementById("srvOtherText").value.trim();
-        if (custom) services.push(custom);
-    }
-
-    // Signature
-    const canvas = document.getElementById("signaturePad");
-    const signature = canvas.toDataURL();
-
-    const now = new Date();
-    const record = {
-        date: now.toLocaleDateString(),
-        time: now.toLocaleTimeString(),
-        first,
-        last,
-        company: finalCompany,
-        reason: finalReason,
-        services: services.join(", "),
-        signature
-    };
-
-    let logs = JSON.parse(localStorage.getItem("ams_logs") || "[]");
-    logs.push(record);
-    localStorage.setItem("ams_logs", JSON.stringify(logs));
-
-    alert("Check-in submitted!");
-    location.reload();
-});
-
-/* =========================================================
-   RESET FORM
-========================================================= */
-document.getElementById("resetFormBtn").addEventListener("click", () => {
-    location.reload();
-});
-
-/* =========================================================
-   ADMIN LOGIN
-========================================================= */
-
-document.getElementById("toggleAdminBtn").addEventListener("click", () => {
-    const pin = prompt("Enter Admin PIN:");
-
-    if (pin === ADMIN_PIN) {
-        document.getElementById("adminArea").style.display = "block";
-        document.getElementById("checkInSection").style.display = "none";
-
-        if (!window.__recentLoaded && typeof renderRecentCheckIns === "function") {
-            renderRecentCheckIns();
-            window.__recentLoaded = true;
-        }
-    }
-});
-
-        /* ---------------------------------------------------
-           DEFAULT TAB = Recent Check-Ins
-        --------------------------------------------------- */
-
-        // Remove active from all tabs
-        document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-
-        // Set Recent Check-Ins tab active
-        document.querySelector('.tab[data-tab="tabRecent"]').classList.add("active");
-
-        // Hide all tab contents
-        document.querySelectorAll(".tab-content").forEach(c => c.style.display = "none");
-
-        // Show Recent Check-Ins content
-        document.getElementById("tabRecent").style.display = "block";
-
-        // Apply filters (if exists)
-        if (typeof applyFilters === "function") {
-            applyFilters();
-        }
-
-    } else {
-        alert("Incorrect PIN.");
-    }
-});
-
-/* =========================================================
-   EXIT ADMIN MODE
-========================================================= */
-document.getElementById("exitAdminBtn").addEventListener("click", () => {
-    document.getElementById("adminArea").style.display = "none";
-    document.getElementById("checkInSection").style.display = "block";
-});
-
-/* =========================================================
-   PAGE LOAD
-========================================================= */
-document.addEventListener("DOMContentLoaded", () => {
-    setupSignaturePad();
-});
-
-/* =========================================================
-   ADMIN TAB CLICK LOGIC — FINAL WORKING VERSION
-========================================================= */
-
-document.addEventListener("DOMContentLoaded", () => {
-    const tabs = document.querySelectorAll(".tab");
-    const contents = document.querySelectorAll(".tab-content");
-
-    console.log("Tabs found:", tabs.length);
-    console.log("Content areas found:", contents.length);
-
-    tabs.forEach(tab => {
-        tab.addEventListener("click", () => {
-
-            // Remove highlight from all tabs
-            tabs.forEach(t => t.classList.remove("active"));
-
-            // Highlight clicked tab
-            tab.classList.add("active");
-
-            // Hide all content areas
-            contents.forEach(c => c.style.display = "none");
-
-            // Show clicked panel
-            const target = tab.getAttribute("data-tab");
-            const section = document.getElementById(target);
-
-            if (section) {
-                section.style.display = "block";
-            }
-        });
-    });
-});
+</body>
+</html>
