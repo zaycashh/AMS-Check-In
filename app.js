@@ -349,3 +349,18 @@ document.addEventListener("change", (e) => {
     }
   }
 });
+/* ================================
+   SEARCH PANEL CLOSE (X BUTTON)
+================================ */
+
+const closeSearchBtn = document.getElementById("closeSearchPanel");
+const searchPanel = document.getElementById("searchPanel");
+const searchOverlay = document.getElementById("searchPanelOverlay");
+
+if (closeSearchBtn) {
+    closeSearchBtn.addEventListener("click", () => {
+        if (searchPanel) searchPanel.classList.add("hidden");
+        if (searchOverlay) searchOverlay.style.display = "none";
+    });
+}
+
