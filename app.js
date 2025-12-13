@@ -178,16 +178,17 @@ document.getElementById("resetFormBtn").addEventListener("click", () => {
 
 document.getElementById("toggleAdminBtn").addEventListener("click", () => {
     const pin = prompt("Enter Admin PIN:");
-   
-if (pin === ADMIN_PIN) {
-    document.getElementById("adminArea").style.display = "block";
-    document.getElementById("checkInSection").style.display = "none";
 
-    if (!window.__recentLoaded && typeof renderRecentCheckIns === "function") {
-        renderRecentCheckIns();
-        window.__recentLoaded = true;
+    if (pin === ADMIN_PIN) {
+        document.getElementById("adminArea").style.display = "block";
+        document.getElementById("checkInSection").style.display = "none";
+
+        if (!window.__recentLoaded && typeof renderRecentCheckIns === "function") {
+            renderRecentCheckIns();
+            window.__recentLoaded = true;
+        }
     }
-}
+});
 
         /* ---------------------------------------------------
            DEFAULT TAB = Recent Check-Ins
