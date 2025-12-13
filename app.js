@@ -222,18 +222,6 @@ document.querySelectorAll(".tab").forEach(tab => {
     if (searchPanel) searchPanel.classList.add("hidden");
     if (searchOverlay) searchOverlay.style.display = "none";
 
-     
-// 🔍 Search Log = slide-out panel ONLY
-if (targetId === "tabSearch") {
-  const panel = document.getElementById("searchPanel");
-  const overlay = document.getElementById("searchPanelOverlay");
-
-  if (panel) panel.classList.remove("hidden");
-  if (overlay) overlay.style.display = "block";
-
-  return; // ⛔ stop normal tab behavior ONLY for Search
-}
-
 
     // Remove active state from all tabs
     document.querySelectorAll(".tab").forEach(t =>
@@ -314,39 +302,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 });
-/* =========================================================
-   CLEAR SEARCH FORM
-========================================================= */
-const clearBtn = document.getElementById("btnClearSearch");
 
-if (clearBtn) {
-  clearBtn.addEventListener("click", () => {
-    // Text inputs
-    ["filterFirstName", "filterLastName", "filterCompanyManual"].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.value = "";
-    });
 
-    // Company dropdown
-    const companySelect = document.getElementById("filterCompany");
-    if (companySelect) companySelect.value = "";
-  });
-}
-
-/* =========================================================
-   SEARCH DATE RANGE — CUSTOM RANGE VISIBILITY
-========================================================= */
-document.addEventListener("change", (e) => {
-  if (e.target && e.target.id === "filterDateRange") {
-    const customWrapper = document.getElementById("customDateWrapper");
-
-    if (!customWrapper) return;
-
-    if (e.target.value === "custom") {
-      customWrapper.style.display = "block";
-    } else {
-      customWrapper.style.display = "none";
-    }
-  }
-});
 
