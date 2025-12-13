@@ -182,7 +182,11 @@ document.getElementById("toggleAdminBtn").addEventListener("click", () => {
         // Show admin, hide check-in
         document.getElementById("adminArea").style.display = "block";
         document.getElementById("checkInSection").style.display = "none";
+       // ALWAYS hide Search Log panel on admin entry
+document.getElementById("searchPanel")?.classList.add("hidden");
+document.getElementById("searchPanelOverlay")?.style.display = "none";
 
+       
         // Load Recent Check-Ins ONCE
         if (!window.__recentLoaded && typeof renderRecentCheckIns === "function") {
             renderRecentCheckIns();
@@ -208,6 +212,13 @@ document.getElementById("toggleAdminBtn").addEventListener("click", () => {
 document.querySelectorAll(".tab").forEach(tab => {
   tab.addEventListener("click", () => {
     const targetId = tab.dataset.tab;
+     // 🔍 Search Log = slide-out panel ONLY
+if (targetId === "tabSearch") {
+  document.getElementById("searchPanel")?.classList.remove("hidden");
+  document.getElementById("searchPanelOverlay").style.display = "block";
+  return; // ⛔ stop normal tab behavior
+}
+
 
     // Remove active state from all tabs
     document.querySelectorAll(".tab").forEach(t =>
