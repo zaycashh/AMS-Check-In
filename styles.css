@@ -413,3 +413,29 @@ body {
     font-size: 26px;
     cursor: pointer;
 }
+/* ===============================
+   SEARCH PANEL SLIDE SYSTEM
+================================ */
+
+.search-panel {
+    position: fixed;
+    top: 0;
+    right: -420px; /* start off screen */
+    width: 420px;
+    height: 100%;
+    background: #ffffff;
+    z-index: 9001;
+    transition: right 0.35s ease-in-out;
+    box-shadow: -4px 0 10px rgba(0,0,0,0.2);
+}
+
+.search-panel.open {
+    right: 0;
+}
+
+.search-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    z-index: 9000;
+}
