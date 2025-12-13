@@ -215,11 +215,16 @@ if (searchOverlay) searchOverlay.classList.add("hidden");
 document.querySelectorAll(".tab").forEach(tab => {
   tab.addEventListener("click", () => {
     const targetId = tab.dataset.tab;
-     // 🔍 Search Log = slide-out panel ONLY
+     
+// 🔍 Search Log = slide-out panel ONLY
 if (targetId === "tabSearch") {
-  document.getElementById("searchPanel")?.classList.remove("hidden");
-  document.getElementById("searchPanelOverlay").style.display = "block";
-  return; // ⛔ stop normal tab behavior
+  const panel = document.getElementById("searchPanel");
+  const overlay = document.getElementById("searchPanelOverlay");
+
+  if (panel) panel.classList.remove("hidden");
+  if (overlay) overlay.style.display = "block";
+
+  return; // ⛔ stop normal tab behavior ONLY for Search
 }
 
 
