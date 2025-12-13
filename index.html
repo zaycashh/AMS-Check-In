@@ -136,6 +136,28 @@
     <!-- TAB CONTENT AREAS MUST EXIST BELOW -->
 <div id="tabSearch" class="tab-content" style="display:none;">
     <!-- Search Log will be shown here -->
+        <!-- EXPORT BUTTONS -->
+    <div class="export-bar">
+        <button id="btnExportExcel" class="export-btn excel">Export XLS</button>
+        <button id="btnExportPDF" class="export-btn pdf">Export PDF</button>
+    </div>
+
+    <!-- RESULTS TABLE -->
+    <table class="log-table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Name</th>
+                <th>Company</th>
+                <th>Reason</th>
+                <th>Services</th>
+                <th>Signature</th>
+            </tr>
+        </thead>
+        <tbody id="searchResults"></tbody>
+    </table>
+    
 </div>
 
 <div id="tabGeneral" class="tab-content" style="display:none;">
