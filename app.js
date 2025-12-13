@@ -315,6 +315,25 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 /* =========================================================
+   CLEAR SEARCH FORM
+========================================================= */
+const clearBtn = document.getElementById("btnClearSearch");
+
+if (clearBtn) {
+  clearBtn.addEventListener("click", () => {
+    // Text inputs
+    ["filterFirstName", "filterLastName", "filterCompanyManual"].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = "";
+    });
+
+    // Company dropdown
+    const companySelect = document.getElementById("filterCompany");
+    if (companySelect) companySelect.value = "";
+  });
+}
+
+/* =========================================================
    SEARCH DATE RANGE — CUSTOM RANGE VISIBILITY
 ========================================================= */
 document.addEventListener("change", (e) => {
