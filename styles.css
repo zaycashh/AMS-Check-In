@@ -413,29 +413,30 @@ body {
     font-size: 26px;
     cursor: pointer;
 }
-/* ===============================
-   SEARCH PANEL SLIDE SYSTEM
+/* ================================
+   SEARCH LOG SLIDE PANEL (LEFT)
 ================================ */
 
-.search-panel {
-    position: fixed;
-    top: 0;
-    right: -420px; /* start off screen */
-    width: 420px;
-    height: 100%;
-    background: #ffffff;
-    z-index: 9001;
-    transition: right 0.35s ease-in-out;
-    box-shadow: -4px 0 10px rgba(0,0,0,0.2);
+#searchPanel {
+  position: fixed;
+  top: 0;
+  left: -420px;              /* start hidden off-screen */
+  width: 420px;
+  height: 100vh;
+  background: #ffffff;
+  box-shadow: 6px 0 20px rgba(0,0,0,0.25);
+  transition: left 0.35s ease;
+  z-index: 1001;
+  overflow-y: auto;
 }
 
-.search-panel.open {
-    right: 0;
+/* OPEN STATE */
+#searchPanel.open {
+  left: 0;
 }
 
-.search-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.55);
-    z-index: 9000;
+/* Optional polish */
+#searchPanel {
+  border-top-right-radius: 12px;
+  border-bottom-right-radius: 12px;
 }
