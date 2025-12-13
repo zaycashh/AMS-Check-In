@@ -212,9 +212,6 @@ document.querySelectorAll(".tab").forEach(tab => {
   tab.addEventListener("click", () => {
     const targetId = tab.dataset.tab;
 
-    const searchPanel = document.getElementById("searchPanel");
-    const searchOverlay = document.getElementById("searchPanelOverlay");
-
     // ✅ ALWAYS close Search panel when switching tabs
     if (searchPanel) searchPanel.classList.remove("open");
     if (searchOverlay) searchOverlay.style.display = "none";
