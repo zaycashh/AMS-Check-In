@@ -215,6 +215,13 @@ if (searchOverlay) searchOverlay.classList.add("hidden");
 document.querySelectorAll(".tab").forEach(tab => {
   tab.addEventListener("click", () => {
     const targetId = tab.dataset.tab;
+         // 🔒 ALWAYS close Search panel when switching tabs
+    const searchPanel = document.getElementById("searchPanel");
+    const searchOverlay = document.getElementById("searchPanelOverlay");
+
+    if (searchPanel) searchPanel.classList.add("hidden");
+    if (searchOverlay) searchOverlay.style.display = "none";
+
      
 // 🔍 Search Log = slide-out panel ONLY
 if (targetId === "tabSearch") {
