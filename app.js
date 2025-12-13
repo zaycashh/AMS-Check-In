@@ -184,7 +184,6 @@ document.getElementById("toggleAdminBtn").addEventListener("click", () => {
         document.getElementById("checkInSection").style.display = "none";
        // ALWAYS hide Search Log panel on admin entry
 const searchPanel = document.getElementById("searchPanel");
-const searchOverlay = document.getElementById("searchPanelOverlay");
 
        
         // Load Recent Check-Ins ONCE
