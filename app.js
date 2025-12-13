@@ -2,6 +2,7 @@
    GLOBAL VARIABLES
 ========================================================= */
 const ADMIN_PIN = "2468";
+let isAdminMode = false;
 
 let searchPanel;
 let searchOverlay;
@@ -176,6 +177,17 @@ document.getElementById("resetFormBtn").addEventListener("click", () => {
 /* =========================================================
    ADMIN LOGIN
 ========================================================= */
+if (pin === ADMIN_PIN) {
+    isAdminMode = true;
+
+    document.getElementById("adminArea").style.display = "block";
+    document.getElementById("checkInSection").style.display = "none";
+
+    if (searchPanel) searchPanel.classList.remove("open");
+    if (searchOverlay) searchOverlay.style.display = "none";
+
+    // rest of your code...
+}
 
 document.getElementById("toggleAdminBtn").addEventListener("click", () => {
     const pin = prompt("Enter Admin PIN:");
@@ -233,6 +245,15 @@ document.querySelectorAll(".tab").forEach(tab => {
 /* =========================================================
    EXIT ADMIN MODE
 ========================================================= */
+document.getElementById("exitAdminBtn").addEventListener("click", () => {
+    isAdminMode = false;
+
+    if (searchPanel) searchPanel.classList.remove("open");
+    if (searchOverlay) searchOverlay.style.display = "none";
+
+    document.getElementById("adminArea").style.display = "none";
+    document.getElementById("checkInSection").style.display = "block";
+});
 document.getElementById("exitAdminBtn").addEventListener("click", () => {
     document.getElementById("adminArea").style.display = "none";
     document.getElementById("checkInSection").style.display = "block";
