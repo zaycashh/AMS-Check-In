@@ -318,8 +318,6 @@ document.addEventListener("change", (e) => {
 ================================ */
 
 const closeSearchBtn = document.getElementById("closeSearchPanel");
-const searchPanel = document.getElementById("searchPanel");
-const searchOverlay = document.getElementById("searchPanelOverlay");
 
 if (closeSearchBtn) {
     closeSearchBtn.addEventListener("click", () => {
