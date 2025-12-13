@@ -84,8 +84,14 @@ function setupSignaturePad() {
    SUBMIT FORM
 ========================================================= */
 document.getElementById("submitBtn")?.addEventListener("click", () => {
-    const first = firstName.value.trim();
-    const last = lastName.value.trim();
+    const firstInput = document.getElementById("firstName");
+    const lastInput = document.getElementById("lastName");
+    const companySelectEl = document.getElementById("companySelect");
+    const reasonSelectEl = document.getElementById("reasonSelect");
+    const canvas = document.getElementById("signaturePad");
+
+    const first = firstInput?.value.trim();
+    const last = lastInput?.value.trim();
 
     if (!first || !last) {
         alert("Please enter first and last name.");
@@ -97,9 +103,9 @@ document.getElementById("submitBtn")?.addEventListener("click", () => {
         time: new Date().toLocaleTimeString(),
         first,
         last,
-        company: companySelect.value,
-        reason: reasonSelect.value,
-        signature: signaturePad.toDataURL()
+        company: companySelectEl?.value || "",
+        reason: reasonSelectEl?.value || "",
+        signature: canvas ? canvas.toDataURL() : ""
     };
 
     const logs = JSON.parse(localStorage.getItem("ams_logs") || "[]");
