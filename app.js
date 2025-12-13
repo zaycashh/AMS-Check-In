@@ -3,6 +3,8 @@
 ========================================================= */
 const ADMIN_PIN = "2468";
 
+const searchPanel = document.getElementById("searchPanel");
+const searchOverlay = document.getElementById("searchPanelOverlay");
 /* =========================================================
    SIGNATURE PAD INITIALIZATION
 ========================================================= */
