@@ -171,6 +171,7 @@ document.getElementById("submitBtn").addEventListener("click", () => {
 document.getElementById("resetFormBtn").addEventListener("click", () => {
     location.reload();
 });
+
 /* =========================================================
    ADMIN LOGIN
 ========================================================= */
@@ -179,33 +180,41 @@ document.getElementById("toggleAdminBtn").addEventListener("click", () => {
     const pin = prompt("Enter Admin PIN:");
 
     if (pin === ADMIN_PIN) {
-        // Show admin, hide check-in
         document.getElementById("adminArea").style.display = "block";
         document.getElementById("checkInSection").style.display = "none";
 
-        // Load Recent Check-Ins ONCE
         if (!window.__recentLoaded && typeof renderRecentCheckIns === "function") {
             renderRecentCheckIns();
             window.__recentLoaded = true;
         }
+    }
+});
 
-        // Default to Recent Check-Ins tab
+        /* ---------------------------------------------------
+           DEFAULT TAB = Recent Check-Ins
+        --------------------------------------------------- */
+
+        // Remove active from all tabs
         document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+
+        // Set Recent Check-Ins tab active
         document.querySelector('.tab[data-tab="tabRecent"]').classList.add("active");
 
+        // Hide all tab contents
         document.querySelectorAll(".tab-content").forEach(c => c.style.display = "none");
+
+        // Show Recent Check-Ins content
         document.getElementById("tabRecent").style.display = "block";
 
-        // Apply filters if available
+        // Apply filters (if exists)
         if (typeof applyFilters === "function") {
             applyFilters();
         }
 
     } else {
-        alert("Incorrect PIN");
+        alert("Incorrect PIN.");
     }
 });
-
 
 /* =========================================================
    EXIT ADMIN MODE
