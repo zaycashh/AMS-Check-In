@@ -314,3 +314,19 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 });
+/* =========================================================
+   SEARCH DATE RANGE (CUSTOM RANGE TOGGLE)
+========================================================= */
+
+const filterDateRange = document.getElementById("filterDateRange");
+const customDateWrapper = document.getElementById("customDateWrapper");
+
+if (filterDateRange && customDateWrapper) {
+  filterDateRange.addEventListener("change", () => {
+    if (filterDateRange.value === "custom") {
+      customDateWrapper.style.display = "block";
+    } else {
+      customDateWrapper.style.display = "none";
+    }
+  });
+}
