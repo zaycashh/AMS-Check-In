@@ -359,8 +359,7 @@ const searchOverlay = document.getElementById("searchPanelOverlay");
 
 if (closeSearchBtn) {
     closeSearchBtn.addEventListener("click", () => {
-        if (searchPanel) searchPanel.classList.add("hidden");
+        if (searchPanel) searchPanel.classList.remove("open");
         if (searchOverlay) searchOverlay.style.display = "none";
     });
 }
-
