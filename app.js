@@ -196,10 +196,6 @@ document.getElementById("toggleAdminBtn").addEventListener("click", () => {
         document.querySelectorAll(".tab-content").forEach(c => c.style.display = "none");
         document.getElementById("tabRecent").style.display = "block";
 
-        // Apply filters if available
-        if (typeof applyFilters === "function") {
-            applyFilters();
-        }
 
     } else {
         alert("Incorrect PIN");
