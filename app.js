@@ -83,68 +83,73 @@ function setupSignaturePad() {
 /* =========================================================
    SUBMIT FORM
 ========================================================= */
-document.getElementById("submitBtn")?.addEventListener("click", () => {
-    const firstInput = document.getElementById("firstName");
-    const lastInput = document.getElementById("lastName");
-    const companySelectEl = document.getElementById("companySelect");
-    const reasonSelectEl = document.getElementById("reasonSelect");
-    const canvas = document.getElementById("signaturePad");
+const submitBtn = document.getElementById("submitBtn");
+if (submitBtn) {
+    submitBtn.addEventListener("click", () => {
+        const firstInput = document.getElementById("firstName");
+        const lastInput = document.getElementById("lastName");
+        const companySelectEl = document.getElementById("companySelect");
+        const reasonSelectEl = document.getElementById("reasonSelect");
+        const canvas = document.getElementById("signaturePad");
 
-    const first = firstInput?.value.trim();
-    const last = lastInput?.value.trim();
+        const first = firstInput?.value.trim();
+        const last = lastInput?.value.trim();
 
-    if (!first || !last) {
-        alert("Please enter first and last name.");
-        return;
-    }
+        if (!first || !last) {
+            alert("Please enter first and last name.");
+            return;
+        }
 
-    const record = {
-        date: new Date().toLocaleDateString(),
-        time: new Date().toLocaleTimeString(),
-        first,
-        last,
-        company: companySelectEl?.value || "",
-        reason: reasonSelectEl?.value || "",
-        signature: canvas ? canvas.toDataURL() : ""
-    };
+        const record = {
+            date: new Date().toLocaleDateString(),
+            time: new Date().toLocaleTimeString(),
+            first,
+            last,
+            company: companySelectEl?.value || "",
+            reason: reasonSelectEl?.value || "",
+            signature: canvas ? canvas.toDataURL() : ""
+        };
 
-    const logs = JSON.parse(localStorage.getItem("ams_logs") || "[]");
-    logs.push(record);
-    localStorage.setItem("ams_logs", JSON.stringify(logs));
+        const logs = JSON.parse(localStorage.getItem("ams_logs") || "[]");
+        logs.push(record);
+        localStorage.setItem("ams_logs", JSON.stringify(logs));
 
-    alert("Check-in submitted!");
-    location.reload();
-});
+        alert("Check-in submitted!");
+        location.reload();
+    });
+}
 
 /* =========================================================
    ADMIN LOGIN
 ========================================================= */
-document.getElementById("toggleAdminBtn")?.addEventListener("click", () => {
-    const pin = prompt("Enter Admin PIN:");
-    if (pin !== ADMIN_PIN) {
-        alert("Incorrect PIN");
-        return;
-    }
+const adminBtn = document.getElementById("toggleAdminBtn");
+if (adminBtn) {
+    adminBtn.addEventListener("click", () => {
+        const pin = prompt("Enter Admin PIN:");
+        if (pin !== ADMIN_PIN) {
+            alert("Incorrect PIN");
+            return;
+        }
 
-    isAdminMode = true;
+        isAdminMode = true;
 
-    adminArea.style.display = "block";
-    checkInSection.style.display = "none";
+        document.getElementById("adminArea").style.display = "block";
+        document.getElementById("checkInSection").style.display = "none";
 
-    if (searchPanel) searchPanel.classList.remove("open");
-    if (searchOverlay) searchOverlay.style.display = "none";
+        closeSearchPanel();
 
-    if (!window.__recentLoaded && typeof renderRecentCheckIns === "function") {
-        renderRecentCheckIns();
-        window.__recentLoaded = true;
-    }
+        if (!window.__recentLoaded && typeof renderRecentCheckIns === "function") {
+            renderRecentCheckIns();
+            window.__recentLoaded = true;
+        }
 
-    document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-    document.querySelector('[data-tab="tabRecent"]')?.classList.add("active");
+        document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+        document.querySelector('[data-tab="tabRecent"]')?.classList.add("active");
 
-    document.querySelectorAll(".tab-content").forEach(c => c.style.display = "none");
-    document.getElementById("tabRecent")?.style.display = "block";
-});
+        document.querySelectorAll(".tab-content").forEach(c => c.style.display = "none");
+        document.getElementById("tabRecent")?.style.display = "block";
+    });
+}
 
 /* =========================================================
    ADMIN TAB NAVIGATION
@@ -153,13 +158,11 @@ document.querySelectorAll(".tab").forEach(tab => {
     tab.addEventListener("click", () => {
         const target = tab.dataset.tab;
 
-        if (searchPanel) searchPanel.classList.remove("open");
-        if (searchOverlay) searchOverlay.style.display = "none";
+        closeSearchPanel();
 
         if (target === "tabSearch") {
             if (!isAdminMode) return;
-            searchPanel.classList.add("open");
-            searchOverlay.style.display = "block";
+            openSearchPanel();
             return;
         }
 
@@ -174,28 +177,43 @@ document.querySelectorAll(".tab").forEach(tab => {
 /* =========================================================
    EXIT ADMIN MODE
 ========================================================= */
-document.getElementById("exitAdminBtn")?.addEventListener("click", () => {
-    isAdminMode = false;
+const exitBtn = document.getElementById("exitAdminBtn");
+if (exitBtn) {
+    exitBtn.addEventListener("click", () => {
+        isAdminMode = false;
+        closeSearchPanel();
 
-    if (searchPanel) searchPanel.classList.remove("open");
-    if (searchOverlay) searchOverlay.style.display = "none";
+        document.getElementById("adminArea").style.display = "none";
+        document.getElementById("checkInSection").style.display = "block";
+    });
+}
 
-    adminArea.style.display = "none";
-    checkInSection.style.display = "block";
-});
+/* =========================================================
+   SEARCH PANEL HELPERS
+========================================================= */
+function openSearchPanel() {
+    if (!searchPanel || !searchOverlay) return;
+    searchPanel.classList.add("open");
+    searchOverlay.style.display = "block";
+}
+
+function closeSearchPanel() {
+    if (!searchPanel || !searchOverlay) return;
+    searchPanel.classList.remove("open");
+    searchOverlay.style.display = "none";
+}
 
 /* =========================================================
    SEARCH PANEL CLOSE (X + OVERLAY)
 ========================================================= */
-document.getElementById("closeSearchPanel")?.addEventListener("click", () => {
-    searchPanel.classList.remove("open");
-    searchOverlay.style.display = "none";
-});
+const closeBtn = document.getElementById("closeSearchPanel");
+if (closeBtn) {
+    closeBtn.addEventListener("click", closeSearchPanel);
+}
 
 document.addEventListener("click", e => {
     if (e.target === searchOverlay) {
-        searchPanel.classList.remove("open");
-        searchOverlay.style.display = "none";
+        closeSearchPanel();
     }
 });
 
@@ -207,3 +225,4 @@ document.addEventListener("DOMContentLoaded", () => {
     searchOverlay = document.getElementById("searchPanelOverlay");
     setupSignaturePad();
 });
+
