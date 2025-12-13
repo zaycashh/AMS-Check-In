@@ -314,33 +314,23 @@ document.addEventListener("change", (e) => {
   }
 });
 /* ================================
-   SEARCH PANEL CLOSE (X BUTTON)
+   SEARCH PANEL CLOSE (X BUTTON + OVERLAY)
 ================================ */
 
 const closeSearchBtn = document.getElementById("closeSearchPanel");
 
+/* CLOSE PANEL VIA X BUTTON */
 if (closeSearchBtn) {
     closeSearchBtn.addEventListener("click", () => {
         if (searchPanel) searchPanel.classList.remove("open");
         if (searchOverlay) searchOverlay.style.display = "none";
     });
 }
-const searchPanel = document.getElementById("searchPanel");
-const searchOverlay = document.getElementById("searchPanelOverlay");
-const closeSearchBtn = document.getElementById("closeSearchPanel");
 
-/* CLOSE PANEL */
-if (closeSearchBtn) {
-    closeSearchBtn.addEventListener("click", () => {
-        searchPanel.classList.remove("open");
-        searchOverlay.style.display = "none";
-    });
-}
-
-/* CLOSE BY CLICKING OVERLAY */
+/* CLOSE PANEL BY CLICKING OVERLAY */
 if (searchOverlay) {
     searchOverlay.addEventListener("click", () => {
-        searchPanel.classList.remove("open");
+        if (searchPanel) searchPanel.classList.remove("open");
         searchOverlay.style.display = "none";
     });
 }
