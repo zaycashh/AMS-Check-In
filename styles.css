@@ -325,3 +325,6 @@ body {
     cursor: pointer;
     pointer-events: auto !important;
 }
+.hidden {
+  display: none;
+}
