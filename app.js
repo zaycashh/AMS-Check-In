@@ -186,9 +186,6 @@ document.getElementById("toggleAdminBtn").addEventListener("click", () => {
 const searchPanel = document.getElementById("searchPanel");
 const searchOverlay = document.getElementById("searchPanelOverlay");
 
-if (searchPanel) searchPanel.classList.add("hidden");
-if (searchOverlay) searchOverlay.classList.add("hidden");
-
        
         // Load Recent Check-Ins ONCE
         if (!window.__recentLoaded && typeof renderRecentCheckIns === "function") {
