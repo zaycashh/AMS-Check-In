@@ -315,18 +315,18 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 /* =========================================================
-   SEARCH DATE RANGE (CUSTOM RANGE TOGGLE)
+   SEARCH DATE RANGE — CUSTOM RANGE VISIBILITY
 ========================================================= */
+document.addEventListener("change", (e) => {
+  if (e.target && e.target.id === "filterDateRange") {
+    const customWrapper = document.getElementById("customDateWrapper");
 
-const filterDateRange = document.getElementById("filterDateRange");
-const customDateWrapper = document.getElementById("customDateWrapper");
+    if (!customWrapper) return;
 
-if (filterDateRange && customDateWrapper) {
-  filterDateRange.addEventListener("change", () => {
-    if (filterDateRange.value === "custom") {
-      customDateWrapper.style.display = "block";
+    if (e.target.value === "custom") {
+      customWrapper.style.display = "block";
     } else {
-      customDateWrapper.style.display = "none";
+      customWrapper.style.display = "none";
     }
-  });
-}
+  }
+});
