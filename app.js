@@ -182,6 +182,9 @@ document.getElementById("toggleAdminBtn").addEventListener("click", () => {
         // Show admin, hide check-in
         document.getElementById("adminArea").style.display = "block";
         document.getElementById("checkInSection").style.display = "none";
+
+       initRunSearch();
+
        // ALWAYS hide Search Log panel on admin entry
 const searchPanel = document.getElementById("searchPanel");
 const searchOverlay = document.getElementById("searchPanelOverlay");
@@ -325,4 +328,30 @@ document.getElementById("clearSearch")?.addEventListener("click", () => {
   if (companySelect) companySelect.value = "";
   if (dateRangeSelect) dateRangeSelect.value = "";
 });
+/* =========================================================
+   STEP 2 — INIT SEARCH (SAFE, ADMIN-ONLY)
+========================================================= */
+function initRunSearch() {
+  const runBtn = document.getElementById("runSearch");
+  if (!runBtn) return;
+
+  runBtn.addEventListener("click", () => {
+    const first = document.getElementById("filterFirstName")?.value.toLowerCase() || "";
+    const last = document.getElementById("filterLastName")?.value.toLowerCase() || "";
+    const company = document.getElementById("filterCompany")?.value.toLowerCase() || "";
+
+    const logs = JSON.parse(localStorage.getItem("ams_logs") || "[]");
+
+    const filtered = logs.filter(entry => {
+      return (
+        (!first || entry.first.toLowerCase().includes(first)) &&
+        (!last || entry.last.toLowerCase().includes(last)) &&
+        (!company || entry.company.toLowerCase().includes(company))
+      );
+    });
+
+    console.clear();
+    console.table(filtered);
+  });
+}
 
