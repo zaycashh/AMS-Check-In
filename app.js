@@ -302,6 +302,26 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 });
+/* =========================================================
+   STEP 1 — CLEAR SEARCH FILTERS
+========================================================= */
+document.getElementById("clearSearch")?.addEventListener("click", () => {
+  // Text inputs
+  const textFields = [
+    "filterFirstName",
+    "filterLastName",
+    "filterCompanyManual"
+  ];
 
+  textFields.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = "";
+  });
 
+  // Dropdowns
+  const companySelect = document.getElementById("filterCompany");
+  const dateRangeSelect = document.getElementById("filterDateRange");
 
+  if (companySelect) companySelect.value = "";
+  if (dateRangeSelect) dateRangeSelect.value = "";
+});
