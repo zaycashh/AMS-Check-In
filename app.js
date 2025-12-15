@@ -211,6 +211,7 @@ if (searchOverlay) searchOverlay.classList.add("hidden");
         alert("Incorrect PIN");
     }
 });
+
 /* =========================================================
    STEP 2 — RUN SEARCH (SAFE + WORKING)
 ========================================================= */
