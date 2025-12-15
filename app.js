@@ -199,14 +199,6 @@ if (searchOverlay) searchOverlay.classList.add("hidden");
             window.__recentLoaded = true;
         }
 
-        // Default to Recent Check-Ins tab
-        document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-        document.querySelector('.tab[data-tab="tabRecent"]').classList.add("active");
-
-        document.querySelectorAll(".tab-content").forEach(c => c.style.display = "none");
-        document.getElementById("tabRecent").style.display = "block";
-
-
     } else {
         alert("Incorrect PIN");
     }
