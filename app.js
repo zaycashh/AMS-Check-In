@@ -352,6 +352,13 @@ function initRunSearch() {
 
     console.clear();
     console.table(filtered);
+     // Force switch to Recent Check-Ins tab
+document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+document.querySelector('[data-tab="tabRecent"]').classList.add("active");
+
+document.querySelectorAll(".tab-content").forEach(c => c.style.display = "none");
+document.getElementById("tabRecent").style.display = "block";
+
   });
 }
 /* =========================================================
