@@ -212,6 +212,42 @@ if (searchOverlay) searchOverlay.classList.add("hidden");
     }
 });
 /* =========================================================
+   STEP 2 — RUN SEARCH (SAFE + WORKING)
+========================================================= */
+function initRunSearch() {
+    const runBtn = document.getElementById("runSearch");
+    if (!runBtn) return; // prevents crash if button not rendered
+
+    runBtn.onclick = () => {
+        const logs = JSON.parse(localStorage.getItem("ams_logs") || "[]");
+
+        const first = document.getElementById("filterFirstName")?.value.toLowerCase() || "";
+        const last = document.getElementById("filterLastName")?.value.toLowerCase() || "";
+        const company = document.getElementById("filterCompany")?.value || "";
+
+        const filtered = logs.filter(r => {
+            return (
+                (!first || r.first.toLowerCase().includes(first)) &&
+                (!last || r.last.toLowerCase().includes(last)) &&
+                (!company || company === "all" || r.company === company)
+            );
+        });
+
+        // 🔥 THIS is what makes it visible
+        if (typeof renderRecentCheckIns === "function") {
+            renderRecentCheckIns(filtered);
+        }
+
+        // Switch to Recent tab
+        document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+        document.querySelector('[data-tab="tabRecent"]')?.classList.add("active");
+
+        document.querySelectorAll(".tab-content").forEach(c => c.style.display = "none");
+        document.getElementById("tabRecent")?.style.display = "block";
+    };
+}
+
+/* =========================================================
    ADMIN TAB NAVIGATION (CLICKABLE SIDEBAR)
 ========================================================= */
 
@@ -254,8 +290,6 @@ document.querySelectorAll(".tab").forEach(tab => {
     }
   });
 });
-
-
 
 /* =========================================================
    EXIT ADMIN MODE
