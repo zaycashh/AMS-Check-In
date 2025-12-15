@@ -199,6 +199,14 @@ if (searchOverlay) searchOverlay.classList.add("hidden");
             window.__recentLoaded = true;
         }
 
+        // Default to Recent Check-Ins tab
+        document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+        document.querySelector('.tab[data-tab="tabRecent"]').classList.add("active");
+
+        document.querySelectorAll(".tab-content").forEach(c => c.style.display = "none");
+        document.getElementById("tabRecent").style.display = "block";
+
+
     } else {
         alert("Incorrect PIN");
     }
@@ -344,63 +352,5 @@ function initRunSearch() {
 
     console.clear();
     console.table(filtered);
-     // Force switch to Recent Check-Ins tab
-document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-document.querySelector('[data-tab="tabRecent"]').classList.add("active");
-
-document.querySelectorAll(".tab-content").forEach(c => c.style.display = "none");
-document.getElementById("tabRecent").style.display = "block";
-
   });
 }
-/* =========================================================
-   RENDER RECENT CHECK-INS (DISPLAY RESULTS)
-========================================================= */
-function renderRecentCheckIns(data) {
-    const container = document.getElementById("tabRecent");
-    if (!container) return;
-
-    container.innerHTML = "";
-
-    if (!data || data.length === 0) {
-        container.innerHTML = "<p>No results found.</p>";
-        return;
-    }
-
-    const table = document.createElement("table");
-    table.className = "log-table";
-
-    table.innerHTML = `
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Time</th>
-                <th>First</th>
-                <th>Last</th>
-                <th>Company</th>
-                <th>Reason</th>
-                <th>Services</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    `;
-
-    const tbody = table.querySelector("tbody");
-
-    data.forEach(r => {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-            <td>${r.date || ""}</td>
-            <td>${r.time || ""}</td>
-            <td>${r.first || ""}</td>
-            <td>${r.last || ""}</td>
-            <td>${r.company || ""}</td>
-            <td>${r.reason || ""}</td>
-            <td>${r.services || ""}</td>
-        `;
-        tbody.appendChild(row);
-    });
-
-    container.appendChild(table);
-}
-
