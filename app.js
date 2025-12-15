@@ -325,3 +325,44 @@ document.getElementById("clearSearch")?.addEventListener("click", () => {
   if (companySelect) companySelect.value = "";
   if (dateRangeSelect) dateRangeSelect.value = "";
 });
+/* =========================================================
+   STEP 2 — RUN SEARCH FILTER
+========================================================= */
+document.getElementById("runSearch")?.addEventListener("click", () => {
+  const first = document.getElementById("filterFirstName")?.value.toLowerCase() || "";
+  const last = document.getElementById("filterLastName")?.value.toLowerCase() || "";
+  const company = document.getElementById("filterCompany")?.value.toLowerCase() || "";
+  const manualCompany = document.getElementById("filterCompanyManual")?.value.toLowerCase() || "";
+  const dateRange = document.getElementById("filterDateRange")?.value || "";
+
+  const logs = JSON.parse(localStorage.getItem("ams_logs") || "[]");
+
+  let filtered = logs.filter(entry => {
+    const matchesFirst = !first || entry.first.toLowerCase().includes(first);
+    const matchesLast = !last || entry.last.toLowerCase().includes(last);
+
+    const companyValue = entry.company.toLowerCase();
+    const matchesCompany =
+      (!company || companyValue === company) &&
+      (!manualCompany || companyValue.includes(manualCompany));
+
+    return matchesFirst && matchesLast && matchesCompany;
+  });
+
+  // 🚨 TEMP: console output only (safe)
+  console.clear();
+  console.table(filtered);
+
+  // 👉 Send results to Recent Check-Ins
+  if (typeof renderRecentCheckIns === "function") {
+    renderRecentCheckIns(filtered);
+  }
+
+  // Switch to Recent tab automatically
+  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+  document.querySelector('[data-tab="tabRecent"]')?.classList.add("active");
+
+  document.querySelectorAll(".tab-content").forEach(c => c.style.display = "none");
+  document.getElementById("tabRecent")?.style.display = "block";
+});
+
