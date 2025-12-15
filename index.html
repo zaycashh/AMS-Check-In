@@ -140,6 +140,52 @@
 <div id="tabCompany" class="tab-content" style="display:none;">
     <!-- Detail Company Report -->
 </div>
+    <!-- ===============================
+     SEARCH LOG TAB
+================================ -->
+<div id="tabSearch" class="tab-content" style="display:none;">
+
+  <h2 class="section-title">Search Log</h2>
+
+  <div class="search-form">
+
+    <div class="form-row">
+      <label>First Name</label>
+      <input type="text" id="filterFirstName" placeholder="Optional">
+    </div>
+
+    <div class="form-row">
+      <label>Last Name</label>
+      <input type="text" id="filterLastName" placeholder="Optional">
+    </div>
+
+    <div class="form-row">
+      <label>Company</label>
+      <select id="filterCompany">
+        <option value="">All Companies</option>
+      </select>
+    </div>
+
+    <div class="form-row">
+      <label>Date Range</label>
+      <select id="filterDateRange">
+        <option value="">Select Range</option>
+        <option value="today">Today</option>
+        <option value="thisWeek">This Week</option>
+        <option value="thisMonth">This Month</option>
+        <option value="custom">Custom</option>
+      </select>
+    </div>
+
+    <!-- ACTION BUTTONS -->
+    <div class="search-actions">
+      <button class="btn-primary" id="runSearch">Search</button>
+      <button class="btn-secondary" id="clearSearch">Clear Filters</button>
+    </div>
+
+  </div>
+
+</div>
 
 <div id="tabRecent" class="tab-content" style="display:block;">
     <!-- Recent Check-Ins -->
