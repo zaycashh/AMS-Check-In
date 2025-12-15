@@ -182,6 +182,10 @@ document.getElementById("toggleAdminBtn").addEventListener("click", () => {
         // Show admin, hide check-in
         document.getElementById("adminArea").style.display = "block";
         document.getElementById("checkInSection").style.display = "none";
+
+       initRunSearch();
+
+       
        // ALWAYS hide Search Log panel on admin entry
 const searchPanel = document.getElementById("searchPanel");
 const searchOverlay = document.getElementById("searchPanelOverlay");
@@ -366,3 +370,35 @@ document.getElementById("runSearch")?.addEventListener("click", () => {
   document.getElementById("tabRecent")?.style.display = "block";
 });
 */
+/* =========================================================
+   STEP 2 — RUN SEARCH (ADMIN SAFE)
+========================================================= */
+function initRunSearch() {
+  const runBtn = document.getElementById("runSearch");
+  if (!runBtn) return; // 👈 prevents crash
+
+  runBtn.addEventListener("click", () => {
+    const first = document.getElementById("filterFirstName")?.value.toLowerCase() || "";
+    const last = document.getElementById("filterLastName")?.value.toLowerCase() || "";
+    const company = document.getElementById("filterCompany")?.value.toLowerCase() || "";
+    const manualCompany = document.getElementById("filterCompanyManual")?.value.toLowerCase() || "";
+
+    const logs = JSON.parse(localStorage.getItem("ams_logs") || "[]");
+
+    const filtered = logs.filter(entry => {
+      return (
+        (!first || entry.first.toLowerCase().includes(first)) &&
+        (!last || entry.last.toLowerCase().includes(last)) &&
+        (!company || entry.company.toLowerCase() === company) &&
+        (!manualCompany || entry.company.toLowerCase().includes(manualCompany))
+      );
+    });
+
+    console.table(filtered);
+
+    if (typeof renderRecentCheckIns === "function") {
+      renderRecentCheckIns(filtered);
+    }
+  });
+}
+
