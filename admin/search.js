@@ -1,5 +1,6 @@
 /* ============================================================
-   ADMIN SEARCH MODULE – PREMIUM VERSION (NO DUPLICATES)
+   ADMIN SEARCH MODULE – FIXED FOR AMS HTML
+   (NO ADMIN / SIGNATURE / LOGIN CONFLICTS)
 ============================================================ */
 
 console.log("Admin Search Module Loaded");
@@ -12,293 +13,91 @@ function getLogs() {
 }
 
 /* --------------------------------------
-   DATE HELPERS
+   FILTER + SEARCH
 -------------------------------------- */
-function toDate(d) {
-    const dt = new Date(d);
-    dt.setHours(0, 0, 0, 0);
-    return dt;
-}
-
-function getRange(range) {
-    const today = toDate(new Date());
-
-    switch (range) {
-        case "today": return { start: today, end: today };
-
-        case "yesterday":
-            const y = new Date(today);
-            y.setDate(y.getDate() - 1);
-            return { start: y, end: y };
-
-        case "thisWeek":
-            const wStart = new Date(today);
-            wStart.setDate(today.getDate() - today.getDay());
-            return { start: wStart, end: today };
-
-        case "lastWeek":
-            const lwEnd = new Date(today);
-            lwEnd.setDate(today.getDate() - today.getDay() - 1);
-            const lwStart = new Date(lwEnd);
-            lwStart.setDate(lwEnd.getDate() - 6);
-            return { start: lwStart, end: lwEnd };
-
-        case "thisMonth":
-            return {
-                start: new Date(today.getFullYear(), today.getMonth(), 1),
-                end: today
-            };
-
-        case "lastMonth":
-            return {
-                start: new Date(today.getFullYear(), today.getMonth() - 1, 1),
-                end: new Date(today.getFullYear(), today.getMonth(), 0)
-            };
-
-        case "thisYear":
-            return {
-                start: new Date(today.getFullYear(), 0, 1),
-                end: today
-            };
-
-        case "lastYear":
-            return {
-                start: new Date(today.getFullYear() - 1, 0, 1),
-                end: new Date(today.getFullYear() - 1, 11, 31)
-            };
-
-        default:
-            return null;
-    }
-}
-
-/* ============================================================
-   FILTER + RESULTS
-============================================================ */
-
-let filteredResults = [];
-
-function applyFilters() {
+function runSearch() {
     const logs = getLogs();
 
-    const nameFilter = document.getElementById("filterName").value.toLowerCase();
-    const companyFilter = document.getElementById("filterCompany").value;
-    const startDate = document.getElementById("filterDateStart").value;
-    const endDate = document.getElementById("filterDateEnd").value;
+    const first = document.getElementById("filterFirstName").value.trim().toLowerCase();
+    const last = document.getElementById("filterLastName").value.trim().toLowerCase();
+    const company = document.getElementById("filterCompany").value;
     const range = document.getElementById("filterDateRange").value;
 
-    let start = null;
-    let end = null;
+    let results = logs.filter(log => {
+        const f = (log.first || "").toLowerCase();
+        const l = (log.last || "").toLowerCase();
 
-    if (range) {
-        const r = getRange(range);
-        start = r.start;
-        end = r.end;
-    } else {
-        if (startDate) start = toDate(startDate);
-        if (endDate) end = toDate(endDate);
-    }
-
-    filteredResults = logs.filter(log => {
-        const fullName = `${log.first} ${log.last}`.toLowerCase();
-        const logDate = toDate(log.date);
-
-        if (nameFilter && !fullName.includes(nameFilter)) return false;
-        if (companyFilter && log.company !== companyFilter) return false;
-        if (start && logDate < start) return false;
-        if (end && logDate > end) return false;
+        if (first && !f.includes(first)) return false;
+        if (last && !l.includes(last)) return false;
+        if (company && company !== "All Companies" && log.company !== company) return false;
 
         return true;
     });
 
-    renderFilteredResults(filteredResults);
+    renderSearchResults(results);
 }
 
 /* --------------------------------------
-   RENDER RESULTS INTO TABLE
+   RENDER RESULTS
 -------------------------------------- */
-function renderFilteredResults(list) {
-    const tbody = document.getElementById("searchResults");
-    tbody.innerHTML = "";
+function renderSearchResults(results) {
+    const container = document.getElementById("searchResultsTable");
 
-    list.forEach(log => {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-            <td>${log.date}</td>
-            <td>${log.time}</td>
-            <td>${log.first} ${log.last}</td>
-            <td>${log.company}</td>
-            <td>${log.reason}</td>
-            <td>${log.services}</td>
-            <td><img src="${log.signature}" class="sig-thumb"></td>
-        `;
-        tbody.appendChild(row);
-    });
-}
-
-/* ============================================================
-   POPULATE DROPDOWN
-============================================================ */
-function populateCompanyDropdown() {
-    const logs = getLogs();
-    const unique = [...new Set(logs.map(l => l.company).filter(Boolean))];
-
-    const select = document.getElementById("filterCompany");
-    select.innerHTML = `<option value="">All Companies</option>`;
-
-    unique.forEach(c => {
-        const opt = document.createElement("option");
-        opt.value = c;
-        opt.textContent = c;
-        select.appendChild(opt);
-    });
-}
-
-/* ============================================================
-   EXPORT XLS
-============================================================ */
-function exportToExcel() {
-    if (!filteredResults.length) {
-        alert("No records to export.");
+    if (!results.length) {
+        container.innerHTML = "<p>No results found</p>";
         return;
     }
 
-    let table = `
-        <table border="1">
+    let html = `
+        <table class="log-table">
             <thead>
-                <tr style="background:#e6e6e6; font-weight:bold;">
+                <tr>
                     <th>Date</th>
                     <th>Time</th>
-                    <th>Name</th>
+                    <th>First</th>
+                    <th>Last</th>
                     <th>Company</th>
                     <th>Reason</th>
-                    <th>Services</th>
                 </tr>
-            </thead><tbody>
+            </thead>
+            <tbody>
     `;
 
-    filteredResults.forEach(log => {
-        table += `
+    results.forEach(r => {
+        html += `
             <tr>
-                <td>${log.date}</td>
-                <td>${log.time}</td>
-                <td>${log.first} ${log.last}</td>
-                <td>${log.company}</td>
-                <td>${log.reason}</td>
-                <td>${log.services}</td>
+                <td>${r.date}</td>
+                <td>${r.time}</td>
+                <td>${r.first}</td>
+                <td>${r.last}</td>
+                <td>${r.company}</td>
+                <td>${r.reason}</td>
             </tr>
         `;
     });
 
-    table += "</tbody></table>";
-
-    const blob = new Blob([table], { type: "application/vnd.ms-excel" });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "AMS_Search_Report.xls";
-    a.click();
+    html += "</tbody></table>";
+    container.innerHTML = html;
 }
 
-/* ============================================================
-   EXPORT PDF (PREMIUM FORMAT)
-============================================================ */
-async function exportToPDF() {
-    const logs = filteredResults || getLogs();
-    if (!logs.length) {
-        alert("No records to export.");
-        return;
-    }
-
-    async function getBase64(imgUrl) {
-        return new Promise(resolve => {
-            let img = new Image();
-            img.crossOrigin = "Anonymous";
-            img.onload = function () {
-                const c = document.createElement("canvas");
-                c.width = img.width;
-                c.height = img.height;
-                c.getContext("2d").drawImage(img, 0, 0);
-                resolve(c.toDataURL("image/png"));
-            };
-            img.src = imgUrl;
-        });
-    }
-
-    const tableBody = [
-        [
-            { text: "Date", bold: true },
-            { text: "Time", bold: true },
-            { text: "Name", bold: true },
-            { text: "Company", bold: true },
-            { text: "Reason", bold: true },
-            { text: "Services", bold: true },
-            { text: "Signature", bold: true }
-        ]
-    ];
-
-    for (let log of logs) {
-        const sig = log.signature ? await getBase64(log.signature) : "";
-
-        tableBody.push([
-            log.date,
-            log.time,
-            `${log.first} ${log.last}`,
-            log.company,
-            log.reason,
-            log.services,
-            sig ? { image: sig, width: 80 } : ""
-        ]);
-    }
-
-    const docDef = {
-        pageOrientation: "landscape",
-        pageSize: "LETTER",
-
-        header: {
-            columns: [
-                { text: "AMS Check-In Report", fontSize: 16, bold: true, margin: [20, 10] },
-                { text: new Date().toLocaleDateString(), alignment: "right", margin: [0, 10, 20, 0] }
-            ]
-        },
-
-        footer: function (currentPage, pageCount) {
-            return {
-                text: `Page ${currentPage} of ${pageCount}`,
-                alignment: "center",
-                margin: [0, 10, 0, 0]
-            };
-        },
-
-        content: [
-            {
-                table: {
-                    headerRows: 1,
-                    widths: ["auto", "auto", "*", "*", "*", "*", 100],
-                    body: tableBody
-                }
-            }
-        ]
-    };
-
-    pdfMake.createPdf(docDef).download("AMS_Report.pdf");
+/* --------------------------------------
+   CLEAR FILTERS
+-------------------------------------- */
+function clearSearch() {
+    document.getElementById("filterFirstName").value = "";
+    document.getElementById("filterLastName").value = "";
+    document.getElementById("filterCompany").value = "";
+    document.getElementById("filterDateRange").value = "";
+    document.getElementById("searchResultsTable").innerHTML = "";
 }
 
-/* ============================================================
-   INIT EVENT LISTENERS
-============================================================ */
+/* --------------------------------------
+   INIT
+-------------------------------------- */
 document.addEventListener("DOMContentLoaded", () => {
-    populateCompanyDropdown();
-    applyFilters();
+    const btnSearch = document.getElementById("runSearch");
+    const btnClear = document.getElementById("clearSearch");
 
-    document.getElementById("filterName").addEventListener("input", applyFilters);
-    document.getElementById("filterCompany").addEventListener("change", applyFilters);
-    document.getElementById("filterDateStart").addEventListener("change", applyFilters);
-    document.getElementById("filterDateEnd").addEventListener("change", applyFilters);
-    document.getElementById("filterDateRange").addEventListener("change", applyFilters);
-
-    const btnXLS = document.getElementById("btnExportExcel");
-    if (btnXLS) btnXLS.addEventListener("click", exportToExcel);
-
-    const btnPDF = document.getElementById("btnExportPDF");
-    if (btnPDF) btnPDF.addEventListener("click", exportToPDF);
+    if (btnSearch) btnSearch.addEventListener("click", runSearch);
+    if (btnClear) btnClear.addEventListener("click", clearSearch);
 });
