@@ -257,6 +257,7 @@ function initRunSearch() {
                         <th>First</th>
                         <th>Last</th>
                         <th>Company</th>
+                        <th>Services</th>
                         <th>Reason</th>
                     </tr>
                 </thead>
@@ -271,6 +272,7 @@ function initRunSearch() {
                     <td>${r.first}</td>
                     <td>${r.last}</td>
                     <td>${r.company}</td>
+                    <td>${r.services}</td>
                     <td>${r.reason}</td>
                 </tr>
             `;
