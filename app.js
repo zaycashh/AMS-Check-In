@@ -369,13 +369,24 @@ if (runSearchBtn) {
 
         const data = JSON.parse(localStorage.getItem("checkIns")) || [];
 
-        let results = data.filter(entry => {
-            return (
-                (!first || entry.first.toLowerCase().includes(first)) &&
-                (!last || entry.last.toLowerCase().includes(last)) &&
-                (!company || entry.company === company)
-            );
-        });
+       let results = data.filter(entry => {
+    const firstInput = first.trim();
+    const lastInput = last.trim();
+
+    const entryFirst = (entry.first || "").toLowerCase();
+    const entryLast = (entry.last || "").toLowerCase();
+
+    const matchFirst =
+        !firstInput || entryFirst.includes(firstInput);
+
+    const matchLast =
+        !lastInput || entryLast.includes(lastInput);
+
+    const matchCompany =
+        company === "" || entry.company === company;
+
+    return matchFirst && matchLast && matchCompany;
+});
 
         renderSearchResults(results);
     });
