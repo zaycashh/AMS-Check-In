@@ -80,7 +80,6 @@ html += `
 </tr>
 `;
 
-    `;
   });
 
   html += "</tbody></table>";
