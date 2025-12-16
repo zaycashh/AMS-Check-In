@@ -417,6 +417,10 @@ if (clearSearchBtn) {
 
 function renderSearchResults(results) {
     const container = document.getElementById("searchResultsTable");
+    container.style.display = "block";
+    container.style.visibility = "visible";
+    container.style.opacity = "1";
+
 
     if (!results.length) {
         container.innerHTML = "<p>No results found</p>";
