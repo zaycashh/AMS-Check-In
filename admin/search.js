@@ -116,3 +116,63 @@ if (dateRangeSelect && customRange) {
     });
   }
 });
+/* =========================
+   EXPORT SEARCH LOG
+========================= */
+
+function getVisibleTableData() {
+  const rows = document.querySelectorAll(".log-table tbody tr");
+  const data = [];
+
+  rows.forEach(row => {
+    const cells = row.querySelectorAll("td");
+    data.push({
+      Date: cells[0]?.innerText || "",
+      Time: cells[1]?.innerText || "",
+      First: cells[2]?.innerText || "",
+      Last: cells[3]?.innerText || "",
+      Company: cells[4]?.innerText || "",
+      Services: cells[5]?.innerText || "",
+      Reason: cells[6]?.innerText || ""
+    });
+  });
+
+  return data;
+}
+document.getElementById("exportExcel")?.addEventListener("click", () => {
+  const data = getVisibleTableData();
+  if (!data.length) return alert("No data to export");
+
+  const worksheet = XLSX.utils.json_to_sheet(data);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Search Log");
+
+  XLSX.writeFile(workbook, "AMS_Search_Log.xlsx");
+});
+document.getElementById("exportPDF")?.addEventListener("click", () => {
+  const data = getVisibleTableData();
+  if (!data.length) return alert("No data to export");
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+
+  doc.text("AMS Search Log", 14, 15);
+
+  const tableData = data.map(row => [
+    row.Date,
+    row.Time,
+    row.First,
+    row.Last,
+    row.Company,
+    row.Services,
+    row.Reason
+  ]);
+
+  doc.autoTable({
+    head: [["Date", "Time", "First", "Last", "Company", "Services", "Reason"]],
+    body: tableData,
+    startY: 20
+  });
+
+  doc.save("AMS_Search_Log.pdf");
+});
