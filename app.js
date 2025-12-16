@@ -383,7 +383,9 @@ if (runSearchBtn) {
         !lastInput || entryLast.includes(lastInput);
 
     const matchCompany =
-        company === "" || entry.company === company;
+    company === "" ||
+    company === "All Companies" ||
+    entry.company === company;
 
     return matchFirst && matchLast && matchCompany;
 });
