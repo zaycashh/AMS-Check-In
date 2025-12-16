@@ -1,103 +1,106 @@
-/* ============================================================
-   ADMIN SEARCH MODULE – FIXED FOR AMS HTML
-   (NO ADMIN / SIGNATURE / LOGIN CONFLICTS)
-============================================================ */
+/* =========================================================
+   ADMIN SEARCH MODULE — SAFE VERSION
+   (NO LOGIN / TAB / SIGNATURE CONFLICTS)
+========================================================= */
 
 console.log("Admin Search Module Loaded");
 
-/* --------------------------------------
+/* =========================
    LOAD LOGS
--------------------------------------- */
+========================= */
 function getLogs() {
-    return JSON.parse(localStorage.getItem("ams_logs") || "[]");
+  return JSON.parse(localStorage.getItem("ams_logs") || "[]");
 }
 
-/* --------------------------------------
-   FILTER + SEARCH
--------------------------------------- */
+/* =========================
+   RUN SEARCH
+========================= */
 function runSearch() {
-    const logs = getLogs();
+  const logs = getLogs();
 
-    const first = document.getElementById("filterFirstName").value.trim().toLowerCase();
-    const last = document.getElementById("filterLastName").value.trim().toLowerCase();
-    const company = document.getElementById("filterCompany").value;
-    const range = document.getElementById("filterDateRange").value;
+  const first = document.getElementById("filterFirstName").value.trim().toLowerCase();
+  const last = document.getElementById("filterLastName").value.trim().toLowerCase();
+  const company = document.getElementById("filterCompany").value;
+  const range = document.getElementById("filterDateRange").value;
 
-    let results = logs.filter(log => {
-        const f = (log.first || "").toLowerCase();
-        const l = (log.last || "").toLowerCase();
+  const results = logs.filter(entry => {
+    if (!entry) return false;
 
-        if (first && !f.includes(first)) return false;
-        if (last && !l.includes(last)) return false;
-        if (company && company !== "All Companies" && log.company !== company) return false;
+    const matchFirst = !first || (entry.first || "").toLowerCase().includes(first);
+    const matchLast = !last || (entry.last || "").toLowerCase().includes(last);
+    const matchCompany = !company || company === "All Companies" || entry.company === company;
 
-        return true;
-    });
+    return matchFirst && matchLast && matchCompany;
+  });
 
-    renderSearchResults(results);
+  renderResults(results);
 }
 
-/* --------------------------------------
+/* =========================
    RENDER RESULTS
--------------------------------------- */
-function renderSearchResults(results) {
-    const container = document.getElementById("searchResultsTable");
+========================= */
+function renderResults(results) {
+  const container = document.getElementById("searchResultsTable");
 
-    if (!results.length) {
-        container.innerHTML = "<p>No results found</p>";
-        return;
-    }
+  if (!container) {
+    console.error("searchResultsTable not found");
+    return;
+  }
 
-    let html = `
-        <table class="log-table">
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Time</th>
-                    <th>First</th>
-                    <th>Last</th>
-                    <th>Company</th>
-                    <th>Reason</th>
-                </tr>
-            </thead>
-            <tbody>
+  if (results.length === 0) {
+    container.innerHTML = "<p>No matching records found.</p>";
+    return;
+  }
+
+  let html = `
+    <table class="log-table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Time</th>
+          <th>First</th>
+          <th>Last</th>
+          <th>Company</th>
+          <th>Reason</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+
+  results.forEach(entry => {
+    html += `
+      <tr>
+        <td>${entry.date || ""}</td>
+        <td>${entry.time || ""}</td>
+        <td>${entry.first || ""}</td>
+        <td>${entry.last || ""}</td>
+        <td>${entry.company || ""}</td>
+        <td>${entry.reason || ""}</td>
+      </tr>
     `;
+  });
 
-    results.forEach(r => {
-        html += `
-            <tr>
-                <td>${r.date}</td>
-                <td>${r.time}</td>
-                <td>${r.first}</td>
-                <td>${r.last}</td>
-                <td>${r.company}</td>
-                <td>${r.reason}</td>
-            </tr>
-        `;
-    });
+  html += "</tbody></table>";
 
-    html += "</tbody></table>";
-    container.innerHTML = html;
+  container.innerHTML = html;
 }
 
-/* --------------------------------------
-   CLEAR FILTERS
--------------------------------------- */
-function clearSearch() {
-    document.getElementById("filterFirstName").value = "";
-    document.getElementById("filterLastName").value = "";
-    document.getElementById("filterCompany").value = "";
-    document.getElementById("filterDateRange").value = "";
-    document.getElementById("searchResultsTable").innerHTML = "";
-}
-
-/* --------------------------------------
-   INIT
--------------------------------------- */
+/* =========================
+   BUTTON HOOKS
+========================= */
 document.addEventListener("DOMContentLoaded", () => {
-    const btnSearch = document.getElementById("runSearch");
-    const btnClear = document.getElementById("clearSearch");
+  const searchBtn = document.getElementById("runSearch");
+  const clearBtn = document.getElementById("clearSearch");
 
-    if (btnSearch) btnSearch.addEventListener("click", runSearch);
-    if (btnClear) btnClear.addEventListener("click", clearSearch);
+  if (searchBtn) searchBtn.addEventListener("click", runSearch);
+
+  if (clearBtn) {
+    clearBtn.addEventListener("click", () => {
+      document.getElementById("filterFirstName").value = "";
+      document.getElementById("filterLastName").value = "";
+      document.getElementById("filterCompany").value = "";
+      document.getElementById("filterDateRange").value = "";
+      document.getElementById("searchResultsTable").innerHTML = "";
+    });
+  }
 });
