@@ -33,7 +33,7 @@ function runSearch() {
     return matchFirst && matchLast && matchCompany;
   });
 
-  renderResults(results);
+  renderSearchResults(results);
 }
 
 /* =========================
