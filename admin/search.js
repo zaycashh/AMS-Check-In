@@ -89,6 +89,16 @@ function renderResults(results) {
    BUTTON HOOKS
 ========================= */
 document.addEventListener("DOMContentLoaded", () => {
+const dateRangeSelect = document.getElementById("filterDateRange");
+const customRange = document.getElementById("customDateRange");
+
+if (dateRangeSelect && customRange) {
+  dateRangeSelect.addEventListener("change", () => {
+    customRange.style.display =
+      dateRangeSelect.value === "custom" ? "block" : "none";
+  });
+}
+
   const searchBtn = document.getElementById("runSearch");
   const clearBtn = document.getElementById("clearSearch");
 
