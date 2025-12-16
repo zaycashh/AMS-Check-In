@@ -76,6 +76,7 @@ function renderResults(results) {
         <td>${entry.first || ""}</td>
         <td>${entry.last || ""}</td>
         <td>${entry.company || ""}</td>
+        <td>${log.service || "-"}</td>
         <td>${entry.reason || ""}</td>
       </tr>
     `;
