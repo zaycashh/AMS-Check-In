@@ -389,6 +389,16 @@ if (runSearchBtn) {
 
     return matchFirst && matchLast && matchCompany;
 });
+       // FORCE Search tab to be visible
+document.querySelectorAll(".tab-content").forEach(tab => {
+    tab.style.display = "none";
+});
+
+const searchTab = document.getElementById("tabSearch");
+if (searchTab) {
+    searchTab.style.display = "block";
+}
+
 
         renderSearchResults(results);
     });
