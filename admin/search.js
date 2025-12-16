@@ -52,7 +52,7 @@ function renderSearchResults(logs) {
                     <th>First</th>
                     <th>Last</th>
                     <th>Company</th>
-                    <th>Service</th>
+                    <th>Services</th>
                     <th>Reason</th>
                 </tr>
             </thead>
@@ -67,7 +67,7 @@ function renderSearchResults(logs) {
                 <td>${log.first || "-"}</td>
                 <td>${log.last || "-"}</td>
                 <td>${log.company || "-"}</td>
-                <td>${log.service || "-"}</td>
+                <td>${log.services || "-"}</td>
                 <td>${log.reason || "-"}</td>
             </tr>
         `;
