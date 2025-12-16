@@ -1,0 +1,28 @@
+/* ==========================================
+   ADMIN TAB NAVIGATION (SAFE + ISOLATED)
+========================================== */
+
+document.addEventListener("DOMContentLoaded", () => {
+  const tabs = document.querySelectorAll(".sidebar-menu .tab");
+  const contents = document.querySelectorAll(".tab-content");
+
+  tabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+      const targetId = tab.dataset.tab;
+
+      // Hide all tab contents
+      contents.forEach(c => c.style.display = "none");
+
+      // Remove active state
+      tabs.forEach(t => t.classList.remove("active"));
+
+      // Show selected tab
+      const target = document.getElementById(targetId);
+      if (target) {
+        target.style.display = "block";
+      }
+
+      tab.classList.add("active");
+    });
+  });
+});
