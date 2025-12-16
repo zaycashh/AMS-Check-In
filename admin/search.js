@@ -61,6 +61,7 @@ function renderResults(results) {
           <th>First</th>
           <th>Last</th>
           <th>Company</th>
+          <th>Service</th>
           <th>Reason</th>
         </tr>
       </thead>
