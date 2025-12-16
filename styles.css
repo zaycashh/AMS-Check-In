@@ -440,3 +440,24 @@ body {
   border-top-right-radius: 12px;
   border-bottom-right-radius: 12px;
 }
+.search-results {
+    margin-top: 20px;
+}
+
+.log-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #ffffff;
+}
+
+.log-table th,
+.log-table td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: left;
+}
+
+.log-table th {
+    background: #f0f4f8;
+    font-weight: bold;
+}
