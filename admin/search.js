@@ -52,33 +52,34 @@ function renderResults(results) {
     return;
   }
 
-  let html = `
-    <table class="log-table">
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Time</th>
-          <th>First</th>
-          <th>Last</th>
-          <th>Company</th>
-          <th>Service</th>
-          <th>Reason</th>
-        </tr>
-      </thead>
-      <tbody>
-  `;
+let html = `
+<table class="log-table">
+  <thead>
+    <tr>
+      <th>Date</th>
+      <th>Time</th>
+      <th>First</th>
+      <th>Last</th>
+      <th>Company</th>
+      <th>Service</th>
+      <th>Reason</th>
+    </tr>
+  </thead>
+  <tbody>
+`;
 
-  results.forEach(entry => {
-    html += `
-      <tr>
-        <td>${entry.date || ""}</td>
-        <td>${entry.time || ""}</td>
-        <td>${entry.first || ""}</td>
-        <td>${entry.last || ""}</td>
-        <td>${entry.company || ""}</td>
-        <td>${log.service || "-"}</td>
-        <td>${entry.reason || ""}</td>
-      </tr>
+html += `
+<tr>
+  <td>${log.date}</td>
+  <td>${log.time}</td>
+  <td>${log.first}</td>
+  <td>${log.last}</td>
+  <td>${log.company}</td>
+  <td>${log.service || "-"}</td>
+  <td>${log.reason || "-"}</td>
+</tr>
+`;
+
     `;
   });
 
