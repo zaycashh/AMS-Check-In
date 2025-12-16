@@ -431,3 +431,6 @@ function renderSearchResults(results) {
     html += "</tbody></table>";
     container.innerHTML = html;
 }
+document.addEventListener("DOMContentLoaded", () => {
+    initRunSearch();
+});
