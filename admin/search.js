@@ -104,12 +104,18 @@ if (dateRangeSelect && customRange) {
 
   if (searchBtn) searchBtn.addEventListener("click", runSearch);
 
-  if (clearBtn) {
+    if (clearBtn) {
     clearBtn.addEventListener("click", () => {
       document.getElementById("filterFirstName").value = "";
       document.getElementById("filterLastName").value = "";
       document.getElementById("filterCompany").value = "";
       document.getElementById("filterDateRange").value = "";
+
+      document.getElementById("filterStartDate").value = "";
+      document.getElementById("filterEndDate").value = "";
+
+      if (customRange) customRange.style.display = "none";
+
       document.getElementById("searchResultsTable").innerHTML = "";
     });
   }
