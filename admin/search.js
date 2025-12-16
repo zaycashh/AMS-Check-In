@@ -39,52 +39,46 @@ function runSearch() {
 /* =========================
    RENDER RESULTS
 ========================= */
-function renderResults(results) {
-  const container = document.getElementById("searchResultsTable");
+function renderSearchResults(logs) {
+    const container = document.getElementById("searchResultsTable");
+    if (!container) return;
 
-  if (!container) {
-    console.error("searchResultsTable not found");
-    return;
-  }
+    let html = `
+        <table class="log-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>First</th>
+                    <th>Last</th>
+                    <th>Company</th>
+                    <th>Service</th>
+                    <th>Reason</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
 
-  if (results.length === 0) {
-    container.innerHTML = "<p>No matching records found.</p>";
-    return;
-  }
+    logs.forEach(log => {
+        html += `
+            <tr>
+                <td>${log.date || "-"}</td>
+                <td>${log.time || "-"}</td>
+                <td>${log.first || "-"}</td>
+                <td>${log.last || "-"}</td>
+                <td>${log.company || "-"}</td>
+                <td>${log.service || "-"}</td>
+                <td>${log.reason || "-"}</td>
+            </tr>
+        `;
+    });
 
-let html = `
-<table class="log-table">
-  <thead>
-    <tr>
-      <th>Date</th>
-      <th>Time</th>
-      <th>First</th>
-      <th>Last</th>
-      <th>Company</th>
-      <th>Service</th>
-      <th>Reason</th>
-    </tr>
-  </thead>
-  <tbody>
-`;
+    html += `
+            </tbody>
+        </table>
+    `;
 
-html += `
-<tr>
-  <td>${log.date}</td>
-  <td>${log.time}</td>
-  <td>${log.first}</td>
-  <td>${log.last}</td>
-  <td>${log.company}</td>
-  <td>${log.service || "-"}</td>
-  <td>${log.reason || "-"}</td>
-</tr>
-`;
-
-  });
-
-  html += "</tbody></table>";
-
-  container.innerHTML = html;
+    container.innerHTML = html;
 }
 
 /* =========================
