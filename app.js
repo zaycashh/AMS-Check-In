@@ -282,7 +282,3 @@ function initRunSearch() {
         resultsBox.innerHTML = html;
     });
 }
-        html += "</tbody></table>";
-        resultsBox.innerHTML = html;
-    });
-}
