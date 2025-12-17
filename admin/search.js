@@ -56,10 +56,14 @@ window.runSearch = function () {
     }
 
     if (range === "yesterday") {
-        startDate = new Date(today);
-        startDate.setDate(startDate.getDate() - 1);
-        endDate = new Date(startDate);
-    }
+  startDate = new Date(today);
+  startDate.setDate(startDate.getDate() - 1);
+  startDate.setHours(0, 0, 0, 0);
+
+  endDate = new Date(startDate);
+  endDate.setHours(23, 59, 59, 999);
+}
+
 
     if (range === "thisWeek") {
         startDate = new Date(today);
