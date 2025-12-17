@@ -137,25 +137,25 @@ document.getElementById("submitBtn").addEventListener("click", () => {
     const canvas = document.getElementById("signaturePad");
     const signature = canvas.toDataURL();
 
-    const now = new Date();
-    const record = {
-        date: now.toLocaleDateString(),
-        time: now.toLocaleTimeString(),
-        first,
-        last,
-        company: finalCompany,
-        reason: finalReason,
-        services: services.join(", "),
-        signature
-    };
+   const now = new Date();
 
-    let logs = JSON.parse(localStorage.getItem("ams_logs") || "[]");
-    logs.push(record);
-    localStorage.setItem("ams_logs", JSON.stringify(logs));
+const record = {
+  date: now.toLocaleDateString(),
+  time: now.toLocaleTimeString(),
+  first,
+  last,
+  company: finalCompany,
+  reason: finalReason,
+  services: services.join(", "),
+  signature
+};
 
-    alert("Check-in submitted!");
-    location.reload();
-});
+let logs = JSON.parse(localStorage.getItem("ams_logs") || "[]");
+logs.push(record);
+localStorage.setItem("ams_logs", JSON.stringify(logs));
+
+alert("Check-in submitted!");
+location.reload();
 
 /* =========================================================
    RESET FORM
