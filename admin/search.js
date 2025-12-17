@@ -282,4 +282,25 @@ document.getElementById("exportPDF").addEventListener("click", async () => {
         doc.save("AMS_Search_Log_Report.pdf");
     };
 });
+   // ================================
+// TOGGLE CUSTOM DATE RANGE INPUTS
+// ================================
+document.addEventListener("DOMContentLoaded", () => {
+    const dateRangeSelect = document.getElementById("filterDateRange");
+    const customDateRange = document.getElementById("customDateRange");
 
+    if (!dateRangeSelect || !customDateRange) return;
+
+    // Initial state (in case page loads with Custom selected)
+    customDateRange.style.display =
+        dateRangeSelect.value === "custom" ? "block" : "none";
+
+    // Toggle on change
+    dateRangeSelect.addEventListener("change", () => {
+        if (dateRangeSelect.value === "custom") {
+            customDateRange.style.display = "block";
+        } else {
+            customDateRange.style.display = "none";
+        }
+    });
+});
