@@ -119,25 +119,50 @@ window.runSearch = function () {
 ========================================================= */
 
 function renderSearchResults(results) {
-    const container = document.getElementById("searchResultsTable");
-    if (!container) return;
+  const container = document.getElementById("searchResultsTable");
+  if (!container) return;
 
-    container.innerHTML = "";
+  container.innerHTML = "";
 
-    if (!results.length) {
-        container.innerHTML = "<p>No results found</p>";
-        return;
-    }
+  if (!results.length) {
+    container.innerHTML = "<p>No results found</p>";
+    return;
+  }
 
-    results.forEach(entry => {
-        const div = document.createElement("div");
-        div.className = "result-row";
-        div.innerHTML = `
-            <strong>${entry.first} ${entry.last}</strong><br>
-            Company: ${entry.company}<br>
-            Date: ${entry.date}
-            <hr>
-        `;
-        container.appendChild(div);
-    });
+  let html = `
+    <table class="log-table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Time</th>
+          <th>First</th>
+          <th>Last</th>
+          <th>Company</th>
+          <th>Reason</th>
+          <th>Services</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+
+  results.forEach(entry => {
+    html += `
+      <tr>
+        <td>${entry.date || ""}</td>
+        <td>${entry.time || ""}</td>
+        <td>${entry.first || ""}</td>
+        <td>${entry.last || ""}</td>
+        <td>${entry.company || ""}</td>
+        <td>${entry.reason || ""}</td>
+        <td>${entry.services || ""}</td>
+      </tr>
+    `;
+  });
+
+  html += `
+      </tbody>
+    </table>
+  `;
+
+  container.innerHTML = html;
 }
