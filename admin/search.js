@@ -197,34 +197,56 @@ window.exportSearchExcel = function () {
     XLSX.writeFile(workbook, "AMS_Search_Log.xlsx");
 };
 
-window.exportSearchPDF = function () {
+document.getElementById("exportPDF").addEventListener("click", () => {
     if (!currentSearchResults.length) {
-        alert("No search results to export");
+        alert("No results to export.");
         return;
     }
 
     const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
+    const doc = new jsPDF("landscape");
 
-    doc.text("AMS Search Log", 14, 15);
+    doc.setFontSize(18);
+    doc.text("AMS Search Log Report", 14, 18);
 
-    const tableData = currentSearchResults.map(entry => [
-        entry.date || "",
-        entry.time || "",
-        entry.first || "",
-        entry.last || "",
-        entry.company || "",
-        entry.reason || "",
-        Array.isArray(entry.services)
-            ? entry.services.join(", ")
-            : entry.services || ""
-    ]);
+    doc.setFontSize(11);
+    doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 26);
+    doc.text(`Total Records: ${currentSearchResults.length}`, 14, 34);
+
+    const company = document.getElementById("filterCompany").value || "All Companies";
+    const range = document.getElementById("filterDateRange").value || "All Dates";
+
+    doc.text(`Company: ${company}`, 14, 42);
+    doc.text(`Date Range: ${range}`, 14, 50);
+
+    const rows = currentSearchResults.map(r => ([
+        r.date || "",
+        r.time || "",
+        r.first || "",
+        r.last || "",
+        r.company || "",
+        r.reason || "",
+        (r.services || []).join(", ")
+    ]));
 
     doc.autoTable({
-        startY: 20,
-        head: [["Date", "Time", "First", "Last", "Company", "Reason", "Services"]],
-        body: tableData
+        startY: 60,
+        head: [[
+            "Date",
+            "Time",
+            "First",
+            "Last",
+            "Company",
+            "Reason",
+            "Services"
+        ]],
+        body: rows,
+        styles: { fontSize: 9 },
+        headStyles: {
+            fillColor: [30, 58, 89],
+            textColor: 255
+        }
     });
 
-    doc.save("AMS_Search_Log.pdf");
-};
+    doc.save(`AMS_Search_Log_${Date.now()}.pdf`);
+});
