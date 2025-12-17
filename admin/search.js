@@ -119,7 +119,7 @@ window.runSearch = function () {
 ========================================================= */
 
 function renderSearchResults(results) {
-    const container = document.getElementById("searchResults");
+    const container = document.getElementById("searchResultsTable");
     if (!container) return;
 
     container.innerHTML = "";
