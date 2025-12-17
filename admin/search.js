@@ -196,57 +196,41 @@ window.exportSearchExcel = function () {
 
     XLSX.writeFile(workbook, "AMS_Search_Log.xlsx");
 };
-
-document.getElementById("exportPDF").addEventListener("click", () => {
-    if (!currentSearchResults.length) {
-        alert("No results to export.");
-        return;
-    }
-
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF("landscape");
-
-    doc.setFontSize(18);
-    doc.text("AMS Search Log Report", 14, 18);
-
-    doc.setFontSize(11);
-    doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 26);
-    doc.text(`Total Records: ${currentSearchResults.length}`, 14, 34);
-
-    const company = document.getElementById("filterCompany").value || "All Companies";
-    const range = document.getElementById("filterDateRange").value || "All Dates";
-
-    doc.text(`Company: ${company}`, 14, 42);
-    doc.text(`Date Range: ${range}`, 14, 50);
-
-    const rows = currentSearchResults.map(r => ([
-        r.date || "",
-        r.time || "",
-        r.first || "",
-        r.last || "",
-        r.company || "",
-        r.reason || "",
-        (r.services || []).join(", ")
-    ]));
-
-    doc.autoTable({
-        startY: 60,
-        head: [[
-            "Date",
-            "Time",
-            "First",
-            "Last",
-            "Company",
-            "Reason",
-            "Services"
-        ]],
-        body: rows,
-        styles: { fontSize: 9 },
-        headStyles: {
-            fillColor: [30, 58, 89],
-            textColor: 255
+const exportPDFBtn = document.getElementById("exportPDF");
+if (exportPDFBtn) {
+    exportPDFBtn.addEventListener("click", () => {
+        if (!currentSearchResults.length) {
+            alert("No results to export.");
+            return;
         }
-    });
 
-    doc.save(`AMS_Search_Log_${Date.now()}.pdf`);
-});
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF("landscape");
+
+        doc.setFontSize(18);
+        doc.text("AMS Search Log Report", 14, 18);
+
+        doc.setFontSize(11);
+        doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 26);
+        doc.text(`Total Records: ${currentSearchResults.length}`, 14, 34);
+
+        const tableData = currentSearchResults.map(e => [
+            e.date || "",
+            e.time || "",
+            e.first || "",
+            e.last || "",
+            e.company || "",
+            e.reason || "",
+            Array.isArray(e.services) ? e.services.join(", ") : e.services || ""
+        ]);
+
+        doc.autoTable({
+            startY: 40,
+            head: [["Date", "Time", "First", "Last", "Company", "Reason", "Services"]],
+            body: tableData,
+            styles: { fontSize: 9 }
+        });
+
+        doc.save("AMS_Search_Log.pdf");
+    });
+}
