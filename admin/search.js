@@ -40,10 +40,6 @@ window.toggleCustomDateRange = function (value) {
     custom.style.display = value === "custom" ? "block" : "none";
 };
 
-/* =========================================================
-   RUN SEARCH
-========================================================= */
-
 window.runSearch = function () {
     const logs = getLogs();
 
@@ -86,11 +82,15 @@ window.runSearch = function () {
         startDate = new Date(today.getFullYear(), today.getMonth(), 1);
         endDate = new Date(today);
     }
-
+   
     if (range === "custom" && startInput && endInput) {
-        startDate = new Date(startInput);
-        endDate = new Date(endInput);
-    }
+     const [sy, sm, sd] = startInput.split("-").map(Number);
+     const [ey, em, ed] = endInput.split("-").map(Number);
+
+     startDate = new Date(sy, sm - 1, sd);
+     endDate = new Date(ey, em - 1, ed);
+}
+
 
     if (startDate) startDate.setHours(0, 0, 0, 0);
     if (endDate) endDate.setHours(23, 59, 59, 999);
