@@ -185,34 +185,6 @@ function renderSearchResults(results) {
 
   container.innerHTML = html;
 }
-/* =========================================================
-   EXPORT FUNCTIONS (SEARCH LOG)
-========================================================= */
-
-window.exportSearchExcel = function () {
-    if (!currentSearchResults.length) {
-        alert("No search results to export");
-        return;
-    }
-
-    const data = currentSearchResults.map(entry => ({
-        Date: entry.date || "",
-        Time: entry.time || "",
-        First: entry.first || "",
-        Last: entry.last || "",
-        Company: entry.company || "",
-        Reason: entry.reason || "",
-        Services: Array.isArray(entry.services)
-            ? entry.services.join(", ")
-            : entry.services || ""
-    }));
-
-    const worksheet = XLSX.utils.json_to_sheet(data);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Search Log");
-
-    XLSX.writeFile(workbook, "AMS_Search_Log.xlsx");
-};
 const exportPDFBtn = document.getElementById("exportPDF");
 
 if (exportPDFBtn) {
@@ -222,83 +194,79 @@ if (exportPDFBtn) {
       return;
     }
 
-    loadLogoBase64((logo) => {
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF("landscape");
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF("landscape");
 
-  /* HEADER BAR */
-  doc.setFillColor(32, 99, 155);
-  doc.rect(0, 0, 297, 24, "F");
+    /* HEADER BAR */
+    doc.setFillColor(32, 99, 155);
+    doc.rect(0, 0, 297, 20, "F");
 
-  /* LOGO */
-  doc.addImage(logo, "PNG", 10, 4, 32, 16);
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(16);
+    doc.text("AMS Search Log Report", 14, 14);
 
-  /* TITLE */
-  doc.setTextColor(255, 255, 255);
-  doc.setFontSize(16);
-  doc.text("AMS Search Log Report", 48, 16);
+    /* META INFO */
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(10);
 
-  /* META INFO */
-  doc.setTextColor(0, 0, 0);
-  doc.setFontSize(10);
+    const now = new Date();
+    doc.text(`Generated: ${now.toLocaleString()}`, 14, 28);
+    doc.text(`Total Records: ${currentSearchResults.length}`, 14, 34);
 
-  const now = new Date();
-  doc.text(`Generated: ${now.toLocaleString()}`, 14, 34);
-  doc.text(`Total Records: ${currentSearchResults.length}`, 14, 40);
+    const company =
+      document.getElementById("filterCompany")?.value || "All Companies";
+    const range =
+      document.getElementById("filterDateRange")?.value || "All Dates";
 
-  const company =
-    document.getElementById("filterCompany")?.value || "All Companies";
-  const range =
-    document.getElementById("filterDateRange")?.value || "All Dates";
+    doc.text(`Company: ${company}`, 120, 28);
+    doc.text(`Date Range: ${range}`, 120, 34);
 
-  doc.text(`Company: ${company}`, 140, 34);
-  doc.text(`Date Range: ${range}`, 140, 40);
+    /* TABLE */
+    const tableData = currentSearchResults.map(e => [
+      e.date || "",
+      e.time || "",
+      e.first || "",
+      e.last || "",
+      e.company || "",
+      e.reason || "",
+      Array.isArray(e.services) ? e.services.join(", ") : e.services || ""
+    ]);
 
-  /* TABLE */
-  const tableData = currentSearchResults.map(e => [
-    e.date || "",
-    e.time || "",
-    e.first || "",
-    e.last || "",
-    e.company || "",
-    e.reason || "",
-    Array.isArray(e.services) ? e.services.join(", ") : e.services || ""
-  ]);
+    doc.autoTable({
+      startY: 42,
+      head: [[
+        "Date",
+        "Time",
+        "First",
+        "Last",
+        "Company",
+        "Reason",
+        "Services"
+      ]],
+      body: tableData,
+      styles: { fontSize: 9 },
+      headStyles: { fillColor: [32, 99, 155] },
+      alternateRowStyles: { fillColor: [245, 247, 250] },
+      margin: { left: 14, right: 14 },
+      didDrawPage: () => {
+        const page = doc.internal.getNumberOfPages();
+        doc.setFontSize(9);
+        doc.text(
+          `Page ${page}`,
+          doc.internal.pageSize.getWidth() - 20,
+          doc.internal.pageSize.getHeight() - 10
+        );
+      }
+    });
 
-  doc.autoTable({
-    startY: 46,
-    head: [[
-      "Date",
-      "Time",
-      "First",
-      "Last",
-      "Company",
-      "Reason",
-      "Services"
-    ]],
-    body: tableData,
-    styles: { fontSize: 9 },
-    headStyles: { fillColor: [32, 99, 155] },
-    alternateRowStyles: { fillColor: [245, 247, 250] },
-    margin: { left: 14, right: 14 },
-    didDrawPage: () => {
-      const page = doc.internal.getNumberOfPages();
-      doc.setFontSize(8);
-      doc.text(
-        `Page ${page}`,
-        doc.internal.pageSize.getWidth() - 20,
-        doc.internal.pageSize.getHeight() - 10
-      );
-    }
+    /* FOOTER */
+    doc.setFontSize(8);
+    doc.text(
+      "Confidential – Internal Use Only – AMS Check-In System",
+      14,
+      doc.internal.pageSize.getHeight() - 10
+    );
+
+    doc.save("AMS_Search_Log_Report.pdf");
   });
-
-  /* FOOTER */
-  doc.setFontSize(8);
-  doc.text(
-    "Confidential – Internal Use Only – AMS Check-In System",
-    14,
-    doc.internal.pageSize.getHeight() - 10
-  );
-
-  doc.save("AMS_Search_Log_Report.pdf");
-});
+}
