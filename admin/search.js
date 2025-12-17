@@ -11,6 +11,15 @@ console.log("Admin Search Module Loaded");
 function getLogs() {
   return JSON.parse(localStorage.getItem("ams_logs") || "[]");
 }
+/* =====================
+   DATE PARSER (SAFE)
+===================== */
+function parseMMDDYYYY(dateStr) {
+    if (!dateStr) return null;
+    const [month, day, year] = dateStr.split("/");
+    return new Date(year, month - 1, day);
+}
+
 
 /* =========================
    RUN SEARCH
@@ -23,7 +32,7 @@ function runSearch() {
   const company = document.getElementById("filterCompany").value;
   const range = document.getElementById("filterDateRange").value;
 
-  const results = logs.filter(entry => {
+  let filtered = logs.filter(entry => {
     if (!entry) return false;
 
     const matchFirst = !first || (entry.first || "").toLowerCase().includes(first);
@@ -31,10 +40,35 @@ function runSearch() {
     const matchCompany = !company || company === "All Companies" || entry.company === company;
 
     return matchFirst && matchLast && matchCompany;
-  });
+});
 
-  renderSearchResults(results);
+/* =====================
+   DATE RANGE FILTER
+===================== */
+
+const startDate = document.getElementById("filterStartDate")?.value;
+const endDate = document.getElementById("filterEndDate")?.value;
+
+if (range === "custom" && startDate && endDate) {
+    const start = new Date(startDate);
+    start.setHours(0, 0, 0, 0);
+
+    const end = new Date(endDate);
+    end.setHours(23, 59, 59, 999);
+
+    filtered = filtered.filter(entry => {
+        const entryDate = parseMMDDYYYY(entry.date);
+        if (!entryDate) return false;
+        return entryDate >= start && entryDate <= end;
+    });
 }
+
+/* =====================
+   RENDER RESULTS
+===================== */
+
+renderSearchResults(filtered);
+
 
 /* =========================
    RENDER RESULTS
