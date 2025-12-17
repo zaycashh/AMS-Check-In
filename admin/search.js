@@ -1,3 +1,5 @@
+let currentSearchResults = [];
+
 /* =========================================================
    AMS ADMIN SEARCH LOG (CLEAN REBUILD)
 ========================================================= */
@@ -110,7 +112,7 @@ window.runSearch = function () {
 
         return true;
     });
-
+    currentSearchResults = results;
     renderSearchResults(results);
 };
 
@@ -166,3 +168,63 @@ function renderSearchResults(results) {
 
   container.innerHTML = html;
 }
+/* =========================================================
+   EXPORT FUNCTIONS (SEARCH LOG)
+========================================================= */
+
+window.exportSearchExcel = function () {
+    if (!currentSearchResults.length) {
+        alert("No search results to export");
+        return;
+    }
+
+    const data = currentSearchResults.map(entry => ({
+        Date: entry.date || "",
+        Time: entry.time || "",
+        First: entry.first || "",
+        Last: entry.last || "",
+        Company: entry.company || "",
+        Reason: entry.reason || "",
+        Services: Array.isArray(entry.services)
+            ? entry.services.join(", ")
+            : entry.services || ""
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Search Log");
+
+    XLSX.writeFile(workbook, "AMS_Search_Log.xlsx");
+};
+
+window.exportSearchPDF = function () {
+    if (!currentSearchResults.length) {
+        alert("No search results to export");
+        return;
+    }
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    doc.text("AMS Search Log", 14, 15);
+
+    const tableData = currentSearchResults.map(entry => [
+        entry.date || "",
+        entry.time || "",
+        entry.first || "",
+        entry.last || "",
+        entry.company || "",
+        entry.reason || "",
+        Array.isArray(entry.services)
+            ? entry.services.join(", ")
+            : entry.services || ""
+    ]);
+
+    doc.autoTable({
+        startY: 20,
+        head: [["Date", "Time", "First", "Last", "Company", "Reason", "Services"]],
+        body: tableData
+    });
+
+    doc.save("AMS_Search_Log.pdf");
+};
