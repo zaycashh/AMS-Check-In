@@ -149,7 +149,7 @@ document.getElementById("exportExcel")?.addEventListener("click", () => {
 
   XLSX.writeFile(workbook, "AMS_Search_Log.xlsx");
 });
-document.getElementById("exportPDF").addEventListener("click", () => {
+document.getElementById("exportPDF").addEventListener("click", async () => {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
 
@@ -160,63 +160,92 @@ document.getElementById("exportPDF").addEventListener("click", () => {
     }
 
     /* ============================
-       HEADER BRANDING
+       LOAD LOGO
     ============================ */
-    doc.setFontSize(16);
-    doc.text("AMS Check-In System", 14, 18);
+    const logo = new Image();
+    logo.src = "logo.png";
 
-    doc.setFontSize(11);
-    doc.text("Search Log Report", 14, 26);
+    logo.onload = () => {
 
-    doc.setFontSize(9);
-    doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 32);
+        /* ============================
+           HEADER
+        ============================ */
+        doc.addImage(logo, "PNG", 14, 10, 28, 28);
 
-    /* ============================
-       TABLE DATA
-    ============================ */
-    const tableData = logs.map(log => [
-        log.date || "",
-        log.time || "",
-        log.first || "",
-        log.last || "",
-        log.company || "",
-        log.services || "",
-        log.reason || ""
-    ]);
+        doc.setFontSize(16);
+        doc.text("AMS Check-In System", 48, 18);
 
-    doc.autoTable({
-        startY: 38,
-        head: [[
-            "Date",
-            "Time",
-            "First",
-            "Last",
-            "Company",
-            "Services",
-            "Reason"
-        ]],
-        body: tableData,
-        styles: {
-            fontSize: 8,
-            cellPadding: 3
-        },
-        headStyles: {
-            fillColor: [33, 150, 243], // blue header
-            textColor: 255
-        },
-        alternateRowStyles: {
-            fillColor: [245, 245, 245]
-        },
-        didDrawPage: function (data) {
-            const pageCount = doc.internal.getNumberOfPages();
-            doc.setFontSize(8);
-            doc.text(
-                `Page ${doc.internal.getCurrentPageInfo().pageNumber} of ${pageCount}`,
-                data.settings.margin.left,
-                doc.internal.pageSize.height - 8
-            );
-        }
-    });
+        doc.setFontSize(11);
+        doc.text("Search Log Report", 48, 26);
 
-    doc.save("AMS_Search_Log_Report.pdf");
+        doc.setFontSize(9);
+        doc.text(`Generated: ${new Date().toLocaleString()}`, 48, 32);
+
+        /* ============================
+           FILTER SUMMARY
+        ============================ */
+        const first = document.getElementById("filterFirstName").value || "Any";
+        const last = document.getElementById("filterLastName").value || "Any";
+        const company = document.getElementById("filterCompany").value || "All Companies";
+        const range = document.getElementById("filterDateRange").value || "All Dates";
+
+        doc.setFontSize(10);
+        doc.text(`Filters Applied:`, 14, 46);
+
+        doc.setFontSize(9);
+        doc.text(`First Name: ${first}`, 14, 52);
+        doc.text(`Last Name: ${last}`, 80, 52);
+        doc.text(`Company: ${company}`, 14, 58);
+        doc.text(`Date Range: ${range}`, 80, 58);
+
+        /* ============================
+           TABLE DATA
+        ============================ */
+        const tableData = logs.map(log => [
+            log.date || "",
+            log.time || "",
+            log.first || "",
+            log.last || "",
+            log.company || "",
+            log.services || "",
+            log.reason || ""
+        ]);
+
+        doc.autoTable({
+            startY: 66,
+            head: [[
+                "Date",
+                "Time",
+                "First",
+                "Last",
+                "Company",
+                "Services",
+                "Reason"
+            ]],
+            body: tableData,
+            styles: {
+                fontSize: 8,
+                cellPadding: 3
+            },
+            headStyles: {
+                fillColor: [33, 150, 243],
+                textColor: 255
+            },
+            alternateRowStyles: {
+                fillColor: [245, 245, 245]
+            },
+            didDrawPage: function (data) {
+                const pageCount = doc.internal.getNumberOfPages();
+                doc.setFontSize(8);
+                doc.text(
+                    `Page ${doc.internal.getCurrentPageInfo().pageNumber} of ${pageCount}`,
+                    data.settings.margin.left,
+                    doc.internal.pageSize.height - 8
+                );
+            }
+        });
+
+        doc.save("AMS_Search_Log_Report.pdf");
+    };
 });
+
