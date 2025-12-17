@@ -13,11 +13,22 @@ function getLogs() {
 }
 
 function parseEntryDate(entry) {
-    if (!entry || !entry.date) return null;
-    // supports MM/DD/YYYY
-    const [month, day, year] = entry.date.split("/");
-    return new Date(year, month - 1, day);
+  // BEST SOURCE: timestamp (most accurate)
+  if (entry && entry.timestamp) {
+    return new Date(entry.timestamp);
+  }
+
+  // Fallback: MM/DD/YYYY string
+  if (!entry || !entry.date) return null;
+
+  const [month, day, year] = entry.date.split("/").map(Number);
+  if (!month || !day || !year) return null;
+
+  const d = new Date(year, month - 1, day);
+  d.setHours(0, 0, 0, 0);
+  return d;
 }
+
 
 /* =========================================================
    DATE RANGE TOGGLE (SAFE FOR DYNAMIC DOM)
