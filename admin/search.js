@@ -127,16 +127,32 @@ window.runSearch = function () {
     renderSearchResults(results);
 };
 window.clearFilters = function () {
+  // Clear text inputs
   document.getElementById("filterFirstName").value = "";
   document.getElementById("filterLastName").value = "";
+
+  // Reset selects
   document.getElementById("filterCompany").value = "All Companies";
   document.getElementById("filterDateRange").value = "";
 
-  document.getElementById("filterStartDate").value = "";
-  document.getElementById("filterEndDate").value = "";
+  // Clear custom date inputs
+  const start = document.getElementById("filterStartDate");
+  const end = document.getElementById("filterEndDate");
 
+  start.value = "";
+  end.value = "";
+
+  // FORCE reset date input UI (important)
+  start.type = "text";
+  start.type = "date";
+
+  end.type = "text";
+  end.type = "date";
+
+  // Hide custom date section
   toggleCustomDateRange("");
 
+  // Reset results
   currentSearchResults = [];
   renderSearchResults([]);
 };
