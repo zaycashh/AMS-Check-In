@@ -131,9 +131,9 @@ window.clearFilters = function () {
   document.getElementById("filterFirstName").value = "";
   document.getElementById("filterLastName").value = "";
 
-  // Reset selects
-  document.getElementById("filterCompany").value = "All Companies";
-  document.getElementById("filterDateRange").value = "";
+  // 🔥 RESET DATE RANGE FIRST (THIS IS THE KEY)
+  const dateRange = document.getElementById("filterDateRange");
+  dateRange.value = "";
 
   // Clear custom date inputs
   const start = document.getElementById("filterStartDate");
@@ -142,20 +142,17 @@ window.clearFilters = function () {
   start.value = "";
   end.value = "";
 
-  // FORCE reset date input UI (important)
-  start.type = "text";
-  start.type = "date";
-
-  end.type = "text";
-  end.type = "date";
-
-  // Hide custom date section
+  // Hide custom date container
   toggleCustomDateRange("");
 
-  // Reset results
+  // Reset company
+  document.getElementById("filterCompany").value = "All Companies";
+
+  // Clear results
   currentSearchResults = [];
   renderSearchResults([]);
 };
+
 
 /* =========================================================
    RENDER RESULTS
