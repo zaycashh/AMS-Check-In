@@ -100,7 +100,12 @@ function runSearch() {
 
         const matchFirst = !first || (entry.first || "").toLowerCase().includes(first);
         const matchLast = !last || (entry.last || "").toLowerCase().includes(last);
-        const matchCompany = !company || company === "All Companies" || entry.company === company;
+        const matchCompany =
+  !company ||
+  company === "All Companies" ||
+  company === "" ||
+  entry.company === company;
+
 
         if (!matchFirst || !matchLast || !matchCompany) return false;
 
