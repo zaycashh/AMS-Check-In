@@ -136,8 +136,9 @@ window.clearFilters = function () {
   dateRange.value = "";
 
   // Clear custom date inputs
-  const start = document.getElementById("filterStartDate");
-  const end = document.getElementById("filterEndDate");
+  
+  document.getElementById("filterStartDate").value = "";
+  document.getElementById("filterEndDate").value = "";
 
   start.value = "";
   end.value = "";
