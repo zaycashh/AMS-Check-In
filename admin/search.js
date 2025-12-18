@@ -127,32 +127,39 @@ window.runSearch = function () {
     renderSearchResults(results);
 };
 window.clearFilters = function () {
-  // Clear text inputs
+
+  // Clear name filters
   document.getElementById("filterFirstName").value = "";
   document.getElementById("filterLastName").value = "";
 
-  // 🔥 RESET DATE RANGE FIRST (THIS IS THE KEY)
-  const dateRange = document.getElementById("filterDateRange");
-  dateRange.value = "";
-
-  // Clear custom date inputs
-  
-  document.getElementById("filterStartDate").value = "";
-  document.getElementById("filterEndDate").value = "";
-
-  start.value = "";
-  end.value = "";
-
-  // Hide custom date container
-  toggleCustomDateRange("");
-
   // Reset company
   document.getElementById("filterCompany").value = "All Companies";
+
+  // ✅ RESET DATE RANGE DROPDOWN (CRITICAL)
+  document.getElementById("filterDateRange").value = "";
+
+  // ✅ CLEAR CUSTOM DATE INPUTS (CORRECT IDs)
+  const start = document.getElementById("filterStartDate");
+  const end = document.getElementById("filterEndDate");
+
+  if (start) {
+    start.value = "";
+    start.valueAsDate = null;
+  }
+
+  if (end) {
+    end.value = "";
+    end.valueAsDate = null;
+  }
+
+  // Hide custom date UI
+  toggleCustomDateRange("");
 
   // Clear results
   currentSearchResults = [];
   renderSearchResults([]);
 };
+
 
 
 /* =========================================================
