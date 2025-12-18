@@ -23,19 +23,26 @@ function loadLogoBase64(callback) {
 
 console.log("Admin Search Module Loaded");
 
-/* =========================================================
+/* =========================
    HELPERS
-========================================================= */
+========================= */
 
 function getLogs() {
-    return JSON.parse(localStorage.getItem("ams_logs") || "[]");
+  return JSON.parse(localStorage.getItem("checkIns")) || [];
 }
 
 function parseEntryDate(entry) {
-  // BEST SOURCE: timestamp (most accurate)
-  if (entry && entry.timestamp) {
-    return new Date(entry.timestamp);
+  if (!entry?.date) return null;
+
+  // Normalize time (adds :00 seconds if missing)
+  let time = entry.time || "00:00";
+  if (/^\d{1,2}:\d{2}\s(AM|PM)$/.test(time)) {
+    time = time.replace(" ", ":00 ");
   }
+
+  const parsed = new Date(`${entry.date} ${time}`);
+  return isNaN(parsed.getTime()) ? null : parsed;
+}
 
   // Fallback: MM/DD/YYYY string
   if (!entry || !entry.date) return null;
