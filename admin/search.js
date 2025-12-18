@@ -229,6 +229,12 @@ if (exportPDFBtn) {
 
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF("landscape");
+    const logo = new Image();
+logo.src = "logo.png";
+
+logo.onload = () => {
+
+    
 
     /* HEADER BAR */
     doc.setFillColor(32, 99, 155);
@@ -236,7 +242,7 @@ if (exportPDFBtn) {
 
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(16);
-    doc.text("AMS Search Log Report", 14, 14);
+    doc.text("AMS Search Log Report", 42, 14);
 
     /* META INFO */
     doc.setTextColor(0, 0, 0);
