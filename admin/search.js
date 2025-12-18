@@ -126,6 +126,20 @@ window.runSearch = function () {
     currentSearchResults = results;
     renderSearchResults(results);
 };
+window.clearFilters = function () {
+  document.getElementById("filterFirstName").value = "";
+  document.getElementById("filterLastName").value = "";
+  document.getElementById("filterCompany").value = "All Companies";
+  document.getElementById("filterDateRange").value = "";
+
+  document.getElementById("filterStartDate").value = "";
+  document.getElementById("filterEndDate").value = "";
+
+  toggleCustomDateRange("");
+
+  currentSearchResults = [];
+  renderSearchResults([]);
+};
 
 /* =========================================================
    RENDER RESULTS
