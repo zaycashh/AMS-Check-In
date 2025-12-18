@@ -4,6 +4,55 @@
 ========================================================= */
 
 console.log("Admin Search Module Loaded");
+// ===============================
+// CLEAR FILTERS (SAFE & GLOBAL)
+// ===============================
+window.clearFilters = function () {
+  // Clear name fields
+  const first = document.getElementById("filterFirstName");
+  const last = document.getElementById("filterLastName");
+  if (first) first.value = "";
+  if (last) last.value = "";
+
+  // Reset company
+  const company = document.getElementById("filterCompany");
+  if (company) company.value = "All Companies";
+
+  // Reset date range dropdown
+  const range = document.getElementById("filterDateRange");
+  if (range) range.value = "";
+
+  // Clear custom date inputs
+  const start = document.getElementById("filterStartDate");
+  const end = document.getElementById("filterEndDate");
+  if (start) start.value = "";
+  if (end) end.value = "";
+
+  // Hide custom date UI
+  if (typeof toggleCustomDateRange === "function") {
+    toggleCustomDateRange("");
+  }
+
+  // Clear results safely
+  if (typeof renderSearchResults === "function") {
+    renderSearchResults([]);
+  }
+
+  if (typeof currentSearchResults !== "undefined") {
+    currentSearchResults = [];
+  }
+};
+
+window.toggleCustomDateRange = function (value) {
+  const box = document.getElementById("customDateRange");
+  if (!box) return;
+
+  if (value === "custom") {
+    box.style.display = "flex";
+  } else {
+    box.style.display = "none";
+  }
+};
 
 /* =========================
    LOAD LOGS
