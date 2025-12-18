@@ -65,24 +65,55 @@ function getLogs() {
    RUN SEARCH
 ========================= */
 function runSearch() {
-  const logs = getLogs();
+    const logs = getLogs();
 
-  const first = document.getElementById("filterFirstName").value.trim().toLowerCase();
-  const last = document.getElementById("filterLastName").value.trim().toLowerCase();
-  const company = document.getElementById("filterCompany").value;
-  const range = document.getElementById("filterDateRange").value;
+    const first = document.getElementById("filterFirstName").value.trim().toLowerCase();
+    const last = document.getElementById("filterLastName").value.trim().toLowerCase();
+    const company = document.getElementById("filterCompany").value;
+    const range = document.getElementById("filterDateRange").value;
 
-  const results = logs.filter(entry => {
-    if (!entry) return false;
+    const today = new Date();
+    let startDate = null;
+    let endDate = null;
 
-    const matchFirst = !first || (entry.first || "").toLowerCase().includes(first);
-    const matchLast = !last || (entry.last || "").toLowerCase().includes(last);
-    const matchCompany = !company || company === "All Companies" || entry.company === company;
+    // DATE RANGE LOGIC
+    if (range === "today") {
+        startDate = new Date(today);
+        startDate.setHours(0, 0, 0, 0);
 
-    return matchFirst && matchLast && matchCompany;
-  });
+        endDate = new Date(today);
+        endDate.setHours(23, 59, 59, 999);
+    }
 
-  renderSearchResults(results);
+    if (range === "thisWeek") {
+        startDate = new Date(today);
+        startDate.setDate(today.getDate() - today.getDay());
+        startDate.setHours(0, 0, 0, 0);
+
+        endDate = new Date(startDate);
+        endDate.setDate(startDate.getDate() + 6);
+        endDate.setHours(23, 59, 59, 999);
+    }
+
+    const results = logs.filter(entry => {
+        if (!entry) return false;
+
+        const matchFirst = !first || (entry.first || "").toLowerCase().includes(first);
+        const matchLast = !last || (entry.last || "").toLowerCase().includes(last);
+        const matchCompany = !company || company === "All Companies" || entry.company === company;
+
+        if (!matchFirst || !matchLast || !matchCompany) return false;
+
+        // ✅ DATE FILTER MUST BE HERE (INSIDE FILTER)
+        if (startDate && endDate && entry.date) {
+            const entryDate = new Date(entry.date);
+            if (entryDate < startDate || entryDate > endDate) return false;
+        }
+
+        return true;
+    });
+
+    renderSearchResults(results);
 }
 
 /* =========================
