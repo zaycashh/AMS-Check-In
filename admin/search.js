@@ -309,3 +309,6 @@ logo.onload = () => {
     doc.save("AMS_Search_Log_Report.pdf");
   });
 }
+  }; // ✅ closes logo.onload
+
+}); // ✅ closes exportPDFBtn.addEventListener
