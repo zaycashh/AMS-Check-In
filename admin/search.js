@@ -44,9 +44,6 @@ function parseEntryDate(entry) {
   return isNaN(parsed.getTime()) ? null : parsed;
 }
 
-  // Fallback: MM/DD/YYYY string
-  if (!entry || !entry.date) return null;
-
   const [month, day, year] = entry.date.split("/").map(Number);
   if (!month || !day || !year) return null;
 
