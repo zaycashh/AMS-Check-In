@@ -53,41 +53,64 @@ window.toggleCustomDateRange = function (value) {
     custom.style.display = value === "custom" ? "block" : "none";
 };
 
-window.clearFilters = function () {
+// ==============================
+// RUN SEARCH (REQUIRED)
+// ==============================
+window.runSearch = function () {
+  const logs = getLogs();
 
-  // Clear name filters
-  document.getElementById("filterFirstName").value = "";
-  document.getElementById("filterLastName").value = "";
+  const first = document.getElementById("filterFirstName").value.trim().toLowerCase();
+  const last = document.getElementById("filterLastName").value.trim().toLowerCase();
+  const company = document.getElementById("filterCompany").value;
+  const range = document.getElementById("filterDateRange").value;
 
-  // Reset company
-  document.getElementById("filterCompany").value = "All Companies";
+  const startInput = document.getElementById("filterStartDate")?.value;
+  const endInput = document.getElementById("filterEndDate")?.value;
 
-  // ✅ RESET DATE RANGE DROPDOWN (CRITICAL)
-  document.getElementById("filterDateRange").value = "";
+  let startDate = null;
+  let endDate = null;
 
-  // ✅ CLEAR CUSTOM DATE INPUTS (CORRECT IDs)
-  const start = document.getElementById("filterStartDate");
-  const end = document.getElementById("filterEndDate");
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
 
-  if (start) {
-    start.value = "";
-    start.valueAsDate = null;
+  if (range === "today") {
+    startDate = new Date(today);
+    endDate = new Date(today);
   }
 
-  if (end) {
-    end.value = "";
-    end.valueAsDate = null;
+  if (range === "yesterday") {
+    startDate = new Date(today);
+    startDate.setDate(startDate.getDate() - 1);
+    endDate = new Date(startDate);
   }
 
-  // Hide custom date UI
-  toggleCustomDateRange("");
+  if (range === "custom" && startInput && endInput) {
+    startDate = new Date(startInput);
+    endDate = new Date(endInput);
+  }
 
-  // Clear results
-  currentSearchResults = [];
-  renderSearchResults([]);
+  if (startDate) startDate.setHours(0, 0, 0, 0);
+  if (endDate) endDate.setHours(23, 59, 59, 999);
+
+  const results = logs.filter(entry => {
+    if (!entry) return false;
+
+    if (first && !entry.first?.toLowerCase().includes(first)) return false;
+    if (last && !entry.last?.toLowerCase().includes(last)) return false;
+    if (company !== "All Companies" && entry.company !== company) return false;
+
+    if (startDate && endDate) {
+      const entryDate = parseEntryDate(entry);
+      if (!entryDate) return false;
+      if (entryDate < startDate || entryDate > endDate) return false;
+    }
+
+    return true;
+  });
+
+  currentSearchResults = results;
+  renderSearchResults(results);
 };
-
-
 /* =========================================================
    RENDER RESULTS
 ========================================================= */
