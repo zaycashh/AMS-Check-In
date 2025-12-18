@@ -185,6 +185,39 @@ function renderSearchResults(results) {
 
   container.innerHTML = html;
 }
+
+// ==============================
+// EXPORT EXCEL
+// ==============================
+const exportExcelBtn = document.getElementById("exportExcel");
+
+if (exportExcelBtn) {
+  exportExcelBtn.addEventListener("click", () => {
+    if (!currentSearchResults.length) {
+      alert("No search results to export.");
+      return;
+    }
+
+    const data = currentSearchResults.map(e => ({
+      Date: e.date || "",
+      Time: e.time || "",
+      First: e.first || "",
+      Last: e.last || "",
+      Company: e.company || "",
+      Reason: e.reason || "",
+      Services: Array.isArray(e.services)
+        ? e.services.join(", ")
+        : e.services || ""
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Search Log");
+
+    XLSX.writeFile(workbook, "AMS_Search_Log.xlsx");
+  });
+}
+
 const exportPDFBtn = document.getElementById("exportPDF");
 
 if (exportPDFBtn) {
