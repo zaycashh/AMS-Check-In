@@ -26,16 +26,12 @@ console.log("Admin Search Module Loaded");
 /* =========================
    HELPERS
 ========================= */
-
-function getLogs() {
-  return JSON.parse(localStorage.getItem("checkIns")) || [];
-}
-
 function parseEntryDate(entry) {
-  if (!entry?.date) return null;
+  if (!entry || !entry.date) return null;
 
-  // Normalize time (adds :00 seconds if missing)
   let time = entry.time || "00:00";
+
+  // Normalize "12:35 PM" → "12:35:00 PM"
   if (/^\d{1,2}:\d{2}\s(AM|PM)$/.test(time)) {
     time = time.replace(" ", ":00 ");
   }
@@ -43,15 +39,6 @@ function parseEntryDate(entry) {
   const parsed = new Date(`${entry.date} ${time}`);
   return isNaN(parsed.getTime()) ? null : parsed;
 }
-
-  const [month, day, year] = entry.date.split("/").map(Number);
-  if (!month || !day || !year) return null;
-
-  const d = new Date(year, month - 1, day);
-  d.setHours(0, 0, 0, 0);
-  return d;
-}
-
 
 /* =========================================================
    DATE RANGE TOGGLE (SAFE FOR DYNAMIC DOM)
