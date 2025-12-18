@@ -137,21 +137,23 @@ document.getElementById("submitBtn").addEventListener("click", () => {
     const canvas = document.getElementById("signaturePad");
     const signature = canvas.toDataURL();
 
-    const now = new Date();
-    const record = {
-        date: now.toLocaleDateString(),
-        time: now.toLocaleTimeString(),
-        first,
-        last,
-        company: finalCompany,
-        reason: finalReason,
-        services: services.join(", "),
-        signature
-    };
+   const now = new Date();
 
-    let logs = JSON.parse(localStorage.getItem("ams_logs") || "[]");
-    logs.push(record);
-    localStorage.setItem("ams_logs", JSON.stringify(logs));
+const record = {
+  date: now.toISOString().split("T")[0], // ✅ YYYY-MM-DD (CRITICAL)
+  time: now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+  first,
+  last,
+  company: finalCompany,
+  reason: finalReason,
+  services: services.join(", "),
+  signature
+};
+
+// ✅ USE SAME KEY SEARCH LOG EXPECTS
+let logs = JSON.parse(localStorage.getItem("checkIns")) || [];
+logs.push(record);
+localStorage.setItem("checkIns", JSON.stringify(logs));
 
     alert("Check-in submitted!");
     location.reload();
