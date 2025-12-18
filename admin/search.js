@@ -22,6 +22,10 @@ function loadLogoBase64(callback) {
 ========================================================= */
 
 console.log("Admin Search Module Loaded");
+function getLogs() {
+  return JSON.parse(localStorage.getItem("checkIns")) || [];
+}
+
 
 /* =========================
    HELPERS
