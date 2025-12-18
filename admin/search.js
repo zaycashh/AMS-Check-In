@@ -126,6 +126,7 @@ window.runSearch = function () {
     currentSearchResults = results;
     renderSearchResults(results);
 };
+
 window.clearFilters = function () {
 
   // Clear name filters
@@ -159,7 +160,6 @@ window.clearFilters = function () {
   currentSearchResults = [];
   renderSearchResults([]);
 };
-
 
 
 /* =========================================================
