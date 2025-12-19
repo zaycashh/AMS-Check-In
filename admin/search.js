@@ -311,4 +311,48 @@ if (exportPDFBtn) {
     };
   });
 }
+// ==============================
+// CLEAR FILTERS
+// ==============================
+const clearBtn = document.getElementById("clearFilters");
 
+if (clearBtn) {
+  clearBtn.addEventListener("click", () => {
+    // Clear text inputs
+    document.getElementById("filterFirstName").value = "";
+    document.getElementById("filterLastName").value = "";
+
+    // Reset company
+    document.getElementById("filterCompany").value = "All Companies";
+
+    // Reset date range dropdown
+    const range = document.getElementById("filterDateRange");
+    range.value = "";
+    // Clear custom date inputs
+const start = document.getElementById("filterStartDate");
+const end = document.getElementById("filterEndDate");
+if (start) start.value = "";
+if (end) end.value = "";
+
+// Hide custom date section
+const custom = document.getElementById("customDateRange");
+if (custom) custom.style.display = "none";
+
+// Clear results
+document.getElementById("searchResultsTable").innerHTML = "";
+
+
+    // Clear custom dates
+    const start = document.getElementById("filterStartDate");
+    const end = document.getElementById("filterEndDate");
+    if (start) start.value = "";
+    if (end) end.value = "";
+
+    // Hide custom date UI
+    const custom = document.getElementById("customDateRange");
+    if (custom) custom.style.display = "none";
+
+    // Clear results
+    document.getElementById("searchResultsTable").innerHTML = "";
+  });
+}
