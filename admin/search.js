@@ -341,4 +341,8 @@ if (custom) custom.style.display = "none";
 
 // Clear results
 document.getElementById("searchResultsTable").innerHTML = "";
+  });
+}
+
+
 
