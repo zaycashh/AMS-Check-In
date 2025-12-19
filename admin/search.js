@@ -108,12 +108,12 @@ function runSearch() {
 
 
         if (!matchFirst || !matchLast || !matchCompany) return false;
+       // DATE FILTER (must be inside filter)
+if (startDate && endDate && entry.date) {
+  const entryDate = new Date(entry.date + "T00:00:00");
+  if (entryDate < startDate || entryDate > endDate) return false;
+}
 
-        // ✅ DATE FILTER MUST BE HERE (INSIDE FILTER)
-        if (startDate && endDate && entry.date) {
-            const entryDate = new Date(entry.date);
-            if (entryDate < startDate || entryDate > endDate) return false;
-        }
 
         return true;
     });
