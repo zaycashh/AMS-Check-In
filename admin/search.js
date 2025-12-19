@@ -77,13 +77,13 @@ function runSearch() {
     let endDate = null;
 
     // DATE RANGE LOGIC
-    if (range === "today") {
-        startDate = new Date(today);
-        startDate.setHours(0, 0, 0, 0);
+   if (range === "today") {
+  startDate = new Date();
+  startDate.setHours(0, 0, 0, 0); // start of TODAY
 
-        endDate = new Date(today);
-        endDate.setHours(23, 59, 59, 999);
-    }
+  endDate = new Date();
+  endDate.setHours(23, 59, 59, 999); // end of TODAY
+}
 
     if (range === "thisWeek") {
         startDate = new Date(today);
@@ -112,9 +112,9 @@ function runSearch() {
        // DATE FILTER (must be inside filter)
 if (startDate && endDate && entry.date) {
   const entryDate = new Date(entry.date + "T00:00:00");
+
   if (entryDate < startDate || entryDate > endDate) return false;
 }
-
 
         return true;
     });
