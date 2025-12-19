@@ -149,15 +149,17 @@ const record = {
   services: services.join(", "),
   signature
 };
+   // SAVE TO MASTER SEARCH LOG (ONE SOURCE OF TRUTH)
+let logs = JSON.parse(localStorage.getItem("ams_logs") || "[]");
 
-// ✅ USE SAME KEY SEARCH LOG EXPECTS
-let logs = JSON.parse(localStorage.getItem("checkIns")) || [];
+// add timestamp for accurate searching
+record.timestamp = Date.now();
+
 logs.push(record);
-localStorage.setItem("checkIns", JSON.stringify(logs));
+localStorage.setItem("ams_logs", JSON.stringify(logs));
 
-    alert("Check-in submitted!");
-    location.reload();
-});
+alert("Check-in submitted!");
+location.reload();
 
 /* =========================================================
    RESET FORM
