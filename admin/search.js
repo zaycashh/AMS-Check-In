@@ -95,33 +95,27 @@ function runSearch() {
         endDate.setDate(startDate.getDate() + 6);
         endDate.setHours(23, 59, 59, 999);
     }
+   logs.forEach(entry => {
+    if (!entry) return;
 
-    const results = logs.filter(entry => {
-        if (!entry) return false;
+    const matchFirst = !first || (entry.first || "").toLowerCase().includes(first);
+    const matchLast = !last || (entry.last || "").toLowerCase().includes(last);
+    const matchCompany =
+      !company ||
+      company === "All Companies" ||
+      company === "" ||
+      entry.company === company;
 
-        const matchFirst = !first || (entry.first || "").toLowerCase().includes(first);
-        const matchLast = !last || (entry.last || "").toLowerCase().includes(last);
-        const matchCompany =
-  !company ||
-  company === "All Companies" ||
-  company === "" ||
-  entry.company === company;
+    if (!matchFirst || !matchLast || !matchCompany) return;
 
+    // DATE FILTER
+    if (startDate && endDate && entry.date) {
+        const entryDate = new Date(entry.date + "T00:00:00");
+        if (entryDate < startDate || entryDate > endDate) return;
+    }
 
-        if (!matchFirst || !matchLast || !matchCompany) return false;
-       
-       // DATE FILTER (must be inside filter)
-if (startDate && endDate && entry.date) {
-  const entryDate = new Date(entry.date + "T00:00:00");
-
-  if (entryDate < startDate || entryDate > endDate) return false;
-}
-
-        return true;
-    });
-
-    renderSearchResults(results);
-}
+    results.push(entry);
+});
 
 /* =========================
    RENDER RESULTS
