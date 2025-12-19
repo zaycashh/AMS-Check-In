@@ -66,6 +66,7 @@ function getLogs() {
 ========================= */
 function runSearch() {
     const logs = getLogs();
+   let results = [];
 
     const first = document.getElementById("filterFirstName").value.trim().toLowerCase();
     const last = document.getElementById("filterLastName").value.trim().toLowerCase();
