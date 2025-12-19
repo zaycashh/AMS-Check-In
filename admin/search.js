@@ -100,7 +100,16 @@ window.runSearch = function () {
     if (company !== "All Companies" && entry.company !== company) return false;
 
     if (startDate && endDate && entry.date) {
-  const entryDate = new Date(entry.date + "T00:00:00");
+  // Handle MM/DD/YYYY safely
+  const parts = entry.date.split("/");
+  if (parts.length !== 3) return false;
+
+      const entryDate = new Date(
+  Number(parts[2]),       // year
+  Number(parts[0]) - 1,   // month
+  Number(parts[1]),       // day
+  12, 0, 0                // force midday to avoid edge issues
+);
 
   if (entryDate < startDate || entryDate > endDate) return false;
 }
