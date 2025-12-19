@@ -331,8 +331,8 @@ if (clearBtn) {
     toggleCustomDateRange("");
 
     // Clear custom date inputs
-const start = document.getElementById("filterStartDate");
-const end = document.getElementById("filterEndDate");
+const startInput = document.getElementById("filterStartDate");
+const endInput = document.getElementById("filterEndDate");
 if (start) start.value = "";
 if (end) end.value = "";
 
