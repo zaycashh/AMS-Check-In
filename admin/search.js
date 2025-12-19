@@ -108,6 +108,7 @@ function runSearch() {
 
 
         if (!matchFirst || !matchLast || !matchCompany) return false;
+       
        // DATE FILTER (must be inside filter)
 if (startDate && endDate && entry.date) {
   const entryDate = new Date(entry.date + "T00:00:00");
