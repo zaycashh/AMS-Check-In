@@ -99,11 +99,11 @@ window.runSearch = function () {
     if (last && !entry.last?.toLowerCase().includes(last)) return false;
     if (company !== "All Companies" && entry.company !== company) return false;
 
-    if (startDate && endDate) {
-      const entryDate = parseEntryDate(entry);
-      if (!entryDate) return false;
-      if (entryDate < startDate || entryDate > endDate) return false;
-    }
+    if (startDate && endDate && entry.date) {
+  const entryDate = new Date(entry.date + "T00:00:00");
+
+  if (entryDate < startDate || entryDate > endDate) return false;
+}
 
     return true;
   });
