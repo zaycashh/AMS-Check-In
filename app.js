@@ -160,7 +160,7 @@ localStorage.setItem("ams_logs", JSON.stringify(logs));
 
 alert("Check-in submitted!");
 location.reload();
-
+});
 /* =========================================================
    RESET FORM
 ========================================================= */
