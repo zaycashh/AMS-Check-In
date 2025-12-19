@@ -1,303 +1,291 @@
+let currentSearchResults = [];
+function loadLogoBase64(callback) {
+  const img = new Image();
+  img.crossOrigin = "Anonymous";
+  img.src = "logo.png";
+
+  img.onload = function () {
+    const canvas = document.createElement("canvas");
+    canvas.width = img.width;
+    canvas.height = img.height;
+
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(img, 0, 0);
+
+    const dataURL = canvas.toDataURL("image/png");
+    callback(dataURL);
+  };
+}
+
 /* =========================================================
-   ADMIN SEARCH MODULE — SAFE VERSION
-   (NO LOGIN / TAB / SIGNATURE CONFLICTS)
+   AMS ADMIN SEARCH LOG (CLEAN REBUILD)
 ========================================================= */
 
 console.log("Admin Search Module Loaded");
-// ===============================
-// CLEAR FILTERS (SAFE & GLOBAL)
-// ===============================
-window.clearFilters = function () {
-  // Clear name fields
-  const first = document.getElementById("filterFirstName");
-  const last = document.getElementById("filterLastName");
-  if (first) first.value = "";
-  if (last) last.value = "";
-
-  // Reset company
-  const company = document.getElementById("filterCompany");
-  if (company) company.value = "All Companies";
-
-  // Reset date range dropdown
-  const range = document.getElementById("filterDateRange");
-  if (range) range.value = "";
-
-  // Clear custom date inputs
-  const start = document.getElementById("filterStartDate");
-  const end = document.getElementById("filterEndDate");
-  if (start) start.value = "";
-  if (end) end.value = "";
-
-  // Hide custom date UI
-  if (typeof toggleCustomDateRange === "function") {
-    toggleCustomDateRange("");
-  }
-
-  // Clear results safely
-  if (typeof renderSearchResults === "function") {
-    renderSearchResults([]);
-  }
-
-  if (typeof currentSearchResults !== "undefined") {
-    currentSearchResults = [];
-  }
+window.getLogs = function () {
+  return JSON.parse(localStorage.getItem("checkIns")) || [];
 };
+
+/* =========================
+   HELPERS
+========================= */
+function parseEntryDate(entry) {
+  if (!entry || !entry.date) return null;
+
+  let time = entry.time || "00:00";
+
+  // Normalize "12:35 PM" → "12:35:00 PM"
+  if (/^\d{1,2}:\d{2}\s(AM|PM)$/.test(time)) {
+    time = time.replace(" ", ":00 ");
+  }
+
+  const parsed = new Date(`${entry.date} ${time}`);
+  return isNaN(parsed.getTime()) ? null : parsed;
+}
+
+/* =========================================================
+   DATE RANGE TOGGLE (SAFE FOR DYNAMIC DOM)
+========================================================= */
 
 window.toggleCustomDateRange = function (value) {
-  const box = document.getElementById("customDateRange");
-  if (!box) return;
-
-  if (value === "custom") {
-    box.style.display = "flex";
-  } else {
-    box.style.display = "none";
-  }
+    const custom = document.getElementById("customDateRange");
+    if (!custom) return;
+    custom.style.display = value === "custom" ? "block" : "none";
 };
 
-/* =========================
-   LOAD LOGS
-========================= */
-function getLogs() {
-  return JSON.parse(localStorage.getItem("ams_logs") || "[]");
-}
+// ==============================
+// RUN SEARCH (REQUIRED)
+// ==============================
+window.runSearch = function () {
+  const logs = getLogs();
 
-/* =========================
-   RUN SEARCH
-========================= */
-function runSearch() {
-    const logs = getLogs();
-   let results = [];
+  const first = document.getElementById("filterFirstName").value.trim().toLowerCase();
+  const last = document.getElementById("filterLastName").value.trim().toLowerCase();
+  const company = document.getElementById("filterCompany").value;
+  const range = document.getElementById("filterDateRange").value;
 
-    const first = document.getElementById("filterFirstName").value.trim().toLowerCase();
-    const last = document.getElementById("filterLastName").value.trim().toLowerCase();
-    const company = document.getElementById("filterCompany").value;
-    const range = document.getElementById("filterDateRange").value;
+  const startInput = document.getElementById("filterStartDate")?.value;
+  const endInput = document.getElementById("filterEndDate")?.value;
 
-    const today = new Date();
-    let startDate = null;
-    let endDate = null;
+  let startDate = null;
+  let endDate = null;
 
-    // DATE RANGE LOGIC
-   if (range === "today") {
-  startDate = new Date();
-  startDate.setHours(0, 0, 0, 0); // start of TODAY
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
 
-  endDate = new Date();
-  endDate.setHours(23, 59, 59, 999); // end of TODAY
-}
-
-    if (range === "thisWeek") {
-        startDate = new Date(today);
-        startDate.setDate(today.getDate() - today.getDay());
-        startDate.setHours(0, 0, 0, 0);
-
-        endDate = new Date(startDate);
-        endDate.setDate(startDate.getDate() + 6);
-        endDate.setHours(23, 59, 59, 999);
-    }
-   logs.forEach(entry => {
-    if (!entry) return;
-
-    const matchFirst = !first || (entry.first || "").toLowerCase().includes(first);
-    const matchLast = !last || (entry.last || "").toLowerCase().includes(last);
-    const matchCompany =
-      !company ||
-      company === "All Companies" ||
-      company === "" ||
-      entry.company === company;
-
-    if (!matchFirst || !matchLast || !matchCompany) return;
-
-    // DATE FILTER
-    if (startDate && endDate && entry.date) {
-        const entryDate = new Date(entry.date + "T00:00:00");
-        if (entryDate < startDate || entryDate > endDate) return;
-    }
-
-    results.push(entry);
-});
-
-/* =========================
-   RENDER RESULTS
-========================= */
-function renderSearchResults(logs) {
-    const container = document.getElementById("searchResultsTable");
-    if (!container) return;
-
-    let html = `
-        <table class="log-table">
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Time</th>
-                    <th>First</th>
-                    <th>Last</th>
-                    <th>Company</th>
-                    <th>Services</th>
-                    <th>Reason</th>
-                </tr>
-            </thead>
-            <tbody>
-    `;
-
-    logs.forEach(log => {
-        html += `
-            <tr>
-                <td>${log.date || "-"}</td>
-                <td>${log.time || "-"}</td>
-                <td>${log.first || "-"}</td>
-                <td>${log.last || "-"}</td>
-                <td>${log.company || "-"}</td>
-                <td>${log.services || "-"}</td>
-                <td>${log.reason || "-"}</td>
-            </tr>
-        `;
-    });
-
-    html += `
-            </tbody>
-        </table>
-    `;
-
-    container.innerHTML = html;
-}
-
-/* =========================
-   BUTTON HOOKS
-========================= */
-document.addEventListener("DOMContentLoaded", () => {
-const dateRangeSelect = document.getElementById("filterDateRange");
-const customRange = document.getElementById("customDateRange");
-
-if (dateRangeSelect && customRange) {
-  dateRangeSelect.addEventListener("change", () => {
-    customRange.style.display =
-      dateRangeSelect.value === "custom" ? "block" : "none";
-  });
-}
-
-  const searchBtn = document.getElementById("runSearch");
-  const clearBtn = document.getElementById("clearSearch");
-
-  if (searchBtn) searchBtn.addEventListener("click", runSearch);
-
-    if (clearBtn) {
-    clearBtn.addEventListener("click", () => {
-      document.getElementById("filterFirstName").value = "";
-      document.getElementById("filterLastName").value = "";
-      document.getElementById("filterCompany").value = "";
-      document.getElementById("filterDateRange").value = "";
-
-      document.getElementById("filterStartDate").value = "";
-      document.getElementById("filterEndDate").value = "";
-
-      if (customRange) customRange.style.display = "none";
-
-      document.getElementById("searchResultsTable").innerHTML = "";
-    });
+  if (range === "today") {
+    startDate = new Date(today);
+    endDate = new Date(today);
   }
-});
-/* =========================
-   EXPORT SEARCH LOG
-========================= */
 
-function getVisibleTableData() {
-  const rows = document.querySelectorAll(".log-table tbody tr");
-  const data = [];
+  if (range === "yesterday") {
+    startDate = new Date(today);
+    startDate.setDate(startDate.getDate() - 1);
+    endDate = new Date(startDate);
+  }
 
-  rows.forEach(row => {
-    const cells = row.querySelectorAll("td");
-    data.push({
-      Date: cells[0]?.innerText || "",
-      Time: cells[1]?.innerText || "",
-      First: cells[2]?.innerText || "",
-      Last: cells[3]?.innerText || "",
-      Company: cells[4]?.innerText || "",
-      Services: cells[5]?.innerText || "",
-      Reason: cells[6]?.innerText || ""
-    });
-  });
+  if (range === "custom" && startInput && endInput) {
+    startDate = new Date(startInput);
+    endDate = new Date(endInput);
+  }
 
-  return data;
-}
-document.getElementById("exportExcel")?.addEventListener("click", () => {
-  const data = getVisibleTableData();
-  if (!data.length) return alert("No data to export");
+  if (startDate) startDate.setHours(0, 0, 0, 0);
+  if (endDate) endDate.setHours(23, 59, 59, 999);
 
-  const worksheet = XLSX.utils.json_to_sheet(data);
-  const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, "Search Log");
+  const results = logs.filter(entry => {
+    if (!entry) return false;
 
-  XLSX.writeFile(workbook, "AMS_Search_Log.xlsx");
-});
-document.getElementById("exportPDF").addEventListener("click", () => {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
+    if (first && !entry.first?.toLowerCase().includes(first)) return false;
+    if (last && !entry.last?.toLowerCase().includes(last)) return false;
+    if (company !== "All Companies" && entry.company !== company) return false;
 
-    const logs = getLogs();
-    if (!logs.length) {
-        alert("No records to export.");
-        return;
+    if (startDate && endDate) {
+      const entryDate = parseEntryDate(entry);
+      if (!entryDate) return false;
+      if (entryDate < startDate || entryDate > endDate) return false;
     }
 
-    /* ============================
-       HEADER BRANDING
-    ============================ */
-    doc.setFontSize(16);
-    doc.text("AMS Check-In System", 14, 18);
+    return true;
+  });
 
-    doc.setFontSize(11);
-    doc.text("Search Log Report", 14, 26);
+  currentSearchResults = results;
+  renderSearchResults(results);
+};
+/* =========================================================
+   RENDER RESULTS
+========================================================= */
 
-    doc.setFontSize(9);
-    doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 32);
+function renderSearchResults(results) {
+  const container = document.getElementById("searchResultsTable");
+  if (!container) return;
 
-    /* ============================
-       TABLE DATA
-    ============================ */
-    const tableData = logs.map(log => [
-        log.date || "",
-        log.time || "",
-        log.first || "",
-        log.last || "",
-        log.company || "",
-        log.services || "",
-        log.reason || ""
-    ]);
+  container.innerHTML = "";
 
-    doc.autoTable({
-        startY: 38,
+  if (!results.length) {
+    container.innerHTML = "<p>No results found</p>";
+    return;
+  }
+
+  let html = `
+    <table class="log-table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Time</th>
+          <th>First</th>
+          <th>Last</th>
+          <th>Company</th>
+          <th>Reason</th>
+          <th>Services</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+
+  results.forEach(entry => {
+    html += `
+      <tr>
+        <td>${entry.date || ""}</td>
+        <td>${entry.time || ""}</td>
+        <td>${entry.first || ""}</td>
+        <td>${entry.last || ""}</td>
+        <td>${entry.company || ""}</td>
+        <td>${entry.reason || ""}</td>
+        <td>${entry.services || ""}</td>
+      </tr>
+    `;
+  });
+
+  html += `
+      </tbody>
+    </table>
+  `;
+
+  container.innerHTML = html;
+}
+
+// ==============================
+// EXPORT EXCEL
+// ==============================
+const exportExcelBtn = document.getElementById("exportExcel");
+
+if (exportExcelBtn) {
+  exportExcelBtn.addEventListener("click", () => {
+    if (!currentSearchResults.length) {
+      alert("No search results to export.");
+      return;
+    }
+
+    const data = currentSearchResults.map(e => ({
+      Date: e.date || "",
+      Time: e.time || "",
+      First: e.first || "",
+      Last: e.last || "",
+      Company: e.company || "",
+      Reason: e.reason || "",
+      Services: Array.isArray(e.services)
+        ? e.services.join(", ")
+        : e.services || ""
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Search Log");
+
+    XLSX.writeFile(workbook, "AMS_Search_Log.xlsx");
+  });
+}
+
+const exportPDFBtn = document.getElementById("exportPDF");
+
+if (exportPDFBtn) {
+  exportPDFBtn.addEventListener("click", () => {
+    if (!currentSearchResults.length) {
+      alert("No results to export.");
+      return;
+    }
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF("landscape");
+
+    const logo = new Image();
+    logo.src = "logo.png";
+
+    logo.onload = () => {
+
+      // HEADER BAR
+      doc.setFillColor(32, 99, 155);
+      doc.rect(0, 0, 297, 20, "F");
+
+      doc.addImage(logo, "PNG", 14, 2, 24, 16);
+
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(16);
+      doc.text("AMS Search Log Report", 42, 14);
+
+      // META INFO
+      doc.setTextColor(0, 0, 0);
+      doc.setFontSize(10);
+
+      const now = new Date();
+      doc.text(`Generated: ${now.toLocaleString()}`, 14, 28);
+      doc.text(`Total Records: ${currentSearchResults.length}`, 14, 34);
+
+      const company =
+        document.getElementById("filterCompany")?.value || "All Companies";
+      const range =
+        document.getElementById("filterDateRange")?.value || "All Dates";
+
+      doc.text(`Company: ${company}`, 120, 28);
+      doc.text(`Date Range: ${range}`, 120, 34);
+
+      // TABLE
+      const tableData = currentSearchResults.map(e => [
+        e.date || "",
+        e.time || "",
+        e.first || "",
+        e.last || "",
+        e.company || "",
+        e.reason || "",
+        Array.isArray(e.services) ? e.services.join(", ") : e.services || ""
+      ]);
+
+      doc.autoTable({
+        startY: 42,
         head: [[
-            "Date",
-            "Time",
-            "First",
-            "Last",
-            "Company",
-            "Services",
-            "Reason"
+          "Date",
+          "Time",
+          "First",
+          "Last",
+          "Company",
+          "Reason",
+          "Services"
         ]],
         body: tableData,
-        styles: {
-            fontSize: 8,
-            cellPadding: 3
-        },
-        headStyles: {
-            fillColor: [33, 150, 243], // blue header
-            textColor: 255
-        },
-        alternateRowStyles: {
-            fillColor: [245, 245, 245]
-        },
-        didDrawPage: function (data) {
-            const pageCount = doc.internal.getNumberOfPages();
-            doc.setFontSize(8);
-            doc.text(
-                `Page ${doc.internal.getCurrentPageInfo().pageNumber} of ${pageCount}`,
-                data.settings.margin.left,
-                doc.internal.pageSize.height - 8
-            );
+        styles: { fontSize: 9 },
+        headStyles: { fillColor: [32, 99, 155] },
+        alternateRowStyles: { fillColor: [245, 247, 250] },
+        margin: { left: 14, right: 14 },
+        didDrawPage: () => {
+          const page = doc.internal.getNumberOfPages();
+          doc.setFontSize(9);
+          doc.text(
+            `Page ${page}`,
+            doc.internal.pageSize.getWidth() - 20,
+            doc.internal.pageSize.getHeight() - 10
+          );
         }
-    });
+      });
 
-    doc.save("AMS_Search_Log_Report.pdf");
-});
+      // FOOTER
+      doc.setFontSize(8);
+      doc.text(
+        "Confidential – Internal Use Only – AMS Check-In System",
+        14,
+        doc.internal.pageSize.getHeight() - 10
+      );
+
+      doc.save("AMS_Search_Log_Report.pdf");
+    };
+  });
+}
