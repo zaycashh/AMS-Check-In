@@ -57,7 +57,7 @@ window.toggleCustomDateRange = function (value) {
 // RUN SEARCH (REQUIRED)
 // ==============================
 window.runSearch = function () {
-  const logs = getLogs();
+  const logs = Object.values(getLogs());
 
   const first = document.getElementById("filterFirstName").value.trim().toLowerCase();
   const last = document.getElementById("filterLastName").value.trim().toLowerCase();
