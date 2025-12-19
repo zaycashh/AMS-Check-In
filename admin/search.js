@@ -61,8 +61,12 @@ window.runSearch = function () {
 
   const first = document.getElementById("filterFirstName").value.trim().toLowerCase();
   const last = document.getElementById("filterLastName").value.trim().toLowerCase();
-  const company = document.getElementById("filterCompany").value;
-  const range = document.getElementById("filterDateRange").value;
+  const range = document
+  .getElementById("filterDateRange")
+  .value
+  .toLowerCase();
+
+  if (range === "this week" || range === "thisweek") {
 
   const startInput = document.getElementById("filterStartDate")?.value;
   const endInput = document.getElementById("filterEndDate")?.value;
