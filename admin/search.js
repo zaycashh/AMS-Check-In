@@ -23,7 +23,7 @@ function loadLogoBase64(callback) {
 
 console.log("Admin Search Module Loaded");
 window.getLogs = function () {
-  return JSON.parse(localStorage.getItem("checkIns")) || [];
+  return JSON.parse(localStorage.getItem("ams_logs")) || [];
 };
 
 /* =========================
