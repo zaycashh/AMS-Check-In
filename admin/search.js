@@ -61,15 +61,12 @@ window.runSearch = function () {
 
   const first = document.getElementById("filterFirstName").value.trim().toLowerCase();
   const last = document.getElementById("filterLastName").value.trim().toLowerCase();
+  const company = document.getElementById("filterCompany").value;
+
   const range = document
-  .getElementById("filterDateRange")
-  .value
-  .toLowerCase();
-
-  if (range === "this week" || range === "thisweek") {
-
-  const startInput = document.getElementById("filterStartDate")?.value;
-  const endInput = document.getElementById("filterEndDate")?.value;
+    .getElementById("filterDateRange")
+    .value
+    .toLowerCase();
 
   let startDate = null;
   let endDate = null;
@@ -80,43 +77,44 @@ window.runSearch = function () {
   if (range === "today") {
     startDate = new Date(today);
     endDate = new Date(today);
+    endDate.setHours(23, 59, 59, 999);
   }
 
   if (range === "yesterday") {
     startDate = new Date(today);
     startDate.setDate(startDate.getDate() - 1);
+
     endDate = new Date(startDate);
+    endDate.setHours(23, 59, 59, 999);
   }
 
-  if (range === "custom" && startInput && endInput) {
-    startDate = new Date(startInput);
-    endDate = new Date(endInput);
-  }
+  if (range === "this week" || range === "thisweek") {
+    startDate = new Date(today);
+    startDate.setDate(today.getDate() - today.getDay());
 
-  if (startDate) startDate.setHours(0, 0, 0, 0);
-  if (endDate) endDate.setHours(23, 59, 59, 999);
+    endDate = new Date(startDate);
+    endDate.setDate(startDate.getDate() + 6);
+    endDate.setHours(23, 59, 59, 999);
+  }
 
   const results = logs.filter(entry => {
-    if (!entry) return false;
-
     if (first && !entry.first?.toLowerCase().includes(first)) return false;
     if (last && !entry.last?.toLowerCase().includes(last)) return false;
     if (company !== "All Companies" && entry.company !== company) return false;
 
     if (startDate && endDate && entry.date) {
-  // Handle MM/DD/YYYY safely
-  const parts = entry.date.split("/");
-  if (parts.length !== 3) return false;
+      // supports MM/DD/YYYY and YYYY-MM-DD
+      let entryDate;
 
-      const entryDate = new Date(
-  Number(parts[2]),       // year
-  Number(parts[0]) - 1,   // month
-  Number(parts[1]),       // day
-  12, 0, 0                // force midday to avoid edge issues
-);
+      if (entry.date.includes("/")) {
+        const p = entry.date.split("/");
+        entryDate = new Date(p[2], p[0] - 1, p[1], 12);
+      } else {
+        entryDate = new Date(entry.date + "T12:00:00");
+      }
 
-  if (entryDate < startDate || entryDate > endDate) return false;
-}
+      if (entryDate < startDate || entryDate > endDate) return false;
+    }
 
     return true;
   });
@@ -124,6 +122,7 @@ window.runSearch = function () {
   currentSearchResults = results;
   renderSearchResults(results);
 };
+
 /* =========================================================
    RENDER RESULTS
 ========================================================= */
