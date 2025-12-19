@@ -328,6 +328,8 @@ if (clearBtn) {
     // Reset date range dropdown
     const range = document.getElementById("filterDateRange");
     range.value = "";
+    toggleCustomDateRange("");
+
     // Clear custom date inputs
 const start = document.getElementById("filterStartDate");
 const end = document.getElementById("filterEndDate");
