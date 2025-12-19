@@ -329,12 +329,11 @@ if (clearBtn) {
     const range = document.getElementById("filterDateRange");
     range.value = "";
     toggleCustomDateRange("");
-
     // Clear custom date inputs
 const startInput = document.getElementById("filterStartDate");
 const endInput = document.getElementById("filterEndDate");
-if (start) start.value = "";
-if (end) end.value = "";
+if (startInput) startInput.value = "";
+if (endInput) endInput.value = "";
 
 // Hide custom date section
 const custom = document.getElementById("customDateRange");
@@ -343,18 +342,3 @@ if (custom) custom.style.display = "none";
 // Clear results
 document.getElementById("searchResultsTable").innerHTML = "";
 
-
-    // Clear custom dates
-    const start = document.getElementById("filterStartDate");
-    const end = document.getElementById("filterEndDate");
-    if (start) start.value = "";
-    if (end) end.value = "";
-
-    // Hide custom date UI
-    const custom = document.getElementById("customDateRange");
-    if (custom) custom.style.display = "none";
-
-    // Clear results
-    document.getElementById("searchResultsTable").innerHTML = "";
-  });
-}
