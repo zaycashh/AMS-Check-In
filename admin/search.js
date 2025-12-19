@@ -102,26 +102,33 @@ window.runSearch = function () {
     if (last && !entry.last?.toLowerCase().includes(last)) return false;
     if (company !== "All Companies" && entry.company !== company) return false;
 
-    if (startDate && endDate && entry.date) {
-      // supports MM/DD/YYYY and YYYY-MM-DD
-      let entryDate;
+if (startDate && endDate && entry.date) {
+  let entryDate;
 
-      if (entry.date.includes("/")) {
-        const p = entry.date.split("/");
-        entryDate = new Date(p[2], p[0] - 1, p[1], 12);
-      } else {
-        entryDate = new Date(entry.date + "T12:00:00");
-      }
+  // Handle YYYY-MM-DD (ISO)
+  if (entry.date.includes("-")) {
+    entryDate = new Date(entry.date + "T12:00:00");
+  }
 
-      if (entryDate < startDate || entryDate > endDate) return false;
-    }
+  // Handle MM/DD/YYYY
+  else if (entry.date.includes("/")) {
+    const parts = entry.date.split("/");
+    if (parts.length !== 3) return false;
 
-    return true;
-  });
+    entryDate = new Date(
+      Number(parts[2]),
+      Number(parts[0]) - 1,
+      Number(parts[1]),
+      12, 0, 0
+    );
+  }
 
-  currentSearchResults = results;
-  renderSearchResults(results);
-};
+  else {
+    return false;
+  }
+
+  if (entryDate < startDate || entryDate > endDate) return false;
+}
 
 /* =========================================================
    RENDER RESULTS
