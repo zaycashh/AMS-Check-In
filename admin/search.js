@@ -269,7 +269,26 @@ if (exportPDFBtn) {
         document.getElementById("filterDateRange")?.value || "All Dates";
 
       doc.text(`Company: ${company}`, 120, 28);
-      doc.text(`Date Range: ${range}`, 120, 34);
+      // Format date range label for PDF
+let dateRangeLabel = "All Dates";
+
+switch (range) {
+  case "today":
+    dateRangeLabel = "Today";
+    break;
+  case "thisWeek":
+    dateRangeLabel = "This Week";
+    break;
+  case "thisMonth":
+    dateRangeLabel = "This Month";
+    break;
+  case "custom":
+    dateRangeLabel = "Custom Date Range";
+    break;
+}
+
+doc.text(`Date Range: ${dateRangeLabel}`, 120, 34);
+
 
       // TABLE
       const tableData = currentSearchResults.map(e => [
