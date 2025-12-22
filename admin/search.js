@@ -1,3 +1,15 @@
+// ===============================
+// DATE HELPERS (LOCAL MIDNIGHT SAFE)
+// ===============================
+function normalizeLocalDate(date) {
+  const d = new Date(date);
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
+function isSameLocalDay(dateA, dateB) {
+  return normalizeLocalDate(dateA).getTime() === normalizeLocalDate(dateB).getTime();
+}
 let currentSearchResults = [];
 function loadLogoBase64(callback) {
   const img = new Image();
@@ -75,21 +87,19 @@ window.runSearch = function () {
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-
-    if (range === "today") {
-        startDate = new Date(today);
-        endDate = new Date(today);
-    }
-
-    if (range === "yesterday") {
+  // TODAY (local-safe)
+if (range === "today") {
   startDate = new Date(today);
-  startDate.setDate(startDate.getDate() - 1);
-  startDate.setHours(0, 0, 0, 0);
-
-  endDate = new Date(startDate);
-  endDate.setHours(23, 59, 59, 999);
+  endDate = new Date(today);
 }
 
+// YESTERDAY (local-safe)
+if (range === "yesterday") {
+  startDate = new Date(today);
+  startDate.setDate(startDate.getDate() - 1);
+
+  endDate = new Date(startDate);
+}
 
     if (range === "thisWeek") {
         startDate = new Date(today);
