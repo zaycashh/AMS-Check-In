@@ -304,49 +304,32 @@ if (exportPDFBtn) {
 let dateRangeLabel = "All Dates";
 const today = normalizeLocalDate(new Date());
 
-switch (range) {
+if (range === "today") {
+  dateRangeLabel = `Today (${formatShortDate(today)})`;
+}
 
-  case "today": {
-    dateRangeLabel = `Today (${formatShortDate(today)})`;
-    break;
-  }
+else if (range === "thisWeek") {
+  const startOfWeek = new Date(today);
+  startOfWeek.setDate(today.getDate() - today.getDay()); // Sunday start
 
-  case "thisWeek": {
-    const startOfWeek = new Date(today);
-    startOfWeek.setDate(today.getDate() - today.getDay()); // Sunday
+  const endOfWeek = new Date(startOfWeek);
+  endOfWeek.setDate(startOfWeek.getDate() + 6);
 
-    const endOfWeek = new Date(startOfWeek);
-    endOfWeek.setDate(startOfWeek.getDate() + 6);
+  dateRangeLabel = `This Week (${formatRange(startOfWeek, endOfWeek)})`;
+}
 
-    dateRangeLabel = `This Week (${formatRange(startOfWeek, endOfWeek)})`;
-    break;
-  }
+else if (range === "thisMonth") {
+  const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+  const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
 
-  case "thisMonth": {
-    const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-    const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+  dateRangeLabel = `This Month (${formatRange(startOfMonth, endOfMonth)})`;
+}
 
-    dateRangeLabel = `This Month (${formatRange(startOfMonth, endOfMonth)})`;
-    break;
-  }
+else if (range === "custom") {
+  const start = normalizeLocalDate(new Date(document.getElementById("customStart").value));
+  const end = normalizeLocalDate(new Date(document.getElementById("customEnd").value));
 
-  case "custom": {
-    const startInput = document.getElementById("customStartDate")?.value;
-    const endInput = document.getElementById("customEndDate")?.value;
-
-    if (startInput && endInput) {
-      const start = normalizeLocalDate(new Date(startInput));
-      const end = normalizeLocalDate(new Date(endInput));
-
-      dateRangeLabel = `Custom (${formatRange(start, end)})`;
-    } else {
-      dateRangeLabel = "Custom Date Range";
-    }
-    break;
-  }
-
-  default:
-    dateRangeLabel = "All Dates";
+  dateRangeLabel = `Custom (${formatRange(start, end)})`;
 }
 
       // TABLE
