@@ -66,9 +66,15 @@ function parseEntryDate(entry) {
 ========================================================= */
 
 window.toggleCustomDateRange = function (value) {
-    const custom = document.getElementById("customDateRange");
-    if (!custom) return;
-    custom.style.display = value === "custom" ? "block" : "none";
+  const customBox = document.getElementById("customDateRange");
+
+  if (!customBox) return;
+
+  if (value === "custom") {
+    customBox.style.display = "block";
+  } else {
+    customBox.style.display = "none";
+  }
 };
 
 window.runSearch = function () {
