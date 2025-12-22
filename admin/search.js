@@ -1,3 +1,23 @@
+// ==============================
+// TOGGLE CUSTOM DATE RANGE
+// ==============================
+window.toggleCustomDateRange = function (value) {
+  const box = document.getElementById("customDateRange");
+  if (!box) return;
+
+  if (value === "custom") {
+    box.style.display = "block";
+  } else {
+    box.style.display = "none";
+
+    // Clear custom dates when switching away
+    const start = document.getElementById("filterStartDate");
+    const end = document.getElementById("filterEndDate");
+    if (start) start.value = "";
+    if (end) end.value = "";
+  }
+};
+
 // ===============================
 // DATE HELPERS (LOCAL MIDNIGHT SAFE)
 // ===============================
