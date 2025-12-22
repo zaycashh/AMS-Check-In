@@ -331,6 +331,8 @@ else if (range === "custom") {
 
   dateRangeLabel = `Custom (${formatRange(start, end)})`;
 }
+      doc.text(`Date Range: ${dateRangeLabel}`, 120, 34);
+
 
       // TABLE
       const tableData = currentSearchResults.map(e => [
