@@ -334,6 +334,8 @@ const endDate = document.getElementById("filterEndDate");
 
 if (startDate) startDate.value = "";
 if (endDate) endDate.value = "";
+    const custom = document.getElementById("customDateRange");
+if (custom) custom.style.display = "none";
 
     // Clear text inputs
     document.getElementById("filterFirstName").value = "";
