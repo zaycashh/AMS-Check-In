@@ -324,43 +324,38 @@ if (exportPDFBtn) {
 // ==============================
 // CLEAR FILTERS
 // ==============================
-const clearBtn = document.getElementById("clearFilters");
+const clearBtn = document.getElementById("clearSearch");
 
 if (clearBtn) {
   clearBtn.addEventListener("click", () => {
-    // FORCE clear custom date inputs
-const startDate = document.getElementById("filterStartDate");
-const endDate = document.getElementById("filterEndDate");
-
-if (startDate) startDate.value = "";
-if (endDate) endDate.value = "";
-    
-    const custom = document.getElementById("customDateRange");
-if (custom) custom.style.display = "none";
 
     // Clear text inputs
-    document.getElementById("filterFirstName").value = "";
-    document.getElementById("filterLastName").value = "";
+    const first = document.getElementById("filterFirstName");
+    const last = document.getElementById("filterLastName");
+    if (first) first.value = "";
+    if (last) last.value = "";
 
     // Reset company
-    document.getElementById("filterCompany").value = "All Companies";
+    const company = document.getElementById("filterCompany");
+    if (company) company.value = "All Companies";
 
     // Reset date range dropdown
     const range = document.getElementById("filterDateRange");
-    range.value = "";
-    toggleCustomDateRange("");
-    // Clear custom date inputs
-const startInput = document.getElementById("filterStartDate");
-const endInput = document.getElementById("filterEndDate");
-if (startInput) startInput.value = "";
-if (endInput) endInput.value = "";
+    if (range) range.value = "";
 
-// Hide custom date section
-const custom = document.getElementById("customDateRange");
-if (custom) custom.style.display = "none";
-});
+    // Clear custom dates
+    const startDate = document.getElementById("filterStartDate");
+    const endDate = document.getElementById("filterEndDate");
+    if (startDate) startDate.value = "";
+    if (endDate) endDate.value = "";
 
-// Clear results
-document.getElementById("searchResultsTable").innerHTML = "";
+    // Hide custom date section
+    const customBox = document.getElementById("customDateRange");
+    if (customBox) customBox.style.display = "none";
+
+    // Clear results table
+    const results = document.getElementById("searchResultsTable");
+    if (results) results.innerHTML = "";
+
   });
 }
