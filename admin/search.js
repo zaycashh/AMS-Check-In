@@ -328,31 +328,33 @@ const clearBtn = document.getElementById("clearFilters");
 
 if (clearBtn) {
   clearBtn.addEventListener("click", () => {
-    // Clear text inputs
-    document.getElementById("filterFirstName").value = "";
-    document.getElementById("filterLastName").value = "";
+  // Clear text inputs
+  document.getElementById("filterFirstName").value = "";
+  document.getElementById("filterLastName").value = "";
 
-    // Reset company
-    document.getElementById("filterCompany").value = "All Companies";
+  // Reset company
+  document.getElementById("filterCompany").value = "All Companies";
 
-    // Reset date range dropdown
-    const range = document.getElementById("filterDateRange");
-    range.value = "";
-    toggleCustomDateRange("");
-    // Clear custom date inputs
-const startInput = document.getElementById("filterStartDate");
-const endInput = document.getElementById("filterEndDate");
-if (startInput) startInput.value = "";
-if (endInput) endInput.value = "";
+  // Reset date range dropdown
+  const range = document.getElementById("filterDateRange");
+  range.value = "";
+  toggleCustomDateRange("");
 
-// Hide custom date section
-const custom = document.getElementById("customDateRange");
-if (custom) custom.style.display = "none";
+  // Clear custom date inputs
+  const startInput = document.getElementById("filterStartDate");
+  const endInput = document.getElementById("filterEndDate");
 
-// Clear results
-document.getElementById("searchResultsTable").innerHTML = "";
-  });
-}
+  if (startInput) startInput.value = "";
+  if (endInput) endInput.value = "";
+
+  // Hide custom date section
+  const custom = document.getElementById("customDateRange");
+  if (custom) custom.style.display = "none";
+
+  // Clear results
+  document.getElementById("searchResultsTable").innerHTML = "";
+});
+
 
 
 
