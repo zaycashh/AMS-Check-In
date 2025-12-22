@@ -328,6 +328,13 @@ const clearBtn = document.getElementById("clearFilters");
 
 if (clearBtn) {
   clearBtn.addEventListener("click", () => {
+    // FORCE clear custom date inputs
+const startDate = document.getElementById("filterStartDate");
+const endDate = document.getElementById("filterEndDate");
+
+if (startDate) startDate.value = "";
+if (endDate) endDate.value = "";
+
     // Clear text inputs
     document.getElementById("filterFirstName").value = "";
     document.getElementById("filterLastName").value = "";
