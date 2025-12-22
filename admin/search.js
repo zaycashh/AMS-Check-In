@@ -350,7 +350,7 @@ if (exportPDFBtn) {
 // ==============================
 // CLEAR FILTERS
 // ==============================
-const clearBtn = document.getElementById("clearFilters");
+const clearBtn = document.getElementById("clearSearch");
 
 if (clearBtn) {
   clearBtn.addEventListener("click", () => {
