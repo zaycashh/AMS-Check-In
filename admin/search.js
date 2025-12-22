@@ -334,6 +334,7 @@ const endDate = document.getElementById("filterEndDate");
 
 if (startDate) startDate.value = "";
 if (endDate) endDate.value = "";
+    
     const custom = document.getElementById("customDateRange");
 if (custom) custom.style.display = "none";
 
@@ -357,6 +358,7 @@ if (endInput) endInput.value = "";
 // Hide custom date section
 const custom = document.getElementById("customDateRange");
 if (custom) custom.style.display = "none";
+});
 
 // Clear results
 document.getElementById("searchResultsTable").innerHTML = "";
