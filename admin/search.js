@@ -1,3 +1,32 @@
+function formatShortDate(date) {
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric"
+  });
+}
+
+function formatRange(startDate, endDate) {
+  const start = startDate.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric"
+  });
+
+  const end = endDate.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric"
+  });
+
+  return `${start} – ${end}`;
+}
+
+function normalizeLocalDate(date) {
+  const d = new Date(date);
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
 // ===============================
 // DATE HELPERS (LOCAL MIDNIGHT SAFE)
 // ===============================
@@ -269,26 +298,56 @@ if (exportPDFBtn) {
         document.getElementById("filterDateRange")?.value || "All Dates";
 
       doc.text(`Company: ${company}`, 120, 28);
-      // Format date range label for PDF
+      // ===============================
+// FORMAT DATE RANGE LABEL (PDF)
+// ===============================
 let dateRangeLabel = "All Dates";
+const today = normalizeLocalDate(new Date());
 
 switch (range) {
-  case "today":
-    dateRangeLabel = "Today";
+
+  case "today": {
+    dateRangeLabel = `Today (${formatShortDate(today)})`;
     break;
-  case "thisWeek":
-    dateRangeLabel = "This Week";
+  }
+
+  case "thisWeek": {
+    const startOfWeek = new Date(today);
+    startOfWeek.setDate(today.getDate() - today.getDay()); // Sunday
+
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6);
+
+    dateRangeLabel = `This Week (${formatRange(startOfWeek, endOfWeek)})`;
     break;
-  case "thisMonth":
-    dateRangeLabel = "This Month";
+  }
+
+  case "thisMonth": {
+    const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+
+    dateRangeLabel = `This Month (${formatRange(startOfMonth, endOfMonth)})`;
     break;
-  case "custom":
-    dateRangeLabel = "Custom Date Range";
+  }
+
+  case "custom": {
+    const startInput = document.getElementById("customStartDate")?.value;
+    const endInput = document.getElementById("customEndDate")?.value;
+
+    if (startInput && endInput) {
+      const start = normalizeLocalDate(new Date(startInput));
+      const end = normalizeLocalDate(new Date(endInput));
+
+      dateRangeLabel = `Custom (${formatRange(start, end)})`;
+    } else {
+      dateRangeLabel = "Custom Date Range";
+    }
     break;
+  }
+
+  default:
+    dateRangeLabel = "All Dates";
 }
-
-doc.text(`Date Range: ${dateRangeLabel}`, 120, 34);
-
 
       // TABLE
       const tableData = currentSearchResults.map(e => [
