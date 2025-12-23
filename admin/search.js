@@ -99,6 +99,24 @@ window.toggleCustomDateRange = function (value) {
     if (!custom) return;
     custom.style.display = value === "custom" ? "block" : "none";
 };
+// ================================
+// COMPANY FILTER UI SYNC (TEXT ↔ DROPDOWN)
+// ================================
+const companyDropdown = document.getElementById("filterCompany");
+const companyText = document.getElementById("filterCompanyText");
+
+if (companyDropdown && companyText) {
+  companyText.addEventListener("input", () => {
+    if (companyText.value.trim() !== "") {
+      companyDropdown.value = "";
+    }
+  });
+}
+companyDropdown.addEventListener("change", () => {
+  if (companyDropdown.value !== "") {
+    companyText.value = "";
+  }
+});
 
 window.runSearch = function () {
     const logs = getLogs();
