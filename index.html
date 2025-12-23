@@ -134,8 +134,45 @@
     </div>
 
 <div id="tabGeneral" class="tab-content" style="display:none;">
-    <!-- General Report -->
+
+  <h2 class="section-title">General Report</h2>
+
+  <div class="report-cards">
+    <div class="report-card">
+      <h3>Total Check-Ins</h3>
+      <p id="totalCount">0</p>
+    </div>
+
+    <div class="report-card">
+      <h3>Today</h3>
+      <p id="todayCount">0</p>
+    </div>
+
+    <div class="report-card">
+      <h3>This Month</h3>
+      <p id="monthCount">0</p>
+    </div>
+
+    <div class="report-card">
+      <h3>Companies</h3>
+      <p id="companyCount">0</p>
+    </div>
+  </div>
+
+  <h3 style="margin-top:20px;">Daily Activity</h3>
+
+  <table class="log-table">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Total Check-Ins</th>
+      </tr>
+    </thead>
+    <tbody id="dailyReportBody"></tbody>
+  </table>
+
 </div>
+
 
 <div id="tabCompany" class="tab-content" style="display:none;">
     <!-- Detail Company Report -->
