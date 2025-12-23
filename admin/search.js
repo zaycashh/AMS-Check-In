@@ -170,7 +170,10 @@ if (range === "yesterday") {
   startDate = new Date(today.getFullYear(), today.getMonth(), 1);
   endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
 }
-
+ else if (range === "thisYear") {
+ startDate = new Date(today.getFullYear(), 0, 1);
+ endDate = new Date(today);
+}
 else if (range === "lastMonth") {
   startDate = new Date(today.getFullYear(), today.getMonth() - 1, 1);
   endDate = new Date(today.getFullYear(), today.getMonth(), 0);
