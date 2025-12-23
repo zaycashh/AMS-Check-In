@@ -106,6 +106,13 @@ window.runSearch = function () {
     const first = document.getElementById("filterFirstName").value.trim().toLowerCase();
     const last = document.getElementById("filterLastName").value.trim().toLowerCase();
     const company = document.getElementById("filterCompany").value;
+  const companyText = document
+  .getElementById("filterCompanyText")
+  ?.value.trim().toLowerCase();
+
+const normalizedCompany =
+  company === "__custom__" ? companyText : company.toLowerCase();
+
     const range = document.getElementById("filterDateRange").value;
 
     const startInput = document.getElementById("filterStartDate")?.value;
@@ -130,22 +137,14 @@ if (range === "yesterday") {
   endDate = new Date(startDate);
 }
   else if (range === "lastWeek") {
-  const today = normalizeLocalDate(new Date());
+  const todayLocal = new Date(today);
 
-  // Start of last week (Sunday)
-  const startOfLastWeek = new Date(today);
-  startOfLastWeek.setDate(today.getDate() - today.getDay() - 7);
+  startDate = new Date(todayLocal);
+  startDate.setDate(todayLocal.getDate() - todayLocal.getDay() - 7);
 
-  // End of last week (Saturday)
-  const endOfLastWeek = new Date(startOfLastWeek);
-  endOfLastWeek.setDate(startOfLastWeek.getDate() + 6);
-
-  filtered = filtered.filter(r => {
-    const recordDate = normalizeLocalDate(r.date);
-    return recordDate >= startOfLastWeek && recordDate <= endOfLastWeek;
-  });
+  endDate = new Date(startDate);
+  endDate.setDate(startDate.getDate() + 6);
 }
-
 
     if (range === "thisMonth") {
         startDate = new Date(today.getFullYear(), today.getMonth(), 1);
@@ -169,7 +168,10 @@ if (range === "yesterday") {
 
         if (first && !entry.first?.toLowerCase().includes(first)) return false;
         if (last && !entry.last?.toLowerCase().includes(last)) return false;
-        if (company && company !== "All Companies" && entry.company !== company) return false;
+        if (normalizedCompany && normalizedCompany !== "all companies") {
+  const recordCompany = (entry.company || "").toLowerCase();
+  if (!recordCompany.includes(normalizedCompany)) return false;
+}
 
         if (startDate && endDate) {
             const entryDate = parseEntryDate(entry);
