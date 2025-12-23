@@ -99,6 +99,23 @@ window.toggleCustomDateRange = function (value) {
     if (!custom) return;
     custom.style.display = value === "custom" ? "block" : "none";
 };
+// ===============================
+// COMPANY FILTER (MATCHES DATE RANGE BEHAVIOR)
+// ===============================
+function toggleCompanyText(value) {
+  const input = document.getElementById("filterCompanyText");
+
+  if (!input) return;
+
+  if (value === "__custom__") {
+    input.style.display = "block";
+    input.focus();
+  } else {
+    input.style.display = "none";
+    input.value = "";
+  }
+}
+
 // ================================
 // COMPANY FILTER UI SYNC (TEXT ↔ DROPDOWN)
 // ================================
@@ -112,11 +129,6 @@ if (companyDropdown && companyText) {
     }
   });
 }
-companyDropdown.addEventListener("change", () => {
-  if (companyDropdown.value !== "") {
-    companyText.value = "";
-  }
-});
 
 window.runSearch = function () {
     const logs = getLogs();
