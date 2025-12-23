@@ -140,7 +140,7 @@ const companyText = document.getElementById("filterCompanyText").value.trim().to
 const company =
   companyDropdown === "__custom__"
     ? companyText
-    : companyDropdown.toLowerCase();
+    : String(companyDropdown).toLowerCase();
 
     const range = document.getElementById("filterDateRange").value;
 
