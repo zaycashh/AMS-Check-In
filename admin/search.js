@@ -129,12 +129,23 @@ if (range === "yesterday") {
 
   endDate = new Date(startDate);
 }
+  else if (range === "lastWeek") {
+  const today = normalizeLocalDate(new Date());
 
-    if (range === "thisWeek") {
-        startDate = new Date(today);
-        startDate.setDate(today.getDate() - today.getDay());
-        endDate = new Date(today);
-    }
+  // Start of last week (Sunday)
+  const startOfLastWeek = new Date(today);
+  startOfLastWeek.setDate(today.getDate() - today.getDay() - 7);
+
+  // End of last week (Saturday)
+  const endOfLastWeek = new Date(startOfLastWeek);
+  endOfLastWeek.setDate(startOfLastWeek.getDate() + 6);
+
+  filtered = filtered.filter(r => {
+    const recordDate = normalizeLocalDate(r.date);
+    return recordDate >= startOfLastWeek && recordDate <= endOfLastWeek;
+  });
+}
+
 
     if (range === "thisMonth") {
         startDate = new Date(today.getFullYear(), today.getMonth(), 1);
