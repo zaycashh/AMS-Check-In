@@ -99,49 +99,13 @@ window.toggleCustomDateRange = function (value) {
     if (!custom) return;
     custom.style.display = value === "custom" ? "block" : "none";
 };
-// ===============================
-// COMPANY FILTER (MATCHES DATE RANGE BEHAVIOR)
-// ===============================
-function toggleCompanyText(value) {
-  const input = document.getElementById("filterCompanyText");
-
-  if (!input) return;
-
-  if (value === "__custom__") {
-    input.style.display = "block";
-    input.focus();
-  } else {
-    input.style.display = "none";
-    input.value = "";
-  }
-}
-
-// ================================
-// COMPANY FILTER UI SYNC (TEXT ↔ DROPDOWN)
-// ================================
-const companyDropdown = document.getElementById("filterCompany");
-const companyText = document.getElementById("filterCompanyText");
-
-if (companyDropdown && companyText) {
-  companyText.addEventListener("input", () => {
-    if (companyText.value.trim() !== "") {
-      companyDropdown.value = "";
-    }
-  });
-}
 
 window.runSearch = function () {
     const logs = getLogs();
 
     const first = document.getElementById("filterFirstName").value.trim().toLowerCase();
     const last = document.getElementById("filterLastName").value.trim().toLowerCase();
-const companyText = document.getElementById("filterCompanyText").value.trim().toLowerCase();
-
-const company =
-  companyDropdown === "__custom__"
-    ? companyText
-    : String(companyDropdown).toLowerCase();
-
+    const company = document.getElementById("filterCompany").value;
     const range = document.getElementById("filterDateRange").value;
 
     const startInput = document.getElementById("filterStartDate")?.value;
@@ -205,15 +169,7 @@ if (range === "yesterday") {
 
         if (first && !entry.first?.toLowerCase().includes(first)) return false;
         if (last && !entry.last?.toLowerCase().includes(last)) return false;
-        // COMPANY FILTER (dropdown + custom text)
-if (company && company !== "all companies") {
-  const recordCompany = (entry.company || "").toLowerCase();
-
-  if (!recordCompany.includes(company)) {
-    return false;
-  }
-}
-
+        if (company && company !== "All Companies" && entry.company !== company) return false;
 
         if (startDate && endDate) {
             const entryDate = parseEntryDate(entry);
