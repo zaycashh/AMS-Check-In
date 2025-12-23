@@ -58,6 +58,22 @@ function loadLogoBase64(callback) {
   };
 }
 
+// =============================
+// COMPANY FILTER (CUSTOM INPUT)
+// =============================
+window.toggleCompanyText = function (value) {
+  const input = document.getElementById("filterCompanyText");
+  if (!input) return;
+
+  if (value === "__custom__") {
+    input.style.display = "block";
+    input.focus();
+  } else {
+    input.style.display = "none";
+    input.value = "";
+  }
+};
+
 /* =========================================================
    AMS ADMIN SEARCH LOG (CLEAN REBUILD)
 ========================================================= */
