@@ -21,6 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (target) {
         target.style.display = "block";
       }
+       if (targetId === "tabGeneral") initGeneralReport();
 
       tab.classList.add("active");
     });
