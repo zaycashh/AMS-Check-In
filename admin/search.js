@@ -337,55 +337,17 @@ if (exportPDFBtn) {
         document.getElementById("filterDateRange")?.value || "All Dates";
 
       doc.text(`Company: ${company}`, 120, 28);
-      // ===============================
+      
+// ===============================
 // FORMAT DATE RANGE LABEL (PDF)
 // ===============================
 let dateRangeLabel = "All Dates";
-const today = normalizeLocalDate(new Date());
 
-if (range === "today") {
-  dateRangeLabel = `Today (${formatShortDate(today)})`;
+if (startDate && endDate) {
+  dateRangeLabel = formatRange(startDate, endDate);
 }
 
-else if (range === "thisWeek") {
-  const startOfWeek = new Date(today);
-  startOfWeek.setDate(today.getDate() - today.getDay()); // Sunday start
-
-  const endOfWeek = new Date(startOfWeek);
-  endOfWeek.setDate(startOfWeek.getDate() + 6);
-
-  dateRangeLabel = `This Week (${formatRange(startOfWeek, endOfWeek)})`;
-}
-
-else if (range === "thisMonth") {
-  const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-  const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-
-  dateRangeLabel = `This Month (${formatRange(startOfMonth, endOfMonth)})`;
-}
-  else if (range === "lastMonth") {
-  const startOfLastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
-  const endOfLastMonth = new Date(today.getFullYear(), today.getMonth(), 0);
-
-  dateRangeLabel = `Last Month (${formatRange(startOfLastMonth, endOfLastMonth)})`;
-}
-
-else if (range === "lastYear") {
-  const startOfLastYear = new Date(today.getFullYear() - 1, 0, 1);
-  const endOfLastYear = new Date(today.getFullYear() - 1, 11, 31);
-
-  dateRangeLabel = `Last Year (${formatRange(startOfLastYear, endOfLastYear)})`;
-}
-
-
-else if (range === "custom") {
-  const start = normalizeLocalDate(new Date(document.getElementById("customStart").value));
-  const end = normalizeLocalDate(new Date(document.getElementById("customEnd").value));
-
-  dateRangeLabel = `Custom (${formatRange(start, end)})`;
-}
-      doc.text(`Date Range: ${dateRangeLabel}`, 120, 34);
-
+doc.text(`Date Range: ${dateRangeLabel}`, 120, 34);
 
       // TABLE
       const tableData = currentSearchResults.map(e => [
