@@ -8,7 +8,7 @@ console.log("Admin General Report Module Loaded");
 function initGeneralReport() {
   console.log("General Report module ready");
 
-  const logs = JSON.parse(localStorage.getItem("amsLogs")) || [];
+  const logs = JSON.parse(localStorage.getItem("ams_logs") || "[]");
 
   const today = new Date().toISOString().split("T")[0];
   const currentMonth = today.slice(0, 7);
