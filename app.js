@@ -124,15 +124,32 @@ document.getElementById("submitBtn").addEventListener("click", () => {
     let finalReason = reason === "other"
         ? document.getElementById("otherReasonInput").value.trim()
         : reason;
+   // BLOCK if Reason = Other but empty
+if (reason === "other") {
+  const otherReason = document.getElementById("otherReasonInput").value.trim();
+  if (!otherReason) {
+    alert("Please enter the reason for testing.");
+    document.getElementById("otherReasonInput").focus();
+    return;
+  }
+}
 
     const services = Array.from(
         document.querySelectorAll('input[name="services"]:checked')
     ).map(cb => cb.value);
+   if (services.includes("Other")) {
+  const custom = document.getElementById("srvOtherText").value.trim();
 
-    if (services.includes("Other")) {
-        const custom = document.getElementById("srvOtherText").value.trim();
-        if (custom) services.push(custom);
-    }
+  if (!custom) {
+    alert("Please enter the other service.");
+    document.getElementById("srvOtherText").focus();
+    return;
+  }
+
+  // Replace "Other" with the typed value
+  services.splice(services.indexOf("Other"), 1);
+  services.push(custom);
+}
 
     const canvas = document.getElementById("signaturePad");
     const signature = canvas.toDataURL();
