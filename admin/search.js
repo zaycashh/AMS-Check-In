@@ -275,24 +275,30 @@ function renderSearchResults(results) {
           <th>Company</th>
           <th>Reason</th>
           <th>Services</th>
+          <th>Signature</th>
         </tr>
       </thead>
       <tbody>
   `;
 
   results.forEach(entry => {
-    html += `
-      <tr>
-        <td>${entry.date || ""}</td>
-        <td>${entry.time || ""}</td>
-        <td>${entry.first || ""}</td>
-        <td>${entry.last || ""}</td>
-        <td>${entry.company || ""}</td>
-        <td>${entry.reason || ""}</td>
-        <td>${entry.services || ""}</td>
-      </tr>
-    `;
-  });
+  html += `
+    <tr>
+      <td>${entry.date || ""}</td>
+      <td>${entry.time || ""}</td>
+      <td>${entry.first || ""}</td>
+      <td>${entry.last || ""}</td>
+      <td>${entry.company || ""}</td>
+      <td>${entry.reason || ""}</td>
+      <td>${entry.services || ""}</td>
+      <td>
+  ${
+    entry.signature
+      ? `<img src="${entry.signature}" style="height:40px; border:1px solid #ccc; background:#fff;" />`
+      : "—"
+  }
+</td>
+</tr>
 
   html += `
       </tbody>
