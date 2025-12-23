@@ -41,4 +41,30 @@ function initGeneralReport() {
       tr.innerHTML = `<td>${date}</td><td>${dailyTotals[date]}</td>`;
       tbody.appendChild(tr);
     });
+   // ===============================
+// TOP COMPANIES REPORT
+// ===============================
+const companyCounts = {};
+
+logs.forEach(l => {
+  if (!l.company) return;
+  const name = l.company.trim();
+  companyCounts[name] = (companyCounts[name] || 0) + 1;
+});
+
+const topCompanies = Object.entries(companyCounts)
+  .sort((a, b) => b[1] - a[1])
+  .slice(0, 5);
+
+const companyBody = document.getElementById("topCompaniesBody");
+if (!companyBody) return;
+
+companyBody.innerHTML = "";
+
+topCompanies.forEach(([company, count]) => {
+  const tr = document.createElement("tr");
+  tr.innerHTML = `<td>${company}</td><td>${count}</td>`;
+  companyBody.appendChild(tr);
+});
+
 }
