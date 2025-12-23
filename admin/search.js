@@ -351,8 +351,11 @@ if (exportPDFBtn) {
 // ===============================
 let dateRangeLabel = "All Dates";
 
-if (startDate && endDate) {
-  dateRangeLabel = formatRange(startDate, endDate);
+if (lastSearchStartDate && lastSearchEndDate) {
+  dateRangeLabel = formatRange(
+    lastSearchStartDate,
+    lastSearchEndDate
+  );
 }
 
 doc.text(`Date Range: ${dateRangeLabel}`, 120, 34);
