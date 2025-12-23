@@ -163,19 +163,21 @@
       <label>Last Name</label>
       <input type="text" id="filterLastName" placeholder="Optional">
     </div>
-
+      
       <div class="form-row">
   <label>Company</label>
 
-  <select id="filterCompany">
+  <select id="filterCompany" onchange="toggleCompanyText(this.value)">
     <option value="">All Companies</option>
+    <!-- populated dynamically -->
+    <option value="__custom__">Type Company (Custom)</option>
   </select>
 
   <input
     id="filterCompanyText"
     type="text"
-    placeholder="Type company name (optional)"
-    style="margin-top:6px;"
+    placeholder="Enter company name"
+    style="display:none; margin-top:6px;"
   />
 </div>
 
