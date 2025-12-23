@@ -115,6 +115,11 @@ window.toggleCustomDateRange = function (value) {
     if (!custom) return;
     custom.style.display = value === "custom" ? "block" : "none";
 };
+// ===============================
+// GLOBAL SEARCH DATE RANGE (PDF)
+// ===============================
+let lastSearchStartDate = null;
+let lastSearchEndDate = null;
 
 window.runSearch = function () {
     const logs = getLogs();
@@ -188,6 +193,9 @@ else if (range === "lastYear") {
 
     if (startDate) startDate.setHours(0, 0, 0, 0);
     if (endDate) endDate.setHours(23, 59, 59, 999);
+  // SAVE LAST SEARCH RANGE FOR PDF
+lastSearchStartDate = startDate;
+lastSearchEndDate = endDate;
 
     const results = logs.filter(entry => {
         if (!entry) return false;
