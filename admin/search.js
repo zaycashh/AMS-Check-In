@@ -161,11 +161,21 @@ if (range === "yesterday") {
   endDate = new Date(startDate);
   endDate.setDate(startDate.getDate() + 6);
 }
+  else if (range === "thisMonth") {
+  startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+  endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+}
 
-    if (range === "thisMonth") {
-        startDate = new Date(today.getFullYear(), today.getMonth(), 1);
-        endDate = new Date(today);
-    }
+else if (range === "lastMonth") {
+  startDate = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+  endDate = new Date(today.getFullYear(), today.getMonth(), 0);
+}
+
+else if (range === "lastYear") {
+  startDate = new Date(today.getFullYear() - 1, 0, 1);
+  endDate = new Date(today.getFullYear() - 1, 11, 31);
+}
+
    
     if (range === "custom" && startInput && endInput) {
      const [sy, sm, sd] = startInput.split("-").map(Number);
