@@ -121,6 +121,22 @@ window.toggleCustomDateRange = function (value) {
 let lastSearchStartDate = null;
 let lastSearchEndDate = null;
 
+/* ===============================
+   PDF DATE RANGE LABEL (PART 2)
+================================ */
+function getSearchDateRangeLabel() {
+  if (!lastSearchStartDate || !lastSearchEndDate) return "All Dates";
+
+  const fmt = d =>
+    d.toLocaleDateString(undefined, {
+      month: "short",
+      day: "2-digit",
+      year: "numeric",
+    });
+
+  return `${fmt(lastSearchStartDate)} – ${fmt(lastSearchEndDate)}`;
+}
+
 window.runSearch = function () {
     const logs = getLogs();
 
@@ -157,6 +173,17 @@ if (range === "yesterday") {
 
   endDate = new Date(startDate);
 }
+  // THIS WEEK (Sunday → Saturday, local-safe)
+else if (range === "thisWeek") {
+  const todayLocal = new Date(today);
+
+  startDate = new Date(todayLocal);
+  startDate.setDate(todayLocal.getDate() - todayLocal.getDay());
+
+  endDate = new Date(startDate);
+  endDate.setDate(startDate.getDate() + 6);
+}
+
   else if (range === "lastWeek") {
   const todayLocal = new Date(today);
 
