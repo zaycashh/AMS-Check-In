@@ -116,6 +116,16 @@ document.getElementById("submitBtn").addEventListener("click", () => {
         alert("Please enter first and last name.");
         return;
     }
+   // BLOCK if Company = Other but empty
+if (company === "__OTHER__") {
+  const otherCompany = document.getElementById("otherCompany").value.trim();
+
+  if (!otherCompany) {
+    alert("Please enter the company name.");
+    document.getElementById("otherCompany").focus();
+    return;
+  }
+}
 
     let finalCompany = company === "__OTHER__"
         ? document.getElementById("otherCompany").value.trim()
