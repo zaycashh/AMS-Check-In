@@ -353,6 +353,20 @@ else if (range === "thisMonth") {
 
   dateRangeLabel = `This Month (${formatRange(startOfMonth, endOfMonth)})`;
 }
+  else if (range === "lastMonth") {
+  const startOfLastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+  const endOfLastMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+
+  dateRangeLabel = `Last Month (${formatRange(startOfLastMonth, endOfLastMonth)})`;
+}
+
+else if (range === "lastYear") {
+  const startOfLastYear = new Date(today.getFullYear() - 1, 0, 1);
+  const endOfLastYear = new Date(today.getFullYear() - 1, 11, 31);
+
+  dateRangeLabel = `Last Year (${formatRange(startOfLastYear, endOfLastYear)})`;
+}
+
 
 else if (range === "custom") {
   const start = normalizeLocalDate(new Date(document.getElementById("customStart").value));
@@ -365,14 +379,16 @@ else if (range === "custom") {
 
       // TABLE
       const tableData = currentSearchResults.map(e => [
-        e.date || "",
-        e.time || "",
-        e.first || "",
-        e.last || "",
-        e.company || "",
-        e.reason || "",
-        Array.isArray(e.services) ? e.services.join(", ") : e.services || ""
-      ]);
+  e.date
+    ? formatShortDate(new Date(e.date + "T00:00:00"))
+    : "",
+  e.time || "",
+  e.first || "",
+  e.last || "",
+  e.company || "",
+  e.reason || "",
+  Array.isArray(e.services) ? e.services.join(", ") : e.services || ""
+]);
 
       doc.autoTable({
         startY: 42,
