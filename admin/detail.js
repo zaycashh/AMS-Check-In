@@ -159,6 +159,36 @@ function exportCompanyPdf() {
       14,
       47
     );
+    // ===== SUMMARY TOTALS =====
+const totalRecords = records.length;
+
+// Normalize services into an array
+const allServices = records.flatMap(r => {
+  if (Array.isArray(r.services)) return r.services;
+  if (typeof r.services === "string" && r.services.trim())
+    return r.services.split(",").map(s => s.trim());
+  return [];
+});
+
+// Count services
+const serviceCounts = {};
+allServices.forEach(svc => {
+  serviceCounts[svc] = (serviceCounts[svc] || 0) + 1;
+});
+
+// Render summary
+let summaryY = 54;
+
+doc.setFontSize(12);
+doc.text(`Total Records: ${totalRecords}`, 14, summaryY);
+
+summaryY += 8;
+
+Object.entries(serviceCounts).forEach(([service, count]) => {
+  doc.text(`${service}: ${count}`, 14, summaryY);
+  summaryY += 7;
+});
+D
 
     // ===== TABLE DATA =====
     const tableData = records.map(r => [
@@ -171,7 +201,7 @@ function exportCompanyPdf() {
     ]);
 
     doc.autoTable({
-      startY: 55,
+      startY: summaryY + 5,
       head: [["Date", "Time", "First", "Last", "Reason", "Services"]],
       body: tableData,
       styles: { fontSize: 9 },
