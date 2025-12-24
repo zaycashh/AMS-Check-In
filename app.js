@@ -313,19 +313,21 @@ function initRunSearch() {
         resultsBox.innerHTML = html;
     });
 }
-// ==============================
-// FORCE ALL CAPS ON DONOR INPUTS
-// ==============================
+// =======================================
+// FORCE ALL CAPS ON DONOR MANUAL INPUTS
+// =======================================
+
 document.addEventListener("input", (e) => {
   const el = e.target;
 
   if (
     el.id === "firstName" ||
     el.id === "lastName" ||
-    el.id === "companyOther" ||
-    el.id === "reasonOther" ||
-    el.id === "serviceOther"
+    el.id === "otherCompanyInput" ||
+    el.id === "otherReasonInput" ||
+    el.id === "otherServiceInput"
   ) {
     el.value = el.value.toUpperCase();
   }
 });
+
