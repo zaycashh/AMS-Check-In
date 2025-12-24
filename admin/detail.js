@@ -100,22 +100,17 @@ function renderCompanyDetailTable() {
     tbody.appendChild(tr);
   });
 }
-
 // ===============================
 // BIND EXPORT BUTTONS
 // ===============================
 function bindDetailCompanyButtons() {
-  document.getElementById("companyDetailExcelBtn")
-    ?.addEventListener("click", exportCompanyExcel);
 
-  // ===============================
-// BIND EXPORT BUTTONS
-// ===============================
-function bindDetailCompanyButtons() {
+  // Excel export
   document
     .getElementById("companyDetailExcelBtn")
     ?.addEventListener("click", exportCompanyExcel);
 
+  // PDF export
   document
     .getElementById("companyDetailPdfBtn")
     ?.addEventListener("click", exportCompanyPdf);
@@ -184,9 +179,7 @@ function exportCompanyPdf() {
 
   doc.save(`AMS_Detail_Company_${companyName}.pdf`);
 }
-
-
-
+ 
 // ===============================
 // EXPORT EXCEL
 // ===============================
