@@ -117,22 +117,17 @@ function bindDetailCompanyButtons() {
 }
 
 // ===============================
-// DETAIL COMPANY → PDF EXPORT
+// DETAIL COMPANY → PDF EXPORT (PRO HEADER + LOGO)
 // ===============================
 function exportCompanyPdf() {
-  const companyName =
-    document.getElementById("detailCompanySelect")?.value;
-
+  const companyName = document.getElementById("detailCompanySelect")?.value;
   if (!companyName) {
     alert("Please select a company first.");
     return;
   }
 
-  const records = JSON.parse(
-    localStorage.getItem("checkInLogs") || "[]"
-  ).filter(
-    r => (r.company || "").toUpperCase() === companyName.toUpperCase()
-  );
+  const records = JSON.parse(localStorage.getItem("checkInLogs") || "[]")
+    .filter(r => (r.company || "").toUpperCase() === companyName.toUpperCase());
 
   if (!records.length) {
     alert("No records found for this company.");
@@ -142,43 +137,51 @@ function exportCompanyPdf() {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF("landscape");
 
-  // HEADER
-  doc.setFontSize(18);
-  doc.text("AMS Check-In System", 14, 18);
+  // ===== HEADER =====
+  const logo = new Image();
+  logo.src = "logo.png";
 
-  doc.setFontSize(14);
-  doc.text("Detail Company Report", 14, 28);
+  logo.onload = () => {
+    doc.addImage(logo, "PNG", 14, 10, 30, 15);
 
-  doc.setFontSize(11);
-  doc.text(`Company: ${companyName}`, 14, 38);
+    doc.setFontSize(18);
+    doc.text("AMS Check-In System", 50, 18);
 
-  const now = new Date();
-  doc.text(
-    `Generated: ${now.toLocaleDateString()} ${now.toLocaleTimeString()}`,
-    14,
-    46
-  );
+    doc.setFontSize(14);
+    doc.text("Detail Company Report", 50, 26);
 
-  // TABLE
-  const tableData = records.map(r => [
-    r.date || "",
-    r.time || "",
-    r.first || "",
-    r.last || "",
-    r.reason || "",
-    Array.isArray(r.services) ? r.services.join(", ") : ""
-  ]);
+    doc.setFontSize(11);
+    doc.text(`Company: ${companyName}`, 14, 40);
 
-  doc.autoTable({
-    startY: 55,
-    head: [["Date", "Time", "First", "Last", "Reason", "Services"]],
-    body: tableData,
-    styles: { fontSize: 9 },
-    headStyles: { fillColor: [30, 58, 89] }
-  });
+    const now = new Date();
+    doc.text(
+      `Generated: ${now.toLocaleDateString()} ${now.toLocaleTimeString()}`,
+      14,
+      47
+    );
 
-  doc.save(`AMS_Detail_Company_${companyName}.pdf`);
+    // ===== TABLE DATA =====
+    const tableData = records.map(r => [
+      r.date || "",
+      r.time || "",
+      r.firstName || "",
+      r.lastName || "",
+      r.reason || "",
+      Array.isArray(r.services) ? r.services.join(", ") : (r.services || "")
+    ]);
+
+    doc.autoTable({
+      startY: 55,
+      head: [["Date", "Time", "First", "Last", "Reason", "Services"]],
+      body: tableData,
+      styles: { fontSize: 9 },
+      headStyles: { fillColor: [30, 58, 89] }
+    });
+
+    doc.save(`AMS_Detail_Company_${companyName}.pdf`);
+  };
 }
+
  
 // ===============================
 // EXPORT EXCEL
