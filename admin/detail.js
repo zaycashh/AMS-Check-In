@@ -58,14 +58,73 @@ function loadDetailCompanyReport() {
     <div class="filter-bar">
       <label>Company:</label>
       <select id="detailCompanySelect"></select>
+
       <button id="companyDetailExcelBtn">Export Excel</button>
+      <button id="companyDetailPdfBtn" style="margin-left:8px;">
+        Export PDF
+      </button>
     </div>
 
     <div id="detailCompanyResults"></div>
   `;
 
   populateDetailCompanyDropdown();
+
+  // ===============================
+  // PDF EXPORT (INSIDE FUNCTION)
+  // ===============================
+  document
+    .getElementById("companyDetailPdfBtn")
+    .addEventListener("click", () => {
+
+      const companyName = getSelectedCompany();
+      if (!companyName) {
+        alert("Please select a company first.");
+        return;
+      }
+
+      const records = JSON.parse(
+        localStorage.getItem("checkInLogs") || "[]"
+      ).filter(
+        r => (r.company || "").toUpperCase() === companyName.toUpperCase()
+      );
+
+      if (!records.length) {
+        alert("No records found for this company.");
+        return;
+      }
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF("l", "pt", "a4");
+
+      doc.setFontSize(18);
+      doc.text("AMS Detail Company Report", 40, 40);
+
+      doc.setFontSize(12);
+      doc.text(`Company: ${companyName}`, 40, 65);
+      doc.text(`Total Records: ${records.length}`, 40, 85);
+
+      const tableData = records.map(r => ([
+        r.date,
+        r.time,
+        r.first,
+        r.last,
+        r.reason,
+        Array.isArray(r.services) ? r.services.join(", ") : r.services
+      ]));
+
+      doc.autoTable({
+        startY: 110,
+        head: [["Date", "Time", "First", "Last", "Reason", "Services"]],
+        body: tableData,
+        styles: { fontSize: 9 },
+        headStyles: { fillColor: [30, 58, 89] }
+      });
+
+      doc.save(`AMS_Company_Report_${companyName}.pdf`);
+    });
 }
+
 
 // ===============================
 // POPULATE COMPANY DROPDOWN
