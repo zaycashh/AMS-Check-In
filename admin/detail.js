@@ -68,7 +68,6 @@ function populateDetailCompanyDropdown() {
   });
 }
   select.addEventListener("change", renderCompanyDetailTable);
-}
 
 // ===============================
 // RENDER TABLE
