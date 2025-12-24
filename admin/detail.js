@@ -108,9 +108,82 @@ function bindDetailCompanyButtons() {
   document.getElementById("companyDetailExcelBtn")
     ?.addEventListener("click", exportCompanyExcel);
 
-  document.getElementById("companyDetailPdfBtn")
-    ?.addEventListener("click", exportCompanyPdf);
-}
+ // ===============================
+// DETAIL COMPANY → PDF EXPORT (POLISHED)
+// ===============================
+document.getElementById("companyDetailPdfBtn")
+?.addEventListener("click", () => {
+
+  const companyName = getSelectedCompany();
+  if (!companyName) {
+    alert("Please select a company first.");
+    return;
+  }
+
+  const records = JSON.parse(localStorage.getItem("checkInLogs") || "[]")
+    .filter(r =>
+      (r.company || "").toUpperCase() === companyName.toUpperCase()
+    );
+
+  if (!records.length) {
+    alert("No records found for this company.");
+    return;
+  }
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF("landscape");
+
+  // ===== HEADER =====
+  doc.setFontSize(18);
+  doc.text("AMS Check-In System", 14, 18);
+
+  doc.setFontSize(14);
+  doc.text("Detail Company Report", 14, 28);
+
+  doc.setFontSize(11);
+  doc.text(`Company: ${companyName}`, 14, 38);
+
+  const now = new Date();
+  doc.text(
+    `Generated: ${now.toLocaleDateString()} ${now.toLocaleTimeString()}`,
+    14,
+    46
+  );
+
+  // ===== TABLE =====
+  const tableData = records.map(r => ([
+    r.date || "",
+    r.time || "",
+    r.first || "",
+    r.last || "",
+    r.reason || "",
+    Array.isArray(r.services) ? r.services.join(", ") : (r.services || "")
+  ]));
+
+  doc.autoTable({
+    startY: 55,
+    head: [["Date", "Time", "First", "Last", "Reason", "Services"]],
+    body: tableData,
+    styles: { fontSize: 9 },
+    headStyles: { fillColor: [30, 58, 89] },
+    alternateRowStyles: { fillColor: [245, 247, 250] }
+  });
+
+  // ===== FOOTER =====
+  const pageCount = doc.getNumberOfPages();
+  for (let i = 1; i <= pageCount; i++) {
+    doc.setPage(i);
+    doc.setFontSize(9);
+    doc.text(
+      `Page ${i} of ${pageCount}`,
+      doc.internal.pageSize.width - 40,
+      doc.internal.pageSize.height - 10
+    );
+  }
+
+  doc.save(`AMS_Detail_Company_${companyName}.pdf`);
+});
+
 
 // ===============================
 // EXPORT EXCEL
