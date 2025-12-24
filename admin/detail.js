@@ -69,6 +69,49 @@ function populateDetailCompanyDropdown() {
   // ✅ MOVE THIS INSIDE
   select.addEventListener("change", renderCompanyDetailTable);
 }
+function filterByDateRange(records) {
+  const range = document.getElementById("detailDateRange")?.value;
+  const startInput = document.getElementById("detailStartDate")?.value;
+  const endInput = document.getElementById("detailEndDate")?.value;
+
+  if (!range && !startInput && !endInput) return records;
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  let startDate = null;
+  let endDate = null;
+
+  if (range === "today") {
+    startDate = new Date(today);
+    endDate = new Date(today);
+  }
+
+  if (range === "yesterday") {
+    startDate = new Date(today);
+    startDate.setDate(today.getDate() - 1);
+    endDate = new Date(startDate);
+  }
+
+  if (range === "thisMonth") {
+    startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+    endDate = new Date(today);
+  }
+
+  if (startInput) startDate = new Date(startInput);
+  if (endInput) endDate = new Date(endInput);
+
+  return records.filter(r => {
+    if (!r.date) return false;
+    const recordDate = new Date(r.date);
+    recordDate.setHours(0, 0, 0, 0);
+
+    if (startDate && recordDate < startDate) return false;
+    if (endDate && recordDate > endDate) return false;
+
+    return true;
+  });
+}
 
 // ===============================
 // RENDER TABLE
