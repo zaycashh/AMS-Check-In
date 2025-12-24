@@ -138,3 +138,51 @@ document.querySelectorAll(".tab").forEach(tab => {
     }
   });
 });
+// ===============================
+// DETAIL COMPANY → TABLE RENDER
+// ===============================
+function renderCompanyDetailTable() {
+  const tbody = document.getElementById("companyDetailBody");
+  if (!tbody) return;
+
+  tbody.innerHTML = "";
+
+  const companyName = getSelectedCompany();
+  if (!companyName) return;
+
+  const records = JSON.parse(localStorage.getItem("checkInLogs") || "[]")
+    .filter(r => (r.company || "").toUpperCase() === companyName.toUpperCase());
+
+  if (!records.length) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="6" style="text-align:center;">No records found</td>
+      </tr>
+    `;
+    return;
+  }
+
+  records.forEach(r => {
+    const tr = document.createElement("tr");
+
+    tr.innerHTML = `
+      <td>${r.date || ""}</td>
+      <td>${r.time || ""}</td>
+      <td>${r.first || ""}</td>
+      <td>${r.last || ""}</td>
+      <td>${r.reason || ""}</td>
+      <td>${Array.isArray(r.services) ? r.services.join(", ") : (r.services || "")}</td>
+    `;
+
+    tbody.appendChild(tr);
+  });
+}
+
+// ===============================
+// AUTO REFRESH WHEN COMPANY CHANGES
+// ===============================
+document.getElementById("filterCompany")
+?.addEventListener("change", renderCompanyDetailTable);
+
+document.getElementById("filterCompanyText")
+?.addEventListener("input", renderCompanyDetailTable);
