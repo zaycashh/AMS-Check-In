@@ -51,8 +51,9 @@ function loadDetailCompanyReport() {
 // POPULATE COMPANY DROPDOWN
 // ===============================
 function populateDetailCompanyDropdown() {
-  JSON.parse(localStorage.getItem("ams_logs") || "[]");
+  const logs = JSON.parse(localStorage.getItem("ams_logs") || "[]");
   const select = document.getElementById("detailCompanySelect");
+
   if (!select) return;
 
   const companies = [...new Set(logs.map(l => l.company).filter(Boolean))];
@@ -65,7 +66,7 @@ function populateDetailCompanyDropdown() {
     opt.textContent = company;
     select.appendChild(opt);
   });
-
+}
   select.addEventListener("change", renderCompanyDetailTable);
 }
 
