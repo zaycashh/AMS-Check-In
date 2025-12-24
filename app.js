@@ -314,19 +314,24 @@ function initRunSearch() {
     });
 }
 // =======================================
-// FORCE ALL CAPS ON DONOR MANUAL INPUTS
+// FORCE ALL CAPS ON MANUAL "OTHER" INPUTS
 // =======================================
 
 document.addEventListener("input", (e) => {
   const el = e.target;
 
+  // Only affect text inputs
+  if (el.tagName !== "INPUT" || el.type !== "text") return;
+
+  // Only auto-cap manual-entry fields
   if (
+    el.closest("#otherCompanyWrapper") ||
+    el.closest("#otherReasonWrapper") ||
+    el.closest("#otherServiceWrapper") ||
     el.id === "firstName" ||
-    el.id === "lastName" ||
-    el.id === "companyOtherInput" ||   // ✅ FIXED
-    el.id === "otherReasonInput" ||     // ✅ already correct
-    el.id === "otherService"            // ✅ FIXED
+    el.id === "lastName"
   ) {
     el.value = el.value.toUpperCase();
   }
 });
+
