@@ -323,11 +323,10 @@ document.addEventListener("input", (e) => {
   if (
     el.id === "firstName" ||
     el.id === "lastName" ||
-    el.id === "otherCompanyInput" ||
-    el.id === "otherReasonInput" ||
-    el.id === "otherServiceInput"
+    el.id === "companyOtherInput" ||   // ✅ FIXED
+    el.id === "otherReasonInput" ||     // ✅ already correct
+    el.id === "otherService"            // ✅ FIXED
   ) {
     el.value = el.value.toUpperCase();
   }
 });
-
