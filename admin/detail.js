@@ -1,50 +1,5 @@
 console.log("✅ Detail Company Report Module Loaded");
 
-function loadDetailCompanyReport() {
-  const container = document.getElementById("tabCompany");
-  if (!container) return;
-
-  container.innerHTML = `
-    <h2 class="section-title">Detail Company Report</h2>
-
-    <div class="filter-bar">
-      <label>Company:</label>
-      <select id="detailCompanySelect"></select>
-      <button id="runDetailCompany">Run Report</button>
-    </div>
-
-    <div id="detailCompanyResults"></div>
-  `;
-
-  populateDetailCompanyDropdown();
-}
-
-function populateDetailCompanyDropdown() {
-  const logs = JSON.parse(localStorage.getItem("checkInLogs")) || [];
-  const select = document.getElementById("detailCompanySelect");
-  if (!select) return;
-
-  const companies = [...new Set(logs.map(l => l.company).filter(Boolean))];
-
-  select.innerHTML = `<option value="">-- Select Company --</option>`;
-
-  companies.forEach(c => {
-    const opt = document.createElement("option");
-    opt.value = c;
-    opt.textContent = c;
-    select.appendChild(opt);
-  });
-}
-
-document.querySelectorAll(".tab").forEach(tab => {
-  tab.addEventListener("click", () => {
-    if (tab.dataset.tab === "tabCompany") {
-      loadDetailCompanyReport();
-    }
-  });
-});
-console.log("✅ Detail Company Report Module Loaded");
-
 // ===============================
 // LOAD DETAIL COMPANY TAB
 // ===============================
@@ -65,66 +20,24 @@ function loadDetailCompanyReport() {
       </button>
     </div>
 
-    <div id="detailCompanyResults"></div>
+    <table class="report-table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Time</th>
+          <th>First</th>
+          <th>Last</th>
+          <th>Reason</th>
+          <th>Services</th>
+        </tr>
+      </thead>
+      <tbody id="companyDetailBody"></tbody>
+    </table>
   `;
 
   populateDetailCompanyDropdown();
-
-  // ===============================
-  // PDF EXPORT (INSIDE FUNCTION)
-  // ===============================
-  document
-    .getElementById("companyDetailPdfBtn")
-    .addEventListener("click", () => {
-
-      const companyName = getSelectedCompany();
-      if (!companyName) {
-        alert("Please select a company first.");
-        return;
-      }
-
-      const records = JSON.parse(
-        localStorage.getItem("checkInLogs") || "[]"
-      ).filter(
-        r => (r.company || "").toUpperCase() === companyName.toUpperCase()
-      );
-
-      if (!records.length) {
-        alert("No records found for this company.");
-        return;
-      }
-
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF("l", "pt", "a4");
-
-      doc.setFontSize(18);
-      doc.text("AMS Detail Company Report", 40, 40);
-
-      doc.setFontSize(12);
-      doc.text(`Company: ${companyName}`, 40, 65);
-      doc.text(`Total Records: ${records.length}`, 40, 85);
-
-      const tableData = records.map(r => ([
-        r.date,
-        r.time,
-        r.first,
-        r.last,
-        r.reason,
-        Array.isArray(r.services) ? r.services.join(", ") : r.services
-      ]));
-
-      doc.autoTable({
-        startY: 110,
-        head: [["Date", "Time", "First", "Last", "Reason", "Services"]],
-        body: tableData,
-        styles: { fontSize: 9 },
-        headStyles: { fillColor: [30, 58, 89] }
-      });
-
-      doc.save(`AMS_Company_Report_${companyName}.pdf`);
-    });
+  bindDetailCompanyButtons();
 }
-
 
 // ===============================
 // POPULATE COMPANY DROPDOWN
@@ -144,73 +57,26 @@ function populateDetailCompanyDropdown() {
     opt.textContent = company;
     select.appendChild(opt);
   });
+
+  select.addEventListener("change", renderCompanyDetailTable);
 }
 
 // ===============================
-// EXPORT EXCEL
-// ===============================
-document.addEventListener("click", e => {
-  if (e.target && e.target.id === "companyDetailExcelBtn") {
-    exportCompanyExcel();
-  }
-});
-
-function exportCompanyExcel() {
-  const companyName = document.getElementById("detailCompanySelect")?.value;
-  if (!companyName) {
-    alert("Please select a company first.");
-    return;
-  }
-
-  const records = JSON.parse(localStorage.getItem("checkInLogs") || "[]")
-    .filter(r => (r.company || "").toUpperCase() === companyName.toUpperCase());
-
-  if (!records.length) {
-    alert("No records found for this company.");
-    return;
-  }
-
-  const excelData = records.map(r => ({
-    Date: r.date,
-    Time: r.time,
-    First: r.first,
-    Last: r.last,
-    Company: r.company,
-    Reason: r.reason,
-    Services: Array.isArray(r.services) ? r.services.join(", ") : r.services
-  }));
-
-  const ws = XLSX.utils.json_to_sheet(excelData);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "Company Detail");
-
-  XLSX.writeFile(wb, `AMS_Company_Report_${companyName}.xlsx`);
-}
-
-// ===============================
-// TAB CLICK HANDLER
-// ===============================
-document.querySelectorAll(".tab").forEach(tab => {
-  tab.addEventListener("click", () => {
-    if (tab.dataset.tab === "tabCompany") {
-      loadDetailCompanyReport();
-    }
-  });
-});
-// ===============================
-// DETAIL COMPANY → TABLE RENDER
+// RENDER TABLE
 // ===============================
 function renderCompanyDetailTable() {
   const tbody = document.getElementById("companyDetailBody");
-  if (!tbody) return;
+  const companyName = document.getElementById("detailCompanySelect")?.value;
 
-  tbody.innerHTML = "";
-
-  const companyName = getSelectedCompany();
-  if (!companyName) return;
+  if (!tbody || !companyName) {
+    tbody.innerHTML = "";
+    return;
+  }
 
   const records = JSON.parse(localStorage.getItem("checkInLogs") || "[]")
     .filter(r => (r.company || "").toUpperCase() === companyName.toUpperCase());
+
+  tbody.innerHTML = "";
 
   if (!records.length) {
     tbody.innerHTML = `
@@ -223,7 +89,6 @@ function renderCompanyDetailTable() {
 
   records.forEach(r => {
     const tr = document.createElement("tr");
-
     tr.innerHTML = `
       <td>${r.date || ""}</td>
       <td>${r.time || ""}</td>
@@ -232,16 +97,107 @@ function renderCompanyDetailTable() {
       <td>${r.reason || ""}</td>
       <td>${Array.isArray(r.services) ? r.services.join(", ") : (r.services || "")}</td>
     `;
-
     tbody.appendChild(tr);
   });
 }
 
 // ===============================
-// AUTO REFRESH WHEN COMPANY CHANGES
+// BIND EXPORT BUTTONS
 // ===============================
-document.getElementById("filterCompany")
-?.addEventListener("change", renderCompanyDetailTable);
+function bindDetailCompanyButtons() {
+  document.getElementById("companyDetailExcelBtn")
+    ?.addEventListener("click", exportCompanyExcel);
 
-document.getElementById("filterCompanyText")
-?.addEventListener("input", renderCompanyDetailTable);
+  document.getElementById("companyDetailPdfBtn")
+    ?.addEventListener("click", exportCompanyPdf);
+}
+
+// ===============================
+// EXPORT EXCEL
+// ===============================
+function exportCompanyExcel() {
+  const companyName = document.getElementById("detailCompanySelect")?.value;
+  if (!companyName) {
+    alert("Please select a company first.");
+    return;
+  }
+
+  const records = JSON.parse(localStorage.getItem("checkInLogs") || "[]")
+    .filter(r => (r.company || "").toUpperCase() === companyName.toUpperCase());
+
+  if (!records.length) {
+    alert("No records found.");
+    return;
+  }
+
+  const excelData = records.map(r => ({
+    Date: r.date,
+    Time: r.time,
+    First: r.first,
+    Last: r.last,
+    Reason: r.reason,
+    Services: Array.isArray(r.services) ? r.services.join(", ") : r.services
+  }));
+
+  const ws = XLSX.utils.json_to_sheet(excelData);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Company Detail");
+  XLSX.writeFile(wb, `AMS_Company_Report_${companyName}.xlsx`);
+}
+
+// ===============================
+// EXPORT PDF
+// ===============================
+function exportCompanyPdf() {
+  const companyName = document.getElementById("detailCompanySelect")?.value;
+  if (!companyName) {
+    alert("Please select a company first.");
+    return;
+  }
+
+  const records = JSON.parse(localStorage.getItem("checkInLogs") || "[]")
+    .filter(r => (r.company || "").toUpperCase() === companyName.toUpperCase());
+
+  if (!records.length) {
+    alert("No records found.");
+    return;
+  }
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF("l", "pt", "a4");
+
+  doc.setFontSize(18);
+  doc.text("AMS Detail Company Report", 40, 40);
+  doc.setFontSize(12);
+  doc.text(`Company: ${companyName}`, 40, 65);
+  doc.text(`Total Records: ${records.length}`, 40, 85);
+
+  const tableData = records.map(r => [
+    r.date,
+    r.time,
+    r.first,
+    r.last,
+    r.reason,
+    Array.isArray(r.services) ? r.services.join(", ") : r.services
+  ]);
+
+  doc.autoTable({
+    startY: 110,
+    head: [["Date", "Time", "First", "Last", "Reason", "Services"]],
+    body: tableData,
+    styles: { fontSize: 9 }
+  });
+
+  doc.save(`AMS_Company_Report_${companyName}.pdf`);
+}
+
+// ===============================
+// TAB CLICK HANDLER
+// ===============================
+document.querySelectorAll(".tab").forEach(tab => {
+  tab.addEventListener("click", () => {
+    if (tab.dataset.tab === "tabCompany") {
+      loadDetailCompanyReport();
+    }
+  });
+});
