@@ -292,10 +292,10 @@ function renderSearchResults(results) {
   <td>${entry.reason || ""}</td>
   <td>${entry.services || ""}</td>
   <td>${
-    entry.signature
-      ? '<img src="' + entry.signature + '" style="height:40px;border:1px solid #ccc;background:#fff;" />'
-      : '—'
-  }</td>
+  entry.signature
+    ? `<img src="${entry.signature}" style="height:40px;border:1px solid #ccc;background:#fff;" />`
+    : "-"
+}</td>
 </tr>
 `;
 
