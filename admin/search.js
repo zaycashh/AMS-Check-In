@@ -377,42 +377,6 @@ if (exportPDFBtn) {
       const now = new Date();
       doc.text(`Generated: ${now.toLocaleString()}`, 14, 28);
       doc.text(`Total Records: ${currentSearchResults.length}`, 14, 34);
-      // ===============================
-// TABLE ROWS (WITH SIGNATURE)
-// ===============================
-let startY = 50;
-
-currentSearchResults.forEach((e, index) => {
-  doc.text(String(index + 1), 10, startY);
-  doc.text(e.date || "", 20, startY);
-  doc.text(e.time || "", 45, startY);
-  doc.text(e.first || "", 70, startY);
-  doc.text(e.last || "", 95, startY);
-  doc.text(e.company || "", 120, startY);
-
-  // SIGNATURE
-  if (e.signature && e.signature.startsWith("data:image")) {
-    doc.addImage(
-      e.signature,
-      "PNG",
-      150,
-      startY - 6,
-      40,
-      12
-    );
-  } else {
-    doc.text("-", 155, startY);
-  }
-
-  startY += 16;
-
-  if (startY > 190) {
-    doc.addPage();
-    startY = 20;
-  }
-});
-
-
       const company =
         document.getElementById("filterCompany")?.value || "All Companies";
       const range =
