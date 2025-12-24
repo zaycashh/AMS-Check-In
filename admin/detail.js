@@ -51,7 +51,7 @@ function loadDetailCompanyReport() {
 // POPULATE COMPANY DROPDOWN
 // ===============================
 function populateDetailCompanyDropdown() {
-  const logs = JSON.parse(localStorage.getItem("checkInLogs")) || [];
+  JSON.parse(localStorage.getItem("ams_logs") || "[]");
   const select = document.getElementById("detailCompanySelect");
   if (!select) return;
 
