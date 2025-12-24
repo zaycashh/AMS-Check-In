@@ -485,18 +485,7 @@ doc.text(`Date Range: ${dateRangeLabel}`, 120, 34);
   );
 }
           });
-      // SIGNATURE BLOCK
-const finalY = doc.lastAutoTable.finalY + 20;
-
-doc.setFontSize(11);
-doc.setTextColor(0);
-
-doc.text("Authorized By:", 14, finalY);
-doc.line(40, finalY + 1, 120, finalY + 1);
-
-doc.text("Date:", 14, finalY + 15);
-doc.line(40, finalY + 16, 120, finalY + 16);
-;
+      
       doc.save("AMS_Search_Log_Report.pdf");
     };
   });
