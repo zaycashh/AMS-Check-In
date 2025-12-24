@@ -38,6 +38,14 @@ function loadDetailCompanyReport() {
   populateDetailCompanyDropdown();
   bindDetailCompanyButtons();
 }
+// ===============================
+// RE-RENDER TABLE ON DATE FILTER CHANGE
+// ===============================
+["detailDateRange", "detailStartDate", "detailEndDate"].forEach(id => {
+  document.getElementById(id)?.addEventListener("change", () => {
+    loadDetailCompanyReport();
+  });
+});
 
 // ===============================
 // POPULATE COMPANY DROPDOWN
@@ -73,8 +81,10 @@ function renderCompanyDetailTable() {
     return;
   }
 
-  const records = JSON.parse(localStorage.getItem("ams_logs") || "[]")
-    .filter(r => (r.company || "").toUpperCase() === companyName.toUpperCase());
+  let records = JSON.parse(localStorage.getItem("ams_logs") || "[]")
+  .filter(r => (r.company || "").toUpperCase() === companyName.toUpperCase());
+
+records = filterByDateRange(records);
 
   tbody.innerHTML = "";
 
