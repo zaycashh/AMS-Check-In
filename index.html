@@ -184,10 +184,47 @@
 
 </div>
 
-
 <div id="tabCompany" class="tab-content" style="display:none;">
-    <!-- Detail Company Report -->
+
+  <h2 class="section-title">Detail Company Report</h2>
+
+  <div class="export-bar">
+    <label>
+      Company:
+      <select id="filterCompany"></select>
+    </label>
+
+    <input
+      id="filterCompanyText"
+      type="text"
+      placeholder="Enter company name"
+      style="display:none;"
+    />
+
+    <button id="companyDetailExcelBtn">Export Excel</button>
+    <button id="companyDetailPdfBtn">Export PDF</button>
+  </div>
+
+  <div id="companyTotals" class="totals-bar" style="margin:10px 0; font-weight:600;">
+    Total Records: <span id="companyTotalCount">0</span>
+  </div>
+
+  <table class="report-table">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Time</th>
+        <th>First</th>
+        <th>Last</th>
+        <th>Reason</th>
+        <th>Services</th>
+      </tr>
+    </thead>
+    <tbody id="companyDetailBody"></tbody>
+  </table>
+
 </div>
+
     <!-- ===============================
      SEARCH LOG TAB
 ================================ -->
