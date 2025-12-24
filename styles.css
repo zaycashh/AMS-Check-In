@@ -461,3 +461,20 @@ body {
     background: #f0f4f8;
     font-weight: bold;
 }
+.report-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 12px;
+}
+
+.report-table th,
+.report-table td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: left;
+}
+
+.report-table th {
+  background: #f4f6f8;
+  font-weight: 600;
+}
