@@ -196,26 +196,39 @@ function exportCompanyPdf() {
   }
 
   const { jsPDF } = window.jspdf;
-  const doc = new jsPDF("landscape");
+const doc = new jsPDF("landscape");
 
-  /* ===============================
-     HEADER BAR
-  =============================== */
-  doc.setFillColor(30, 94, 150); // blue bar
-  doc.rect(0, 0, doc.internal.pageSize.width, 40, "F");
+/* ===============================
+   HEADER BAR
+================================ */
+doc.setFillColor(30, 94, 150); // AMS blue
+doc.rect(0, 0, doc.internal.pageSize.width, 40, "F");
 
-  // LOGO
-  const logoImg = document.getElementById("amsLogoBase64");
-  if (logoImg?.src) {
-    doc.addImage(logoImg.src, "PNG", 14, 8, 32, 22);
-  }
+/* ===============================
+   LOGO (SAFE BASE64 RENDER)
+================================ */
+const logoImg = document.getElementById("amsLogoBase64");
 
-  // TITLE
-  doc.setTextColor(255, 255, 255);
-  doc.setFontSize(18);
-  doc.text("AMS Detail Company Report", 55, 26);
+if (logoImg && logoImg.complete) {
+  const canvas = document.createElement("canvas");
+  canvas.width = logoImg.naturalWidth;
+  canvas.height = logoImg.naturalHeight;
 
-  doc.setTextColor(0, 0, 0);
+  const ctx = canvas.getContext("2d");
+  ctx.drawImage(logoImg, 0, 0);
+
+  const logoBase64 = canvas.toDataURL("image/png");
+  doc.addImage(logoBase64, "PNG", 14, 8, 32, 22);
+}
+
+/* ===============================
+   TITLE
+================================ */
+doc.setTextColor(255, 255, 255);
+doc.setFontSize(18);
+doc.text("AMS Detail Company Report", 55, 26);
+
+doc.setTextColor(0, 0, 0);
 
   /* ===============================
      META INFO
