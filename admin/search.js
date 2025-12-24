@@ -504,8 +504,6 @@ doc.autoTable({
       
       doc.save("AMS_Search_Log_Report.pdf");
     };
-  });
-}
 // ==============================
 // CLEAR FILTERS
 // ==============================
