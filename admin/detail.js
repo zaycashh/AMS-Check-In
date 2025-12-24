@@ -53,12 +53,11 @@ function loadDetailCompanyReport() {
 function populateDetailCompanyDropdown() {
   const logs = JSON.parse(localStorage.getItem("ams_logs") || "[]");
   const select = document.getElementById("detailCompanySelect");
-
   if (!select) return;
 
   const companies = [...new Set(logs.map(l => l.company).filter(Boolean))];
 
-  select.innerHTML = `<option value="">-- Select Company --</option>`;
+  select.innerHTML = '<option value="">-- Select Company --</option>';
 
   companies.forEach(company => {
     const opt = document.createElement("option");
@@ -66,8 +65,10 @@ function populateDetailCompanyDropdown() {
     opt.textContent = company;
     select.appendChild(opt);
   });
-}
+
+  // ✅ MOVE THIS INSIDE
   select.addEventListener("change", renderCompanyDetailTable);
+}
 
 // ===============================
 // RENDER TABLE
