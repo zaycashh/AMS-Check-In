@@ -171,17 +171,24 @@ function bindDetailCompanyButtons() {
 }
 
 // ===============================
-// DETAIL COMPANY → PDF EXPORT (PRO HEADER + LOGO)
+// DETAIL COMPANY → PDF (MATCH SEARCH LOG STYLE)
 // ===============================
 function exportCompanyPdf() {
-  const companyName = document.getElementById("detailCompanySelect")?.value;
+  const companyName =
+    document.getElementById("detailCompanySelect")?.value;
+
   if (!companyName) {
     alert("Please select a company first.");
     return;
   }
 
-  const records = JSON.parse(localStorage.getItem("ams_logs") || "[]")
-    .filter(r => (r.company || "").toUpperCase() === companyName.toUpperCase());
+  let records = JSON.parse(localStorage.getItem("ams_logs") || "[]")
+    .filter(r =>
+      (r.company || "").toUpperCase() === companyName.toUpperCase()
+    );
+
+  // Apply date filter (same behavior as Search Log)
+  records = filterByDateRange(records);
 
   if (!records.length) {
     alert("No records found for this company.");
@@ -191,81 +198,72 @@ function exportCompanyPdf() {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF("landscape");
 
-  // ===== HEADER =====
-  const logo = new Image();
-  logo.src = "logo.png";
+  /* ===============================
+     HEADER BAR
+  =============================== */
+  doc.setFillColor(30, 94, 150); // blue bar
+  doc.rect(0, 0, doc.internal.pageSize.width, 40, "F");
 
-  logo.onload = () => {
-    doc.addImage(logo, "PNG", 14, 10, 30, 15);
+  // LOGO
+  const logoImg = document.getElementById("amsLogoBase64");
+  if (logoImg?.src) {
+    doc.addImage(logoImg.src, "PNG", 14, 8, 32, 22);
+  }
 
-    doc.setFontSize(18);
-    doc.text("AMS Check-In System", 50, 18);
+  // TITLE
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(18);
+  doc.text("AMS Detail Company Report", 55, 26);
 
-    doc.setFontSize(14);
-    doc.text("Detail Company Report", 50, 26);
+  doc.setTextColor(0, 0, 0);
 
-    doc.setFontSize(11);
-    doc.text(`Company: ${companyName}`, 14, 40);
+  /* ===============================
+     META INFO
+  =============================== */
+  const now = new Date();
+  const startY = 55;
 
-    const now = new Date();
-    doc.text(
-      `Generated: ${now.toLocaleDateString()} ${now.toLocaleTimeString()}`,
-      14,
-      47
-    );
-    // ===== SUMMARY TOTALS =====
-const totalRecords = records.length;
+  doc.setFontSize(11);
+  doc.text(`Generated: ${now.toLocaleDateString()} ${now.toLocaleTimeString()}`, 14, startY);
+  doc.text(`Company: ${companyName}`, 14, startY + 10);
+  doc.text(`Total Records: ${records.length}`, 14, startY + 20);
 
-// Normalize services into an array
-const allServices = records.flatMap(r => {
-  if (Array.isArray(r.services)) return r.services;
-  if (typeof r.services === "string" && r.services.trim())
-    return r.services.split(",").map(s => s.trim());
-  return [];
-});
+  /* ===============================
+     TABLE DATA
+  =============================== */
+  const tableData = records.map(r => [
+    r.date || "",
+    r.time || "",
+    r.first || "",
+    r.last || "",
+    r.reason || "",
+    Array.isArray(r.services) ? r.services.join(", ") : (r.services || "")
+  ]);
 
-// Count services
-const serviceCounts = {};
-allServices.forEach(svc => {
-  serviceCounts[svc] = (serviceCounts[svc] || 0) + 1;
-});
+  doc.autoTable({
+    startY: startY + 30,
+    head: [["Date", "Time", "First", "Last", "Reason", "Services"]],
+    body: tableData,
+    styles: {
+      fontSize: 9,
+      cellPadding: 4
+    },
+    headStyles: {
+      fillColor: [30, 94, 150],
+      textColor: 255,
+      fontStyle: "bold"
+    },
+    alternateRowStyles: {
+      fillColor: [245, 248, 252]
+    }
+  });
 
-// Render summary
-let summaryY = 54;
-
-doc.setFontSize(12);
-doc.text(`Total Records: ${totalRecords}`, 14, summaryY);
-
-summaryY += 8;
-
-Object.entries(serviceCounts).forEach(([service, count]) => {
-  doc.text(`${service}: ${count}`, 14, summaryY);
-  summaryY += 7;
-});
-
-    // ===== TABLE DATA =====
-    const tableData = records.map(r => [
-      r.date || "",
-      r.time || "",
-      r.firstName || "",
-      r.lastName || "",
-      r.reason || "",
-      Array.isArray(r.services) ? r.services.join(", ") : (r.services || "")
-    ]);
-
-    doc.autoTable({
-      startY: summaryY + 5,
-      head: [["Date", "Time", "First", "Last", "Reason", "Services"]],
-      body: tableData,
-      styles: { fontSize: 9 },
-      headStyles: { fillColor: [30, 58, 89] }
-    });
-
-    doc.save(`AMS_Detail_Company_${companyName}.pdf`);
-  };
+  /* ===============================
+     SAVE
+  =============================== */
+  doc.save(`AMS_Detail_Company_${companyName}.pdf`);
 }
 
- 
 // ===============================
 // EXPORT EXCEL
 // ===============================
