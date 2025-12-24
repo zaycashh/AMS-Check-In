@@ -379,9 +379,23 @@ if (exportPDFBtn) {
       const now = new Date();
       doc.text(`Generated: ${now.toLocaleString()}`, 14, 28);
       doc.text(`Total Records: ${currentSearchResults.length}`, 14, 34);
+      // ===============================
+// COMPANY LABEL (PDF HEADER)
+// ===============================
+let company = "All Companies";
 
-      const company =
-        document.getElementById("filterCompany")?.value || "All Companies";
+const companySelect = document.getElementById("filterCompany");
+const companyText = document.getElementById("filterCompanyText");
+
+if (companySelect && companySelect.value) {
+  if (companySelect.value === "__custom__") {
+    // Custom typed company
+    company = companyText?.value?.trim() || "Individual";
+  } else if (companySelect.value !== "All Companies") {
+    // Selected company from dropdown
+    company = companySelect.value;
+  }
+}
 
       doc.text(`Company: ${company}`, 120, 28);
 
