@@ -73,7 +73,7 @@ function renderCompanyDetailTable() {
     return;
   }
 
-  const records = JSON.parse(localStorage.getItem("checkInLogs") || "[]")
+  const records = JSON.parse(localStorage.getItem("ams_logs") || "[]")
     .filter(r => (r.company || "").toUpperCase() === companyName.toUpperCase());
 
   tbody.innerHTML = "";
@@ -126,7 +126,7 @@ function exportCompanyPdf() {
     return;
   }
 
-  const records = JSON.parse(localStorage.getItem("checkInLogs") || "[]")
+  const records = JSON.parse(localStorage.getItem("ams_logs") || "[]")
     .filter(r => (r.company || "").toUpperCase() === companyName.toUpperCase());
 
   if (!records.length) {
@@ -223,7 +223,7 @@ function exportCompanyExcel() {
     return;
   }
 
-  const records = JSON.parse(localStorage.getItem("checkInLogs") || "[]")
+  const records = JSON.parse(localStorage.getItem("ams_logs") || "[]")
     .filter(r => (r.company || "").toUpperCase() === companyName.toUpperCase());
 
   if (!records.length) {
@@ -256,7 +256,7 @@ function exportCompanyPdf() {
     return;
   }
 
-  const records = JSON.parse(localStorage.getItem("checkInLogs") || "[]")
+  const records = JSON.parse(localStorage.getItem("ams_logs") || "[]")
     .filter(r => (r.company || "").toUpperCase() === companyName.toUpperCase());
 
   if (!records.length) {
