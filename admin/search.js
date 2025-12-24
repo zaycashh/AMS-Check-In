@@ -280,9 +280,8 @@ function renderSearchResults(results) {
       </thead>
       <tbody>
   `;
-
   results.forEach(entry => {
-  html += '
+  html += `
     <tr>
       <td>${entry.date || ""}</td>
       <td>${entry.time || ""}</td>
@@ -302,6 +301,8 @@ function renderSearchResults(results) {
   `;
 });
 
+
+  
   html += `
       </tbody>
     </table>
