@@ -21,7 +21,16 @@ document.addEventListener("DOMContentLoaded", () => {
       if (target) {
         target.style.display = "block";
       }
-       if (targetId === "tabGeneral") initGeneralReport();
+
+      // ✅ INIT GENERAL
+      if (targetId === "tabGeneral") {
+        initGeneralReport();
+      }
+
+      // ✅ INIT RECENT (THIS WAS MISSING)
+      if (targetId === "tabRecent" && typeof renderRecentCheckIns === "function") {
+        renderRecentCheckIns();
+      }
 
       tab.classList.add("active");
     });
