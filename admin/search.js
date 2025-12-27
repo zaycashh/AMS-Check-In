@@ -140,117 +140,74 @@ function getSearchDateRangeLabel() {
 }
 
 window.runSearch = function () {
-    const logs = getLogs();
+  const logs = getLogs();
 
-    const first = document.getElementById("filterFirstName").value.trim().toLowerCase();
-    const last = document.getElementById("filterLastName").value.trim().toLowerCase();
-    const company = document.getElementById("filterCompany").value;
+  const first = document.getElementById("filterFirstName").value.trim().toLowerCase();
+  const last = document.getElementById("filterLastName").value.trim().toLowerCase();
+  const company = document.getElementById("filterCompany").value;
+
   const companyText = document
-  .getElementById("filterCompanyText")
-  ?.value.trim().toLowerCase();
+    .getElementById("filterCompanyText")
+    ?.value.trim().toLowerCase();
 
-const normalizedCompany =
-  company === "__custom__" ? companyText : company.toLowerCase();
+  const normalizedCompany =
+    company === "__custom__" ? companyText : company.toLowerCase();
 
-    const range = document.getElementById("filterDateRange").value;
+  const range = document.getElementById("filterDateRange").value;
 
-    const startInput = document.getElementById("filterStartDate")?.value;
-    const endInput = document.getElementById("filterEndDate")?.value;
+  const startInput = document.getElementById("filterStartDate")?.value;
+  const endInput = document.getElementById("filterEndDate")?.value;
 
-    let startDate = null;
-    let endDate = null;
+  let startDate = null;
+  let endDate = null;
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-  // TODAY (local-safe)
-if (range === "today") {
-  startDate = new Date(today);
-  endDate = new Date(today);
-}
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
 
-// YESTERDAY (local-safe)
-if (range === "yesterday") {
-  startDate = new Date(today);
-  startDate.setDate(startDate.getDate() - 1);
+  if (range === "today") {
+    startDate = new Date(today);
+    endDate = new Date(today);
+  } else if (range === "yesterday") {
+    startDate = new Date(today);
+    startDate.setDate(today.getDate() - 1);
+    endDate = new Date(startDate);
+  } else if (range === "thisMonth") {
+    startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+    endDate = new Date(today);
+  } else if (range === "custom" && startInput && endInput) {
+    startDate = new Date(startInput);
+    endDate = new Date(endInput);
+  }
 
-  endDate = new Date(startDate);
-}
-  // THIS WEEK (Sunday → Saturday, local-safe)
-else if (range === "thisWeek") {
-  const todayLocal = new Date(today);
+  if (startDate) startDate.setHours(0, 0, 0, 0);
+  if (endDate) endDate.setHours(23, 59, 59, 999);
 
-  startDate = new Date(todayLocal);
-  startDate.setDate(todayLocal.getDate() - todayLocal.getDay());
+  const results = logs.filter(entry => {
+    if (!entry) return false;
 
-  endDate = new Date(startDate);
-  endDate.setDate(startDate.getDate() + 6);
-}
+    if (first && !entry.first?.toLowerCase().includes(first)) return false;
+    if (last && !entry.last?.toLowerCase().includes(last)) return false;
 
-  else if (range === "lastWeek") {
-  const todayLocal = new Date(today);
+    if (normalizedCompany && normalizedCompany !== "all companies") {
+      const recordCompany = (entry.company || "").toLowerCase();
+      if (!recordCompany.includes(normalizedCompany)) return false;
+    }
 
-  startDate = new Date(todayLocal);
-  startDate.setDate(todayLocal.getDate() - todayLocal.getDay() - 7);
+    if (startDate && endDate) {
+      const entryDate = parseEntryDate(entry);
+      if (!entryDate) return false;
+      if (entryDate < startDate || entryDate > endDate) return false;
+    }
 
-  endDate = new Date(startDate);
-  endDate.setDate(startDate.getDate() + 6);
-}
-  else if (range === "thisMonth") {
-  startDate = new Date(today.getFullYear(), today.getMonth(), 1);
-  endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-}
- else if (range === "thisYear") {
- startDate = new Date(today.getFullYear(), 0, 1);
- endDate = new Date(today);
-}
-else if (range === "lastMonth") {
-  startDate = new Date(today.getFullYear(), today.getMonth() - 1, 1);
-  endDate = new Date(today.getFullYear(), today.getMonth(), 0);
-}
+    return true;
+  });
 
-else if (range === "lastYear") {
-  startDate = new Date(today.getFullYear() - 1, 0, 1);
-  endDate = new Date(today.getFullYear() - 1, 11, 31);
-}
+  // ✅ ONLY PLACE THESE VARIABLES ARE SET
+  lastSearchResults = results;
+  currentSearchResults = results;
 
-   
-    if (range === "custom" && startInput && endInput) {
-     const [sy, sm, sd] = startInput.split("-").map(Number);
-     const [ey, em, ed] = endInput.split("-").map(Number);
-
-     startDate = new Date(sy, sm - 1, sd);
-     endDate = new Date(ey, em - 1, ed);
-}
-
-
-    if (startDate) startDate.setHours(0, 0, 0, 0);
-    if (endDate) endDate.setHours(23, 59, 59, 999);
-  // SAVE LAST SEARCH RANGE FOR PDF
-lastSearchStartDate = startDate;
-lastSearchEndDate = endDate;
-
-    const results = logs.filter(entry => {
-        if (!entry) return false;
-
-        if (first && !entry.first?.toLowerCase().includes(first)) return false;
-        if (last && !entry.last?.toLowerCase().includes(last)) return false;
-        if (normalizedCompany && normalizedCompany !== "all companies") {
-  const recordCompany = (entry.company || "").toLowerCase();
-  if (!recordCompany.includes(normalizedCompany)) return false;
-}
-      lastSearchResults = results;
-      
-        if (startDate && endDate) {
-            const entryDate = parseEntryDate(entry);
-            if (!entryDate) return false;
-            if (entryDate < startDate || entryDate > endDate) return false;
-        }
-
-        return true;
-    });
-    // ✅ CORRECT PLACE (AFTER filter)
-lastSearchResults = results;
-currentSearchResults = results;
+  renderSearchResults(results);
+};
 
 /* =========================================================
    RENDER RESULTS
@@ -303,8 +260,6 @@ function renderSearchResults(results) {
     </tr>
   `;
 });
-
-
   
   html += `
       </tbody>
@@ -312,37 +267,6 @@ function renderSearchResults(results) {
   `;
 
   container.innerHTML = html;
-}
-
-// ==============================
-// EXPORT SEARCH RESULTS (EXCEL)
-// ==============================
-const exportExcelBtn = document.getElementById("exportExcel");
-
-if (exportExcelBtn) {
-  exportExcelBtn.onclick = () => {
-    if (!Array.isArray(lastSearchResults) || lastSearchResults.length === 0) {
-      alert("Please run a search before exporting.");
-      return;
-    }
-
-    const rows = lastSearchResults.map(r => ({
-      Date: r.date || "",
-      Time: r.time || "",
-      First: r.first || "",
-      Last: r.last || "",
-      Company: r.company || "",
-      Reason: r.reason || "",
-      Services: Array.isArray(r.services) ? r.services.join(", ") : r.services || "",
-      Signature: r.signature ? "Yes" : ""
-    }));
-
-    const ws = XLSX.utils.json_to_sheet(rows);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Search Results");
-
-    XLSX.writeFile(wb, "AMS_Search_Log.xlsx");
-  };
 }
 
 // ==============================
@@ -382,6 +306,7 @@ if (exportPDFBtn) {
       const now = new Date();
       doc.text(`Generated: ${now.toLocaleString()}`, 14, 28);
       doc.text(`Total Records: ${currentSearchResults.length}`, 14, 34);
+     
       // ===============================
 // COMPANY LABEL (PDF HEADER)
 // ===============================
