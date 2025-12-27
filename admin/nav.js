@@ -36,3 +36,8 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 });
+// ✅ Default Admin Tab = Recent Check-Ins
+const defaultRecentTab = document.querySelector('.tab[data-tab="tabRecent"]');
+if (defaultRecentTab) {
+  defaultRecentTab.click();
+}
