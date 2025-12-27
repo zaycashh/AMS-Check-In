@@ -4,7 +4,7 @@ function renderRecentCheckIns() {
     const container = document.getElementById("tabRecent");
     if (!container) return;
 
-    const logs = JSON.parse(localStorage.getItem("ams_Logs")) || [];
+    const logs = JSON.parse(localStorage.getItem("ams_logs") || "[]");
 
     if (logs.length === 0) {
         container.innerHTML = "<p style='opacity:.6;'>No recent check-ins yet.</p>";
