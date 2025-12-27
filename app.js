@@ -201,21 +201,37 @@ document.getElementById("resetFormBtn").addEventListener("click", () => {
 document.getElementById("toggleAdminBtn").addEventListener("click", () => {
     const pin = prompt("Enter Admin PIN:");
 
-    if (pin === ADMIN_PIN) {
-        document.getElementById("adminArea").style.display = "block";
-        document.getElementById("checkInSection").style.display = "none";
-
-        initRunSearch();
-
-        document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-        document.querySelector('.tab[data-tab="tabRecent"]').classList.add("active");
-
-        document.querySelectorAll(".tab-content").forEach(c => c.style.display = "none");
-        document.getElementById("tabRecent").style.display = "block";
-    } else {
+    if (pin !== ADMIN_PIN) {
         alert("Incorrect PIN");
+        return;
     }
+
+    // Show admin area / hide public check-in
+    document.getElementById("adminArea").style.display = "block";
+    document.getElementById("checkInSection").style.display = "none";
+
+    // Reset active tabs
+    document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+    document.querySelectorAll(".tab-content").forEach(c => c.style.display = "none");
+
+    // Activate Recent tab by default
+    const recentTabBtn = document.querySelector('.tab[data-tab="tabRecent"]');
+    const recentTabContent = document.getElementById("tabRecent");
+
+    if (recentTabBtn && recentTabContent) {
+        recentTabBtn.classList.add("active");
+        recentTabContent.style.display = "block";
+
+        // ✅ RENDER RECENT CHECK-INS
+        if (typeof renderRecentCheckIns === "function") {
+            renderRecentCheckIns();
+        }
+    }
+
+    // Init search logic (kept as-is)
+    initRunSearch();
 });
+
 
 /* =========================================================
    EXIT ADMIN MODE
