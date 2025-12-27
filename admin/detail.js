@@ -286,33 +286,97 @@ doc.setTextColor(0, 0, 0);
 // EXPORT EXCEL
 // ===============================
 function exportCompanyExcel() {
-  const companyName = document.getElementById("detailCompanySelect")?.value;
+  const companyName =
+    document.getElementById("detailCompanySelect")?.value;
+
   if (!companyName) {
     alert("Please select a company first.");
     return;
   }
 
-  const records = JSON.parse(localStorage.getItem("ams_logs") || "[]")
-    .filter(r => (r.company || "").toUpperCase() === companyName.toUpperCase());
+  const records = JSON.parse(
+    localStorage.getItem("ams_logs") || "[]"
+  ).filter(
+    r => (r.company || "").toUpperCase() === companyName.toUpperCase()
+  );
 
   if (!records.length) {
-    alert("No records found.");
+    alert("No records found for this company.");
     return;
   }
 
-  const excelData = records.map(r => ({
-    Date: r.date,
-    Time: r.time,
-    First: r.first,
-    Last: r.last,
-    Reason: r.reason,
-    Services: Array.isArray(r.services) ? r.services.join(", ") : r.services
-  }));
-
-  const ws = XLSX.utils.json_to_sheet(excelData);
+  // ===============================
+  // BUILD EXCEL DATA
+  // ===============================
   const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "Company Detail");
-  XLSX.writeFile(wb, `AMS_Company_Report_${companyName}.xlsx`);
+
+  const headerRows = [
+    ["AMS Detail Company Report"],
+    [`Company: ${companyName}`],
+    [`Generated: ${new Date().toLocaleString()}`],
+    [],
+    ["Date", "Time", "First", "Last", "Reason", "Services"]
+  ];
+
+  const dataRows = records.map(r => [
+    r.date || "",
+    r.time || "",
+    r.first || "",
+    r.last || "",
+    r.reason || "",
+    Array.isArray(r.services) ? r.services.join(", ") : ""
+  ]);
+
+  const sheetData = [...headerRows, ...dataRows];
+  const ws = XLSX.utils.aoa_to_sheet(sheetData);
+
+  // ===============================
+  // STYLING
+  // ===============================
+
+  // Merge title row
+  ws["!merges"] = [
+    { s: { r: 0, c: 0 }, e: { r: 0, c: 5 } }
+  ];
+
+  // Column widths
+  ws["!cols"] = [
+    { wch: 14 },
+    { wch: 10 },
+    { wch: 14 },
+    { wch: 14 },
+    { wch: 20 },
+    { wch: 30 }
+  ];
+
+  // Freeze header row
+  ws["!freeze"] = { ySplit: 5 };
+
+  // Style title
+  ws["A1"].s = {
+    font: { bold: true, sz: 16 },
+    alignment: { horizontal: "center" }
+  };
+
+  // Style table headers
+  for (let c = 0; c <= 5; c++) {
+    const cell = XLSX.utils.encode_cell({ r: 4, c });
+    ws[cell].s = {
+      font: { bold: true, color: { rgb: "FFFFFF" } },
+      fill: { fgColor: { rgb: "1E5E96" } },
+      alignment: { horizontal: "center" }
+    };
+  }
+
+  // ===============================
+  // EXPORT
+  // ===============================
+  XLSX.utils.book_append_sheet(wb, ws, "Detail Company");
+
+  XLSX.writeFile(
+    wb,
+    `AMS_Detail_Company_${companyName}.xlsx`
+  );
 }
 
 // ===============================
