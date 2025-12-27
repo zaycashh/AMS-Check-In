@@ -314,33 +314,49 @@ function renderSearchResults(results) {
 // ==============================
 // EXPORT EXCEL
 // ==============================
-const exportExcelBtn = document.getElementById("exportExcel");
+function exportSearchExcel() {
+  const logs = JSON.parse(localStorage.getItem("ams_logs") || "[]");
 
-if (exportExcelBtn) {
-  exportExcelBtn.addEventListener("click", () => {
-    if (!currentSearchResults.length) {
-      alert("No search results to export.");
-      return;
-    }
+  if (!logs.length) {
+    alert("No records to export.");
+    return;
+  }
 
-    const data = currentSearchResults.map(e => ({
-      Date: e.date || "",
-      Time: e.time || "",
-      First: e.first || "",
-      Last: e.last || "",
-      Company: e.company || "",
-      Reason: e.reason || "",
-      Services: Array.isArray(e.services)
-        ? e.services.join(", ")
-        : e.services || ""
-    }));
+  // Map data into clean rows
+  const rows = logs.map(r => ({
+    Date: r.date || "",
+    Time: r.time || "",
+    First: r.first || "",
+    Last: r.last || "",
+    Company: r.company || "",
+    Reason: r.reason || "",
+    Services: Array.isArray(r.services) ? r.services.join(", ") : "",
+    Signature: r.signature ? "Yes" : ""
+  }));
 
-    const worksheet = XLSX.utils.json_to_sheet(data);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Search Log");
+  // Create worksheet
+  const ws = XLSX.utils.json_to_sheet(rows);
 
-    XLSX.writeFile(workbook, "AMS_Search_Log.xlsx");
-  });
+  // Auto-size columns
+  ws["!cols"] = Object.keys(rows[0]).map(key => ({
+    wch: Math.max(
+      key.length,
+      ...rows.map(r => (r[key] || "").toString().length)
+    ) + 2
+  }));
+
+  // Create workbook
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Search Log");
+
+  // File name
+  const now = new Date();
+  const fileName =
+    `AMS_Search_Log_${now.getFullYear()}-${String(
+      now.getMonth() + 1
+    ).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}.xlsx`;
+
+  XLSX.writeFile(wb, fileName);
 }
 // ==============================
 // EXPORT PDF (WITH SIGNATURES)
