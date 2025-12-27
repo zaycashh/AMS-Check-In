@@ -202,7 +202,8 @@ const doc = new jsPDF("landscape");
    HEADER BAR
 ================================ */
 doc.setFillColor(30, 94, 150); // AMS blue
-doc.rect(0, 0, doc.internal.pageSize.width, 40, "F");
+doc.rect(0, 0, doc.internal.pageSize.width, 32, "F");
+
 
 /* ===============================
    LOGO (SAFE BASE64 RENDER)
@@ -225,8 +226,8 @@ if (logoImg && logoImg.complete) {
    TITLE
 ================================ */
 doc.setTextColor(255, 255, 255);
-doc.setFontSize(18);
-doc.text("AMS Detail Company Report", 55, 26);
+doc.setFontSize(16);
+doc.text("AMS Detail Company Report", 55, 21);
 
 doc.setTextColor(0, 0, 0);
 
@@ -236,7 +237,7 @@ doc.setTextColor(0, 0, 0);
   const now = new Date();
   const startY = 55;
 
-  doc.setFontSize(11);
+  doc.setFontSize(12);
   doc.text(`Generated: ${now.toLocaleDateString()} ${now.toLocaleTimeString()}`, 14, startY);
   doc.text(`Company: ${companyName}`, 14, startY + 10);
   doc.text(`Total Records: ${records.length}`, 14, startY + 20);
@@ -254,22 +255,26 @@ doc.setTextColor(0, 0, 0);
   ]);
 
   doc.autoTable({
-    startY: startY + 30,
-    head: [["Date", "Time", "First", "Last", "Reason", "Services"]],
-    body: tableData,
-    styles: {
-      fontSize: 9,
-      cellPadding: 4
-    },
-    headStyles: {
-      fillColor: [30, 94, 150],
-      textColor: 255,
-      fontStyle: "bold"
-    },
-    alternateRowStyles: {
-      fillColor: [245, 248, 252]
-    }
-  });
+  startY: startY + 30,
+  head: [["Date", "Time", "First", "Last", "Reason", "Services"]],
+  body: tableData,
+
+  styles: {
+    fontSize: 9,       // body font (matches Search Log)
+    cellPadding: 4
+  },
+
+  headStyles: {
+    fillColor: [30, 94, 150],
+    textColor: 255,
+    fontStyle: "bold",
+    fontSize: 9        // ✅ THIS was missing
+  },
+
+  alternateRowStyles: {
+    fillColor: [245, 248, 252]
+  }
+});
 
   /* ===============================
      SAVE
