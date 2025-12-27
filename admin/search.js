@@ -238,7 +238,8 @@ lastSearchEndDate = endDate;
   const recordCompany = (entry.company || "").toLowerCase();
   if (!recordCompany.includes(normalizedCompany)) return false;
 }
-
+      lastSearchResults = results;
+      
         if (startDate && endDate) {
             const entryDate = parseEntryDate(entry);
             if (!entryDate) return false;
