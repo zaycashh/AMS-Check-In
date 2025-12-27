@@ -1,20 +1,17 @@
 console.log("Admin Recent Check-Ins Module Loaded");
 
-document.addEventListener("DOMContentLoaded", renderRecentCheckIns);
-
 function renderRecentCheckIns() {
     const container = document.getElementById("tabRecent");
     if (!container) return;
 
-    // ✅ USE SAME STORAGE AS SEARCH LOG
-    const logs = JSON.parse(localStorage.getItem("ams_logs") || "[]");
+    const logs = JSON.parse(localStorage.getItem("ams_Logs")) || [];
 
     if (logs.length === 0) {
         container.innerHTML = "<p style='opacity:.6;'>No recent check-ins yet.</p>";
         return;
     }
 
-    // ✅ SORT NEWEST → OLDEST (SAFE)
+    // Sort newest → oldest
     logs.sort((a, b) => {
         const aDate = new Date(`${a.date} ${a.time}`);
         const bDate = new Date(`${b.date} ${b.time}`);
@@ -34,7 +31,6 @@ function renderRecentCheckIns() {
                     <th>Last Name</th>
                     <th>Company</th>
                     <th>Reason</th>
-                    <th>Collector</th>
                     <th>Signature</th>
                 </tr>
             </thead>
@@ -42,15 +38,17 @@ function renderRecentCheckIns() {
     `;
 
     recent.forEach(log => {
+        const firstName = log.firstName || (log.name ? log.name.split(" ")[0] : "");
+        const lastName  = log.lastName  || (log.name ? log.name.split(" ").slice(1).join(" ") : "");
+
         html += `
             <tr>
                 <td>${log.date || ""}</td>
                 <td>${log.time || ""}</td>
-                <td>${log.firstName || ""}</td>
-                <td>${log.lastName || ""}</td>
+                <td>${firstName}</td>
+                <td>${lastName}</td>
                 <td>${log.company || ""}</td>
                 <td>${log.reason || ""}</td>
-                <td>${log.collector || ""}</td>
                 <td>
                     ${log.signature
                         ? `<img src="${log.signature}" style="height:40px;">`
