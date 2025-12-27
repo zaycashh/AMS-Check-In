@@ -248,9 +248,9 @@ lastSearchEndDate = endDate;
 
         return true;
     });
-    currentSearchResults = results;
-    renderSearchResults(results);
-};
+    // ✅ CORRECT PLACE (AFTER filter)
+lastSearchResults = results;
+currentSearchResults = results;
 
 /* =========================================================
    RENDER RESULTS
@@ -315,59 +315,34 @@ function renderSearchResults(results) {
 }
 
 // ==============================
-// EXPORT EXCEL
-// ==============================
-function exportSearchExcel() {
-  const logs = JSON.parse(localStorage.getItem("ams_logs") || "[]");
-
-  if (!logs.length) {
-    alert("No records to export.");
-    return;
-  }
-
-  // Map data into clean rows
-  const rows = logs.map(r => ({
-    Date: r.date || "",
-    Time: r.time || "",
-    First: r.first || "",
-    Last: r.last || "",
-    Company: r.company || "",
-    Reason: r.reason || "",
-    Services: Array.isArray(r.services) ? r.services.join(", ") : "",
-    Signature: r.signature ? "Yes" : ""
-  }));
-
-  // Create worksheet
-  const ws = XLSX.utils.json_to_sheet(rows);
-
-  // Auto-size columns
-  ws["!cols"] = Object.keys(rows[0]).map(key => ({
-    wch: Math.max(
-      key.length,
-      ...rows.map(r => (r[key] || "").toString().length)
-    ) + 2
-  }));
-
-  // Create workbook
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "Search Log");
-
-  // File name
-  const now = new Date();
-  const fileName =
-    `AMS_Search_Log_${now.getFullYear()}-${String(
-      now.getMonth() + 1
-    ).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}.xlsx`;
-
-  XLSX.writeFile(wb, fileName);
-}
-// ==============================
-// BIND SEARCH LOG EXCEL EXPORT
+// EXPORT SEARCH RESULTS (EXCEL)
 // ==============================
 const exportExcelBtn = document.getElementById("exportExcel");
 
 if (exportExcelBtn) {
-  exportExcelBtn.addEventListener("click", exportSearchExcel);
+  exportExcelBtn.onclick = () => {
+    if (!Array.isArray(lastSearchResults) || lastSearchResults.length === 0) {
+      alert("Please run a search before exporting.");
+      return;
+    }
+
+    const rows = lastSearchResults.map(r => ({
+      Date: r.date || "",
+      Time: r.time || "",
+      First: r.first || "",
+      Last: r.last || "",
+      Company: r.company || "",
+      Reason: r.reason || "",
+      Services: Array.isArray(r.services) ? r.services.join(", ") : r.services || "",
+      Signature: r.signature ? "Yes" : ""
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(rows);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Search Results");
+
+    XLSX.writeFile(wb, "AMS_Search_Log.xlsx");
+  };
 }
 
 // ==============================
