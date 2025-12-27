@@ -359,6 +359,15 @@ function exportSearchExcel() {
   XLSX.writeFile(wb, fileName);
 }
 // ==============================
+// BIND SEARCH LOG EXCEL EXPORT
+// ==============================
+const exportExcelBtn = document.getElementById("exportExcel");
+
+if (exportExcelBtn) {
+  exportExcelBtn.addEventListener("click", exportSearchExcel);
+}
+
+// ==============================
 // EXPORT PDF (WITH SIGNATURES)
 // ==============================
 const exportPDFBtn = document.getElementById("exportPDF");
