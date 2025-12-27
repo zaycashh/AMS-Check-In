@@ -7,7 +7,7 @@ function renderRecentCheckIns() {
     if (!container) return;
 
     // ✅ USE SAME STORAGE AS SEARCH LOG
-    const logs = JSON.parse(localStorage.getItem("amsLogs")) || [];
+    const logs = JSON.parse(localStorage.getItem("ams_logs") || "[]");
 
     if (logs.length === 0) {
         container.innerHTML = "<p style='opacity:.6;'>No recent check-ins yet.</p>";
