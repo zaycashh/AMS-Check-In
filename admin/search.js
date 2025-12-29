@@ -137,6 +137,13 @@ function getSearchDateRangeLabel() {
 
   return `${fmt(lastSearchStartDate)} – ${fmt(lastSearchEndDate)}`;
 }
+function toggleCustomDateRange() {
+  const range = document.getElementById("filterDateRange").value;
+  const customFields = document.getElementById("customDateRange");
+
+  if (!customFields) return;
+  customFields.style.display = range === "custom" ? "flex" : "none";
+}
 
 window.runSearch = function () {
   const logs = getLogs();
@@ -157,7 +164,11 @@ window.runSearch = function () {
   const startInput = document.getElementById("filterStartDate")?.value;
   const endInput = document.getElementById("filterEndDate")?.value;
 
-  let startDate = null;
+// ===============================
+// DATE RANGE HANDLING (FIXED)
+// ===============================
+
+let startDate = null;
 let endDate = null;
 
 const today = new Date();
@@ -169,10 +180,10 @@ if (range === "today") {
 
 } else if (range === "yesterday") {
   startDate = new Date(today);
-  startDate.setDate(today.getDate() - 1);
+  startDate.setDate(startDate.getDate() - 1);
   endDate = new Date(startDate);
 
-} else if (range === "thisWeek") { 
+} else if (range === "thisWeek") {
   const startOfWeek = new Date(today);
   startOfWeek.setDate(today.getDate() - today.getDay());
   startOfWeek.setHours(0, 0, 0, 0);
@@ -195,6 +206,7 @@ if (range === "today") {
 
 if (startDate) startDate.setHours(0, 0, 0, 0);
 if (endDate) endDate.setHours(23, 59, 59, 999);
+
 
   startDate = startOfWeek;
   endDate = endOfWeek;
