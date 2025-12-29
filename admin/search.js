@@ -89,24 +89,23 @@ console.log("Admin Search Module Loaded");
 function getLogs() {
     return JSON.parse(localStorage.getItem("ams_logs") || "[]");
 }
-
 function parseEntryDate(entry) {
-  // BEST SOURCE: timestamp (most accurate)
-  if (entry && entry.timestamp) {
-    return new Date(entry.timestamp);
-  }
-
-  // Fallback: MM/DD/YYYY string
   if (!entry || !entry.date) return null;
 
-  const [month, day, year] = entry.date.split("/").map(Number);
-  if (!month || !day || !year) return null;
+  // Expecting YYYY-MM-DD (your actual storage format)
+  const parts = entry.date.split("-");
+  if (parts.length !== 3) return null;
 
-  const d = new Date(year, month - 1, day);
-  d.setHours(0, 0, 0, 0);
+  const year = Number(parts[0]);
+  const month = Number(parts[1]) - 1; // JS months are 0-based
+  const day = Number(parts[2]);
+
+  // Force LOCAL date at midday (prevents timezone bugs)
+  const d = new Date(year, month, day);
+  d.setHours(12, 0, 0, 0);
+
   return d;
 }
-
 
 /* =========================================================
    DATE RANGE TOGGLE (SAFE FOR DYNAMIC DOM)
