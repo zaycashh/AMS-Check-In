@@ -426,6 +426,37 @@ if (companySelect && companySelect.value) {
     };
   });
 }
+// ==============================
+// EXPORT SEARCH RESULTS (EXCEL)
+// ==============================
+document.addEventListener("click", (e) => {
+  if (e.target && e.target.id === "exportExcel") {
+
+    if (!Array.isArray(lastSearchResults) || lastSearchResults.length === 0) {
+      alert("Please run a search before exporting.");
+      return;
+    }
+
+    const rows = lastSearchResults.map(r => ({
+      Date: r.date || "",
+      Time: r.time || "",
+      First: r.first || "",
+      Last: r.last || "",
+      Company: r.company || "",
+      Reason: r.reason || "",
+      Services: Array.isArray(r.services)
+        ? r.services.join(", ")
+        : r.services || "",
+      Signature: r.signature ? "Yes" : ""
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(rows);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Search Results");
+
+    XLSX.writeFile(wb, "AMS_Search_Results.xlsx");
+  }
+});
 
 // ==============================
 // CLEAR FILTERS
