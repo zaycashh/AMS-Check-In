@@ -159,29 +159,43 @@ window.runSearch = function () {
   const endInput = document.getElementById("filterEndDate")?.value;
 
   let startDate = null;
-  let endDate = null;
+let endDate = null;
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+const today = new Date();
+today.setHours(0, 0, 0, 0);
 
-  if (range === "today") {
-    startDate = new Date(today);
-    endDate = new Date(today);
-  } else if (range === "yesterday") {
-    startDate = new Date(today);
-    startDate.setDate(today.getDate() - 1);
-    endDate = new Date(startDate);
-    else if (range === "thisWeek") {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+if (range === "today") {
+  startDate = new Date(today);
+  endDate = new Date(today);
 
+} else if (range === "yesterday") {
+  startDate = new Date(today);
+  startDate.setDate(today.getDate() - 1);
+  endDate = new Date(startDate);
+
+} else if (range === "thisWeek") {
   const startOfWeek = new Date(today);
-  startOfWeek.setDate(today.getDate() - today.getDay()); // Sunday
+  startOfWeek.setDate(today.getDate() - today.getDay());
   startOfWeek.setHours(0, 0, 0, 0);
 
   const endOfWeek = new Date(startOfWeek);
-  endOfWeek.setDate(startOfWeek.getDate() + 6); // Saturday
+  endOfWeek.setDate(startOfWeek.getDate() + 6);
   endOfWeek.setHours(23, 59, 59, 999);
+
+  startDate = startOfWeek;
+  endDate = endOfWeek;
+
+} else if (range === "thisMonth") {
+  startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+  endDate = new Date(today);
+
+} else if (range === "custom" && startInput && endInput) {
+  startDate = new Date(startInput);
+  endDate = new Date(endInput);
+}
+
+if (startDate) startDate.setHours(0, 0, 0, 0);
+if (endDate) endDate.setHours(23, 59, 59, 999);
 
   startDate = startOfWeek;
   endDate = endOfWeek;
