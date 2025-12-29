@@ -173,7 +173,7 @@ if (range === "today") {
   startDate.setDate(today.getDate() - 1);
   endDate = new Date(startDate);
 
-} else if (range === "thisWeek") {
+} else if (range === "thisWeek") { 
   const startOfWeek = new Date(today);
   startOfWeek.setDate(today.getDate() - today.getDay());
   startOfWeek.setHours(0, 0, 0, 0);
