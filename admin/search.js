@@ -39,7 +39,6 @@ function normalizeLocalDate(date) {
 function isSameLocalDay(dateA, dateB) {
   return normalizeLocalDate(dateA).getTime() === normalizeLocalDate(dateB).getTime();
 }
-let currentSearchResults = [];
 function loadLogoBase64(callback) {
   const img = new Image();
   img.crossOrigin = "Anonymous";
