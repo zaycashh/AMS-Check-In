@@ -463,5 +463,11 @@ if (clearBtn) {
     const results = document.getElementById("searchResultsTable");
     if (results) results.innerHTML = "";
 
+    // ✅ RESET SEARCH STATE (THIS FIXES PDF ISSUE)
+    lastSearchResults = [];
+    currentSearchResults = [];
+    lastSearchStartDate = null;
+    lastSearchEndDate = null;
+
   });
 }
