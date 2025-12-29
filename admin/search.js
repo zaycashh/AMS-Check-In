@@ -427,35 +427,57 @@ if (companySelect && companySelect.value) {
   });
 }
 // ==============================
-// EXPORT SEARCH RESULTS (EXCEL)
+// EXPORT SEARCH RESULTS (EXCEL – PRO STYLE)
 // ==============================
 document.addEventListener("click", (e) => {
-  if (e.target && e.target.id === "exportExcel") {
+  if (!e.target || e.target.id !== "exportExcel") return;
 
-    if (!Array.isArray(lastSearchResults) || lastSearchResults.length === 0) {
-      alert("Please run a search before exporting.");
-      return;
-    }
-
-    const rows = lastSearchResults.map(r => ({
-      Date: r.date || "",
-      Time: r.time || "",
-      First: r.first || "",
-      Last: r.last || "",
-      Company: r.company || "",
-      Reason: r.reason || "",
-      Services: Array.isArray(r.services)
-        ? r.services.join(", ")
-        : r.services || "",
-      Signature: r.signature ? "Yes" : ""
-    }));
-
-    const ws = XLSX.utils.json_to_sheet(rows);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Search Results");
-
-    XLSX.writeFile(wb, "AMS_Search_Results.xlsx");
+  if (!Array.isArray(lastSearchResults) || lastSearchResults.length === 0) {
+    alert("Please run a search before exporting.");
+    return;
   }
+
+  const company =
+    document.getElementById("filterCompany")?.value || "All Companies";
+
+  const now = new Date().toLocaleString();
+
+  // ---- Build sheet rows manually (PRO layout)
+  const sheetData = [
+    ["AMS Search Log Report"],
+    [`Company: ${company}`],
+    [`Generated: ${now}`],
+    [],
+    ["Date", "Time", "First", "Last", "Company", "Reason", "Services", "Signature"]
+  ];
+
+  lastSearchResults.forEach(r => {
+    sheetData.push([
+      r.date || "",
+      r.time || "",
+      r.first || "",
+      r.last || "",
+      r.company || "",
+      r.reason || "",
+      Array.isArray(r.services) ? r.services.join(", ") : r.services || "",
+      r.signature ? "Yes" : ""
+    ]);
+  });
+
+  const ws = XLSX.utils.aoa_to_sheet(sheetData);
+
+  // ---- Auto column sizing
+  ws["!cols"] = sheetData[4].map((_, colIndex) => ({
+    wch: Math.max(
+      ...sheetData.map(row => (row[colIndex] || "").toString().length),
+      12
+    )
+  }));
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Search Log");
+
+  XLSX.writeFile(wb, "AMS_Search_Log_Report.xlsx");
 });
 
 // ==============================
