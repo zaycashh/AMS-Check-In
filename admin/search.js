@@ -75,37 +75,164 @@ window.toggleCompanyText = function (value) {
     input.value = "";
   }
 };
-
 /* =========================================================
-   AMS ADMIN SEARCH LOG (CLEAN REBUILD)
+   AMS ADMIN SEARCH LOG (CLEAN & FIXED)
 ========================================================= */
 
 console.log("Admin Search Module Loaded");
 
-/* =========================================================
-   HELPERS
-========================================================= */
+// -------------------- STATE --------------------
+let lastSearchResults = [];
+let currentSearchResults = [];
+let lastSearchStartDate = null;
+let lastSearchEndDate = null;
 
+// -------------------- HELPERS --------------------
 function getLogs() {
-    return JSON.parse(localStorage.getItem("ams_logs") || "[]");
+  return JSON.parse(localStorage.getItem("ams_logs") || "[]");
 }
+
 function parseEntryDate(entry) {
-  if (!entry || !entry.date) return null;
+  if (entry?.timestamp) return new Date(entry.timestamp);
+  if (!entry?.date) return null;
 
-  // Expecting YYYY-MM-DD (your actual storage format)
-  const parts = entry.date.split("-");
-  if (parts.length !== 3) return null;
+  const [y, m, d] = entry.date.split("-").map(Number);
+  if (!y || !m || !d) return null;
 
-  const year = Number(parts[0]);
-  const month = Number(parts[1]) - 1; // JS months are 0-based
-  const day = Number(parts[2]);
-
-  // Force LOCAL date at midday (prevents timezone bugs)
-  const d = new Date(year, month, day);
-  d.setHours(12, 0, 0, 0);
-
-  return d;
+  const dt = new Date(y, m - 1, d);
+  dt.setHours(12, 0, 0, 0); // timezone-safe
+  return dt;
 }
+
+function formatShortDate(date) {
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric"
+  });
+}
+
+// -------------------- DATE RANGE TOGGLE --------------------
+window.toggleCustomDateRange = function (value) {
+  const box = document.getElementById("customDateRange");
+  if (!box) return;
+  box.style.display = value === "custom" ? "flex" : "none";
+};
+
+// -------------------- RUN SEARCH --------------------
+window.runSearch = function () {
+  const logs = getLogs();
+
+  const first = document.getElementById("filterFirstName")?.value.trim().toLowerCase();
+  const last = document.getElementById("filterLastName")?.value.trim().toLowerCase();
+  const companyVal = document.getElementById("filterCompany")?.value;
+  const range = document.getElementById("filterDateRange")?.value;
+
+  const startInput = document.getElementById("filterStartDate")?.value;
+  const endInput = document.getElementById("filterEndDate")?.value;
+
+  let startDate = null;
+  let endDate = null;
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  if (range === "today") {
+    startDate = new Date(today);
+    endDate = new Date(today);
+
+  } else if (range === "yesterday") {
+    startDate = new Date(today);
+    startDate.setDate(startDate.getDate() - 1);
+    endDate = new Date(startDate);
+
+  } else if (range === "thisWeek") {
+    const startOfWeek = new Date(today);
+    startOfWeek.setDate(today.getDate() - today.getDay());
+    startOfWeek.setHours(0, 0, 0, 0);
+
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6);
+    endOfWeek.setHours(23, 59, 59, 999);
+
+    startDate = startOfWeek;
+    endDate = endOfWeek;
+
+  } else if (range === "thisMonth") {
+    startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+    endDate = new Date(today);
+
+  } else if (range === "custom" && startInput && endInput) {
+    startDate = new Date(startInput);
+    endDate = new Date(endInput);
+  }
+
+  if (startDate) startDate.setHours(0, 0, 0, 0);
+  if (endDate) endDate.setHours(23, 59, 59, 999);
+
+  lastSearchStartDate = startDate;
+  lastSearchEndDate = endDate;
+
+  const results = logs.filter(entry => {
+    if (!entry) return false;
+
+    if (first && !entry.first?.toLowerCase().includes(first)) return false;
+    if (last && !entry.last?.toLowerCase().includes(last)) return false;
+
+    if (companyVal && companyVal !== "All Companies") {
+      if (!entry.company?.toLowerCase().includes(companyVal.toLowerCase())) return false;
+    }
+
+    if (startDate && endDate) {
+      const d = parseEntryDate(entry);
+      if (!d || d < startDate || d > endDate) return false;
+    }
+
+    return true;
+  });
+
+  lastSearchResults = results;
+  currentSearchResults = results;
+
+  renderSearchResults(results);
+};
+
+// -------------------- RENDER --------------------
+function renderSearchResults(results) {
+  const container = document.getElementById("searchResultsTable");
+  if (!container) return;
+
+  if (!results.length) {
+    container.innerHTML = "<p>No results found</p>";
+    return;
+  }
+
+  container.innerHTML = `
+    <table class="log-table">
+      <thead>
+        <tr>
+          <th>Date</th><th>Time</th><th>First</th><th>Last</th>
+          <th>Company</th><th>Reason</th><th>Services</th><th>Signature</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${results.map(r => `
+          <tr>
+            <td>${r.date || ""}</td>
+            <td>${r.time || ""}</td>
+            <td>${r.first || ""}</td>
+            <td>${r.last || ""}</td>
+            <td>${r.company || ""}</td>
+            <td>${r.reason || ""}</td>
+            <td>${Array.isArray(r.services) ? r.services.join(", ") : r.services || ""}</td>
+            <td>${r.signature ? `<img src="${r.signature}" style="height:40px" />` : "-"}</td>
+          </tr>
+        `).join("")}
+      </tbody>
+    </table>
+  `;
+}
+
 
 /* =========================================================
    DATE RANGE TOGGLE (SAFE FOR DYNAMIC DOM)
