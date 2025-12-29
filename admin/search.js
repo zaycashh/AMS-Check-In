@@ -180,3 +180,48 @@ if (exportExcelBtn) {
     XLSX.writeFile(wb, "AMS_Search_Log.xlsx");
   };
 };
+function renderSearchResults(results) {
+  const container = document.getElementById("searchResults");
+  if (!container) return;
+
+  if (!Array.isArray(results) || results.length === 0) {
+    container.innerHTML = "<p>No results found.</p>";
+    return;
+  }
+
+  let html = `
+    <table class="results-table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Time</th>
+          <th>First</th>
+          <th>Last</th>
+          <th>Company</th>
+          <th>Reason</th>
+          <th>Services</th>
+          <th>Signature</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+
+  results.forEach(r => {
+    html += `
+      <tr>
+        <td>${r.date || ""}</td>
+        <td>${r.time || ""}</td>
+        <td>${r.first || ""}</td>
+        <td>${r.last || ""}</td>
+        <td>${r.company || ""}</td>
+        <td>${r.reason || ""}</td>
+        <td>${Array.isArray(r.services) ? r.services.join(", ") : (r.services || "")}</td>
+        <td>${r.signature ? "✔" : ""}</td>
+      </tr>
+    `;
+  });
+
+  html += "</tbody></table>";
+  container.innerHTML = html;
+}
+
