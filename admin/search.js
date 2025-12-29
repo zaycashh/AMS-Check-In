@@ -261,13 +261,6 @@ function getSearchDateRangeLabel() {
 
   return `${fmt(lastSearchStartDate)} – ${fmt(lastSearchEndDate)}`;
 }
-function toggleCustomDateRange() {
-  const range = document.getElementById("filterDateRange").value;
-  const customFields = document.getElementById("customDateRange");
-
-  if (!customFields) return;
-  customFields.style.display = range === "custom" ? "flex" : "none";
-}
 
 window.runSearch = function () {
   const logs = getLogs();
