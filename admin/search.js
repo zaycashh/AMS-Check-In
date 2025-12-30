@@ -98,21 +98,30 @@ function parseEntryDate(entry) {
     return d;
   }
 
-  // Fallback ONLY if timestamp missing
   if (!entry?.date) return null;
 
+  // ✅ ISO FORMAT: YYYY-MM-DD
+  if (/^\d{4}-\d{2}-\d{2}/.test(entry.date)) {
+    const d = new Date(entry.date + "T00:00:00");
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }
+
+  // ✅ US FORMAT: MM/DD/YYYY
   const parts = entry.date.split("/");
-  if (parts.length !== 3) return null;
+  if (parts.length === 3) {
+    const month = Number(parts[0]);
+    const day = Number(parts[1]);
+    const year = Number(parts[2]);
 
-  const month = Number(parts[0]);
-  const day = Number(parts[1]);
-  const year = Number(parts[2]);
+    if (!month || !day || !year) return null;
 
-  if (!month || !day || !year) return null;
+    const d = new Date(year, month - 1, day);
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }
 
-  const d = new Date(year, month - 1, day);
-  d.setHours(0, 0, 0, 0);
-  return d;
+  return null;
 }
 
 /* =========================================================
