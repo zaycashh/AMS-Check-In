@@ -1,3 +1,26 @@
+function parseEntryDate(entry) {
+  // 1️⃣ Best case: timestamp (most accurate)
+  if (entry && entry.timestamp) {
+    return new Date(entry.timestamp);
+  }
+
+  // 2️⃣ ISO date: YYYY-MM-DD
+  if (entry && typeof entry.date === "string" && entry.date.includes("-")) {
+    const d = new Date(entry.date);
+    if (!isNaN(d)) return d;
+  }
+
+  // 3️⃣ US date: MM/DD/YYYY
+  if (entry && typeof entry.date === "string" && entry.date.includes("/")) {
+    const [month, day, year] = entry.date.split("/").map(Number);
+    if (month && day && year) {
+      return new Date(year, month - 1, day);
+    }
+  }
+
+  return null;
+}
+
 function getLogs() {
   return JSON.parse(localStorage.getItem("ams_logs") || "[]");
 }
