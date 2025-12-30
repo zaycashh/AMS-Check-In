@@ -311,16 +311,16 @@ if (endDate) endDate.setHours(23, 59, 59, 999);
       if (!recordCompany.includes(normalizedCompany)) return false;
     }
 
-    // 🔑 DATE FILTER (FINAL & CORRECT)
+    // 🔒 DATE FILTER (FINAL – FIXED)
+const logDate = new Date(entry.date);
+if (isNaN(logDate)) return false;
 
-    const logDate = parseEntryDate(entry);
-if (!logDate) return false;
-
-// normalize log date for date-only comparison
+// normalize for date-only comparison
 logDate.setHours(0, 0, 0, 0);
 
-if (startDate && logDate < startDate) return false;
-if (endDate && logDate > endDate) return false;
+if (startDate && endDate) {
+  if (logDate < startDate || logDate > endDate) return false;
+}
 
   // ✅ ONLY PLACE THESE VARIABLES ARE SET
   lastSearchResults = results;
