@@ -158,14 +158,18 @@ window.runSearch = function () {
       endDate = new Date(today.getFullYear() - 1, 11, 31);
       endDate.setHours(23, 59, 59, 999);
       break;
-
+        
+        case "custom":
+  if (startInput && endInput) {
     const [sy, sm, sd] = startInput.split("-").map(Number);
-startDate = new Date(sy, sm - 1, sd);
-startDate.setHours(0, 0, 0, 0);
+    startDate = new Date(sy, sm - 1, sd);
+    startDate.setHours(0, 0, 0, 0);
 
-const [ey, em, ed] = endInput.split("-").map(Number);
-endDate = new Date(ey, em - 1, ed);
-endDate.setHours(23, 59, 59, 999);
+    const [ey, em, ed] = endInput.split("-").map(Number);
+    endDate = new Date(ey, em - 1, ed);
+    endDate.setHours(23, 59, 59, 999);
+  }
+  break;
 
 
   lastSearchStartDate = startDate;
@@ -187,9 +191,10 @@ endDate.setHours(23, 59, 59, 999);
 
     if (startDate && logDate < startDate) return false;
     if (endDate && logDate > endDate) return false;
+     
+     return true;
+});
 
-    return true;
-  });
 
   lastSearchResults = results;
   currentSearchResults = results;
