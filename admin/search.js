@@ -167,51 +167,50 @@ window.runSearch = function () {
 
   let startDate = null;
   let endDate = null;
-// ------------------------------
+// ===============================
 // DATE RANGE HANDLING (FINAL)
-// ------------------------------
+// ===============================
+
 const today = new Date();
 today.setHours(0, 0, 0, 0);
 
-if (range === "Today") {
-  startDate = new Date(today);
-  endDate = new Date(today);
-  endDate.setHours(23, 59, 59, 999);
+let startDate = null;
+let endDate = null;
 
-} else if (range === "Yesterday") {
-  startDate = new Date(today);
-  startDate.setDate(today.getDate() - 1);
-  endDate = new Date(startDate);
-  endDate.setHours(23, 59, 59, 999);
+switch (range) {
+  case "today":
+    startDate = new Date(today);
+    endDate = new Date(today);
+    endDate.setHours(23, 59, 59, 999);
+    break;
 
-} else if (range === "This Week") {
-  startDate = new Date(today);
-  startDate.setDate(today.getDate() - today.getDay());
-  endDate = new Date(startDate);
-  endDate.setDate(startDate.getDate() + 6);
-  endDate.setHours(23, 59, 59, 999);
+  case "yesterday":
+    startDate = new Date(today);
+    startDate.setDate(startDate.getDate() - 1);
+    endDate = new Date(startDate);
+    endDate.setHours(23, 59, 59, 999);
+    break;
 
-} else if (range === "Last Week") {
-  startDate = new Date(today);
-  startDate.setDate(today.getDate() - today.getDay() - 7);
-  endDate = new Date(startDate);
-  endDate.setDate(startDate.getDate() + 6);
-  endDate.setHours(23, 59, 59, 999);
+  case "lastWeek":
+    startDate = new Date(today);
+    startDate.setDate(startDate.getDate() - 7);
+    endDate = new Date(today);
+    endDate.setHours(23, 59, 59, 999);
+    break;
 
-} else if (range === "This Month") {
-  startDate = new Date(today.getFullYear(), today.getMonth(), 1);
-  endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-  endDate.setHours(23, 59, 59, 999);
+  case "lastMonth":
+    startDate = new Date(today);
+    startDate.setMonth(startDate.getMonth() - 1);
+    endDate = new Date(today);
+    endDate.setHours(23, 59, 59, 999);
+    break;
 
-} else if (range === "Last Month") {
-  startDate = new Date(today.getFullYear(), today.getMonth() - 1, 1);
-  endDate = new Date(today.getFullYear(), today.getMonth(), 0);
-  endDate.setHours(23, 59, 59, 999);
-
-} else if (range === "Last Year") {
-  startDate = new Date(today.getFullYear() - 1, 0, 1);
-  endDate = new Date(today.getFullYear() - 1, 11, 31);
-  endDate.setHours(23, 59, 59, 999);
+  case "lastYear":
+    startDate = new Date(today);
+    startDate.setFullYear(startDate.getFullYear() - 1);
+    endDate = new Date(today);
+    endDate.setHours(23, 59, 59, 999);
+    break;
 }
 
 // ✅ SAVE RANGE FOR PDF / EXPORT
