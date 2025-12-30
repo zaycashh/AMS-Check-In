@@ -213,7 +213,7 @@ switch (range) {
   startDate.setHours(0, 0, 0, 0);
 
   endDate = new Date(startDate);
-  endDate.setDate(endDate.getDate() + 1);
+  endDate.setHours(23, 59, 59, 999);
   break;
     
   case "thisWeek": {
