@@ -99,6 +99,25 @@ window.toggleCustomDateRange = function (value) {
 let lastSearchStartDate = null;
 let lastSearchEndDate = null;
 
+function parseEntryDate(entry) {
+  if (!entry || !entry.date) return null;
+
+  // YYYY-MM-DD
+  if (/^\d{4}-\d{2}-\d{2}$/.test(entry.date)) {
+    const d = new Date(entry.date + "T00:00:00");
+    return isNaN(d) ? null : d;
+  }
+
+  // MM/DD/YYYY
+  if (/^\d{2}\/\d{2}\/\d{4}$/.test(entry.date)) {
+    const [m, d, y] = entry.date.split("/");
+    const date = new Date(y, m - 1, d);
+    return isNaN(date) ? null : date;
+  }
+
+  return null;
+}
+
 /* ===============================
    PDF DATE RANGE LABEL (PART 2)
 ================================ */
