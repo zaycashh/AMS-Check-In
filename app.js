@@ -351,3 +351,18 @@ document.addEventListener("input", (e) => {
   }
 });
 
+function toggleCompanyText(value) {
+  const input = document.getElementById("filterCompanyText");
+
+  if (!input) return;
+
+  if (value === "__custom__") {
+    input.style.display = "block";
+    input.disabled = false;
+    input.value = "";
+    setTimeout(() => input.focus(), 50);
+  } else {
+    input.style.display = "none";
+    input.value = "";
+  }
+}
