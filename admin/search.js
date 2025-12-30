@@ -1,3 +1,6 @@
+function getLogs() {
+  return JSON.parse(localStorage.getItem("ams_logs") || "[]");
+}
 let lastSearchResults = [];
 
 function formatShortDate(date) {
