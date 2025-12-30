@@ -81,33 +81,6 @@ window.toggleCompanyText = function (value) {
 ========================================================= */
 
 console.log("Admin Search Module Loaded");
-
-/* =========================================================
-   HELPERS
-========================================================= */
-
-function getLogs() {
-    return JSON.parse(localStorage.getItem("ams_logs") || "[]");
-}
-
-function parseEntryDate(entry) {
-  // BEST SOURCE: timestamp (most accurate)
-  if (entry && entry.timestamp) {
-    return new Date(entry.timestamp);
-  }
-
-  // Fallback: MM/DD/YYYY string
-  if (!entry || !entry.date) return null;
-
-  const [month, day, year] = entry.date.split("/").map(Number);
-  if (!month || !day || !year) return null;
-
-  const d = new Date(year, month - 1, day);
-  d.setHours(0, 0, 0, 0);
-  return d;
-}
-
-
 /* =========================================================
    DATE RANGE TOGGLE (SAFE FOR DYNAMIC DOM)
 ========================================================= */
@@ -158,30 +131,62 @@ window.runSearch = function () {
   const startInput = document.getElementById("filterStartDate")?.value;
   const endInput = document.getElementById("filterEndDate")?.value;
 
-  let startDate = null;
-  let endDate = null;
+  function normalizeDate(dateStr) {
+  if (!dateStr) return null;
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+    return new Date(dateStr + "T00:00:00");
+  }
 
-  if (range === "today") {
+  const parts = dateStr.split("/");
+  if (parts.length === 3) {
+    return new Date(parts[2], parts[0] - 1, parts[1]);
+  }
+
+  return null;
+}
+
+const today = new Date();
+today.setHours(0, 0, 0, 0);
+
+let startDate = null;
+let endDate = null;
+
+switch (range) {
+  case "today":
     startDate = new Date(today);
     endDate = new Date(today);
-  } else if (range === "yesterday") {
+    break;
+
+  case "yesterday":
     startDate = new Date(today);
     startDate.setDate(today.getDate() - 1);
     endDate = new Date(startDate);
-  } else if (range === "thisMonth") {
-    startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+    break;
+
+  case "lastWeek":
     endDate = new Date(today);
-  } else if (range === "custom" && startInput && endInput) {
-    startDate = new Date(startInput);
-    endDate = new Date(endInput);
-  }
+    endDate.setDate(today.getDate() - 1);
+    startDate = new Date(endDate);
+    startDate.setDate(endDate.getDate() - 6);
+    break;
 
-  if (startDate) startDate.setHours(0, 0, 0, 0);
-  if (endDate) endDate.setHours(23, 59, 59, 999);
+  case "lastMonth":
+    startDate = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+    endDate = new Date(today.getFullYear(), today.getMonth(), 0);
+    break;
 
+  case "thisYear":
+    startDate = new Date(today.getFullYear(), 0, 1);
+    endDate = new Date(today.getFullYear(), 11, 31);
+    break;
+
+  case "lastYear":
+    startDate = new Date(today.getFullYear() - 1, 0, 1);
+    endDate = new Date(today.getFullYear() - 1, 11, 31);
+    break;
+}
+  
   const results = logs.filter(entry => {
     if (!entry) return false;
 
@@ -193,11 +198,16 @@ window.runSearch = function () {
       if (!recordCompany.includes(normalizedCompany)) return false;
     }
 
-    if (startDate && endDate) {
-      const entryDate = parseEntryDate(entry);
-      if (!entryDate) return false;
-      if (entryDate < startDate || entryDate > endDate) return false;
-    }
+    // 🔑 DATE FILTER (FINAL & CORRECT)
+const logDate = normalizeDate(entry.date);
+if (!logDate) return false;
+
+logDate.setHours(0, 0, 0, 0);
+
+if (startDate && endDate) {
+  if (logDate < startDate || logDate > endDate) return false;
+}
+
 
     return true;
   });
