@@ -222,6 +222,20 @@ case "thisMonth":
     endDate = new Date(today.getFullYear(), today.getMonth(), 0);
     break;
 
+    case "custom":
+  if (startInput && endInput) {
+    startDate = new Date(startInput);
+    startDate.setHours(0, 0, 0, 0);
+
+    endDate = new Date(endInput);
+    endDate.setHours(23, 59, 59, 999);
+  } else {
+    // If custom selected but dates missing, disable filtering
+    startDate = null;
+    endDate = null;
+  }
+  break;
+
   case "thisYear":
   startDate = new Date(today.getFullYear(), 0, 1);     // Jan 1
   startDate.setHours(0, 0, 0, 0);
@@ -235,19 +249,6 @@ case "thisMonth":
     endDate = new Date(today.getFullYear() - 1, 11, 31);
     break;
 }
-  case "custom":
-  if (startInput && endInput) {
-    startDate = new Date(startInput);
-    startDate.setHours(0, 0, 0, 0);
-
-    endDate = new Date(endInput);
-    endDate.setHours(23, 59, 59, 999);
-  } else {
-    // If custom selected but dates missing, disable filtering
-    startDate = null;
-    endDate = null;
-  }
-  break;
   
   const results = logs.filter(entry => {
     if (!entry) return false;
