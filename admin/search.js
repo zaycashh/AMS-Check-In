@@ -249,7 +249,6 @@ case "lastWeek": {
   endDate.setHours(23, 59, 59, 999);
   break;
 }
-
     
 case "thisMonth":
   // First day of this month
@@ -275,7 +274,7 @@ case "thisMonth":
     // End at beginning of the day AFTER end date (exclusive)
     endDate = new Date(endInput);
     endDate.setDate(endDate.getDate() + 1);
-    endDate.setHours(0, 0, 0, 0);
+    endDate.setHours(23, 59, 59, 999);
   } else {
     startDate = null;
     endDate = null;
