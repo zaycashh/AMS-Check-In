@@ -91,33 +91,22 @@ function getLogs() {
 }
 
 function parseEntryDate(entry) {
-  // ✅ Use timestamp if available (most accurate)
-  if (entry?.timestamp) {
-    const d = new Date(entry.timestamp);
-    d.setHours(0, 0, 0, 0);
-    return d;
+  // BEST SOURCE: timestamp (most accurate)
+  if (entry && entry.timestamp) {
+    return new Date(entry.timestamp);
   }
 
-  if (!entry?.date) return null;
+  // Fallback: MM/DD/YYYY string
+  if (!entry || !entry.date) return null;
 
-  // ✅ ISO format: YYYY-MM-DD
-  if (/^\d{4}-\d{2}-\d{2}$/.test(entry.date)) {
-    const d = new Date(entry.date + "T00:00:00");
-    d.setHours(0, 0, 0, 0);
-    return d;
-  }
+  const [month, day, year] = entry.date.split("/").map(Number);
+  if (!month || !day || !year) return null;
 
-  // ✅ US format: MM/DD/YYYY (STRICT)
-  if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(entry.date)) {
-    const [m, d, y] = entry.date.split("/");
-    const date = new Date(Number(y), Number(m) - 1, Number(d));
-    date.setHours(0, 0, 0, 0);
-    return date;
-  }
-
-  // ❌ Anything else is INVALID and excluded
-  return null;
+  const d = new Date(year, month - 1, day);
+  d.setHours(0, 0, 0, 0);
+  return d;
 }
+
 
 /* =========================================================
    DATE RANGE TOGGLE (SAFE FOR DYNAMIC DOM)
@@ -151,108 +140,117 @@ function getSearchDateRangeLabel() {
 }
 
 window.runSearch = function () {
-  const logs = getLogs();
+    const logs = getLogs();
 
-  const first = document.getElementById("filterFirstName").value.trim().toLowerCase();
-  const last = document.getElementById("filterLastName").value.trim().toLowerCase();
-  const company = document.getElementById("filterCompany").value;
-
+    const first = document.getElementById("filterFirstName").value.trim().toLowerCase();
+    const last = document.getElementById("filterLastName").value.trim().toLowerCase();
+    const company = document.getElementById("filterCompany").value;
   const companyText = document
-    .getElementById("filterCompanyText")
-    ?.value.trim().toLowerCase();
+  .getElementById("filterCompanyText")
+  ?.value.trim().toLowerCase();
 
-  const normalizedCompany =
-    company === "__custom__" ? companyText : company.toLowerCase();
+const normalizedCompany =
+  company === "__custom__" ? companyText : company.toLowerCase();
 
-  const range = document.getElementById("filterDateRange").value.toLowerCase();
+    const range = document.getElementById("filterDateRange").value;
 
-  const startInput = document.getElementById("filterStartDate")?.value;
-  const endInput = document.getElementById("filterEndDate")?.value;
-  
-// ================================
-// DATE RANGE HANDLING (CALENDAR)
-// ================================
+    const startInput = document.getElementById("filterStartDate")?.value;
+    const endInput = document.getElementById("filterEndDate")?.value;
 
-const now = new Date();
-let startDate = null;
-let endDate = null;
+    let startDate = null;
+    let endDate = null;
 
-switch (range) {
-
-  case "today": {
-    startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    endDate = new Date(startDate);
-    endDate.setHours(23, 59, 59, 999);
-    break;
-  }
-
-  case "lastWeek": {
-    // Previous calendar week (Sun–Sat)
-    const dayOfWeek = now.getDay(); // 0 = Sunday
-    endDate = new Date(now);
-    endDate.setDate(now.getDate() - dayOfWeek - 1);
-    endDate.setHours(23, 59, 59, 999);
-
-    startDate = new Date(endDate);
-    startDate.setDate(endDate.getDate() - 6);
-    startDate.setHours(0, 0, 0, 0);
-    break;
-  }
-
-  case "lastMonth": {
-    // Previous calendar month
-    startDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-    endDate = new Date(now.getFullYear(), now.getMonth(), 0);
-    endDate.setHours(23, 59, 59, 999);
-    break;
-  }
-
-  case "thisYear": {
-    startDate = new Date(now.getFullYear(), 0, 1);
-    endDate = new Date(now.getFullYear(), 11, 31);
-    endDate.setHours(23, 59, 59, 999);
-    break;
-  }
-
-  case "lastYear": {
-    const lastYear = now.getFullYear() - 1;
-    startDate = new Date(lastYear, 0, 1);
-    endDate = new Date(lastYear, 11, 31);
-    endDate.setHours(23, 59, 59, 999);
-    break;
-  }
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+  // TODAY (local-safe)
+if (range === "today") {
+  startDate = new Date(today);
+  endDate = new Date(today);
 }
 
-// ✅ SAVE RANGE FOR PDF / EXPORT
+// YESTERDAY (local-safe)
+if (range === "yesterday") {
+  startDate = new Date(today);
+  startDate.setDate(startDate.getDate() - 1);
+
+  endDate = new Date(startDate);
+}
+  // THIS WEEK (Sunday → Saturday, local-safe)
+else if (range === "thisWeek") {
+  const todayLocal = new Date(today);
+
+  startDate = new Date(todayLocal);
+  startDate.setDate(todayLocal.getDate() - todayLocal.getDay());
+
+  endDate = new Date(startDate);
+  endDate.setDate(startDate.getDate() + 6);
+}
+
+  else if (range === "lastWeek") {
+  const todayLocal = new Date(today);
+
+  startDate = new Date(todayLocal);
+  startDate.setDate(todayLocal.getDate() - todayLocal.getDay() - 7);
+
+  endDate = new Date(startDate);
+  endDate.setDate(startDate.getDate() + 6);
+}
+  else if (range === "thisMonth") {
+  startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+  endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+}
+ else if (range === "thisYear") {
+ startDate = new Date(today.getFullYear(), 0, 1);
+ endDate = new Date(today);
+}
+else if (range === "lastMonth") {
+  startDate = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+  endDate = new Date(today.getFullYear(), today.getMonth(), 0);
+}
+
+else if (range === "lastYear") {
+  startDate = new Date(today.getFullYear() - 1, 0, 1);
+  endDate = new Date(today.getFullYear() - 1, 11, 31);
+}
+
+   
+    if (range === "custom" && startInput && endInput) {
+     const [sy, sm, sd] = startInput.split("-").map(Number);
+     const [ey, em, ed] = endInput.split("-").map(Number);
+
+     startDate = new Date(sy, sm - 1, sd);
+     endDate = new Date(ey, em - 1, ed);
+}
+
+
+    if (startDate) startDate.setHours(0, 0, 0, 0);
+    if (endDate) endDate.setHours(23, 59, 59, 999);
+  // SAVE LAST SEARCH RANGE FOR PDF
 lastSearchStartDate = startDate;
 lastSearchEndDate = endDate;
 
-  const results = logs.filter(entry => {
-    if (!entry) return false;
+    const results = logs.filter(entry => {
+        if (!entry) return false;
 
-    if (first && !entry.first?.toLowerCase().includes(first)) return false;
-    if (last && !entry.last?.toLowerCase().includes(last)) return false;
+        if (first && !entry.first?.toLowerCase().includes(first)) return false;
+        if (last && !entry.last?.toLowerCase().includes(last)) return false;
+        if (normalizedCompany && normalizedCompany !== "all companies") {
+  const recordCompany = (entry.company || "").toLowerCase();
+  if (!recordCompany.includes(normalizedCompany)) return false;
+}
+      lastSearchResults = results;
+      
+        if (startDate && endDate) {
+            const entryDate = parseEntryDate(entry);
+            if (!entryDate) return false;
+            if (entryDate < startDate || entryDate > endDate) return false;
+        }
 
-    if (normalizedCompany && normalizedCompany !== "all companies") {
-      const recordCompany = (entry.company || "").toLowerCase();
-      if (!recordCompany.includes(normalizedCompany)) return false;
-    }
-
-    if (startDate && endDate) {
-      const entryDate = parseEntryDate(entry);
-      if (!entryDate) return false;
-      if (entryDate < startDate || entryDate > endDate) return false;
-    }
-
-    return true;
-  });
-
-  // ✅ ONLY PLACE THESE VARIABLES ARE SET
-  lastSearchResults = results;
-  currentSearchResults = results;
-
-  renderSearchResults(results);
-};
+        return true;
+    });
+    // ✅ CORRECT PLACE (AFTER filter)
+lastSearchResults = results;
+currentSearchResults = results;
 
 /* =========================================================
    RENDER RESULTS
@@ -305,6 +303,8 @@ function renderSearchResults(results) {
     </tr>
   `;
 });
+
+
   
   html += `
       </tbody>
@@ -312,6 +312,37 @@ function renderSearchResults(results) {
   `;
 
   container.innerHTML = html;
+}
+
+// ==============================
+// EXPORT SEARCH RESULTS (EXCEL)
+// ==============================
+const exportExcelBtn = document.getElementById("exportExcel");
+
+if (exportExcelBtn) {
+  exportExcelBtn.onclick = () => {
+    if (!Array.isArray(lastSearchResults) || lastSearchResults.length === 0) {
+      alert("Please run a search before exporting.");
+      return;
+    }
+
+    const rows = lastSearchResults.map(r => ({
+      Date: r.date || "",
+      Time: r.time || "",
+      First: r.first || "",
+      Last: r.last || "",
+      Company: r.company || "",
+      Reason: r.reason || "",
+      Services: Array.isArray(r.services) ? r.services.join(", ") : r.services || "",
+      Signature: r.signature ? "Yes" : ""
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(rows);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Search Results");
+
+    XLSX.writeFile(wb, "AMS_Search_Log.xlsx");
+  };
 }
 
 // ==============================
@@ -351,7 +382,6 @@ if (exportPDFBtn) {
       const now = new Date();
       doc.text(`Generated: ${now.toLocaleString()}`, 14, 28);
       doc.text(`Total Records: ${currentSearchResults.length}`, 14, 34);
-     
       // ===============================
 // COMPANY LABEL (PDF HEADER)
 // ===============================
@@ -471,59 +501,6 @@ if (companySelect && companySelect.value) {
     };
   });
 }
-// ==============================
-// EXPORT SEARCH RESULTS (EXCEL – PRO STYLE)
-// ==============================
-document.addEventListener("click", (e) => {
-  if (!e.target || e.target.id !== "exportExcel") return;
-
-  if (!Array.isArray(lastSearchResults) || lastSearchResults.length === 0) {
-    alert("Please run a search before exporting.");
-    return;
-  }
-
-  const company =
-    document.getElementById("filterCompany")?.value || "All Companies";
-
-  const now = new Date().toLocaleString();
-
-  // ---- Build sheet rows manually (PRO layout)
-  const sheetData = [
-    ["AMS Search Log Report"],
-    [`Company: ${company}`],
-    [`Generated: ${now}`],
-    [],
-    ["Date", "Time", "First", "Last", "Company", "Reason", "Services", "Signature"]
-  ];
-
-  lastSearchResults.forEach(r => {
-    sheetData.push([
-      r.date || "",
-      r.time || "",
-      r.first || "",
-      r.last || "",
-      r.company || "",
-      r.reason || "",
-      Array.isArray(r.services) ? r.services.join(", ") : r.services || "",
-      r.signature ? "Yes" : ""
-    ]);
-  });
-
-  const ws = XLSX.utils.aoa_to_sheet(sheetData);
-
-  // ---- Auto column sizing
-  ws["!cols"] = sheetData[4].map((_, colIndex) => ({
-    wch: Math.max(
-      ...sheetData.map(row => (row[colIndex] || "").toString().length),
-      12
-    )
-  }));
-
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "Search Log");
-
-  XLSX.writeFile(wb, "AMS_Search_Log_Report.xlsx");
-});
 
 // ==============================
 // CLEAR FILTERS
@@ -560,12 +537,6 @@ if (clearBtn) {
     // Clear results table
     const results = document.getElementById("searchResultsTable");
     if (results) results.innerHTML = "";
-
-    // ✅ RESET SEARCH STATE (THIS FIXES PDF ISSUE)
-    lastSearchResults = [];
-    currentSearchResults = [];
-    lastSearchStartDate = null;
-    lastSearchEndDate = null;
 
   });
 }
