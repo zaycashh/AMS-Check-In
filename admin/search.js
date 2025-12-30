@@ -164,7 +164,7 @@ window.runSearch = function () {
   const normalizedCompany =
     company === "__custom__" ? companyText : company.toLowerCase();
 
-  const range = document.getElementById("filterDateRange").value;
+  const range = document.getElementById("filterDateRange").value.toLowerCase();
 
   const startInput = document.getElementById("filterStartDate")?.value;
   const endInput = document.getElementById("filterEndDate")?.value;
