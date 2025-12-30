@@ -328,6 +328,7 @@ if (startDate && endDate) {
 
   if (logDate < start || logDate > end) return false;
   }
+  
     return true;
     
   // ✅ ONLY PLACE THESE VARIABLES ARE SET
