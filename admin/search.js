@@ -191,9 +191,10 @@ switch (range) {
   case "yesterday":
   startDate = new Date(today);
   startDate.setDate(today.getDate() - 1);
+  startDate.setHours(0, 0, 0, 0);
 
   endDate = new Date(startDate);
-  endDate.setDate(endDate.getDate() + 1); // exclusive
+  endDate.setHours(23, 59, 59, 999);
   break;
     
   case "thisWeek": {
