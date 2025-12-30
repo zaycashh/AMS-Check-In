@@ -264,9 +264,11 @@ case "thisMonth":
     }
 
     // 🔑 DATE FILTER (FINAL & CORRECT)
-const logDate = normalizeDate(entry.date);
+    
+const logDate = parseEntryDate(entry);
 if (!logDate) return false;
 
+// normalize log date for date-only comparison
 logDate.setHours(0, 0, 0, 0);
 
 if (startDate && endDate) {
