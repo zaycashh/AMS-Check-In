@@ -170,7 +170,7 @@ window.runSearch = function () {
     endDate.setHours(23, 59, 59, 999);
   }
   break;
-
+}
 
   lastSearchStartDate = startDate;
   lastSearchEndDate = endDate;
