@@ -181,16 +181,20 @@ let startDate = null;
 let endDate = null;
 
 switch (range) {
+  
   case "today":
-    startDate = new Date(today);
-    endDate = new Date(today);
-    break;
+  startDate = new Date(today);
+  endDate = new Date(today);
+  endDate.setDate(endDate.getDate() + 1); // exclusive
+  break;
 
   case "yesterday":
-    startDate = new Date(today);
-    startDate.setDate(today.getDate() - 1);
-    endDate = new Date(startDate);
-    break;
+  startDate = new Date(today);
+  startDate.setDate(today.getDate() - 1);
+
+  endDate = new Date(startDate);
+  endDate.setDate(endDate.getDate() + 1); // exclusive
+  break;
     
   case "thisWeek": {
   const day = today.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
@@ -276,7 +280,12 @@ case "thisMonth":
     endDate = new Date(today.getFullYear() - 1, 11, 31);
     break;
 }
-  
+  lastSearchStartDate = startDate ? new Date(startDate) : null;
+lastSearchEndDate = endDate ? new Date(endDate) : null;
+
+  if (startDate) startDate.setHours(0, 0, 0, 0);
+if (endDate) endDate.setHours(23, 59, 59, 999);
+
   const results = logs.filter(entry => {
     if (!entry) return false;
 
