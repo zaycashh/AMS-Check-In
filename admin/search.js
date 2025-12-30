@@ -310,14 +310,6 @@ if (endDate) endDate.setHours(23, 59, 59, 999);
       const recordCompany = (entry.company || "").toLowerCase();
       if (!recordCompany.includes(normalizedCompany)) return false;
     }
-    
-    function normalizeDate(dateStr) {
-  if (!dateStr) return null;
-  const d = new Date(dateStr);
-  if (isNaN(d)) return null;
-  d.setHours(0, 0, 0, 0);
-  return d;
-}
 
   // ✅ ONLY PLACE THESE VARIABLES ARE SET
   lastSearchResults = results;
