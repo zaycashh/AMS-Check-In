@@ -310,27 +310,15 @@ if (endDate) endDate.setHours(23, 59, 59, 999);
       const recordCompany = (entry.company || "").toLowerCase();
       if (!recordCompany.includes(normalizedCompany)) return false;
     }
-   
-    // 📅 DATE FILTER (FINAL – STABLE)
-
-const logDate = new Date(entry.date);
-if (isNaN(logDate)) return false;
-
-// normalize log date (date-only)
-logDate.setHours(0, 0, 0, 0);
-
-if (startDate && endDate) {
-  const start = new Date(startDate);
-  const end = new Date(endDate);
-
-  start.setHours(0, 0, 0, 0);
-  end.setHours(23, 59, 59, 999);
-
-  if (logDate < start || logDate > end) return false;
-  }
-  
-    return true;
     
+    function normalizeDate(dateStr) {
+  if (!dateStr) return null;
+  const d = new Date(dateStr);
+  if (isNaN(d)) return null;
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
   // ✅ ONLY PLACE THESE VARIABLES ARE SET
   lastSearchResults = results;
   currentSearchResults = results;
