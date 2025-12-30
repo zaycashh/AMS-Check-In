@@ -164,46 +164,56 @@ window.runSearch = function () {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  if (range === "today") {
+  // ------------------------------
+// DATE RANGE HANDLING (FINAL)
+// ------------------------------
+const today = new Date();
+today.setHours(0, 0, 0, 0);
+
+if (range === "Today") {
   startDate = new Date(today);
-  startDate.setHours(0, 0, 0, 0);
   endDate = new Date(today);
   endDate.setHours(23, 59, 59, 999);
 
-} else if (range === "yesterday") {
+} else if (range === "Yesterday") {
   startDate = new Date(today);
   startDate.setDate(today.getDate() - 1);
-  startDate.setHours(0, 0, 0, 0);
   endDate = new Date(startDate);
   endDate.setHours(23, 59, 59, 999);
 
-} else if (range === "thisWeek") {
+} else if (range === "This Week") {
   startDate = new Date(today);
   startDate.setDate(today.getDate() - today.getDay());
-  startDate.setHours(0, 0, 0, 0);
   endDate = new Date(startDate);
   endDate.setDate(startDate.getDate() + 6);
   endDate.setHours(23, 59, 59, 999);
 
-} else if (range === "lastWeek") {
+} else if (range === "Last Week") {
   startDate = new Date(today);
   startDate.setDate(today.getDate() - today.getDay() - 7);
-  startDate.setHours(0, 0, 0, 0);
   endDate = new Date(startDate);
   endDate.setDate(startDate.getDate() + 6);
   endDate.setHours(23, 59, 59, 999);
 
-} else if (range === "thisMonth") {
+} else if (range === "This Month") {
   startDate = new Date(today.getFullYear(), today.getMonth(), 1);
   endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
   endDate.setHours(23, 59, 59, 999);
 
-} else if (range === "lastMonth") {
+} else if (range === "Last Month") {
   startDate = new Date(today.getFullYear(), today.getMonth() - 1, 1);
   endDate = new Date(today.getFullYear(), today.getMonth(), 0);
   endDate.setHours(23, 59, 59, 999);
+
+} else if (range === "Last Year") {
+  startDate = new Date(today.getFullYear() - 1, 0, 1);
+  endDate = new Date(today.getFullYear() - 1, 11, 31);
+  endDate.setHours(23, 59, 59, 999);
 }
 
+// ✅ SAVE RANGE FOR PDF / EXPORT
+lastSearchStartDate = startDate;
+lastSearchEndDate = endDate;
 
   const results = logs.filter(entry => {
     if (!entry) return false;
