@@ -91,22 +91,29 @@ function getLogs() {
 }
 
 function parseEntryDate(entry) {
-  // BEST SOURCE: timestamp (most accurate)
-  if (entry && entry.timestamp) {
-    return new Date(entry.timestamp);
+  // ✅ ALWAYS trust timestamp if present
+  if (entry?.timestamp) {
+    const d = new Date(entry.timestamp);
+    d.setHours(0, 0, 0, 0);
+    return d;
   }
 
-  // Fallback: MM/DD/YYYY string
-  if (!entry || !entry.date) return null;
+  // Fallback ONLY if timestamp missing
+  if (!entry?.date) return null;
 
-  const [month, day, year] = entry.date.split("/").map(Number);
+  const parts = entry.date.split("/");
+  if (parts.length !== 3) return null;
+
+  const month = Number(parts[0]);
+  const day = Number(parts[1]);
+  const year = Number(parts[2]);
+
   if (!month || !day || !year) return null;
 
   const d = new Date(year, month - 1, day);
   d.setHours(0, 0, 0, 0);
   return d;
 }
-
 
 /* =========================================================
    DATE RANGE TOGGLE (SAFE FOR DYNAMIC DOM)
