@@ -167,12 +167,21 @@ switch (range) {
     endDate = new Date(startDate);
     break;
 
-  case "lastWeek":
-    endDate = new Date(today);
-    endDate.setDate(today.getDate() - 1);
-    startDate = new Date(endDate);
-    startDate.setDate(endDate.getDate() - 6);
-    break;
+  case "lastWeek": {
+  const dayOfWeek = today.getDay(); // 0 = Sunday, 1 = Monday, etc.
+
+  // Last week's Sunday
+  startDate = new Date(today);
+  startDate.setDate(today.getDate() - dayOfWeek - 7);
+  startDate.setHours(0, 0, 0, 0);
+
+  // Last week's Saturday
+  endDate = new Date(startDate);
+  endDate.setDate(startDate.getDate() + 6);
+  endDate.setHours(23, 59, 59, 999);
+
+  break;
+}
 
   case "lastMonth":
     startDate = new Date(today.getFullYear(), today.getMonth() - 1, 1);
