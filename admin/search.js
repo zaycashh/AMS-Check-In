@@ -200,6 +200,7 @@ window.runSearch = function () {
   currentSearchResults = results;
 
   renderSearchResults(results);
+
 };
 
 /* =========================================================
