@@ -250,7 +250,6 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
       companyInput.style.display = "none";
       companyInput.value = "";
-      companyInput.readOnly = true;
     }
   }
 
