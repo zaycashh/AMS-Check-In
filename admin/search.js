@@ -200,7 +200,18 @@ switch (range) {
 
   break;
 }
+    
+case "thisMonth":
+  // First day of this month
+  startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+  startDate.setHours(0, 0, 0, 0);
 
+  // Last day of this month
+  endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+  endDate.setHours(23, 59, 59, 999);
+  break;
+
+    
   case "lastMonth":
     startDate = new Date(today.getFullYear(), today.getMonth() - 1, 1);
     endDate = new Date(today.getFullYear(), today.getMonth(), 0);
