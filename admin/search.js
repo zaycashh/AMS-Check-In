@@ -164,14 +164,8 @@ window.runSearch = function () {
 
   const startInput = document.getElementById("filterStartDate")?.value;
   const endInput = document.getElementById("filterEndDate")?.value;
-
-  let startDate = null;
-  let endDate = null;
-// ===============================
-// DATE RANGE HANDLING (FINAL)
-// ===============================
-
-  // ================================
+  
+// ================================
 // DATE RANGE HANDLING (CALENDAR)
 // ================================
 
