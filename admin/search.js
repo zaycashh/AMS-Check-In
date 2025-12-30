@@ -181,13 +181,16 @@ window.runSearch = function () {
   function normalizeDate(dateStr) {
   if (!dateStr) return null;
 
+  // YYYY-MM-DD (safe)
   if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
-    return new Date(dateStr + "T00:00:00");
+    const d = new Date(dateStr + "T00:00:00");
+    return isNaN(d) ? null : d;
   }
 
-  const parts = dateStr.split("/");
-  if (parts.length === 3) {
-    return new Date(parts[2], parts[0] - 1, parts[1]);
+  // MM/DD/YYYY (manual parse)
+  if (/^\d{2}\/\d{2}\/\d{4}$/.test(dateStr)) {
+    const [m, d, y] = dateStr.split("/");
+    return new Date(Number(y), Number(m) - 1, Number(d));
   }
 
   return null;
@@ -309,20 +312,15 @@ if (endDate) endDate.setHours(23, 59, 59, 999);
     }
 
     // 🔑 DATE FILTER (FINAL & CORRECT)
-    
-const logDate = parseEntryDate(entry);
+
+    const logDate = normalizeDate(entry.date);
 if (!logDate) return false;
 
 // normalize log date for date-only comparison
 logDate.setHours(0, 0, 0, 0);
 
-if (startDate && endDate) {
-  if (logDate < startDate || logDate > endDate) return false;
-}
-
-
-    return true;
-  });
+if (startDate && logDate < startDate) return false;
+if (endDate && logDate > endDate) return false;
 
   // ✅ ONLY PLACE THESE VARIABLES ARE SET
   lastSearchResults = results;
