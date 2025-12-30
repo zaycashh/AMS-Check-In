@@ -91,7 +91,7 @@ function getLogs() {
 }
 
 function parseEntryDate(entry) {
-  // ✅ ALWAYS trust timestamp if present
+  // ✅ Use timestamp if available (most accurate)
   if (entry?.timestamp) {
     const d = new Date(entry.timestamp);
     d.setHours(0, 0, 0, 0);
@@ -100,27 +100,22 @@ function parseEntryDate(entry) {
 
   if (!entry?.date) return null;
 
-  // ✅ ISO FORMAT: YYYY-MM-DD
-  if (/^\d{4}-\d{2}-\d{2}/.test(entry.date)) {
+  // ✅ ISO format: YYYY-MM-DD
+  if (/^\d{4}-\d{2}-\d{2}$/.test(entry.date)) {
     const d = new Date(entry.date + "T00:00:00");
     d.setHours(0, 0, 0, 0);
     return d;
   }
 
-  // ✅ US FORMAT: MM/DD/YYYY
-  const parts = entry.date.split("/");
-  if (parts.length === 3) {
-    const month = Number(parts[0]);
-    const day = Number(parts[1]);
-    const year = Number(parts[2]);
-
-    if (!month || !day || !year) return null;
-
-    const d = new Date(year, month - 1, day);
-    d.setHours(0, 0, 0, 0);
-    return d;
+  // ✅ US format: MM/DD/YYYY (STRICT)
+  if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(entry.date)) {
+    const [m, d, y] = entry.date.split("/");
+    const date = new Date(Number(y), Number(m) - 1, Number(d));
+    date.setHours(0, 0, 0, 0);
+    return date;
   }
 
+  // ❌ Anything else is INVALID and excluded
   return null;
 }
 
