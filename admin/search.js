@@ -232,4 +232,23 @@ function renderSearchResults(results) {
   html += "</tbody></table>";
   container.innerHTML = html;
 }
+// ================================
+// Company Custom Input Toggle
+// ================================
+window.toggleCompanyText = function (value) {
+  const input = document.getElementById("filterCompanyText");
+  if (!input) return;
 
+  if (value === "__custom__") {
+    input.style.display = "block";
+    input.disabled = false;
+    input.readOnly = false;
+    input.value = "";
+    setTimeout(() => input.focus(), 0);
+  } else {
+    input.style.display = "none";
+    input.disabled = true;
+    input.readOnly = true;
+    input.value = "";
+  }
+};
