@@ -250,3 +250,65 @@ function renderSearchResults(results) {
   html += "</tbody></table>";
   container.innerHTML = html;
 }
+document.getElementById("exportPDF")?.addEventListener("click", () => {
+  if (!currentSearchResults || !currentSearchResults.length) {
+    alert("No search results to export.");
+    return;
+  }
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF("landscape");
+
+  doc.setFontSize(16);
+  doc.text("AMS Search Log Report", 14, 15);
+
+  doc.setFontSize(10);
+  if (lastSearchStartDate && lastSearchEndDate) {
+    doc.text(
+      `Date Range: ${formatRange(lastSearchStartDate, lastSearchEndDate)}`,
+      14,
+      22
+    );
+  }
+
+  const rows = currentSearchResults.map(e => [
+    e.date || "",
+    e.time || "",
+    e.first || "",
+    e.last || "",
+    e.company || "",
+    e.reason || "",
+    Array.isArray(e.services) ? e.services.join(", ") : e.services || ""
+  ]);
+
+  doc.autoTable({
+    startY: 30,
+    head: [["Date", "Time", "First", "Last", "Company", "Reason", "Services"]],
+    body: rows,
+    styles: { fontSize: 9 }
+  });
+
+  doc.save("AMS_Search_Log_Report.pdf");
+});
+document.getElementById("exportExcel")?.addEventListener("click", () => {
+  if (!currentSearchResults || !currentSearchResults.length) {
+    alert("No search results to export.");
+    return;
+  }
+
+  const data = currentSearchResults.map(e => ({
+    Date: e.date || "",
+    Time: e.time || "",
+    First: e.first || "",
+    Last: e.last || "",
+    Company: e.company || "",
+    Reason: e.reason || "",
+    Services: Array.isArray(e.services) ? e.services.join(", ") : e.services || ""
+  }));
+
+  const worksheet = XLSX.utils.json_to_sheet(data);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Search Log");
+
+  XLSX.writeFile(workbook, "AMS_Search_Log_Report.xlsx");
+});
