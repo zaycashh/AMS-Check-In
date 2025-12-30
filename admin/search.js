@@ -270,7 +270,7 @@ if (!logDate) return false;
 logDate.setHours(0, 0, 0, 0);
 
 if (startDate && endDate) {
-  if (logDate < startDate || logDate > endDate) return false;
+  if (logDate < startDate || logDate >= endDate) return false;
 }
 
 
