@@ -260,7 +260,7 @@
       <div class="form-row">
   <label>Company</label>
 
-  <select id="filterCompany">
+  <select id="filterCompany" onchange="this.dispatchEvent(new Event('change'))">
     <option value="">All Companies</option>
     <option value="__custom__">Type Company (Custom)</option>
   </select>
@@ -269,7 +269,6 @@
   type="text"
   id="filterCompanyText"
   placeholder="Type company name"
-  class="hidden-company-input"
   style="margin-top:8px;"
 />
 
