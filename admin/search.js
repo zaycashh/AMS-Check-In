@@ -252,3 +252,22 @@ window.toggleCompanyText = function (value) {
     input.value = "";
   }
 };
+// 🔹 Enable typing when "Type Company (Custom)" is selected
+document.addEventListener("DOMContentLoaded", () => {
+  const companySelect = document.getElementById("filterCompany");
+  const companyInput = document.getElementById("filterCompanyText");
+
+  if (!companySelect || !companyInput) return;
+
+  companySelect.addEventListener("change", () => {
+    if (companySelect.value === "__custom__") {
+      companyInput.style.display = "block";
+      companyInput.disabled = false;
+      companyInput.value = "";
+      companyInput.focus();
+    } else {
+      companyInput.style.display = "none";
+      companyInput.value = "";
+    }
+  });
+});
