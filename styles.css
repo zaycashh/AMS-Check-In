@@ -478,3 +478,56 @@ body {
   background: #f4f6f8;
   font-weight: 600;
 }
+/* ===============================
+   SEARCH LOG TABLE ALIGNMENT FIX
+================================ */
+
+.results-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 16px;
+  font-size: 14px;
+}
+
+.results-table thead th {
+  background: #f3f6f9;
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 2px solid #d0d7de;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.results-table tbody td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #e1e4e8;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.results-table tbody tr:hover {
+  background-color: #f9fafb;
+}
+
+/* Column-specific alignment */
+.results-table td:nth-child(1),
+.results-table th:nth-child(1) {
+  width: 110px; /* Date */
+}
+
+.results-table td:nth-child(2),
+.results-table th:nth-child(2) {
+  width: 110px; /* Time */
+}
+
+.results-table td:nth-child(8),
+.results-table th:nth-child(8) {
+  text-align: center; /* Signature */
+  width: 90px;
+}
+
+/* Signature checkmark */
+.results-table td:last-child {
+  font-size: 16px;
+  font-weight: bold;
+}
