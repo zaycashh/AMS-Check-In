@@ -167,11 +167,7 @@ window.runSearch = function () {
 
   let startDate = null;
   let endDate = null;
-
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  // ------------------------------
+// ------------------------------
 // DATE RANGE HANDLING (FINAL)
 // ------------------------------
 const today = new Date();
