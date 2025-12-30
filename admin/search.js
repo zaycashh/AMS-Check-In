@@ -216,7 +216,15 @@ function renderSearchResults(results) {
         <td>${r.company || ""}</td>
         <td>${r.reason || ""}</td>
         <td>${Array.isArray(r.services) ? r.services.join(", ") : (r.services || "")}</td>
-        <td>${r.signature ? "✔" : ""}</td>
+        <td>
+  ${
+    r.signature
+      ? `<img src="${r.signature}"
+        style="width:90px; height:40px; object-fit:contain; border:1px solid #ccc;" />`
+      : ""
+  }
+</td>
+
       </tr>
     `;
   });
