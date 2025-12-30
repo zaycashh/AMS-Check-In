@@ -232,45 +232,32 @@ function renderSearchResults(results) {
   html += "</tbody></table>";
   container.innerHTML = html;
 }
-// ================================
-// Company Custom Input Toggle
-// ================================
-window.toggleCompanyText = function (value) {
-  const input = document.getElementById("filterCompanyText");
-  if (!input) return;
-
-  if (value === "__custom__") {
-    input.style.display = "block";
-    input.disabled = false;
-    input.readOnly = false;
-    input.value = "";
-    setTimeout(() => input.focus(), 0);
-  } else {
-    input.style.display = "none";
-    input.disabled = true;
-    input.readOnly = true;
-    input.value = "";
-  }
-};
-// 🔹 Enable typing when "Type Company (Custom)" is selected
+// =====================================================
+// Company Custom Input Toggle (Search Log)
+// =====================================================
 document.addEventListener("DOMContentLoaded", () => {
   const companySelect = document.getElementById("filterCompany");
   const companyInput = document.getElementById("filterCompanyText");
 
-  if (!companySelect || !companyInput) {
-    return;
-  }
+  if (!companySelect || !companyInput) return;
 
-  companySelect.addEventListener("change", () => {
+  function toggleCompanyInput() {
     if (companySelect.value === "__custom__") {
       companyInput.style.display = "block";
       companyInput.disabled = false;
-      companyInput.value = "";
+      companyInput.readOnly = false;
       companyInput.focus();
     } else {
       companyInput.style.display = "none";
       companyInput.value = "";
+      companyInput.disabled = true;
+      companyInput.readOnly = true;
     }
-  });
-});
+  }
 
+  // Run when dropdown changes
+  companySelect.addEventListener("change", toggleCompanyInput);
+
+  // Run once on page load (handles pre-selected value)
+  toggleCompanyInput();
+});
