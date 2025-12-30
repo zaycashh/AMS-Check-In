@@ -313,7 +313,7 @@ if (endDate) endDate.setHours(23, 59, 59, 999);
 
     // 🔑 DATE FILTER (FINAL & CORRECT)
 
-    const logDate = normalizeDate(entry.date);
+    const logDate = parseEntryDate(entry);
 if (!logDate) return false;
 
 // normalize log date for date-only comparison
