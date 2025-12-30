@@ -265,21 +265,18 @@ case "thisMonth":
   endDate = new Date(today.getFullYear(), today.getMonth(), 1);
   break;
 
-    case "custom":
+   case "custom":
   if (startInput && endInput) {
-
     startDate = new Date(startInput);
-    startDate.setHours(0, 0, 0, 0); // start of day
+    startDate.setHours(0, 0, 0, 0);
 
     endDate = new Date(endInput);
-    endDate.setHours(23, 59, 59, 999); // end of day
-
+    endDate.setHours(23, 59, 59, 999);
   } else {
     startDate = null;
     endDate = null;
   }
   break;
-
 
   case "thisYear":
   startDate = new Date(today.getFullYear(), 0, 1);     // Jan 1
