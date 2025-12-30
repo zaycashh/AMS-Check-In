@@ -232,30 +232,3 @@ function renderSearchResults(results) {
   html += "</tbody></table>";
   container.innerHTML = html;
 }
-// =====================================================
-// Company Custom Input Toggle (Search Log)
-// =====================================================
-document.addEventListener("DOMContentLoaded", () => {
-  const companySelect = document.getElementById("filterCompany");
-  const companyInput = document.getElementById("filterCompanyText");
-
-  if (!companySelect || !companyInput) return;
-
-  function toggleCompanyInput() {
-    if (companySelect.value === "__custom__") {
-      companyInput.style.display = "block";
-      companyInput.disabled = false;
-      companyInput.readOnly = false;
-      companyInput.focus();
-    } else {
-      companyInput.style.display = "none";
-      companyInput.value = "";
-    }
-  }
-
-  // Run when dropdown changes
-  companySelect.addEventListener("change", toggleCompanyInput);
-
-  // Run once on page load (handles pre-selected value)
-  toggleCompanyInput();
-});
