@@ -163,11 +163,16 @@ if (reason === "other") {
 
     const canvas = document.getElementById("signaturePad");
     const signature = canvas.toDataURL();
+// ===== DATE & RECORD (MM/DD/YYYY – FINAL) =====
+const now = new Date();
 
-   const now = new Date();
+const formattedDate =
+  `${String(now.getMonth() + 1).padStart(2, "0")}/` +
+  `${String(now.getDate()).padStart(2, "0")}/` +
+  `${now.getFullYear()}`;
 
 const record = {
-  date: now.toISOString().split("T")[0], // ✅ YYYY-MM-DD (CRITICAL)
+  date: formattedDate, // ✅ REQUIRED FOR SEARCH
   time: now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
   first,
   last,
@@ -176,15 +181,13 @@ const record = {
   services: services.join(", "),
   signature
 };
-   // SAVE TO MASTER SEARCH LOG (ONE SOURCE OF TRUTH)
+
+// SAVE TO MASTER SEARCH LOG
 let logs = JSON.parse(localStorage.getItem("ams_logs") || "[]");
-
-// add timestamp for accurate searching
 record.timestamp = Date.now();
-
 logs.push(record);
 localStorage.setItem("ams_logs", JSON.stringify(logs));
-
+   
 alert("Check-in submitted!");
 location.reload();
 });
