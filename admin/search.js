@@ -224,13 +224,15 @@ case "thisMonth":
 
     case "custom":
   if (startInput && endInput) {
+    // Start at beginning of start day
     startDate = new Date(startInput);
     startDate.setHours(0, 0, 0, 0);
 
+    // End at beginning of the day AFTER end date (exclusive)
     endDate = new Date(endInput);
-    endDate.setHours(23, 59, 59, 999);
+    endDate.setDate(endDate.getDate() + 1);
+    endDate.setHours(0, 0, 0, 0);
   } else {
-    // If custom selected but dates missing, disable filtering
     startDate = null;
     endDate = null;
   }
