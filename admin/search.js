@@ -171,43 +171,58 @@ window.runSearch = function () {
 // DATE RANGE HANDLING (FINAL)
 // ===============================
 
-const today = new Date();
-today.setHours(0, 0, 0, 0);
+  // ================================
+// DATE RANGE HANDLING (CALENDAR)
+// ================================
+
+const now = new Date();
+let startDate = null;
+let endDate = null;
 
 switch (range) {
-  case "today":
-    startDate = new Date(today);
-    endDate = new Date(today);
-    endDate.setHours(23, 59, 59, 999);
-    break;
 
-  case "yesterday":
-    startDate = new Date(today);
-    startDate.setDate(startDate.getDate() - 1);
+  case "today": {
+    startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     endDate = new Date(startDate);
     endDate.setHours(23, 59, 59, 999);
     break;
+  }
 
-  case "lastWeek":
-    startDate = new Date(today);
-    startDate.setDate(startDate.getDate() - 7);
-    endDate = new Date(today);
+  case "lastWeek": {
+    // Previous calendar week (Sun–Sat)
+    const dayOfWeek = now.getDay(); // 0 = Sunday
+    endDate = new Date(now);
+    endDate.setDate(now.getDate() - dayOfWeek - 1);
+    endDate.setHours(23, 59, 59, 999);
+
+    startDate = new Date(endDate);
+    startDate.setDate(endDate.getDate() - 6);
+    startDate.setHours(0, 0, 0, 0);
+    break;
+  }
+
+  case "lastMonth": {
+    // Previous calendar month
+    startDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    endDate = new Date(now.getFullYear(), now.getMonth(), 0);
     endDate.setHours(23, 59, 59, 999);
     break;
+  }
 
-  case "lastMonth":
-    startDate = new Date(today);
-    startDate.setMonth(startDate.getMonth() - 1);
-    endDate = new Date(today);
+  case "thisYear": {
+    startDate = new Date(now.getFullYear(), 0, 1);
+    endDate = new Date(now.getFullYear(), 11, 31);
     endDate.setHours(23, 59, 59, 999);
     break;
+  }
 
-  case "lastYear":
-    startDate = new Date(today);
-    startDate.setFullYear(startDate.getFullYear() - 1);
-    endDate = new Date(today);
+  case "lastYear": {
+    const lastYear = now.getFullYear() - 1;
+    startDate = new Date(lastYear, 0, 1);
+    endDate = new Date(lastYear, 11, 31);
     endDate.setHours(23, 59, 59, 999);
     break;
+  }
 }
 
 // ✅ SAVE RANGE FOR PDF / EXPORT
