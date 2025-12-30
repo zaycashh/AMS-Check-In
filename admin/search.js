@@ -166,6 +166,24 @@ switch (range) {
     startDate.setDate(today.getDate() - 1);
     endDate = new Date(startDate);
     break;
+    
+  case "thisWeek": {
+  const day = today.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+
+  // Monday of this week
+  const diffToMonday = day === 0 ? -6 : 1 - day;
+
+  startDate = new Date(today);
+  startDate.setDate(today.getDate() + diffToMonday);
+  startDate.setHours(0, 0, 0, 0);
+
+  // Sunday of this week
+  endDate = new Date(startDate);
+  endDate.setDate(startDate.getDate() + 6);
+  endDate.setHours(23, 59, 59, 999);
+
+  break;
+}
 
   case "lastWeek": {
   const dayOfWeek = today.getDay(); // 0 = Sunday, 1 = Monday, etc.
