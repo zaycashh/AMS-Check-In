@@ -194,7 +194,7 @@ switch (range) {
   startDate.setHours(0, 0, 0, 0);
 
   endDate = new Date(startDate);
-  endDate.setHours(23, 59, 59, 999);
+  endDate.setDate(endDate.getDate() + 1);
   break;
     
   case "thisWeek": {
@@ -216,24 +216,18 @@ switch (range) {
 }
 
 case "lastWeek": {
-  const day = today.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+  const day = today.getDay();
   const diffToMonday = day === 0 ? -6 : 1 - day;
 
-  // Monday of THIS week
   const thisMonday = new Date(today);
   thisMonday.setDate(today.getDate() + diffToMonday);
   thisMonday.setHours(0, 0, 0, 0);
 
-  // Monday of LAST week
   startDate = new Date(thisMonday);
   startDate.setDate(thisMonday.getDate() - 7);
-  startDate.setHours(0, 0, 0, 0);
 
-  // Sunday of LAST week
   endDate = new Date(startDate);
-  endDate.setDate(startDate.getDate() + 6);
-  endDate.setHours(23, 59, 59, 999);
-
+  endDate.setDate(endDate.getDate() + 7);
   break;
 }
     
@@ -248,9 +242,9 @@ case "thisMonth":
   break;
  
   case "lastMonth":
-    startDate = new Date(today.getFullYear(), today.getMonth() - 1, 1);
-    endDate = new Date(today.getFullYear(), today.getMonth(), 0);
-    break;
+  startDate = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+  endDate = new Date(today.getFullYear(), today.getMonth(), 1);
+  break;
 
     case "custom":
   if (startInput && endInput) {
