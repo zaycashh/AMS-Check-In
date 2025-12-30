@@ -174,9 +174,6 @@ window.runSearch = function () {
 const today = new Date();
 today.setHours(0, 0, 0, 0);
 
-let startDate = null;
-let endDate = null;
-
 switch (range) {
   case "today":
     startDate = new Date(today);
