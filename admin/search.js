@@ -235,20 +235,21 @@ switch (range) {
 }
 
 case "lastWeek": {
-  const day = today.getDay();
-  const diffToMonday = day === 0 ? -6 : 1 - day;
+  const todayDay = today.getDay(); // 0 = Sun, 1 = Mon
 
-  const thisMonday = new Date(today);
-  thisMonday.setDate(today.getDate() + diffToMonday);
-  thisMonday.setHours(0, 0, 0, 0);
+  // Go back to last Monday
+  startDate = new Date(today);
+  const diffToMonday = todayDay === 0 ? 6 : todayDay - 1;
+  startDate.setDate(today.getDate() - diffToMonday - 7);
+  startDate.setHours(0, 0, 0, 0);
 
-  startDate = new Date(thisMonday);
-  startDate.setDate(thisMonday.getDate() - 7);
-
+  // Last Sunday
   endDate = new Date(startDate);
-  endDate.setDate(endDate.getDate() + 7);
+  endDate.setDate(startDate.getDate() + 6);
+  endDate.setHours(23, 59, 59, 999);
   break;
 }
+
     
 case "thisMonth":
   // First day of this month
