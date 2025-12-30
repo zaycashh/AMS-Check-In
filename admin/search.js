@@ -257,7 +257,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const companySelect = document.getElementById("filterCompany");
   const companyInput = document.getElementById("filterCompanyText");
 
-  if (!companySelect || !companyInput) return;
+  if (!companySelect || !companyInput) {
+    return;
+  }
 
   companySelect.addEventListener("change", () => {
     if (companySelect.value === "__custom__") {
@@ -271,3 +273,4 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
+
