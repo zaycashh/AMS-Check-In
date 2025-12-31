@@ -312,29 +312,30 @@
       
     <div id="searchResultsTable" class="search-results"></div>
 
-<div id="tabRecent" class="tab-content" style="display:block;">
+<div id="tabRecent" class="tab-content" style="display:none;">
+
     <!-- Recent Check-Ins -->
 </div>
 
 <div id="tabManage" class="tab-content" style="display:none;">
-
   <h2 class="section-title">Manage Companies</h2>
 
-  <div style="display:flex; gap:10px; margin-bottom:15px;">
+  <div style="max-width:500px;">
     <input
       type="text"
-      id="newCompanyInput"
+      id="companyInput"
       placeholder="Enter company name"
-      style="flex:1; padding:8px;"
+      style="width:100%; padding:10px; margin-bottom:10px;"
     />
+
     <button id="addCompanyBtn" class="primary-btn">
       Add Company
     </button>
   </div>
 
-  <div id="companyList"></div>
-
+  <div id="companyList" style="margin-top:20px;"></div>
 </div>
+
 
 </section>
 
