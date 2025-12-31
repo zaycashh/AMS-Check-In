@@ -71,3 +71,15 @@ function renderCompanyManager() {
     };
   });
 }
+// 🔧 SAFE GLOBAL EXPOSURE (DO NOT REMOVE)
+if (typeof renderCompanyManager === "function") {
+  window.renderCompanyManager = renderCompanyManager;
+} else {
+  window.renderCompanyManager = function () {
+    const list = document.getElementById("companyList");
+    if (list) {
+      list.innerHTML =
+        "<p style='opacity:.6'>Company manager loaded, no renderer found.</p>";
+    }
+  };
+}
