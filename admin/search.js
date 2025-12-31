@@ -43,7 +43,7 @@ function formatRange(startDate, endDate) {
 
 function toggleCompanyText(value) {
   const select = document.getElementById("searchFilterCompany");
-  const input = document.getElementById("searchFilterCompanyText")
+  const input = document.getElementById("searchFilterCompanyText");
 
   if (!select || !input) return;
 
