@@ -371,7 +371,7 @@ if (typedCompany) {
     );
   }
 });
-
+});
 
 // ==============================
 // EXPORT SEARCH RESULTS (EXCEL – PRO STYLE)
