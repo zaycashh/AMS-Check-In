@@ -92,14 +92,9 @@ window.runSearch = function () {
 
   const first = document.getElementById("filterFirstName").value.trim().toLowerCase();
   const last = document.getElementById("filterLastName").value.trim().toLowerCase();
-  const company = document.getElementById("filterCompany").value;
-
-  const companyText = document
-    .getElementById("filterCompanyText")
-    ?.value.trim().toLowerCase();
-
-  const normalizedCompany =
-    company === "__custom__" ? companyText : company.toLowerCase();
+  const typedCompany = document
+  .getElementById("searchFilterCompanyText")
+  ?.value.trim().toLowerCase();
 
   const range = document.getElementById("filterDateRange").value;
   const startInput = document.getElementById("filterStartDate")?.value;
@@ -193,11 +188,9 @@ window.runSearch = function () {
     if (first && !entry.first?.toLowerCase().includes(first)) return false;
     if (last && !entry.last?.toLowerCase().includes(last)) return false;
 
-    if (normalizedCompany && normalizedCompany !== "all companies") {
+    if (typedCompany) {
   const recordCompany = (entry.company || "").toLowerCase().trim();
-
-  // 🔒 STRICT MATCH ONLY
-  if (recordCompany !== normalizedCompany) return false;
+  if (recordCompany !== typedCompany) return false;
 }
 
     const logDate = normalizeDate(entry.date);
