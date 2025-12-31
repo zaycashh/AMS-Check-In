@@ -405,7 +405,8 @@ if (companySelect && companySelect.value) {
 
       doc.save("AMS_Search_Log_Report.pdf");
     };
-     // ==============================
+  });   
+// ==============================
 // EXPORT SEARCH RESULTS (EXCEL – PRO STYLE)
 // ==============================
 document.addEventListener("click", (e) => {
