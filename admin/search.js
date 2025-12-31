@@ -45,24 +45,23 @@ function formatRange(startDate, endDate) {
    COMPANY CUSTOM INPUT
 ========================================================= */
 function toggleCompanyText(value) {
+  const select = document.getElementById("filterCompany");
   const input = document.getElementById("filterCompanyText");
-  if (!input) return;
+  if (!select || !input) return;
 
   if (value === "__custom__") {
+    select.style.display = "none";   // 🔑 hide select
     input.style.display = "block";
-    input.removeAttribute("disabled"); // 🔑 THIS IS THE FIX
+    input.disabled = false;
     input.value = "";
-    setTimeout(() => input.focus(), 0);
+    input.focus();
   } else {
+    select.style.display = "block";  // 🔑 show select
     input.style.display = "none";
     input.value = "";
-    input.setAttribute("disabled", "true");
+    input.disabled = true;
   }
 }
-
-// ==============================
-// COMPANY DROPDOWN CHANGE LISTENER
-// ==============================
 const companySelect = document.getElementById("filterCompany");
 
 if (companySelect) {
