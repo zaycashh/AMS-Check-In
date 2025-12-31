@@ -317,7 +317,23 @@
 </div>
 
 <div id="tabManage" class="tab-content" style="display:none;">
-    <!-- Manage Companies -->
+
+  <h2 class="section-title">Manage Companies</h2>
+
+  <div style="display:flex; gap:10px; margin-bottom:15px;">
+    <input
+      type="text"
+      id="newCompanyInput"
+      placeholder="Enter company name"
+      style="flex:1; padding:8px;"
+    />
+    <button id="addCompanyBtn" class="primary-btn">
+      Add Company
+    </button>
+  </div>
+
+  <div id="companyList"></div>
+
 </div>
 
 </section>
