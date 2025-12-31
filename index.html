@@ -189,17 +189,19 @@
   <h2 class="section-title">Detail Company Report</h2>
 
   <div class="export-bar">
-  <label>
-    Company:
-    <select id="filterCompany"></select>
-  </label>
+ 
+    <select id="filterCompany">
+  <option value="">-- Select Company --</option>
+  <option value="all">All Companies</option>
+  <option value="__custom__">Type Company (Custom)</option>
+</select>
 
-  <input
-    id="filterCompanyText"
-    type="text"
-    placeholder="Enter company name"
-    style="display:none;"
-  />
+<input
+  id="filterCompanyText"
+  type="text"
+  placeholder="Enter company name"
+  style="display:none;"
+/>
 
   <button id="companyDetailExcelBtn">Export Excel</button>
   <button id="companyDetailPdfBtn" style="display:inline-block; margin-left:8px;">
