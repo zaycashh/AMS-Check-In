@@ -1,80 +1,75 @@
-// admin/manageCompanies.js
+console.log("Manage Companies Module Loaded");
 
-const STORAGE_KEY = "ams_companies";
+// Storage key
+const COMPANY_KEY = "ams_companies";
 
+// Get companies
 function getCompanies() {
-  return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+  return JSON.parse(localStorage.getItem(COMPANY_KEY)) || [];
 }
 
-function saveCompanies(list) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+// Save companies
+function saveCompanies(companies) {
+  localStorage.setItem(COMPANY_KEY, JSON.stringify(companies));
 }
 
+// Render list
 function renderCompanyManager() {
-  const listEl = document.getElementById("companyList");
-  if (!listEl) return;
+  const list = document.getElementById("companyList");
+  if (!list) return;
 
   const companies = getCompanies();
-  listEl.innerHTML = "";
+  list.innerHTML = "";
 
   if (companies.length === 0) {
-    listEl.innerHTML = "<p style='opacity:.6'>No companies added yet.</p>";
+    list.innerHTML = "<p>No companies added yet.</p>";
     return;
   }
 
   companies.forEach((name, index) => {
     const row = document.createElement("div");
     row.style.display = "flex";
-    row.style.justifyContent = "space-between";
     row.style.alignItems = "center";
     row.style.marginBottom = "8px";
-    row.style.padding = "10px";
-    row.style.border = "1px solid #ddd";
-    row.style.borderRadius = "8px";
+    row.style.gap = "8px";
 
-    const label = document.createElement("strong");
+    const label = document.createElement("span");
     label.textContent = name;
+    label.style.flex = "1";
 
-    const delBtn = document.createElement("button");
-    delBtn.textContent = "Delete";
-    delBtn.style.background = "#d9534f";
-    delBtn.style.color = "#fff";
-    delBtn.style.border = "none";
-    delBtn.style.padding = "6px 12px";
-    delBtn.style.borderRadius = "6px";
-    delBtn.style.cursor = "pointer";
-
-    delBtn.onclick = () => {
+    const del = document.createElement("button");
+    del.textContent = "Delete";
+    del.onclick = () => {
       companies.splice(index, 1);
       saveCompanies(companies);
       renderCompanyManager();
     };
 
     row.appendChild(label);
-    row.appendChild(delBtn);
-    listEl.appendChild(row);
+    row.appendChild(del);
+    list.appendChild(row);
   });
 }
 
+// Add company
 document.addEventListener("DOMContentLoaded", () => {
-  const input = document.getElementById("companyInput");
   const btn = document.getElementById("addCompanyBtn");
+  const input = document.getElementById("companyInput");
 
-  if (!input || !btn) return;
+  if (!btn || !input) return;
 
   btn.addEventListener("click", () => {
     const name = input.value.trim();
-    if (!name) return alert("Enter a company name");
+    if (!name) return;
 
     const companies = getCompanies();
-    if (companies.includes(name)) {
-      alert("Company already exists");
-      return;
-    }
-
     companies.push(name);
     saveCompanies(companies);
+
     input.value = "";
     renderCompanyManager();
   });
 });
+
+// Expose for tab init
+window.renderCompanyManager = renderCompanyManager;
