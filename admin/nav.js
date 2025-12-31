@@ -43,5 +43,5 @@ if (defaultRecentTab) {
 }
 // INIT MANAGE COMPANIES
 if (targetId === "tabManage" && typeof renderCompanyManager === "function") {
-    renderCompanyManager();
+  renderCompanyManager();
 }
