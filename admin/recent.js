@@ -36,7 +36,23 @@ const recent = logs
 
 
     let html = `
-        <h2>Recent Check-Ins</h2>
+        let html = `
+  <h2 style="display:flex; align-items:center; gap:10px;">
+    Recent Check-Ins
+    <span style="
+      background:#1e88e5;
+      color:#fff;
+      padding:3px 10px;
+      border-radius:999px;
+      font-size:0.85rem;
+      font-weight:600;
+    ">
+      Today: ${todayCount}
+    </span>
+  </h2>
+
+  <table class="log-table">
+`;
         <table class="log-table">
             <thead>
                 <tr>
