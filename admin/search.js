@@ -47,27 +47,33 @@ function formatRange(startDate, endDate) {
 function toggleCompanyText(value) {
   const select = document.getElementById("filterCompany");
   const input = document.getElementById("filterCompanyText");
+
   if (!select || !input) return;
 
   if (value === "__custom__") {
-    select.style.display = "none";   // 🔑 hide select
-    input.style.display = "block";
-    input.disabled = false;
-    input.value = "";
-    input.focus();
-  } else {
-    select.style.display = "block";  // 🔑 show select
-    input.style.display = "none";
-    input.value = "";
-    input.disabled = true;
-  }
-}
-const companySelect = document.getElementById("filterCompany");
+    // hide select completely (important)
+    select.style.visibility = "hidden";
+    select.style.position = "absolute";
+    select.style.pointerEvents = "none";
 
-if (companySelect) {
-  companySelect.addEventListener("change", (e) => {
-    toggleCompanyText(e.target.value);
-  });
+    // show input
+    input.style.display = "block";
+    input.style.position = "relative";
+    input.style.pointerEvents = "auto";
+    input.disabled = false;
+
+    setTimeout(() => input.focus(), 0);
+  } else {
+    // show select again
+    select.style.visibility = "visible";
+    select.style.position = "relative";
+    select.style.pointerEvents = "auto";
+
+    // hide input
+    input.style.display = "none";
+    input.disabled = true;
+    input.value = "";
+  }
 }
 
 /* =========================================================
