@@ -36,7 +36,6 @@ const recent = logs
 
 
     let html = `
-        let html = `
   <h2 style="display:flex; align-items:center; gap:10px;">
     Recent Check-Ins
     <span style="
@@ -52,21 +51,20 @@ const recent = logs
   </h2>
 
   <table class="log-table">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Time</th>
+        <th>First Name</th>
+        <th>Last Name</th>
+        <th>Company</th>
+        <th>Reason</th>
+        <th>Signature</th>
+      </tr>
+    </thead>
+    <tbody>
 `;
-        <table class="log-table">
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Time</th>
-                    <th>First Name</th>
-                    <th>Last Name</th>
-                    <th>Company</th>
-                    <th>Reason</th>
-                    <th>Signature</th>
-                </tr>
-            </thead>
-            <tbody>
-    `;
+
 
     recent.forEach(log => {
         const firstName = log.firstName || (log.name ? log.name.split(" ")[0] : "");
