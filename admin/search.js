@@ -297,16 +297,14 @@ if (exportPDFBtn) {
 
       // COMPANY LABEL
       let company = "All Companies";
-      const companySelect = document.getElementById("filterCompany");
-      const companyText = document.getElementById("filterCompanyText");
 
-      if (companySelect && companySelect.value) {
-        if (companySelect.value === "__custom__") {
-          company = companyText?.value?.trim() || "Individual";
-        } else if (companySelect.value !== "All Companies") {
-          company = companySelect.value;
-        }
-      }
+const typedCompany = document
+  .getElementById("searchFilterCompanyText")
+  ?.value.trim();
+
+if (typedCompany) {
+  company = typedCompany.toUpperCase();
+}
 
       doc.text(`Company: ${company}`, 120, 28);
 
