@@ -51,22 +51,21 @@ function toggleCompanyText(value) {
   if (!select || !input) return;
 
   if (value === "__custom__") {
-    // hide select completely (important)
-    select.style.visibility = "hidden";
-    select.style.position = "absolute";
+    // fully disable select
+    select.style.display = "none";
     select.style.pointerEvents = "none";
 
-    // show input
+    // enable input
     input.style.display = "block";
-    input.style.position = "relative";
     input.style.pointerEvents = "auto";
     input.disabled = false;
+    input.readOnly = false;
+    input.style.zIndex = "10";
 
     setTimeout(() => input.focus(), 0);
   } else {
-    // show select again
-    select.style.visibility = "visible";
-    select.style.position = "relative";
+    // restore select
+    select.style.display = "block";
     select.style.pointerEvents = "auto";
 
     // hide input
