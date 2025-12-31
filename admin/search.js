@@ -384,15 +384,16 @@ document.addEventListener("click", (e) => {
     return;
   }
 
+  // COMPANY LABEL (MATCH SEARCH & PDF)
   let company = "All Companies";
 
-const typedCompany = document
-  .getElementById("searchFilterCompanyText")
-  ?.value.trim();
+  const typedCompany = document
+    .getElementById("searchFilterCompanyText")
+    ?.value.trim();
 
-if (typedCompany) {
-  company = typedCompany.toUpperCase();
-}
+  if (typedCompany) {
+    company = typedCompany.toUpperCase();
+  }
 
   const now = new Date().toLocaleString();
 
@@ -401,7 +402,7 @@ if (typedCompany) {
     [`Company: ${company}`],
     [`Generated: ${now}`],
     [],
-    ["Date","Time","First","Last","Company","Reason","Services","Signature"]
+    ["Date", "Time", "First", "Last", "Company", "Reason", "Services", "Signature"]
   ];
 
   lastSearchResults.forEach(r => {
@@ -413,12 +414,14 @@ if (typedCompany) {
       r.company || "",
       r.reason || "",
       Array.isArray(r.services) ? r.services.join(", ") : r.services || "",
-      r.signature ? "Yes" : ""
+      r.signature ? "Signed" : ""
     ]);
   });
 
   const ws = XLSX.utils.aoa_to_sheet(sheetData);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Search Log");
+
   XLSX.writeFile(wb, "AMS_Search_Log_Report.xlsx");
 });
+
