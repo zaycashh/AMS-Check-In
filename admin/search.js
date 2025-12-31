@@ -458,4 +458,5 @@ document.addEventListener("click", (e) => {
 
   XLSX.writeFile(wb, "AMS_Search_Log_Report.xlsx");
 });
-
+});
+   
