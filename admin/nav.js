@@ -23,18 +23,27 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       // ✅ INIT GENERAL
-      if (targetId === "tabGeneral") {
+      if (targetId === "tabGeneral" && typeof initGeneralReport === "function") {
         initGeneralReport();
       }
 
-      // ✅ INIT RECENT (THIS WAS MISSING)
+      // ✅ INIT RECENT
       if (targetId === "tabRecent" && typeof renderRecentCheckIns === "function") {
         renderRecentCheckIns();
       }
 
-// ✅ Default Admin Tab = Recent Check-Ins
-const defaultRecentTab = document.querySelector('.tab[data-tab="tabRecent"]');
-if (defaultRecentTab) {
-  defaultRecentTab.click();
-}
+      // ✅ INIT MANAGE COMPANIES
+      if (targetId === "tabManage" && typeof renderCompanyManager === "function") {
+        renderCompanyManager();
+      }
+
+      tab.classList.add("active");
+    });
+  });
+
+  // ✅ DEFAULT ADMIN TAB = RECENT CHECK-INS
+  const defaultRecentTab = document.querySelector('.tab[data-tab="tabRecent"]');
+  if (defaultRecentTab) {
+    defaultRecentTab.click();
+  }
 });
