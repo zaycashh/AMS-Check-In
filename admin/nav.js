@@ -41,3 +41,7 @@ const defaultRecentTab = document.querySelector('.tab[data-tab="tabRecent"]');
 if (defaultRecentTab) {
   defaultRecentTab.click();
 }
+// INIT MANAGE COMPANIES
+if (targetId === "tabManage" && typeof renderCompanyManager === "function") {
+    renderCompanyManager();
+}
