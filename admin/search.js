@@ -340,24 +340,35 @@ if (exportPDFBtn) {
         columnStyles: { 7: { cellWidth: 35 } },
 
         didDrawCell: function (data) {
-          if (data.column.index === 7 && data.row.index >= 0) {
-            const entry = currentSearchResults[data.row.index];
-            if (entry && entry.signature) {
-              try {
-                doc.addImage(
-                  entry.signature,
-                  "PNG",
-                  data.cell.x + 2,
-                  data.cell.y + 2,
-                  30,
-                  12
-                );
-              } catch (err) {
-                console.warn("Signature render failed", err);
-              }
-            }
-          }
-        },
+  if (data.column.index === 7 && data.row.index >= 0) {
+    const entry = currentSearchResults[data.row.index];
+    if (entry && entry.signature) {
+      try {
+        const cellWidth = data.cell.width;
+        const cellHeight = data.cell.height;
+
+        // Signature size (adjustable)
+        const sigWidth = 28;
+        const sigHeight = 10;
+
+        // Center signature in cell
+        const x = data.cell.x + (cellWidth - sigWidth) / 2;
+        const y = data.cell.y + (cellHeight - sigHeight) / 2;
+
+        doc.addImage(
+          entry.signature,
+          "PNG",
+          x,
+          y,
+          sigWidth,
+          sigHeight
+        );
+      } catch (err) {
+        console.warn("Signature render failed", err);
+      }
+    }
+  }
+},
 
         didDrawPage: () => {
           const h = doc.internal.pageSize.getHeight();
