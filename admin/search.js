@@ -41,7 +41,7 @@ function formatRange(startDate, endDate) {
   return `${formatShortDate(startDate)} – ${formatShortDate(endDate)}`;
 }
 
-function toggleCompanyText(value) {
+window.toggleSearchCompanyText = function (value) {
   const select = document.getElementById("searchFilterCompany");
   const input = document.getElementById("searchFilterCompanyText");
 
