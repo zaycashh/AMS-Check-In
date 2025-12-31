@@ -365,8 +365,15 @@ document.addEventListener("click", (e) => {
     return;
   }
 
-  const company =
-    document.getElementById("filterCompany")?.value || "All Companies";
+  let company = "All Companies";
+
+const typedCompany = document
+  .getElementById("searchFilterCompanyText")
+  ?.value.trim();
+
+if (typedCompany) {
+  company = typedCompany.toUpperCase();
+}
 
   const now = new Date().toLocaleString();
 
