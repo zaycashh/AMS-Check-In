@@ -259,23 +259,23 @@
     </div>
       
       <div class="form-row">
-  <label>Company</label>
+<label>Company</label>
 
-  <select id="filterCompany" onchange="toggleCompanyText(this.value)">
-    <option value="">All Companies</option>
-    <!-- populated dynamically -->
-    <option value="__custom__">Type Company (Custom)</option>
-  </select>
+<select
+  id="searchFilterCompany"
+  onchange="toggleSearchCompanyText(this.value)"
+>
+  <option value="">All Companies</option>
+  <option value="__custom__">Type Company (Custom)</option>
+</select>
 
-  <input
-    id="filterCompanyText"
-    type="text"
-    placeholder="Enter company name"
-    style="display:none; margin-top:6px;"
-  />
-</div>
-
-
+<input
+  id="searchFilterCompanyText"
+  type="text"
+  placeholder="Enter company name"
+  style="display:none; margin-top:6px;"
+/>
+          
     <div class="form-row">
       <label>Date Range</label>
         <select id="filterDateRange" onchange="toggleCustomDateRange(this.value)">
