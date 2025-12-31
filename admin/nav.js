@@ -42,6 +42,7 @@ if (defaultRecentTab) {
   defaultRecentTab.click();
 }
 // INIT MANAGE COMPANIES
-if (targetId === "tabManage" && typeof renderCompanyManager === "function") {
+if (tab.dataset.tab === "tabManage" && typeof renderCompanyManager === "function") {
   renderCompanyManager();
 }
+
