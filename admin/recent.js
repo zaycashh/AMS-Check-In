@@ -32,6 +32,9 @@ const recent = logs
     })
     .slice(0, 10);
 
+    const todayCount = recent.length;
+
+
     let html = `
         <h2>Recent Check-Ins</h2>
         <table class="log-table">
