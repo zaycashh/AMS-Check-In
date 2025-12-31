@@ -50,14 +50,16 @@ function toggleCompanyText(value) {
 
   if (value === "__custom__") {
     input.style.display = "block";
-    input.disabled = false;
-    input.focus();
+    input.removeAttribute("disabled"); // 🔑 THIS IS THE FIX
+    input.value = "";
+    setTimeout(() => input.focus(), 0);
   } else {
     input.style.display = "none";
     input.value = "";
-    input.disabled = true;
+    input.setAttribute("disabled", "true");
   }
 }
+
 // ==============================
 // COMPANY DROPDOWN CHANGE LISTENER
 // ==============================
