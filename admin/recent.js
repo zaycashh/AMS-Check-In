@@ -11,14 +11,26 @@ function renderRecentCheckIns() {
         return;
     }
 
-    // Sort newest → oldest
-    logs.sort((a, b) => {
+    // TODAY ONLY
+const today = new Date();
+today.setHours(0, 0, 0, 0);
+
+const recent = logs
+    .filter(log => {
+        if (!log.date) return false;
+
+        const logDate = new Date(log.date + "T00:00:00");
+        logDate.setHours(0, 0, 0, 0);
+
+        return logDate.getTime() === today.getTime();
+    })
+    // newest → oldest (within today)
+    .sort((a, b) => {
         const aDate = new Date(`${a.date} ${a.time}`);
         const bDate = new Date(`${b.date} ${b.time}`);
         return bDate - aDate;
-    });
-
-    const recent = logs.slice(0, 10);
+    })
+    .slice(0, 10);
 
     let html = `
         <h2>Recent Check-Ins</h2>
