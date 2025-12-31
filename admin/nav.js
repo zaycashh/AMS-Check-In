@@ -19,10 +19,10 @@ document.addEventListener("DOMContentLoaded", () => {
     // TAB INITIALIZERS (SAFE)
     // -----------------------------
 
-    if (tabId === "tabRecent" && typeof renderRecentCheckIns === "function") {
-      renderRecentCheckIns();
-    }
-
+    if (tabId === "tabManage") {
+  console.log("Calling renderCompanyManager");
+  renderCompanyManager();
+}
     if (tabId === "tabGeneral" && typeof initGeneralReport === "function") {
       initGeneralReport();
     }
