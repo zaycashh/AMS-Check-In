@@ -45,8 +45,8 @@ function formatRange(startDate, endDate) {
    COMPANY CUSTOM INPUT
 ========================================================= */
 function toggleCompanyText(value) {
-  const select = document.getElementById("filterCompany");
-  const input = document.getElementById("filterCompanyText");
+  const select = document.getElementById("searchFilterCompany");
+  const input = document.getElementById("searchFilterCompanyText")
 
   if (!select || !input) return;
 
