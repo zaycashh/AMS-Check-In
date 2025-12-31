@@ -405,7 +405,7 @@ if (companySelect && companySelect.value) {
 
       doc.save("AMS_Search_Log_Report.pdf");
     };
-// ==============================
+     // ==============================
 // EXPORT SEARCH RESULTS (EXCEL – PRO STYLE)
 // ==============================
 document.addEventListener("click", (e) => {
@@ -421,7 +421,6 @@ document.addEventListener("click", (e) => {
 
   const now = new Date().toLocaleString();
 
-  // ---- Build sheet rows manually (PRO layout)
   const sheetData = [
     ["AMS Search Log Report"],
     [`Company: ${company}`],
@@ -445,7 +444,6 @@ document.addEventListener("click", (e) => {
 
   const ws = XLSX.utils.aoa_to_sheet(sheetData);
 
-  // ---- Auto column sizing
   ws["!cols"] = sheetData[4].map((_, colIndex) => ({
     wch: Math.max(
       ...sheetData.map(row => (row[colIndex] || "").toString().length),
@@ -455,6 +453,5 @@ document.addEventListener("click", (e) => {
 
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Search Log");
-   XLSX.writeFile(wb, "AMS_Search_Log_Report.xlsx");
+  XLSX.writeFile(wb, "AMS_Search_Log_Report.xlsx");
 });
-
