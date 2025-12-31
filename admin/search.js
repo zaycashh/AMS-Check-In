@@ -193,14 +193,18 @@ window.runSearch = function () {
     if (first && !entry.first?.toLowerCase().includes(first)) return false;
     if (last && !entry.last?.toLowerCase().includes(last)) return false;
 
-    if (normalizedCompany && normalizedCompany !== "all companies") {
+     if (normalizedCompany && normalizedCompany !== "all companies") {
   const recordCompany = (entry.company || "").toLowerCase();
 
-  // 🔒 If using custom typed company → exact match
-  if (company === "__custom__") {
+  const isCustomTyped =
+    document.getElementById("searchFilterCompanyText") &&
+    document.getElementById("searchFilterCompanyText").value.trim() !== "";
+
+  // 🔒 If user typed a company → EXACT match only
+  if (isCustomTyped) {
     if (recordCompany !== normalizedCompany) return false;
-  } 
-  // 🔎 Otherwise (dropdown) → allow partial match
+  }
+  // 🔎 Otherwise (dropdown selection) → partial match
   else {
     if (!recordCompany.includes(normalizedCompany)) return false;
   }
