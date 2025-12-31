@@ -2,39 +2,34 @@ document.addEventListener("DOMContentLoaded", () => {
   const tabs = document.querySelectorAll(".sidebar-menu .tab");
   const contents = document.querySelectorAll(".tab-content");
 
-  function hideAll() {
+  function showTab(tabId) {
+    // hide all
     contents.forEach(c => (c.style.display = "none"));
     tabs.forEach(t => t.classList.remove("active"));
+
+    // show selected
+    const target = document.getElementById(tabId);
+    const activeTab = document.querySelector(`.tab[data-tab="${tabId}"]`);
+
+    if (target) target.style.display = "block";
+    if (activeTab) activeTab.classList.add("active");
+
+    // optional initializers
+    if (tabId === "tabRecent" && typeof renderRecentCheckIns === "function") {
+      renderRecentCheckIns();
+    }
+    if (tabId === "tabGeneral" && typeof initGeneralReport === "function") {
+      initGeneralReport();
+    }
   }
 
+  // bind clicks
   tabs.forEach(tab => {
     tab.addEventListener("click", () => {
-      const targetId = tab.dataset.tab;
-      const target = document.getElementById(targetId);
-
-      hideAll();
-
-      if (target) {
-        target.style.display = "block";
-        tab.classList.add("active");
-      }
-
-      // Init modules safely
-      if (targetId === "tabRecent" && typeof renderRecentCheckIns === "function") {
-        renderRecentCheckIns();
-      }
-
-      if (targetId === "tabGeneral" && typeof initGeneralReport === "function") {
-        initGeneralReport();
-      }
-
-      if (targetId === "tabManage" && typeof renderCompanyManager === "function") {
-        renderCompanyManager();
-      }
+      showTab(tab.dataset.tab);
     });
   });
 
-  // Default tab → Recent
-  const defaultTab = document.querySelector('.tab[data-tab="tabRecent"]');
-  if (defaultTab) defaultTab.click();
+  // default tab
+  showTab("tabRecent");
 });
