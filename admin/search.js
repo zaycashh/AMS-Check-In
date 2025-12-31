@@ -41,9 +41,6 @@ function formatRange(startDate, endDate) {
   return `${formatShortDate(startDate)} – ${formatShortDate(endDate)}`;
 }
 
-/* =========================================================
-   COMPANY CUSTOM INPUT
-========================================================= */
 function toggleCompanyText(value) {
   const select = document.getElementById("searchFilterCompany");
   const input = document.getElementById("searchFilterCompanyText")
@@ -75,9 +72,6 @@ function toggleCompanyText(value) {
   }
 }
 
-/* =========================================================
-   DATE RANGE TOGGLE
-========================================================= */
 window.toggleCustomDateRange = function (value) {
   const custom = document.getElementById("customDateRange");
   if (!custom) return;
