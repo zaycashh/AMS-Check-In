@@ -32,17 +32,9 @@ document.addEventListener("DOMContentLoaded", () => {
         renderRecentCheckIns();
       }
 
-      tab.classList.add("active");
-    });
-  });
-});
 // ✅ Default Admin Tab = Recent Check-Ins
 const defaultRecentTab = document.querySelector('.tab[data-tab="tabRecent"]');
 if (defaultRecentTab) {
   defaultRecentTab.click();
-}
-// INIT MANAGE COMPANIES
-if (tab.dataset.tab === "tabManage" && typeof renderCompanyManager === "function") {
-  renderCompanyManager();
 }
 
