@@ -37,4 +37,4 @@ const defaultRecentTab = document.querySelector('.tab[data-tab="tabRecent"]');
 if (defaultRecentTab) {
   defaultRecentTab.click();
 }
-
+});
