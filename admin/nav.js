@@ -3,9 +3,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const contents = document.querySelectorAll(".tab-content");
 
   function showTab(tabId) {
-    // hide all tabs
-    contents.forEach(c => (c.style.display = "none"));
-    tabs.forEach(t => t.classList.remove("active"));
+  console.log("showTab fired →", tabId);
+
+  contents.forEach(c => (c.style.display = "none"));
+  tabs.forEach(t => t.classList.remove("active"));
 
     // show selected tab
     const target = document.getElementById(tabId);
