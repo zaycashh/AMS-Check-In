@@ -1,115 +1,80 @@
-console.log("Manage Companies Module Loaded");
+// admin/manageCompanies.js
 
-// ==============================
-// STORAGE HELPERS
-// ==============================
+const STORAGE_KEY = "ams_companies";
+
 function getCompanies() {
-  return JSON.parse(localStorage.getItem("ams_companies") || "[]");
+  return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
 }
 
-function saveCompanies(companies) {
-  localStorage.setItem("ams_companies", JSON.stringify(companies));
+function saveCompanies(list) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
 }
 
-// ==============================
-// RENDER COMPANY MANAGER
-// ==============================
 function renderCompanyManager() {
-  const container = document.getElementById("companyList");
-  if (!container) return;
+  const listEl = document.getElementById("companyList");
+  if (!listEl) return;
 
   const companies = getCompanies();
+  listEl.innerHTML = "";
 
   if (companies.length === 0) {
-    container.innerHTML = "<p style='opacity:.6;'>No companies added yet.</p>";
+    listEl.innerHTML = "<p style='opacity:.6'>No companies added yet.</p>";
     return;
   }
 
-  let html = `
-    <table class="log-table">
-      <thead>
-        <tr>
-          <th>Company</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-  `;
+  companies.forEach((name, index) => {
+    const row = document.createElement("div");
+    row.style.display = "flex";
+    row.style.justifyContent = "space-between";
+    row.style.alignItems = "center";
+    row.style.marginBottom = "8px";
+    row.style.padding = "10px";
+    row.style.border = "1px solid #ddd";
+    row.style.borderRadius = "8px";
 
-  companies.forEach((c, index) => {
-    html += `
-      <tr>
-        <td>
-          <input
-            type="text"
-            value="${c.name}"
-            onchange="updateCompany(${index}, this.value)"
-          />
-        </td>
-        <td>
-          <button onclick="deleteCompany(${index})">Delete</button>
-        </td>
-      </tr>
-    `;
+    const label = document.createElement("strong");
+    label.textContent = name;
+
+    const delBtn = document.createElement("button");
+    delBtn.textContent = "Delete";
+    delBtn.style.background = "#d9534f";
+    delBtn.style.color = "#fff";
+    delBtn.style.border = "none";
+    delBtn.style.padding = "6px 12px";
+    delBtn.style.borderRadius = "6px";
+    delBtn.style.cursor = "pointer";
+
+    delBtn.onclick = () => {
+      companies.splice(index, 1);
+      saveCompanies(companies);
+      renderCompanyManager();
+    };
+
+    row.appendChild(label);
+    row.appendChild(delBtn);
+    listEl.appendChild(row);
   });
-
-  html += `
-      </tbody>
-    </table>
-  `;
-
-  container.innerHTML = html;
 }
 
-// ==============================
-// ACTIONS
-// ==============================
-function addCompany() {
-  const input = document.getElementById("newCompanyName");
-  if (!input) return;
+document.addEventListener("DOMContentLoaded", () => {
+  const input = document.getElementById("companyInput");
+  const btn = document.getElementById("addCompanyBtn");
 
-  const name = input.value.trim().toUpperCase();
-  if (!name) return;
+  if (!input || !btn) return;
 
-  let companies = getCompanies();
+  btn.addEventListener("click", () => {
+    const name = input.value.trim();
+    if (!name) return alert("Enter a company name");
 
-  if (companies.some(c => c.name === name)) {
-    alert("Company already exists.");
-    return;
-  }
+    const companies = getCompanies();
+    if (companies.includes(name)) {
+      alert("Company already exists");
+      return;
+    }
 
-  companies.push({
-    id: name.toLowerCase().replace(/\s+/g, "_"),
-    name
+    companies.push(name);
+    saveCompanies(companies);
+    input.value = "";
+    renderCompanyManager();
   });
-
-  saveCompanies(companies);
-  input.value = "";
-  renderCompanyManager();
-  populateCompanyDropdown();
-}
-
-function updateCompany(index, newName) {
-  let companies = getCompanies();
-  companies[index].name = newName.toUpperCase();
-  saveCompanies(companies);
-  populateCompanyDropdown();
-}
-
-function deleteCompany(index) {
-  if (!confirm("Delete this company?")) return;
-  let companies = getCompanies();
-  companies.splice(index, 1);
-  saveCompanies(companies);
-  renderCompanyManager();
-  populateCompanyDropdown();
-}
-
-// ==============================
-// INIT
-// ==============================
-document
-  .getElementById("addCompanyBtn")
-  ?.addEventListener("click", addCompany);
-
-renderCompanyManager();
+});
