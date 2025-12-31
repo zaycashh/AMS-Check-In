@@ -455,8 +455,6 @@ document.addEventListener("click", (e) => {
 
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Search Log");
+   XLSX.writeFile(wb, "AMS_Search_Log_Report.xlsx");
+});
 
-  XLSX.writeFile(wb, "AMS_Search_Log_Report.xlsx");
-});
-});
-   
