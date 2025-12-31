@@ -1,81 +1,73 @@
 console.log("Manage Companies Module Loaded");
 
-// STORAGE KEY
-const COMPANY_KEY = "ams_companies";
-
-// GET COMPANIES
 function getCompanies() {
-  return JSON.parse(localStorage.getItem(COMPANY_KEY)) || [];
+  return JSON.parse(localStorage.getItem("ams_companies")) || [];
 }
 
-// SAVE COMPANIES
 function saveCompanies(companies) {
-  localStorage.setItem(COMPANY_KEY, JSON.stringify(companies));
+  localStorage.setItem("ams_companies", JSON.stringify(companies));
 }
 
-// RENDER LIST
 function renderCompanyManager() {
-  const list = document.getElementById("companyList");
-  if (!list) return;
-
-  const companies = getCompanies();
-  list.innerHTML = "";
-
-  if (companies.length === 0) {
-    list.innerHTML = "<p style='color:#777;'>No companies added yet.</p>";
+  const container = document.getElementById("tabManage");
+  if (!container) {
+    console.warn("tabManage not found");
     return;
   }
 
-  companies.forEach((name, index) => {
-    const row = document.createElement("div");
-    row.style.display = "flex";
-    row.style.justifyContent = "space-between";
-    row.style.alignItems = "center";
-    row.style.marginBottom = "8px";
+  const companies = getCompanies();
 
-    row.innerHTML = `
-      <span>${name}</span>
-      <button data-index="${index}" class="danger-btn">Delete</button>
-    `;
+  container.innerHTML = `
+    <h2 class="section-title">Manage Companies</h2>
 
-    list.appendChild(row);
-  });
+    <div style="max-width:500px; margin-bottom:20px;">
+      <input
+        id="companyInput"
+        type="text"
+        placeholder="Enter company name"
+        style="width:100%; padding:10px; margin-bottom:10px;"
+      />
+      <button id="addCompanyBtn" class="primary-btn">Add Company</button>
+    </div>
 
-  // DELETE HANDLERS
-  list.querySelectorAll(".danger-btn").forEach(btn => {
+    <div id="companyList"></div>
+  `;
+
+  const list = container.querySelector("#companyList");
+
+  if (companies.length === 0) {
+    list.innerHTML = "<p>No companies added yet.</p>";
+  } else {
+    list.innerHTML = companies
+      .map(
+        (c, i) => `
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <span>${c}</span>
+          <button data-index="${i}" class="secondary-btn delete-company">Delete</button>
+        </div>
+      `
+      )
+      .join("");
+  }
+
+  // ADD
+  container.querySelector("#addCompanyBtn").onclick = () => {
+    const input = container.querySelector("#companyInput");
+    const name = input.value.trim();
+    if (!name) return;
+
+    companies.push(name);
+    saveCompanies(companies);
+    renderCompanyManager();
+  };
+
+  // DELETE
+  container.querySelectorAll(".delete-company").forEach(btn => {
     btn.onclick = () => {
-      const i = btn.dataset.index;
-      const companies = getCompanies();
-      companies.splice(i, 1);
+      const index = Number(btn.dataset.index);
+      companies.splice(index, 1);
       saveCompanies(companies);
       renderCompanyManager();
     };
   });
 }
-
-// ADD COMPANY
-document.addEventListener("DOMContentLoaded", () => {
-  const input = document.getElementById("companyInput");
-  const btn = document.getElementById("addCompanyBtn");
-
-  if (!btn || !input) return;
-
-  btn.addEventListener("click", () => {
-    const name = input.value.trim();
-    if (!name) return alert("Enter a company name");
-
-    const companies = getCompanies();
-    if (companies.includes(name)) {
-      alert("Company already exists");
-      return;
-    }
-
-    companies.push(name);
-    saveCompanies(companies);
-    input.value = "";
-    renderCompanyManager();
-  });
-
-  // INITIAL RENDER
-  renderCompanyManager();
-});
