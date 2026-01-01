@@ -51,14 +51,24 @@ function renderCompanyManager() {
 
   // ADD
   document.getElementById("addCompanyBtn").onclick = () => {
-    const input = document.getElementById("companyInput");
-    if (!input.value.trim()) return;
+  const input = document.getElementById("companyInput");
+  const name = input.value.trim();
 
-    companies.push(input.value.trim());
-    saveCompanies(companies);
-    renderCompanyManager();
-    window.populateCompanyDropdown?.();
-  };
+  if (!name) return;
+
+  // prevent duplicates
+  if (companies.some(c => c.toLowerCase() === name.toLowerCase())) {
+    alert("Company already exists.");
+    return;
+  }
+
+  companies.push(name);
+  saveCompanies(companies);
+  input.value = "";
+
+  renderCompanyManager();
+  window.populateCompanyDropdown?.();
+};
 
   // EDIT
   container.querySelectorAll(".edit-company").forEach(btn => {
