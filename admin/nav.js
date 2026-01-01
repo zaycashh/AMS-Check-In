@@ -23,18 +23,20 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       // ✅ INIT GENERAL
-      if (targetId === "tabGeneral") {
-        initGeneralReport();
-      }
+if (targetId === "tabGeneral") {
+  initGeneralReport();
+}
 
-      // ✅ INIT RECENT (THIS WAS MISSING)
-      if (targetId === "tabRecent" && typeof renderRecentCheckIns === "function") {
-        renderRecentCheckIns();
-      } 
-       // ✅ INIT MANAGE COMPANIES
+// ✅ INIT RECENT
+if (targetId === "tabRecent" && typeof renderRecentCheckIns === "function") {
+  renderRecentCheckIns();
+}
+
+// ✅ INIT MANAGE COMPANIES
 if (targetId === "tabManage" && typeof renderCompanyManager === "function") {
   renderCompanyManager();
 }
+
 
       tab.classList.add("active");
     });
