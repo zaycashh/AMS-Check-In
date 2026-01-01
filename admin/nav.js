@@ -7,43 +7,43 @@ document.addEventListener("DOMContentLoaded", () => {
   const contents = document.querySelectorAll(".tab-content");
 
   tabs.forEach(tab => {
-  tab.addEventListener("click", () => {
-    const targetId = tab.dataset.tab;
+    tab.addEventListener("click", () => {
+      const targetId = tab.dataset.tab;
 
-    contents.forEach(c => c.style.display = "none");
-    tabs.forEach(t => t.classList.remove("active"));
+      // Hide all tab contents
+      contents.forEach(c => (c.style.display = "none"));
 
-    const target = document.getElementById(targetId);
-    if (target) {
-      target.style.display = "block";
-    }
+      // Remove active state
+      tabs.forEach(t => t.classList.remove("active"));
 
-    // ✅ INIT GENERAL
-    if (targetId === "tabGeneral") {
-      initGeneralReport();
-    }
+      // Show selected tab
+      const target = document.getElementById(targetId);
+      if (target) {
+        target.style.display = "block";
+      }
 
-    // ✅ INIT RECENT
-    if (targetId === "tabRecent" && typeof renderRecentCheckIns === "function") {
-      renderRecentCheckIns();
-    }
+      // ✅ INIT GENERAL
+      if (targetId === "tabGeneral" && typeof initGeneralReport === "function") {
+        initGeneralReport();
+      }
 
-    tab.classList.add("active");
-  });
-});
+      // ✅ INIT RECENT
+      if (targetId === "tabRecent" && typeof renderRecentCheckIns === "function") {
+        renderRecentCheckIns();
+      }
 
-// ✅ INIT MANAGE COMPANIES
-if (targetId === "tabManage" && typeof renderCompanyManager === "function") {
-  renderCompanyManager();
-}
-
+      // ✅ INIT MANAGE COMPANIES (THIS WAS THE MISSING PIECE)
+      if (targetId === "tabManage" && typeof renderCompanyManager === "function") {
+        renderCompanyManager();
+      }
 
       tab.classList.add("active");
     });
   });
+
+  // ✅ Default Admin Tab = Recent Check-Ins
+  const defaultRecentTab = document.querySelector('.tab[data-tab="tabRecent"]');
+  if (defaultRecentTab) {
+    defaultRecentTab.click();
+  }
 });
-// ✅ Default Admin Tab = Recent Check-Ins
-const defaultRecentTab = document.querySelector('.tab[data-tab="tabRecent"]');
-if (defaultRecentTab) {
-  defaultRecentTab.click();
-}
