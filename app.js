@@ -350,3 +350,27 @@ document.addEventListener("input", (e) => {
     el.value = el.value.toUpperCase();
   }
 });
+/* ===============================
+   COMPANY DROPDOWN (DONOR SIDE)
+================================ */
+
+function populateCompanyDropdown() {
+  const select = document.getElementById("companySelect");
+  if (!select) return;
+
+  const companies = JSON.parse(localStorage.getItem("ams_companies")) || [];
+
+  select.innerHTML = `
+    <option value="">-- Select Company --</option>
+    ${companies.map(c => `<option value="${c}">${c}</option>`).join("")}
+    <option value="__OTHER__">Other (enter manually)</option>
+  `;
+}
+
+// expose globally so admin can trigger refresh
+window.populateCompanyDropdown = populateCompanyDropdown;
+
+// load companies on page start
+document.addEventListener("DOMContentLoaded", populateCompanyDropdown);
+});
+
