@@ -7,30 +7,30 @@ document.addEventListener("DOMContentLoaded", () => {
   const contents = document.querySelectorAll(".tab-content");
 
   tabs.forEach(tab => {
-    tab.addEventListener("click", () => {
-      const targetId = tab.dataset.tab;
+  tab.addEventListener("click", () => {
+    const targetId = tab.dataset.tab;
 
-      // Hide all tab contents
-      contents.forEach(c => c.style.display = "none");
+    contents.forEach(c => c.style.display = "none");
+    tabs.forEach(t => t.classList.remove("active"));
 
-      // Remove active state
-      tabs.forEach(t => t.classList.remove("active"));
+    const target = document.getElementById(targetId);
+    if (target) {
+      target.style.display = "block";
+    }
 
-      // Show selected tab
-      const target = document.getElementById(targetId);
-      if (target) {
-        target.style.display = "block";
-      }
+    // ✅ INIT GENERAL
+    if (targetId === "tabGeneral") {
+      initGeneralReport();
+    }
 
-      // ✅ INIT GENERAL
-if (targetId === "tabGeneral") {
-  initGeneralReport();
-}
+    // ✅ INIT RECENT
+    if (targetId === "tabRecent" && typeof renderRecentCheckIns === "function") {
+      renderRecentCheckIns();
+    }
 
-// ✅ INIT RECENT
-if (targetId === "tabRecent" && typeof renderRecentCheckIns === "function") {
-  renderRecentCheckIns();
-}
+    tab.classList.add("active");
+  });
+});
 
 // ✅ INIT MANAGE COMPANIES
 if (targetId === "tabManage" && typeof renderCompanyManager === "function") {
