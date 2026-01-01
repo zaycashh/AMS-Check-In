@@ -10,10 +10,7 @@ function saveCompanies(companies) {
 
 function renderCompanyManager() {
   const container = document.getElementById("tabManage");
-  if (!container) {
-    console.warn("tabManage not found");
-    return;
-  }
+  if (!container) return;
 
   const companies = getCompanies();
 
@@ -35,35 +32,32 @@ function renderCompanyManager() {
 
   const list = container.querySelector("#companyList");
 
-  if (companies.length === 0) {
+  if (!companies.length) {
     list.innerHTML = "<p>No companies added yet.</p>";
-  } else {
-    list.innerHTML = companies
-      .map(
-        (c, i) => `
-          <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
-            <span style="flex:1;">${c}</span>
-            <button class="secondary-btn edit-company" data-index="${i}">Edit</button>
-            <button class="secondary-btn delete-company" data-index="${i}">Delete</button>
-          </div>
-        `
-      )
-      .join("");
+    return;
   }
 
-  // ADD
-  container.querySelector("#addCompanyBtn").onclick = () => {
-    const input = container.querySelector("#companyInput");
-    const name = input.value.trim();
-    if (!name) return;
+  list.innerHTML = companies
+    .map(
+      (c, i) => `
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+          <span style="flex:1;">${c}</span>
+          <button class="secondary-btn edit-company" data-index="${i}">Edit</button>
+          <button class="secondary-btn delete-company" data-index="${i}">Delete</button>
+        </div>
+      `
+    )
+    .join("");
 
-    companies.push(name);
+  // ADD
+  document.getElementById("addCompanyBtn").onclick = () => {
+    const input = document.getElementById("companyInput");
+    if (!input.value.trim()) return;
+
+    companies.push(input.value.trim());
     saveCompanies(companies);
     renderCompanyManager();
-
-    if (window.populateCompanyDropdown) {
-      populateCompanyDropdown();
-    }
+    window.populateCompanyDropdown?.();
   };
 
   // EDIT
@@ -71,15 +65,12 @@ function renderCompanyManager() {
     btn.onclick = () => {
       const index = Number(btn.dataset.index);
       const updated = prompt("Edit company name:", companies[index]);
-      if (!updated || !updated.trim()) return;
+      if (!updated) return;
 
       companies[index] = updated.trim();
       saveCompanies(companies);
       renderCompanyManager();
-
-      if (window.populateCompanyDropdown) {
-        populateCompanyDropdown();
-      }
+      window.populateCompanyDropdown?.();
     };
   });
 
@@ -87,4 +78,14 @@ function renderCompanyManager() {
   container.querySelectorAll(".delete-company").forEach(btn => {
     btn.onclick = () => {
       const index = Number(btn.dataset.index);
-      if (!confirm("Dele
+      if (!confirm("Delete this company?")) return;
+
+      companies.splice(index, 1);
+      saveCompanies(companies);
+      renderCompanyManager();
+      window.populateCompanyDropdown?.();
+    };
+  });
+}
+
+window.renderCompanyManager = renderCompanyManager;
