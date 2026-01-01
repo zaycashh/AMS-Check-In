@@ -30,7 +30,11 @@ document.addEventListener("DOMContentLoaded", () => {
       // ✅ INIT RECENT (THIS WAS MISSING)
       if (targetId === "tabRecent" && typeof renderRecentCheckIns === "function") {
         renderRecentCheckIns();
-      }
+      } 
+       // ✅ INIT MANAGE COMPANIES
+if (targetId === "tabManage" && typeof renderCompanyManager === "function") {
+  renderCompanyManager();
+}
 
       tab.classList.add("active");
     });
