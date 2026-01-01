@@ -372,5 +372,3 @@ window.populateCompanyDropdown = populateCompanyDropdown;
 
 // load companies on page start
 document.addEventListener("DOMContentLoaded", populateCompanyDropdown);
-});
-
