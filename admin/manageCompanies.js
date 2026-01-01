@@ -41,11 +41,12 @@ function renderCompanyManager() {
     list.innerHTML = companies
       .map(
         (c, i) => `
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-          <span>${c}</span>
-          <button data-index="${i}" class="secondary-btn delete-company">Delete</button>
-        </div>
-      `
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+            <span style="flex:1;">${c}</span>
+            <button class="secondary-btn edit-company" data-index="${i}">Edit</button>
+            <button class="secondary-btn delete-company" data-index="${i}">Delete</button>
+          </div>
+        `
       )
       .join("");
   }
@@ -59,27 +60,31 @@ function renderCompanyManager() {
     companies.push(name);
     saveCompanies(companies);
     renderCompanyManager();
+
+    if (window.populateCompanyDropdown) {
+      populateCompanyDropdown();
+    }
   };
+
+  // EDIT
+  container.querySelectorAll(".edit-company").forEach(btn => {
+    btn.onclick = () => {
+      const index = Number(btn.dataset.index);
+      const updated = prompt("Edit company name:", companies[index]);
+      if (!updated || !updated.trim()) return;
+
+      companies[index] = updated.trim();
+      saveCompanies(companies);
+      renderCompanyManager();
+
+      if (window.populateCompanyDropdown) {
+        populateCompanyDropdown();
+      }
+    };
+  });
 
   // DELETE
   container.querySelectorAll(".delete-company").forEach(btn => {
     btn.onclick = () => {
       const index = Number(btn.dataset.index);
-      companies.splice(index, 1);
-      saveCompanies(companies);
-      renderCompanyManager();
-    };
-  });
-}
-// 🔧 SAFE GLOBAL EXPOSURE (DO NOT REMOVE)
-if (typeof renderCompanyManager === "function") {
-  window.renderCompanyManager = renderCompanyManager;
-} else {
-  window.renderCompanyManager = function () {
-    const list = document.getElementById("companyList");
-    if (list) {
-      list.innerHTML =
-        "<p style='opacity:.6'>Company manager loaded, no renderer found.</p>";
-    }
-  };
-}
+      if (!confirm("Dele
