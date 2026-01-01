@@ -66,24 +66,27 @@ const recent = logs
 `;
 
 
-    recent.forEach(log => {
-        const firstName = log.firstName || (log.name ? log.name.split(" ")[0] : "");
-        const lastName  = log.lastName  || (log.name ? log.name.split(" ").slice(1).join(" ") : "");
+    const firstName =
+  entry.firstName ||
+  entry.first ||
+  (entry.name ? entry.name.split(" ")[0] : "");
+
+const lastName =
+  entry.lastName ||
+  entry.last ||
+  (entry.name ? entry.name.split(" ").slice(1).join(" ") : "");
 
         html += `
-            <tr>
-                <td>${log.date || ""}</td>
-                <td>${log.time || ""}</td>
-                <td>${firstName}</td>
-                <td>${lastName}</td>
-                <td>${log.company || ""}</td>
-                <td>${log.reason || ""}</td>
-                <td>
-                    ${log.signature
-                        ? `<img src="${log.signature}" style="height:40px;">`
-                        : ""}
-                </td>
-            </tr>
+  <tr>
+    <td>${entry.date}</td>
+    <td>${entry.time}</td>
+    <td>${firstName}</td>
+    <td>${lastName}</td>
+    <td>${entry.company}</td>
+    <td>${entry.reason}</td>
+    <td>${signatureHtml}</td>
+  </tr>
+`;
         `;
     });
 
