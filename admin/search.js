@@ -183,3 +183,9 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
+// 🔁 Backward compatibility alias (DO NOT REMOVE)
+window.toggleSearchCompanyText = function (value) {
+  if (typeof toggleSearchCompanyInput === "function") {
+    toggleSearchCompanyInput(value);
+  }
+};
