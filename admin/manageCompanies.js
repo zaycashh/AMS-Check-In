@@ -55,11 +55,10 @@ function renderCompanyManager() {
       .join("");
   }
 
-  // ✅ ADD COMPANY
+  // ADD COMPANY
   container.querySelector("#addCompanyBtn").onclick = () => {
     const input = container.querySelector("#companyInput");
     const name = input.value.trim();
-
     if (!name) return;
 
     companies.push(name);
@@ -68,7 +67,7 @@ function renderCompanyManager() {
     renderCompanyManager();
   };
 
-  // ✅ DELETE COMPANY
+  // DELETE COMPANY
   container.querySelectorAll(".delete-company").forEach(btn => {
     btn.onclick = () => {
       const index = Number(btn.dataset.index);
@@ -79,5 +78,5 @@ function renderCompanyManager() {
   });
 }
 
-// 🌍 Expose globally so nav.js can call it
+// expose globally
 window.renderCompanyManager = renderCompanyManager;
