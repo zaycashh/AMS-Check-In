@@ -257,11 +257,7 @@ results.forEach(entry => {
 
   tbody.appendChild(row);
 });
-
-
-  html += "</tbody></table>";
-  container.innerHTML = html;
-} 
+   
 // ==============================
 // EXPORT PDF (WITH SIGNATURES)
 // ==============================
