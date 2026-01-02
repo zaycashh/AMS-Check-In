@@ -76,7 +76,32 @@ let lastSearchEndDate = null;
 /* =========================================================
    MAIN SEARCH
 ========================================================= */
+
 window.runSearch = function () {
+     const firstCheck = document.getElementById("filterFirstName")?.value.trim();
+  const lastCheck = document.getElementById("filterLastName")?.value.trim();
+  const companyTextCheck = document.getElementById("searchFilterCompanyText")?.value.trim();
+  const companySelectCheck = document.getElementById("searchFilterCompany")?.value;
+  const rangeCheck = document.getElementById("filterDateRange")?.value;
+  const startCheck = document.getElementById("filterStartDate")?.value;
+  const endCheck = document.getElementById("filterEndDate")?.value;
+
+  const hasSearch =
+    firstCheck ||
+    lastCheck ||
+    companyTextCheck ||
+    companySelectCheck ||
+    rangeCheck ||
+    startCheck ||
+    endCheck;
+
+  // ⛔ If user didn't search anything, clear table and stop
+  if (!hasSearch) {
+    const tbody = document.getElementById("searchResultsTable");
+    if (tbody) tbody.innerHTML = "";
+    return;
+  }
+
   const logs = getLogs();
 
   const first = document.getElementById("filterFirstName").value.trim().toLowerCase();
@@ -335,8 +360,6 @@ if (clearBtn) {
     // Hide custom date range
     const customRange = document.getElementById("customDateRange");
     if (customRange) customRange.style.display = "none";
-
-    // Re-run search (shows all logs again)
-    runSearch();
+     
   });
 }
