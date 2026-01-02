@@ -256,6 +256,7 @@ document.getElementById("exitAdminBtn").addEventListener("click", () => {
 ========================================================= */
 document.addEventListener("DOMContentLoaded", () => {
     setupSignaturePad();
+   populateCompanyDropdown();
 });
 
 /* =========================================================
@@ -382,3 +383,23 @@ window.populateCompanyDropdown = populateCompanyDropdown;
 
 // load companies on page start
 document.addEventListener("DOMContentLoaded", populateCompanyDropdown);
+function populateCompanyDropdown() {
+  const select = document.getElementById("companySelect");
+  if (!select) return;
+
+  const companies = JSON.parse(localStorage.getItem("ams_companies")) || [];
+
+  // reset dropdown
+  select.innerHTML = `
+    <option value="">-- Select Company --</option>
+    <option value="__OTHER__">Other (enter manually)</option>
+  `;
+
+  companies.forEach(company => {
+    const opt = document.createElement("option");
+    opt.value = company;
+    opt.textContent = company;
+    select.insertBefore(opt, select.lastElementChild);
+  });
+}
+
