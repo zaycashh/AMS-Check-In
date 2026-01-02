@@ -304,3 +304,39 @@ document.addEventListener("click", e => {
   XLSX.utils.book_append_sheet(wb, ws, "Search Log");
   XLSX.writeFile(wb, "AMS_Search_Log_Report.xlsx");
 });
+// ================================
+// CLEAR SEARCH FILTERS
+// ================================
+const clearBtn = document.getElementById("clearSearch");
+
+if (clearBtn) {
+  clearBtn.addEventListener("click", () => {
+    // Text inputs
+    const inputs = [
+      "filterFirstName",
+      "filterLastName",
+      "searchFilterCompanyText",
+      "filterStartDate",
+      "filterEndDate"
+    ];
+
+    inputs.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = "";
+    });
+
+    // Selects
+    const companySelect = document.getElementById("searchFilterCompany");
+    if (companySelect) companySelect.value = "";
+
+    const rangeSelect = document.getElementById("filterDateRange");
+    if (rangeSelect) rangeSelect.value = "";
+
+    // Hide custom date range
+    const customRange = document.getElementById("customDateRange");
+    if (customRange) customRange.style.display = "none";
+
+    // Re-run search (shows all logs again)
+    runSearch();
+  });
+}
