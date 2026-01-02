@@ -531,3 +531,17 @@ body {
   font-size: 16px;
   font-weight: bold;
 }
+.primary-btn {
+  background: #4f8c47;
+  color: #fff;
+  border: none;
+  padding: 14px;
+  font-size: 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  width: 100%;
+}
+
+.primary-btn:hover {
+  background: #3f733a;
+}
