@@ -21,13 +21,12 @@ document.addEventListener("DOMContentLoaded", () => {
       if (target) {
         target.style.display = "block";
       }
+       
        if (tab.dataset.tab === "tabSearch") {
-      if (typeof runSearch === "function") {
-        runSearch();
-      }
-    }
-  });
-});
+  if (typeof runSearch === "function") {
+    runSearch();
+  }
+}
       // ✅ INIT GENERAL
       if (targetId === "tabGeneral" && typeof initGeneralReport === "function") {
         initGeneralReport();
