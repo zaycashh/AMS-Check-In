@@ -133,116 +133,133 @@
     <div class="tab" data-tab="tabManage">Manage Companies</div>
   </div>
 
-  <div class="admin-content">
-    <div id="tabSearch" class="tab-content" style="display:none;"></div>
-    <div id="tabGeneral" class="tab-content" style="display:none;"></div>
-    <div id="tabCompany" class="tab-content" style="display:none;"></div>
-    <div id="tabRecent" class="tab-content" style="display:none;"></div>
-    <div id="tabManage" class="tab-content" style="display:none;"></div>
+  <!-- ================= SEARCH LOG ================= -->
+  <div id="tabSearch" class="tab-content" style="display:none;">
+    <h2 class="section-title">Search Log</h2>
+
+    <div class="export-bar">
+      <button id="exportExcel">Export Excel</button>
+      <button id="exportPDF">Export PDF</button>
+    </div>
+
+    <table class="results-table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Time</th>
+          <th>First</th>
+          <th>Last</th>
+          <th>Company</th>
+          <th>Reason</th>
+          <th>Signature</th>
+        </tr>
+      </thead>
+      <tbody id="searchResultsTable"></tbody>
+    </table>
+  </div>
+
+  <!-- ================= GENERAL REPORT ================= -->
+  <div id="tabGeneral" class="tab-content" style="display:none;">
+    <h2 class="section-title">General Report</h2>
+
+    <div class="report-cards">
+      <div class="report-card">
+        <h3>Total Check-Ins</h3>
+        <p id="totalCount">0</p>
+      </div>
+
+      <div class="report-card">
+        <h3>Today</h3>
+        <p id="todayCount">0</p>
+      </div>
+
+      <div class="report-card">
+        <h3>This Month</h3>
+        <p id="monthCount">0</p>
+      </div>
+
+      <div class="report-card">
+        <h3>Companies</h3>
+        <p id="companyCount">0</p>
+      </div>
+    </div>
+
+    <h3 style="margin-top:20px;">Daily Activity</h3>
+    <table class="log-table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Total Check-Ins</th>
+        </tr>
+      </thead>
+      <tbody id="dailyReportBody"></tbody>
+    </table>
+
+    <h3 style="margin-top:30px;">Top Companies</h3>
+    <table class="log-table">
+      <thead>
+        <tr>
+          <th>Company</th>
+          <th>Total Check-Ins</th>
+        </tr>
+      </thead>
+      <tbody id="topCompaniesBody"></tbody>
+    </table>
+  </div>
+
+  <!-- ================= DETAIL COMPANY REPORT ================= -->
+  <div id="tabCompany" class="tab-content" style="display:none;">
+    <h2 class="section-title">Detail Company Report</h2>
+
+    <div class="export-bar">
+      <select id="filterCompany">
+        <option value="">-- Select Company --</option>
+        <option value="__custom__">Type Company (Custom)</option>
+      </select>
+
+      <input
+        id="filterCompanyText"
+        type="text"
+        placeholder="Enter company name"
+        style="display:none;"
+      />
+
+      <button id="companyDetailExcelBtn">Export Excel</button>
+      <button id="companyDetailPdfBtn" style="margin-left:8px;">
+        Export PDF
+      </button>
+    </div>
+
+    <div id="companyTotals" class="totals-bar" style="margin:10px 0; font-weight:600;">
+      Total Records: <span id="companyTotalCount">0</span>
+    </div>
+
+    <table class="report-table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Time</th>
+          <th>First</th>
+          <th>Last</th>
+          <th>Reason</th>
+          <th>Services</th>
+        </tr>
+      </thead>
+      <tbody id="companyDetailBody"></tbody>
+    </table>
+  </div>
+
+  <!-- ================= RECENT CHECK-INS ================= -->
+  <div id="tabRecent" class="tab-content" style="display:none;">
+    <!-- Content injected by recent.js -->
+  </div>
+
+  <!-- ================= MANAGE COMPANIES ================= -->
+  <div id="tabManage" class="tab-content" style="display:none;">
+    <!-- Content injected by manageCompanies.js -->
   </div>
 
 </section>
-
-<div id="tabGeneral" class="tab-content" style="display:none;">
-
-  <h2 class="section-title">General Report</h2>
-
-  <div class="report-cards">
-    <div class="report-card">
-      <h3>Total Check-Ins</h3>
-      <p id="totalCount">0</p>
-    </div>
-
-    <div class="report-card">
-      <h3>Today</h3>
-      <p id="todayCount">0</p>
-    </div>
-
-    <div class="report-card">
-      <h3>This Month</h3>
-      <p id="monthCount">0</p>
-    </div>
-
-    <div class="report-card">
-      <h3>Companies</h3>
-      <p id="companyCount">0</p>
-    </div>
-  </div>
-
-  <h3 style="margin-top:20px;">Daily Activity</h3>
-
-  <table class="log-table">
-    <thead>
-      <tr>
-        <th>Date</th>
-        <th>Total Check-Ins</th>
-      </tr>
-    </thead>
-    <tbody id="dailyReportBody"></tbody>
-  </table>
-<h3 style="margin-top:30px;">Top Companies</h3>
-
-<table class="log-table">
-  <thead>
-    <tr>
-      <th>Company</th>
-      <th>Total Check-Ins</th>
-    </tr>
-  </thead>
-  <tbody id="topCompaniesBody"></tbody>
-</table>
-
-</div>
-
-<div id="tabCompany" class="tab-content" style="display:none;">
-
-  <h2 class="section-title">Detail Company Report</h2>
-
-  <div class="export-bar">
- 
-    <select id="filterCompany">
-  <option value="">-- Select Company --</option>
-  <option value="__custom__">Type Company (Custom)</option>
-</select>
-
-<input
-  id="filterCompanyText"
-  type="text"
-  placeholder="Enter company name"
-  style="display:none;"
-/>
-
-  <button id="companyDetailExcelBtn">Export Excel</button>
-  <button id="companyDetailPdfBtn" style="display:inline-block; margin-left:8px;">
-  Export PDF
-</button>
-</div>
-
-
-  <div id="companyTotals" class="totals-bar" style="margin:10px 0; font-weight:600;">
-    Total Records: <span id="companyTotalCount">0</span>
-  </div>
-
-  <table class="report-table">
-    <thead>
-      <tr>
-        <th>Date</th>
-        <th>Time</th>
-        <th>First</th>
-        <th>Last</th>
-        <th>Reason</th>
-        <th>Services</th>
-      </tr>
-    </thead>
-    <tbody id="companyDetailBody"></tbody>
-  </table>
-
-</div>
-
-    <!-- RECENT CHECK-INS TAB -->
-<div id="tabRecent" class="tab-content" style="display:none;">
-  <!-- Content injected by recent.js -->
-</div>
 
     <!-- ===============================
      SEARCH LOG TAB
