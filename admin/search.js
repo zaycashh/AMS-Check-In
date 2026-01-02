@@ -223,37 +223,41 @@ function renderSearchResults(results) {
     return;
   }
 
-  let html = `
-    <table class="log-table">
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Time</th>
-          <th>First</th>
-          <th>Last</th>
-          <th>Company</th>
-          <th>Reason</th>
-          <th>Services</th>
-          <th>Signature</th>
-        </tr>
-      </thead>
-      <tbody>
+   const tbody = document.getElementById("searchResultsTable");
+if (!tbody) {
+  console.error("searchResultsTable not found");
+  return;
+}
+
+tbody.innerHTML = "";
+
+if (!results || results.length === 0) {
+  tbody.innerHTML = `
+    <tr>
+      <td colspan="8" style="text-align:center;opacity:.6;">
+        No results found
+      </td>
+    </tr>`;
+  return;
+}
+
+results.forEach(entry => {
+  const row = document.createElement("tr");
+
+  row.innerHTML = `
+    <td>${entry.date || ""}</td>
+    <td>${entry.time || ""}</td>
+    <td>${entry.first || ""}</td>
+    <td>${entry.last || ""}</td>
+    <td>${entry.company || ""}</td>
+    <td>${entry.reason || ""}</td>
+    <td>${Array.isArray(entry.services) ? entry.services.join(", ") : entry.services || ""}</td>
+    <td>${entry.signature ? `<img src="${entry.signature}" style="height:40px;" />` : ""}</td>
   `;
 
-  results.forEach(entry => {
-    html += `
-      <tr>
-        <td>${entry.date || ""}</td>
-        <td>${entry.time || ""}</td>
-        <td>${entry.first || ""}</td>
-        <td>${entry.last || ""}</td>
-        <td>${entry.company || ""}</td>
-        <td>${entry.reason || ""}</td>
-        <td>${Array.isArray(entry.services) ? entry.services.join(", ") : entry.services || ""}</td>
-        <td>${entry.signature ? `<img src="${entry.signature}" style="height:40px" />` : "-"}</td>
-      </tr>
-    `;
-  });
+  tbody.appendChild(row);
+});
+
 
   html += "</tbody></table>";
   container.innerHTML = html;
