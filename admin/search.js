@@ -385,3 +385,22 @@ function populateSearchCompanyDropdown() {
     select.appendChild(opt);
   });
 }
+function syncCompanySearchUI() {
+  const select = document.getElementById("searchFilterCompany");
+  const text = document.getElementById("searchFilterCompanyText");
+
+  if (!select || !text) return;
+
+  // If text input is empty → show dropdown again
+  if (text.value.trim() === "") {
+    text.style.display = "none";
+    select.style.display = "block";
+    select.value = "";
+  }
+}
+document.addEventListener("DOMContentLoaded", () => {
+  const text = document.getElementById("searchFilterCompanyText");
+  if (!text) return;
+
+  text.addEventListener("input", syncCompanySearchUI);
+});
