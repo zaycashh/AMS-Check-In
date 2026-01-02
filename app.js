@@ -126,14 +126,26 @@ if (company === "__OTHER__") {
     return;
   }
 }
+   // 🚨 Company is required
+if (!company) {
+  alert("Please select a company.");
+  return;
+}
 
-    let finalCompany = company === "__OTHER__"
-        ? document.getElementById("otherCompany").value.trim()
-        : company;
+let finalCompany = "";
 
-    let finalReason = reason === "other"
-        ? document.getElementById("otherReasonInput").value.trim()
-        : reason;
+if (company === "__OTHER__") {
+  finalCompany = document.getElementById("otherCompany").value.trim();
+
+  if (!finalCompany) {
+    alert("Please enter the company name.");
+    document.getElementById("otherCompany").focus();
+    return;
+  }
+} else {
+  finalCompany = company;
+}
+   
    // BLOCK if Reason = Other but empty
 if (reason === "other") {
   const otherReason = document.getElementById("otherReasonInput").value.trim();
