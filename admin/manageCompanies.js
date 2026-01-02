@@ -22,9 +22,15 @@ function renderCompanyManager() {
         id="companyInput"
         type="text"
         placeholder="Enter company name"
-        style="width:100%; padding:10px; margin-bottom:10px;"
+        style="width:100%; padding:12px; margin-bottom:12px;"
       />
-      <button id="addCompanyBtn" class="primary-btn">Add Company</button>
+      <button
+        id="addCompanyBtn"
+        type="button"
+        class="primary-btn"
+      >
+        Add Company
+      </button>
     </div>
 
     <div id="companyList"></div>
@@ -32,70 +38,46 @@ function renderCompanyManager() {
 
   const list = container.querySelector("#companyList");
 
-  if (!companies.length) {
+  if (companies.length === 0) {
     list.innerHTML = "<p>No companies added yet.</p>";
-    return;
+  } else {
+    list.innerHTML = companies
+      .map(
+        (c, i) => `
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <span>${c}</span>
+            <button data-index="${i}" class="secondary-btn delete-company">
+              Delete
+            </button>
+          </div>
+        `
+      )
+      .join("");
   }
 
-  list.innerHTML = companies
-    .map(
-      (c, i) => `
-        <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
-          <span style="flex:1;">${c}</span>
-          <button class="secondary-btn edit-company" data-index="${i}">Edit</button>
-          <button class="secondary-btn delete-company" data-index="${i}">Delete</button>
-        </div>
-      `
-    )
-    .join("");
+  // ✅ ADD COMPANY
+  container.querySelector("#addCompanyBtn").onclick = () => {
+    const input = container.querySelector("#companyInput");
+    const name = input.value.trim();
 
-  // ADD
-  document.getElementById("addCompanyBtn").onclick = () => {
-  const input = document.getElementById("companyInput");
-  const name = input.value.trim();
+    if (!name) return;
 
-  if (!name) return;
+    companies.push(name);
+    saveCompanies(companies);
+    input.value = "";
+    renderCompanyManager();
+  };
 
-  // prevent duplicates
-  if (companies.some(c => c.toLowerCase() === name.toLowerCase())) {
-    alert("Company already exists.");
-    return;
-  }
-
-  companies.push(name);
-  saveCompanies(companies);
-  input.value = "";
-
-  renderCompanyManager();
-  window.populateCompanyDropdown?.();
-};
-
-  // EDIT
-  container.querySelectorAll(".edit-company").forEach(btn => {
-    btn.onclick = () => {
-      const index = Number(btn.dataset.index);
-      const updated = prompt("Edit company name:", companies[index]);
-      if (!updated) return;
-
-      companies[index] = updated.trim();
-      saveCompanies(companies);
-      renderCompanyManager();
-      window.populateCompanyDropdown?.();
-    };
-  });
-
-  // DELETE
+  // ✅ DELETE COMPANY
   container.querySelectorAll(".delete-company").forEach(btn => {
     btn.onclick = () => {
       const index = Number(btn.dataset.index);
-      if (!confirm("Delete this company?")) return;
-
       companies.splice(index, 1);
       saveCompanies(companies);
       renderCompanyManager();
-      window.populateCompanyDropdown?.();
     };
   });
 }
 
+// 🌍 Expose globally so nav.js can call it
 window.renderCompanyManager = renderCompanyManager;
