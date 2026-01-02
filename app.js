@@ -230,8 +230,18 @@ document.getElementById("toggleAdminBtn").addEventListener("click", () => {
 
     // Init search logic (kept as-is)
     initRunSearch();
-});
+   
+       // 🔵 ALSO PREPARE MANAGE COMPANIES TAB
+    const manageTabBtn = document.querySelector('.tab[data-tab="tabManage"]');
+    const manageTabContent = document.getElementById("tabManage");
 
+    if (manageTabBtn && manageTabContent && typeof renderCompanyManager === "function") {
+        manageTabBtn.addEventListener("click", () => {
+            renderCompanyManager();
+        });
+    }
+
+});
 
 /* =========================================================
    EXIT ADMIN MODE
