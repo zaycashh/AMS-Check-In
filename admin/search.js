@@ -1,4 +1,5 @@
 console.log("✅ Search Log module loaded");
+
 /* =========================================================
    BASIC STORAGE
 ========================================================= */
@@ -10,21 +11,18 @@ let lastSearchResults = [];
 let currentSearchResults = [];
 
 /* =========================================================
-   DATE HELPERS (SAFE / LOCAL)
+   DATE HELPERS
 ========================================================= */
 function normalizeDate(dateStr) {
   if (!dateStr) return null;
 
-  // YYYY-MM-DD
   if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
-    const d = new Date(dateStr + "T00:00:00");
-    return isNaN(d) ? null : d;
+    return new Date(dateStr + "T00:00:00");
   }
 
-  // MM/DD/YYYY
   if (/^\d{2}\/\d{2}\/\d{4}$/.test(dateStr)) {
     const [m, d, y] = dateStr.split("/");
-    return new Date(Number(y), Number(m) - 1, Number(d));
+    return new Date(y, m - 1, d);
   }
 
   return null;
@@ -42,6 +40,9 @@ function formatRange(startDate, endDate) {
   return `${formatShortDate(startDate)} – ${formatShortDate(endDate)}`;
 }
 
+/* =========================================================
+   UI HELPERS
+========================================================= */
 window.toggleSearchCompanyText = function (value) {
   const select = document.getElementById("searchFilterCompany");
   const input = document.getElementById("searchFilterCompanyText");
@@ -49,34 +50,21 @@ window.toggleSearchCompanyText = function (value) {
   if (!select || !input) return;
 
   if (value === "__custom__") {
-    // fully disable select
     select.style.display = "none";
-    select.style.pointerEvents = "none";
-
-    // enable input
     input.style.display = "block";
-    input.style.pointerEvents = "auto";
     input.disabled = false;
-    input.readOnly = false;
-    input.style.zIndex = "10";
-
     setTimeout(() => input.focus(), 0);
   } else {
-    // restore select
     select.style.display = "block";
-    select.style.pointerEvents = "auto";
-
-    // hide input
     input.style.display = "none";
-    input.disabled = true;
     input.value = "";
+    input.disabled = true;
   }
-}
+};
 
 window.toggleCustomDateRange = function (value) {
   const custom = document.getElementById("customDateRange");
-  if (!custom) return;
-  custom.style.display = value === "custom" ? "block" : "none";
+  if (custom) custom.style.display = value === "custom" ? "block" : "none";
 };
 
 /* =========================================================
@@ -93,9 +81,7 @@ window.runSearch = function () {
 
   const first = document.getElementById("filterFirstName").value.trim().toLowerCase();
   const last = document.getElementById("filterLastName").value.trim().toLowerCase();
-  const typedCompany = document
-  .getElementById("searchFilterCompanyText")
-  ?.value.trim().toLowerCase();
+  const typedCompany = document.getElementById("searchFilterCompanyText")?.value.trim().toLowerCase();
 
   const range = document.getElementById("filterDateRange").value;
   const startInput = document.getElementById("filterStartDate")?.value;
@@ -122,8 +108,7 @@ window.runSearch = function () {
       break;
 
     case "thisWeek": {
-      const day = today.getDay();
-      const diff = day === 0 ? -6 : 1 - day;
+      const diff = today.getDay() === 0 ? -6 : 1 - today.getDay();
       startDate = new Date(today);
       startDate.setDate(today.getDate() + diff);
       endDate = new Date(startDate);
@@ -133,8 +118,7 @@ window.runSearch = function () {
     }
 
     case "lastWeek": {
-      const day = today.getDay();
-      const diff = day === 0 ? 6 : day - 1;
+      const diff = today.getDay() === 0 ? 6 : today.getDay() - 1;
       startDate = new Date(today);
       startDate.setDate(today.getDate() - diff - 7);
       endDate = new Date(startDate);
@@ -166,109 +150,92 @@ window.runSearch = function () {
       endDate = new Date(today.getFullYear() - 1, 11, 31);
       endDate.setHours(23, 59, 59, 999);
       break;
-        
-        case "custom":
-  if (startInput && endInput) {
-    const [sy, sm, sd] = startInput.split("-").map(Number);
-    startDate = new Date(sy, sm - 1, sd);
-    startDate.setHours(0, 0, 0, 0);
 
-    const [ey, em, ed] = endInput.split("-").map(Number);
-    endDate = new Date(ey, em - 1, ed);
-    endDate.setHours(23, 59, 59, 999);
+    case "custom":
+      if (startInput && endInput) {
+        startDate = new Date(startInput);
+        startDate.setHours(0, 0, 0, 0);
+        endDate = new Date(endInput);
+        endDate.setHours(23, 59, 59, 999);
+      }
+      break;
   }
-  break;
-}
 
   lastSearchStartDate = startDate;
   lastSearchEndDate = endDate;
 
   const results = logs.filter(entry => {
     if (!entry) return false;
-
     if (first && !entry.first?.toLowerCase().includes(first)) return false;
     if (last && !entry.last?.toLowerCase().includes(last)) return false;
 
     if (typedCompany) {
-  const recordCompany = (entry.company || "").toLowerCase().trim();
-  if (recordCompany !== typedCompany) return false;
-}
+      const recordCompany = (entry.company || "").toLowerCase().trim();
+      if (recordCompany !== typedCompany) return false;
+    }
 
     const logDate = normalizeDate(entry.date);
     if (!logDate) return false;
-
     if (startDate && logDate < startDate) return false;
     if (endDate && logDate > endDate) return false;
-     
-     return true;
-});
 
+    return true;
+  });
 
   lastSearchResults = results;
   currentSearchResults = results;
 
   renderSearchResults(results);
-
 };
 
 /* =========================================================
-   RENDER RESULTS
+   RENDER RESULTS (FIXED)
 ========================================================= */
 function renderSearchResults(results) {
-  const container = document.getElementById("searchResultsTable");
-  if (!container) return;
-
-  if (!results.length) {
-    container.innerHTML = "<p>No results found</p>";
+  const tbody = document.getElementById("searchResultsTable");
+  if (!tbody) {
+    console.error("searchResultsTable not found");
     return;
   }
 
-   const tbody = document.getElementById("searchResultsTable");
-if (!tbody) {
-  console.error("searchResultsTable not found");
-  return;
+  tbody.innerHTML = "";
+
+  if (!Array.isArray(results) || results.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="8" style="text-align:center;opacity:.6;">
+          No results found
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  results.forEach(entry => {
+    const row = document.createElement("tr");
+
+    row.innerHTML = `
+      <td>${entry.date || ""}</td>
+      <td>${entry.time || ""}</td>
+      <td>${entry.first || ""}</td>
+      <td>${entry.last || ""}</td>
+      <td>${entry.company || ""}</td>
+      <td>${entry.reason || ""}</td>
+      <td>${Array.isArray(entry.services) ? entry.services.join(", ") : entry.services || ""}</td>
+      <td>${entry.signature ? `<img src="${entry.signature}" style="height:40px;" />` : ""}</td>
+    `;
+
+    tbody.appendChild(row);
+  });
 }
 
-tbody.innerHTML = "";
-
-if (!results || results.length === 0) {
-  tbody.innerHTML = `
-    <tr>
-      <td colspan="8" style="text-align:center;opacity:.6;">
-        No results found
-      </td>
-    </tr>`;
-  return;
-}
-
-results.forEach(entry => {
-  const row = document.createElement("tr");
-
-  row.innerHTML = `
-    <td>${entry.date || ""}</td>
-    <td>${entry.time || ""}</td>
-    <td>${entry.first || ""}</td>
-    <td>${entry.last || ""}</td>
-    <td>${entry.company || ""}</td>
-    <td>${entry.reason || ""}</td>
-    <td>${Array.isArray(entry.services) ? entry.services.join(", ") : entry.services || ""}</td>
-    <td>${entry.signature ? `<img src="${entry.signature}" style="height:40px;" />` : ""}</td>
-  `;
-
-  tbody.appendChild(row);
-});
-   
-// ==============================
-// EXPORT PDF (WITH SIGNATURES)
-// ==============================
+/* =========================================================
+   EXPORT PDF
+========================================================= */
 const exportPDFBtn = document.getElementById("exportPDF");
-
 if (exportPDFBtn) {
   exportPDFBtn.addEventListener("click", () => {
-    if (!currentSearchResults.length) {
-      alert("No results to export.");
-      return;
-    }
+    if (!currentSearchResults.length) return alert("No results to export.");
 
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF("landscape");
@@ -277,49 +244,15 @@ if (exportPDFBtn) {
     logo.src = "logo.png";
 
     logo.onload = () => {
-
-      // HEADER BAR
       doc.setFillColor(32, 99, 155);
       doc.rect(0, 0, 297, 20, "F");
-
       doc.addImage(logo, "PNG", 14, 2, 24, 16);
-
-      doc.setTextColor(255, 255, 255);
+      doc.setTextColor(255);
       doc.setFontSize(16);
       doc.text("AMS Search Log Report", 42, 14);
 
-      // META INFO
-      doc.setTextColor(0);
-      doc.setFontSize(10);
-
-      const now = new Date();
-      doc.text(`Generated: ${now.toLocaleString()}`, 14, 28);
-      doc.text(`Total Records: ${currentSearchResults.length}`, 14, 34);
-
-      // COMPANY LABEL (MATCH SEARCH)
-      let company = "All Companies";
-
-      const typedCompany = document
-        .getElementById("searchFilterCompanyText")
-        ?.value.trim();
-
-      if (typedCompany) {
-        company = typedCompany.toUpperCase();
-      }
-
-      doc.text(`Company: ${company}`, 120, 28);
-
-      // DATE RANGE
-      let dateRangeLabel = "All Dates";
-      if (lastSearchStartDate && lastSearchEndDate) {
-        dateRangeLabel = formatRange(lastSearchStartDate, lastSearchEndDate);
-      }
-
-      doc.text(`Date Range: ${dateRangeLabel}`, 120, 34);
-
-      // TABLE DATA
       const tableData = currentSearchResults.map(e => [
-        e.date ? formatShortDate(new Date(e.date + "T00:00:00")) : "",
+        e.date || "",
         e.time || "",
         e.first || "",
         e.last || "",
@@ -329,100 +262,28 @@ if (exportPDFBtn) {
         ""
       ]);
 
-      // TABLE + SIGNATURES
       doc.autoTable({
-        startY: 42,
-        head: [[
-          "Date","Time","First","Last","Company","Reason","Services","Signature"
-        ]],
-        body: tableData,
-        styles: { fontSize: 9, cellPadding: 3 },
-        headStyles: { fillColor: [32, 99, 155], textColor: 255 },
-        columnStyles: { 7: { cellWidth: 35 } },
-
-        didDrawCell: function (data) {
-  if (data.column.index === 7 && data.row.index >= 0) {
-    const entry = currentSearchResults[data.row.index];
-    if (entry && entry.signature) {
-      try {
-        const cellWidth = data.cell.width;
-        const cellHeight = data.cell.height;
-
-        // Signature size (adjustable)
-        const sigWidth = 28;
-        const sigHeight = 10;
-
-        // Center signature in cell
-        const x = data.cell.x + (cellWidth - sigWidth) / 2;
-        const y = data.cell.y + (cellHeight - sigHeight) / 2;
-
-        doc.addImage(
-          entry.signature,
-          "PNG",
-          x,
-          y,
-          sigWidth,
-          sigHeight
-        );
-      } catch (err) {
-        console.warn("Signature render failed", err);
-      }
-    }
-  }
-},
-
-        didDrawPage: () => {
-          const h = doc.internal.pageSize.getHeight();
-          const w = doc.internal.pageSize.getWidth();
-          doc.setFontSize(9);
-          doc.setTextColor(120);
-          doc.text(
-            "Generated by AMS Check-In System © 2025 Airport Medical Solutions",
-            w / 2,
-            h - 10,
-            { align: "center" }
-          );
-        }
+        startY: 30,
+        head: [["Date","Time","First","Last","Company","Reason","Services","Signature"]],
+        body: tableData
       });
 
-      // SAVE PDF
       doc.save("AMS_Search_Log_Report.pdf");
+    };
+  });
+}
 
-    }; // ✅ closes logo.onload
-  });   // ✅ closes click handler
-}        // ✅ closes exportPDFBtn if
-
-
-// ==============================
-// EXPORT SEARCH RESULTS (EXCEL – PRO STYLE)
-// ==============================
-document.addEventListener("click", (e) => {
-  if (!e.target || e.target.id !== "exportExcel") return;
-
-  if (!Array.isArray(lastSearchResults) || lastSearchResults.length === 0) {
-    alert("Please run a search before exporting.");
-    return;
-  }
-
-  // COMPANY LABEL (MATCH SEARCH & PDF)
-  let company = "All Companies";
-
-  const typedCompany = document
-    .getElementById("searchFilterCompanyText")
-    ?.value.trim();
-
-  if (typedCompany) {
-    company = typedCompany.toUpperCase();
-  }
-
-  const now = new Date().toLocaleString();
+/* =========================================================
+   EXPORT EXCEL
+========================================================= */
+document.addEventListener("click", e => {
+  if (e.target?.id !== "exportExcel") return;
+  if (!lastSearchResults.length) return alert("Run a search first.");
 
   const sheetData = [
     ["AMS Search Log Report"],
-    [`Company: ${company}`],
-    [`Generated: ${now}`],
     [],
-    ["Date", "Time", "First", "Last", "Company", "Reason", "Services", "Signature"]
+    ["Date","Time","First","Last","Company","Reason","Services","Signature"]
   ];
 
   lastSearchResults.forEach(r => {
@@ -441,7 +302,5 @@ document.addEventListener("click", (e) => {
   const ws = XLSX.utils.aoa_to_sheet(sheetData);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Search Log");
-
   XLSX.writeFile(wb, "AMS_Search_Log_Report.xlsx");
 });
-
