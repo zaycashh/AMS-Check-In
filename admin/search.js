@@ -78,6 +78,7 @@ let lastSearchEndDate = null;
 ========================================================= */
 
 window.runSearch = function () {
+
      const firstCheck = document.getElementById("filterFirstName")?.value.trim();
   const lastCheck = document.getElementById("filterLastName")?.value.trim();
   const companyTextCheck = document.getElementById("searchFilterCompanyText")?.value.trim();
@@ -85,6 +86,8 @@ window.runSearch = function () {
   const rangeCheck = document.getElementById("filterDateRange")?.value;
   const startCheck = document.getElementById("filterStartDate")?.value;
   const endCheck = document.getElementById("filterEndDate")?.value;
+
+   populateSearchCompanyDropdown();
 
   const hasSearch =
     firstCheck ||
@@ -361,5 +364,24 @@ if (clearBtn) {
     const customRange = document.getElementById("customDateRange");
     if (customRange) customRange.style.display = "none";
      
+  });
+}
+function populateSearchCompanyDropdown() {
+  const select = document.getElementById("searchFilterCompany");
+  if (!select) return;
+
+  // Reset dropdown (keep first 2 options)
+  select.innerHTML = `
+    <option value="">All Companies</option>
+    <option value="__custom__">Type Company (Custom)</option>
+  `;
+
+  const companies = JSON.parse(localStorage.getItem("ams_companies") || "[]");
+
+  companies.forEach(company => {
+    const opt = document.createElement("option");
+    opt.value = company;
+    opt.textContent = company;
+    select.appendChild(opt);
   });
 }
