@@ -2,6 +2,8 @@
    ADMIN TAB NAVIGATION (SAFE + ISOLATED)
 ========================================== */
 
+console.log("Admin Nav Module Loaded");
+
 document.addEventListener("DOMContentLoaded", () => {
   const tabs = document.querySelectorAll(".sidebar-menu .tab");
   const contents = document.querySelectorAll(".tab-content");
@@ -13,40 +15,42 @@ document.addEventListener("DOMContentLoaded", () => {
       // Hide all tab contents
       contents.forEach(c => (c.style.display = "none"));
 
-      // Remove active state
+      // Remove active state from tabs
       tabs.forEach(t => t.classList.remove("active"));
 
       // Show selected tab
       const target = document.getElementById(targetId);
-      if (target) {
-        target.style.display = "block";
+      if (!target) {
+        console.error("Admin tab not found:", targetId);
+        return;
       }
-       
-       if (tab.dataset.tab === "tabSearch") {
-  if (typeof runSearch === "function") {
-    runSearch();
-  }
-}
-      // ✅ INIT GENERAL
+
+      target.style.display = "block";
+      tab.classList.add("active");
+
+      // 🔑 SEARCH LOG (AUTO-RUN)
+      if (targetId === "tabSearch" && typeof runSearch === "function") {
+        runSearch();
+      }
+
+      // 🔑 GENERAL REPORT
       if (targetId === "tabGeneral" && typeof initGeneralReport === "function") {
         initGeneralReport();
       }
 
-      // ✅ INIT RECENT
+      // 🔑 RECENT CHECK-INS
       if (targetId === "tabRecent" && typeof renderRecentCheckIns === "function") {
         renderRecentCheckIns();
       }
 
-      // ✅ INIT MANAGE COMPANIES (THIS WAS THE MISSING PIECE)
+      // 🔑 MANAGE COMPANIES
       if (targetId === "tabManage" && typeof renderCompanyManager === "function") {
         renderCompanyManager();
       }
-
-      tab.classList.add("active");
     });
   });
 
-  // ✅ Default Admin Tab = Recent Check-Ins
+  // ✅ DEFAULT ADMIN TAB = RECENT CHECK-INS
   const defaultRecentTab = document.querySelector('.tab[data-tab="tabRecent"]');
   if (defaultRecentTab) {
     defaultRecentTab.click();
