@@ -177,6 +177,12 @@ if (reason === "other") {
     const signature = canvas.toDataURL();
 
    const now = new Date();
+   
+// ✅ Ensure finalReason always exists
+const finalReason =
+  document.querySelector('input[name="reason"]:checked')?.value ||
+  document.getElementById("reasonOtherText")?.value ||
+  "";
 
 const record = {
   date: now.toISOString().split("T")[0], // ✅ YYYY-MM-DD (CRITICAL)
@@ -414,4 +420,14 @@ function populateCompanyDropdown() {
     select.insertBefore(opt, select.lastElementChild);
   });
 }
+// ✅ SAFE fallback for missing date toggle
+window.toggleCustomDateRange = function (value) {
+  const customRange = document.getElementById("customDateRange");
+  if (!customRange) return;
 
+  if (value === "custom") {
+    customRange.style.display = "block";
+  } else {
+    customRange.style.display = "none";
+  }
+};
