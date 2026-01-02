@@ -257,7 +257,7 @@ function renderSearchResults(results) {
 
   html += "</tbody></table>";
   container.innerHTML = html;
-}
+} 
 // ==============================
 // EXPORT PDF (WITH SIGNATURES)
 // ==============================
