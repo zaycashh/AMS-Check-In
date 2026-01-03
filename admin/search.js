@@ -106,7 +106,7 @@ switch (range) {
   if (last && !entry.lastName?.toLowerCase().includes(last)) return false;
 
   // Company filter
-  if (company && entry.company?.toLowerCase() !== company) return false;
+    if (company && !entry.company?.toLowerCase().includes(company)) return false;
 
   return true;
 });
@@ -176,7 +176,10 @@ function populateSearchCompanies() {
 
 function clearSearchTable() {
   const table = document.getElementById("searchResultsTable");
+  const counter = document.getElementById("searchResultCount");
   if (!table) return;
+
+  if (counter) counter.textContent = "";
 
   table.innerHTML = `
     <tr>
@@ -186,6 +189,7 @@ function clearSearchTable() {
     </tr>
   `;
 }
+
 window.toggleSearchCompanyText = function (value) {
   const input = document.getElementById("searchFilterCompanyText");
   if (!input) return;
