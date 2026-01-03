@@ -117,12 +117,26 @@ switch (range) {
 
 function renderSearchResults(results) {
   const table = document.getElementById("searchResultsTable");
+  const counter = document.getElementById("searchResultCount");
   if (!table) return;
 
   table.innerHTML = "";
 
+  if (counter) {
+    counter.textContent =
+      results.length === 0
+        ? "No results found"
+        : `${results.length} result${results.length > 1 ? "s" : ""} found`;
+  }
+
   if (results.length === 0) {
-    table.innerHTML = `<tr><td colspan="7" style="text-align:center;opacity:.6;">No results found</td></tr>`;
+    table.innerHTML = `
+      <tr>
+        <td colspan="7" style="text-align:center;opacity:.6;">
+          No matching records
+        </td>
+      </tr>
+    `;
     return;
   }
 
@@ -140,6 +154,7 @@ function renderSearchResults(results) {
     table.appendChild(row);
   });
 }
+
 function populateSearchCompanies() {
   const select = document.getElementById("searchFilterCompany");
   if (!select) return;
