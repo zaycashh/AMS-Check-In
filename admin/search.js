@@ -1,225 +1,51 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>AMS Check-In System</title>
-  <link rel="stylesheet" href="styles.css?v=24">
-</head>
+console.log("Admin Search Module Loaded");
 
-<body>
+// Make search globally accessible
+window.runSearch = function () {
+  const first = document.getElementById("filterFirstName")?.value.trim().toLowerCase();
+  const last = document.getElementById("filterLastName")?.value.trim().toLowerCase();
 
-<!-- =========================================================
-     HEADER
-========================================================= -->
-<header class="main-header">
-  <div class="header-left">
-    <img src="logo.png" alt="Logo" class="header-logo">
-    <h1 class="header-title">AMS Check-In System</h1>
-  </div>
-  <button id="toggleAdminBtn" class="admin-btn">Admin Login</button>
-</header>
+  const companySelect = document.getElementById("searchFilterCompany");
+  const companyText = document.getElementById("searchFilterCompanyText")?.value.trim().toLowerCase();
+  const company =
+    companySelect?.value === "__custom__"
+      ? companyText
+      : companySelect?.value.toLowerCase();
 
-<!-- =========================================================
-     MAIN CHECK-IN FORM
-========================================================= -->
-<section id="checkInSection" class="section-card">
+  const logs = JSON.parse(localStorage.getItem("ams_logs") || "[]");
 
-  <h2 class="section-title">Donor Check-In</h2>
+  const filtered = logs.filter(entry => {
+    if (first && !entry.firstName?.toLowerCase().includes(first)) return false;
+    if (last && !entry.lastName?.toLowerCase().includes(last)) return false;
+    if (company && entry.company?.toLowerCase() !== company) return false;
+    return true;
+  });
 
-  <div class="form-row">
-    <label>First Name</label>
-    <input id="firstName" type="text">
-  </div>
+  renderSearchResults(filtered);
+};
 
-  <div class="form-row">
-    <label>Last Name</label>
-    <input id="lastName" type="text">
-  </div>
+function renderSearchResults(results) {
+  const table = document.getElementById("searchResultsTable");
+  if (!table) return;
 
-  <div class="form-row">
-    <label>Company</label>
-    <select id="companySelect">
-      <option value="">-- Select Company --</option>
-      <option value="__custom__">Other (enter manually)</option>
-    </select>
-  </div>
+  table.innerHTML = "";
 
-  <div id="otherCompanyWrapper" class="form-row" style="display:none;">
-    <label>Enter Company</label>
-    <input id="otherCompany" type="text">
-  </div>
+  if (results.length === 0) {
+    table.innerHTML = `<tr><td colspan="7" style="text-align:center;opacity:.6;">No results found</td></tr>`;
+    return;
+  }
 
-  <div class="form-row">
-    <label>Reason for Testing</label>
-    <select id="reasonSelect">
-      <option value="">-- Select reason --</option>
-      <option value="Pre-Employment">Pre-Employment</option>
-      <option value="Random">Random</option>
-      <option value="Post-Accident">Post-Accident</option>
-      <option value="Return-to-Duty">Return-to-Duty</option>
-      <option value="Follow-Up">Follow-Up</option>
-      <option value="other">Other (enter manually)</option>
-    </select>
-  </div>
-
-  <div id="otherReasonWrapper" class="form-row" style="display:none;">
-    <label>Enter Reason</label>
-    <input id="otherReasonInput" type="text">
-  </div>
-
-  <div class="section-divider"></div>
-  <h3 class="section-subtitle">Services</h3>
-
-  <div class="services-group">
-    <label class="service-item"><input type="checkbox" value="Drug Test"> Drug Test</label>
-    <label class="service-item"><input type="checkbox" value="Alcohol Test"> Alcohol Test</label>
-    <label class="service-item"><input type="checkbox" value="Vision Test"> Vision Test</label>
-    <label class="service-item"><input type="checkbox" value="DOT Physical"> DOT Physical</label>
-    <label class="service-item"><input type="checkbox" value="DNA"> DNA</label>
-    <label class="service-item"><input type="checkbox" value="Other"> Other</label>
-  </div>
-
-  <div id="otherServiceWrapper" class="form-row" style="display:none;">
-    <label>Other Service</label>
-    <input id="srvOtherText" type="text">
-  </div>
-
-  <div class="section-divider"></div>
-  <h3 class="section-subtitle">Signature</h3>
-
-  <div class="signature-pad-wrapper">
-    <canvas id="signaturePad" class="sig-canvas"></canvas>
-    <div id="sigPlaceholder" class="sig-placeholder">Sign Here</div>
-  </div>
-
-  <button id="clearSigBtn" class="secondary-btn">Clear Signature</button>
-
-  <div class="btn-row">
-    <button id="submitBtn" class="primary-btn">Submit Check-In</button>
-  </div>
-
-</section>
-
-<!-- =========================================================
-     ADMIN PANEL
-========================================================= -->
-<section id="adminArea" style="display:none;">
-
-  <button id="exitAdminBtn" class="secondary-btn" style="margin:10px 0;">
-    Exit Admin Mode
-  </button>
-
-  <div class="sidebar-menu">
-    <div class="tab" data-tab="tabSearch">Search Log</div>
-    <div class="tab" data-tab="tabGeneral">General Report</div>
-    <div class="tab" data-tab="tabCompany">Detail Company Report</div>
-    <div class="tab" data-tab="tabRecent">Recent Check-Ins</div>
-    <div class="tab" data-tab="tabManage">Manage Companies</div>
-  </div>
-
-  <!-- ================= SEARCH LOG ================= -->
-  <div id="tabSearch" class="tab-content" style="display:none;">
-    <h2 class="section-title">Search Log</h2>
-
-    <div class="search-form">
-
-      <div class="form-row">
-        <label>First Name</label>
-        <input id="filterFirstName" type="text">
-      </div>
-
-      <div class="form-row">
-        <label>Last Name</label>
-        <input id="filterLastName" type="text">
-      </div>
-
-      <div class="form-row">
-        <label>Company</label>
-        <select id="searchFilterCompany" onchange="toggleSearchCompanyText(this.value)">
-          <option value="">All Companies</option>
-          <option value="__custom__">Type Company (Custom)</option>
-        </select>
-        <input id="searchFilterCompanyText" type="text" style="display:none; margin-top:6px;">
-      </div>
-
-      <div class="form-row">
-        <label>Date Range</label>
-        <select id="filterDateRange" onchange="toggleCustomDateRange(this.value)">
-          <option value="">All Dates</option>
-          <option value="today">Today</option>
-          <option value="yesterday">Yesterday</option>
-          <option value="thisWeek">This Week</option>
-          <option value="lastWeek">Last Week</option>
-          <option value="thisMonth">This Month</option>
-          <option value="lastMonth">Last Month</option>
-          <option value="thisYear">This Year</option>
-          <option value="lastYear">Last Year</option>
-          <option value="custom">Custom</option>
-        </select>
-      </div>
-
-      <div id="customDateRange" class="form-row" style="display:none;">
-        <label>Start Date</label>
-        <input id="filterStartDate" type="date">
-        <label style="margin-top:6px;">End Date</label>
-        <input id="filterEndDate" type="date">
-      </div>
-
-      <div class="search-actions">
-        <button type="button" onclick="runSearch()">Search</button>
-        <button type="button" id="clearSearch">Clear</button>
-      </div>
-
-    </div>
-
-    <table class="results-table">
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Time</th>
-          <th>First</th>
-          <th>Last</th>
-          <th>Company</th>
-          <th>Reason</th>
-          <th>Signature</th>
-        </tr>
-      </thead>
-      <tbody id="searchResultsTable"></tbody>
-    </table>
-  </div>
-
-  <div id="tabGeneral" class="tab-content" style="display:none;"></div>
-  <div id="tabCompany" class="tab-content" style="display:none;"></div>
-  <div id="tabRecent" class="tab-content" style="display:none;"></div>
-  <div id="tabManage" class="tab-content" style="display:none;"></div>
-
-</section>
-
-<!-- SIGNATURE MODAL -->
-<div id="signatureModal" class="modal-bg">
-  <div class="modal-box">
-    <h3>Signature</h3>
-    <img id="signatureModalImg">
-    <button id="closeSignatureModal" class="primary-btn">Close</button>
-  </div>
-</div>
-
-<!-- LIBRARIES -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
-
-<!-- APP SCRIPTS -->
-<script src="app.js"></script>
-<script src="admin/nav.js"></script>
-<script src="admin/search.js"></script>
-<script src="admin/recent.js"></script>
-<script src="admin/general.js"></script>
-<script src="admin/detail.js"></script>
-<script src="admin/manageCompanies.js"></script>
-
-<img id="amsLogoBase64" src="logo.png" style="display:none">
-
-</body>
-</html>
+  results.forEach(r => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${r.date || ""}</td>
+      <td>${r.time || ""}</td>
+      <td>${r.firstName || ""}</td>
+      <td>${r.lastName || ""}</td>
+      <td>${r.company || ""}</td>
+      <td>${r.reason || ""}</td>
+      <td>${r.signature ? "✔" : ""}</td>
+    `;
+    table.appendChild(row);
+  });
+}
