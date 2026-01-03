@@ -87,14 +87,25 @@ switch (range) {
     if (endInput) endDate = normalizeDate(endInput);
     break;
 }
-
-
   const filtered = logs.filter(entry => {
-    if (first && !entry.firstName?.toLowerCase().includes(first)) return false;
-    if (last && !entry.lastName?.toLowerCase().includes(last)) return false;
-    if (company && entry.company?.toLowerCase() !== company) return false;
-    return true;
-  });
+  // Normalize log date
+  const logDate = normalizeDate(entry.date);
+  if (!logDate) return false;
+
+  // Apply date range
+  if (startDate && logDate < startDate) return false;
+  if (endDate && logDate > endDate) return false;
+
+  // Name filters
+  if (first && !entry.firstName?.toLowerCase().includes(first)) return false;
+  if (last && !entry.lastName?.toLowerCase().includes(last)) return false;
+
+  // Company filter
+  if (company && entry.company?.toLowerCase() !== company) return false;
+
+  return true;
+});
+
 
   renderSearchResults(filtered);
 };
