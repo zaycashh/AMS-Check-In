@@ -23,6 +23,10 @@ window.runSearch = function () {
     companySelect?.value === "__custom__"
       ? companyText
       : companySelect?.value.toLowerCase();
+  
+  const range = document.getElementById("filterDateRange")?.value;
+  const startInput = document.getElementById("filterStartDate")?.value;
+  const endInput = document.getElementById("filterEndDate")?.value;
 
   const logs = JSON.parse(localStorage.getItem("ams_logs") || "[]");
   // UX GUARD — prevent empty searches
@@ -31,10 +35,6 @@ if (!first && !last && !company && !range) {
   return;
 }
   
-  // DATE FILTER INPUTS
-const range = document.getElementById("filterDateRange")?.value;
-const startInput = document.getElementById("filterStartDate")?.value;
-const endInput = document.getElementById("filterEndDate")?.value;
 // DATE RANGE LOGIC (PREP ONLY)
 const today = new Date();
 today.setHours(0, 0, 0, 0);
