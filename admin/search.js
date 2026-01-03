@@ -30,6 +30,63 @@ window.runSearch = function () {
 const range = document.getElementById("filterDateRange")?.value;
 const startInput = document.getElementById("filterStartDate")?.value;
 const endInput = document.getElementById("filterEndDate")?.value;
+// DATE RANGE LOGIC (PREP ONLY)
+const today = new Date();
+today.setHours(0, 0, 0, 0);
+
+let startDate = null;
+let endDate = null;
+
+switch (range) {
+  case "today":
+    startDate = new Date(today);
+    endDate = new Date(today);
+    break;
+
+  case "yesterday":
+    startDate = new Date(today);
+    startDate.setDate(today.getDate() - 1);
+    endDate = new Date(startDate);
+    break;
+
+  case "thisWeek":
+    startDate = new Date(today);
+    startDate.setDate(today.getDate() - today.getDay());
+    endDate = new Date(today);
+    break;
+
+  case "lastWeek":
+    startDate = new Date(today);
+    startDate.setDate(today.getDate() - today.getDay() - 7);
+    endDate = new Date(startDate);
+    endDate.setDate(startDate.getDate() + 6);
+    break;
+
+  case "thisMonth":
+    startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+    endDate = new Date(today);
+    break;
+
+  case "lastMonth":
+    startDate = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+    endDate = new Date(today.getFullYear(), today.getMonth(), 0);
+    break;
+
+  case "thisYear":
+    startDate = new Date(today.getFullYear(), 0, 1);
+    endDate = new Date(today);
+    break;
+
+  case "lastYear":
+    startDate = new Date(today.getFullYear() - 1, 0, 1);
+    endDate = new Date(today.getFullYear() - 1, 11, 31);
+    break;
+
+  case "custom":
+    if (startInput) startDate = normalizeDate(startInput);
+    if (endInput) endDate = normalizeDate(endInput);
+    break;
+}
 
 
   const filtered = logs.filter(entry => {
