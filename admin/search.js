@@ -1,4 +1,10 @@
 console.log("Admin Search Module Loaded");
+document.addEventListener("DOMContentLoaded", () => {
+  
+  populateSearchCompanies();
+  clearSearchTable();
+});
+
 
 // Make search globally accessible
 window.runSearch = function () {
@@ -49,3 +55,59 @@ function renderSearchResults(results) {
     table.appendChild(row);
   });
 }
+function populateSearchCompanies() {
+  const select = document.getElementById("searchFilterCompany");
+  if (!select) return;
+
+  select.innerHTML = `
+    <option value="">All Companies</option>
+    <option value="__custom__">Type Company (Custom)</option>
+  `;
+
+  const companies = JSON.parse(localStorage.getItem("ams_companies") || "[]");
+
+  companies.forEach(name => {
+    const opt = document.createElement("option");
+    opt.value = name.toLowerCase();
+    opt.textContent = name;
+    select.appendChild(opt);
+  });
+}
+
+function clearSearchTable() {
+  const table = document.getElementById("searchResultsTable");
+  if (!table) return;
+
+  table.innerHTML = `
+    <tr>
+      <td colspan="7" style="text-align:center; opacity:.6;">
+        Use filters and click Search to view records
+      </td>
+    </tr>
+  `;
+}
+window.toggleSearchCompanyText = function (value) {
+  const input = document.getElementById("searchFilterCompanyText");
+  if (!input) return;
+
+  if (value === "__custom__") {
+    input.style.display = "block";
+    input.focus();
+  } else {
+    input.style.display = "none";
+    input.value = "";
+  }
+};
+
+window.toggleSearchCompanyText = function (value) {
+  const input = document.getElementById("searchFilterCompanyText");
+  if (!input) return;
+
+  if (value === "__custom__") {
+    input.style.display = "block";
+    input.focus();
+  } else {
+    input.style.display = "none";
+    input.value = "";
+  }
+};
