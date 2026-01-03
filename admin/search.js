@@ -198,3 +198,26 @@ window.toggleSearchCompanyText = function (value) {
     input.value = "";
   }
 };
+// UX: Press Enter to trigger Search
+document.addEventListener("keydown", function (e) {
+  if (e.key !== "Enter") return;
+
+  const el = document.activeElement;
+  if (!el) return;
+
+  const allowedIds = [
+    "filterFirstName",
+    "filterLastName",
+    "searchFilterCompanyText",
+    "filterStartDate",
+    "filterEndDate"
+  ];
+
+  if (allowedIds.includes(el.id)) {
+    e.preventDefault();
+    if (typeof window.runSearch === "function") {
+      window.runSearch();
+    }
+  }
+});
+
