@@ -29,7 +29,7 @@ window.runSearch = function () {
   const endInput = document.getElementById("filterEndDate")?.value;
 
   const logs = JSON.parse(localStorage.getItem("ams_logs") || "[]");
-  // UX GUARD — prevent empty searches
+  // UX GUARD — block ONLY when absolutely nothing is entered
 if (!first && !last && !company && !range) {
   clearSearchTable();
   return;
@@ -241,4 +241,3 @@ window.toggleCustomDateRange = function (value) {
     if (end) end.value = "";
   }
 };
-
