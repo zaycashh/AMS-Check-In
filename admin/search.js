@@ -97,16 +97,3 @@ window.toggleSearchCompanyText = function (value) {
     input.value = "";
   }
 };
-
-window.toggleSearchCompanyText = function (value) {
-  const input = document.getElementById("searchFilterCompanyText");
-  if (!input) return;
-
-  if (value === "__custom__") {
-    input.style.display = "block";
-    input.focus();
-  } else {
-    input.style.display = "none";
-    input.value = "";
-  }
-};
