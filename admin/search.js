@@ -145,8 +145,8 @@ function renderSearchResults(results) {
     row.innerHTML = `
       <td>${r.date || ""}</td>
       <td>${r.time || ""}</td>
-      <td>${r.firstName || ""}</td>
-      <td>${r.lastName || ""}</td>
+      <td>${r.firstName || r.first || r.fname || ""}</td>
+      <td>${r.lastName || r.last || r.lname || ""}</td>
       <td>${r.company || ""}</td>
       <td>${r.reason || ""}</td>
       <td>${r.signature ? "✔" : ""}</td>
