@@ -25,6 +25,11 @@ window.runSearch = function () {
       : companySelect?.value.toLowerCase();
 
   const logs = JSON.parse(localStorage.getItem("ams_logs") || "[]");
+  // UX GUARD — prevent empty searches
+if (!first && !last && !company && !range) {
+  clearSearchTable();
+  return;
+}
   
   // DATE FILTER INPUTS
 const range = document.getElementById("filterDateRange")?.value;
