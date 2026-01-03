@@ -29,11 +29,6 @@ window.runSearch = function () {
   const endInput = document.getElementById("filterEndDate")?.value;
 
   const logs = JSON.parse(localStorage.getItem("ams_logs") || "[]");
-  // UX GUARD — block ONLY when absolutely nothing is entered
-if (!first && !last && !company && !range) {
-  clearSearchTable();
-  return;
-}
   
 // DATE RANGE LOGIC (PREP ONLY)
 const today = new Date();
