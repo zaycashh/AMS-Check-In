@@ -29,10 +29,11 @@ document.addEventListener("DOMContentLoaded", () => {
       tab.classList.add("active");
 
       // 🔑 SEARCH LOG (AUTO-RUN)
-      if (targetId === "tabSearch" && typeof runSearch === "function") {
-        runSearch();
-      }
-
+      if (targetId === "tabSearch") {
+  if (typeof clearSearchTable === "function") {
+    clearSearchTable();
+  }
+}
       // 🔑 GENERAL REPORT
       if (targetId === "tabGeneral" && typeof initGeneralReport === "function") {
         initGeneralReport();
