@@ -25,12 +25,11 @@ window.runSearch = function () {
       : companySelect?.value.toLowerCase();
 
   const logs = JSON.parse(localStorage.getItem("ams_logs") || "[]");
-  function normalizeDate(dateStr) {
-  if (!dateStr) return null;
-  const d = new Date(dateStr + "T00:00:00");
-  d.setHours(0, 0, 0, 0);
-  return d;
-}
+  
+  // DATE FILTER INPUTS
+const range = document.getElementById("filterDateRange")?.value;
+const startInput = document.getElementById("filterStartDate")?.value;
+const endInput = document.getElementById("filterEndDate")?.value;
 
 
   const filtered = logs.filter(entry => {
