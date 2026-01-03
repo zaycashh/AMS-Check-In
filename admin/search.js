@@ -1,4 +1,11 @@
 console.log("Admin Search Module Loaded");
+function normalizeDate(dateStr) {
+  if (!dateStr) return null;
+  const d = new Date(dateStr + "T00:00:00");
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   
   populateSearchCompanies();
