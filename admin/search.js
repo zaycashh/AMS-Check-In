@@ -101,17 +101,18 @@ switch (range) {
   if (startDate && logDate < startDate) return false;
   if (endDate && logDate > endDate) return false;
 
-  // Name filters
-  if (first && !entry.firstName?.toLowerCase().includes(first)) return false;
-  if (last && !entry.lastName?.toLowerCase().includes(last)) return false;
+  // Name filters (support legacy keys)
+const entryFirst = entry.firstName || entry.first || entry.fname || "";
+const entryLast = entry.lastName || entry.last || entry.lname || "";
 
-  // Company filter
-    if (company && !entry.company?.toLowerCase().includes(company)) return false;
+if (first && !entryFirst.toLowerCase().includes(first)) return false;
+if (last && !entryLast.toLowerCase().includes(last)) return false;
+// Company filter
+if (company && !entry.company?.toLowerCase().includes(company)) return false;
 
-  return true;
+return true;
 });
-
-
+  
   renderSearchResults(filtered);
 };
 
