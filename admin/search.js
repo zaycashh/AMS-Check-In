@@ -5,7 +5,6 @@ document.addEventListener("DOMContentLoaded", () => {
   clearSearchTable();
 });
 
-
 // Make search globally accessible
 window.runSearch = function () {
   const first = document.getElementById("filterFirstName")?.value.trim().toLowerCase();
