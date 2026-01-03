@@ -237,3 +237,24 @@ window.toggleCustomDateRange = function (value) {
     if (end) end.value = "";
   }
 };
+// Clear Search button handler
+window.clearSearch = function () {
+  const first = document.getElementById("filterFirstName");
+  const last = document.getElementById("filterLastName");
+  const company = document.getElementById("searchFilterCompany");
+  const companyText = document.getElementById("searchFilterCompanyText");
+  const range = document.getElementById("filterDateRange");
+  const start = document.getElementById("filterStartDate");
+  const end = document.getElementById("filterEndDate");
+
+  if (first) first.value = "";
+  if (last) last.value = "";
+  if (company) company.value = "";
+  if (companyText) companyText.value = "";
+  if (range) range.value = "all";
+  if (start) start.value = "";
+  if (end) end.value = "";
+
+  clearSearchTable(); // ✅ clears table + result count
+};
+
