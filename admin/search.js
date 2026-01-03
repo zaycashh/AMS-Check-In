@@ -220,4 +220,21 @@ document.addEventListener("keydown", function (e) {
     }
   }
 });
+// UX: Toggle custom date inputs
+window.toggleCustomDateRange = function (value) {
+  const wrapper = document.getElementById("customDateRange");
+  const start = document.getElementById("filterStartDate");
+  const end = document.getElementById("filterEndDate");
+
+  if (!wrapper) return;
+
+  if (value === "custom") {
+    wrapper.style.display = "block";
+    if (start) start.focus();
+  } else {
+    wrapper.style.display = "none";
+    if (start) start.value = "";
+    if (end) end.value = "";
+  }
+};
 
