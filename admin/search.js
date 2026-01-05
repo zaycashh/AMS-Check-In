@@ -322,7 +322,7 @@ function exportSearchPdf() {
   r.last || r.lastName || "",
   r.company || "",
   r.reason || "",
-  "" // ✅ signature placeholder ONLY
+  "" // ⬅️ leave signature cell EMPTY
 ]);
 
   doc.autoTable({
