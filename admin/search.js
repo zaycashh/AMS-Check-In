@@ -316,16 +316,14 @@ function exportSearchPdf() {
   doc.text(`Total Records: ${records.length}`, 14, startY + 10);
 
   const tableData = records.map(r => [
-    r.date || "",
-    r.time || "",
-    r.first || r.firstName || "",
-    r.last || r.lastName || "",
-    r.company || "",
-    r.reason || "",
-    r.signature
-      ? { image: r.signature }
-      : ""
-  ]);
+  r.date || "",
+  r.time || "",
+  r.first || r.firstName || "",
+  r.last || r.lastName || "",
+  r.company || "",
+  r.reason || "",
+  "" // ✅ signature placeholder ONLY
+]);
 
   doc.autoTable({
     startY: startY + 20,
@@ -338,20 +336,33 @@ function exportSearchPdf() {
       fontStyle: "bold",
       fontSize: 9
     },
-    alternateRowStyles: { fillColor: [245, 248, 252] },
-    didDrawCell: data => {
-      if (data.column.index === 6 && data.cell.raw?.image) {
-        doc.addImage(
-          data.cell.raw.image,
-          "PNG",
-          data.cell.x + 2,
-          data.cell.y + 2,
-          30,
-          12
-        );
-      }
+    ,
+didDrawCell: function (data) {
+  if (data.section === "body" && data.column.index === 6) {
+    const record = records[data.row.index];
+
+    if (
+      record.signature &&
+      record.signature.startsWith("data:image")
+    ) {
+      const imgWidth = 35;
+      const imgHeight = 12;
+
+      const x = data.cell.x + (data.cell.width - imgWidth) / 2;
+      const y = data.cell.y + (data.cell.height - imgHeight) / 2;
+
+      doc.addImage(
+        record.signature,
+        "PNG",
+        x,
+        y,
+        imgWidth,
+        imgHeight
+      );
     }
-  });
+  }
+}
+});
 
   doc.save("AMS_Search_Log_Report.pdf");
 }
