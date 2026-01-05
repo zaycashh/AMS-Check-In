@@ -336,8 +336,8 @@ function exportSearchPdf() {
       fontStyle: "bold",
       fontSize: 9
     },
-    ,
-didDrawCell: function (data) {
+    
+    didDrawCell: function (data) {
   if (data.section === "body" && data.column.index === 6) {
     const record = records[data.row.index];
 
