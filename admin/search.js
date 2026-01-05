@@ -324,46 +324,52 @@ function exportSearchPdf() {
   r.reason || "",
   "" // ⬅️ leave signature cell EMPTY
 ]);
-
   doc.autoTable({
-    startY: startY + 20,
-    head: [["Date", "Time", "First", "Last", "Company", "Reason", "Signature"]],
-    body: tableData,
-    styles: { fontSize: 9, cellPadding: 4 },
-    headStyles: {
-      fillColor: [30, 94, 150],
-      textColor: 255,
-      fontStyle: "bold",
-      fontSize: 9
-    },
-    
-    didDrawCell: function (data) {
-  if (data.section === "body" && data.column.index === 6) {
-    const record = records[data.row.index];
+  startY: startY + 20,
+  head: [["Date", "Time", "First", "Last", "Company", "Reason", "Signature"]],
+  body: tableData,
 
-    if (
-      record.signature &&
-      record.signature.startsWith("data:image")
-    ) {
-      const imgWidth = 35;
-      const imgHeight = 12;
+  styles: {
+    fontSize: 9,
+    cellPadding: 4
+  },
 
-      const x = data.cell.x + (data.cell.width - imgWidth) / 2;
-      const y = data.cell.y + (data.cell.height - imgHeight) / 2;
+  headStyles: {
+    fillColor: [30, 94, 150],
+    textColor: 255,
+    fontStyle: "bold",
+    fontSize: 9
+  },
 
-      doc.addImage(
-        record.signature,
-        "PNG",
-        x,
-        y,
-        imgWidth,
-        imgHeight
-      );
+  alternateRowStyles: {
+    fillColor: [245, 248, 252]
+  },
+
+  didDrawCell: function (data) {
+    if (data.section === "body" && data.column.index === 6) {
+      const record = records[data.row.index];
+
+      if (
+        record.signature &&
+        record.signature.startsWith("data:image")
+      ) {
+        const imgWidth = 35;
+        const imgHeight = 12;
+
+        const x =
+          data.cell.x + (data.cell.width - imgWidth) / 2;
+        const y =
+          data.cell.y + (data.cell.height - imgHeight) / 2;
+
+        doc.addImage(
+          record.signature,
+          "PNG",
+          x,
+          y,
+          imgWidth,
+          imgHeight
+        );
+      }
     }
   }
-}
 });
-
-  doc.save("AMS_Search_Log_Report.pdf");
-}
-
