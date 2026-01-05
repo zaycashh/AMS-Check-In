@@ -239,22 +239,30 @@ window.toggleCustomDateRange = function (value) {
 };
 // Clear Search button handler
 window.clearSearch = function () {
-  const first = document.getElementById("filterFirstName");
-  const last = document.getElementById("filterLastName");
-  const company = document.getElementById("searchFilterCompany");
+  // Clear text inputs
+  document.getElementById("filterFirstName").value = "";
+  document.getElementById("filterLastName").value = "";
+
+  // Reset company dropdown
+  const companySelect = document.getElementById("searchFilterCompany");
   const companyText = document.getElementById("searchFilterCompanyText");
-  const range = document.getElementById("filterDateRange");
-  const start = document.getElementById("filterStartDate");
-  const end = document.getElementById("filterEndDate");
 
-  if (first) first.value = "";
-  if (last) last.value = "";
-  if (company) company.value = "";
-  if (companyText) companyText.value = "";
-  if (range) range.value = "";
-  if (start) start.value = "";
-  if (end) end.value = "";
+  if (companySelect) companySelect.value = "";
+  if (companyText) {
+    companyText.value = "";
+    companyText.style.display = "none"; // 👈 THIS IS THE FIX
+  }
 
-  clearSearchTable(); // ✅ clears table + result count
+  // Reset date range
+  const dateRange = document.getElementById("filterDateRange");
+  if (dateRange) dateRange.value = "";
+
+  const startDate = document.getElementById("filterStartDate");
+  const endDate = document.getElementById("filterEndDate");
+
+  if (startDate) startDate.value = "";
+  if (endDate) endDate.value = "";
+
+  // Clear results table + counter
+  clearSearchTable();
 };
-
