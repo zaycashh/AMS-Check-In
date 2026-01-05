@@ -251,7 +251,7 @@ window.clearSearch = function () {
   if (last) last.value = "";
   if (company) company.value = "";
   if (companyText) companyText.value = "";
-  if (range) range.value = "all";
+  if (range) range.value = "";
   if (start) start.value = "";
   if (end) end.value = "";
 
