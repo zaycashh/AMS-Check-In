@@ -277,3 +277,82 @@ window.clearSearch = function () {
   // Clear results table + counter
   clearSearchTable();
 };
+function exportSearchPdf() {
+  const records = JSON.parse(localStorage.getItem("ams_logs") || "[]");
+
+  if (!records.length) {
+    alert("No records found.");
+    return;
+  }
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF("landscape");
+
+  /* HEADER BAR */
+  doc.setFillColor(30, 94, 150);
+  doc.rect(0, 0, doc.internal.pageSize.width, 32, "F");
+
+  /* LOGO */
+  const logoImg = document.getElementById("amsLogoBase64");
+  if (logoImg && logoImg.complete) {
+    const canvas = document.createElement("canvas");
+    canvas.width = logoImg.naturalWidth;
+    canvas.height = logoImg.naturalHeight;
+    canvas.getContext("2d").drawImage(logoImg, 0, 0);
+    doc.addImage(canvas.toDataURL("image/png"), "PNG", 14, 8, 32, 22);
+  }
+
+  /* TITLE */
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(16);
+  doc.text("AMS Search Log Report", 55, 21);
+  doc.setTextColor(0, 0, 0);
+
+  const startY = 55;
+  const now = new Date();
+
+  doc.setFontSize(12);
+  doc.text(`Generated: ${now.toLocaleString()}`, 14, startY);
+  doc.text(`Total Records: ${records.length}`, 14, startY + 10);
+
+  const tableData = records.map(r => [
+    r.date || "",
+    r.time || "",
+    r.first || r.firstName || "",
+    r.last || r.lastName || "",
+    r.company || "",
+    r.reason || "",
+    r.signature
+      ? { image: r.signature }
+      : ""
+  ]);
+
+  doc.autoTable({
+    startY: startY + 20,
+    head: [["Date", "Time", "First", "Last", "Company", "Reason", "Signature"]],
+    body: tableData,
+    styles: { fontSize: 9, cellPadding: 4 },
+    headStyles: {
+      fillColor: [30, 94, 150],
+      textColor: 255,
+      fontStyle: "bold",
+      fontSize: 9
+    },
+    alternateRowStyles: { fillColor: [245, 248, 252] },
+    didDrawCell: data => {
+      if (data.column.index === 6 && data.cell.raw?.image) {
+        doc.addImage(
+          data.cell.raw.image,
+          "PNG",
+          data.cell.x + 2,
+          data.cell.y + 2,
+          30,
+          12
+        );
+      }
+    }
+  });
+
+  doc.save("AMS_Search_Log_Report.pdf");
+}
+
