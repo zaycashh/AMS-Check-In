@@ -145,7 +145,18 @@ function renderSearchResults(results) {
       <td>${r.lastName || r.last || r.lname || ""}</td>
       <td>${r.company || ""}</td>
       <td>${r.reason || ""}</td>
-      <td>${r.signature ? "✔" : ""}</td>
+      <td>
+  ${
+    r.signature
+      ? `<img 
+           src="${r.signature}" 
+           style="width:120px; height:40px; object-fit:contain; border:1px solid #ccc; background:#fff;"
+           alt="Signature"
+         />`
+      : ""
+  }
+</td>
+
     `;
     table.appendChild(row);
   });
