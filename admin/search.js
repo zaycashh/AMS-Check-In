@@ -111,11 +111,17 @@ if (
 
 return true;
 });
-  
-  window.searchResults = filtered;
+  /* ===============================
+   SORT — NEWEST → OLDEST
+=============================== */
+filtered.sort((a, b) => {
+  const ta = a.timestamp || new Date(a.date).getTime();
+  const tb = b.timestamp || new Date(b.date).getTime();
+  return tb - ta;
+});
 
-  renderSearchResults(filtered);
-};
+window.searchResults = filtered;
+renderSearchResults(filtered);
 
 function renderSearchResults(results) {
   const table = document.getElementById("searchResultsTable");
