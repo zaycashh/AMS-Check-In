@@ -416,10 +416,13 @@ function exportSearchLogExcel() {
   XLSX.writeFile(workbook, `AMS_Search_Log_${today}.xlsx`);
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  const pdfBtn = document.getElementById("exportPdfBtn");
+document.addEventListener("click", function (e) {
+  if (e.target && e.target.id === "exportPdfBtn") {
+    exportSearchPdf();
+  }
 
-  if (pdfBtn) {
-    pdfBtn.addEventListener("click", exportSearchPdf);
+  if (e.target && e.target.id === "exportExcelBtn") {
+    exportSearchLogExcel();
   }
 });
+
