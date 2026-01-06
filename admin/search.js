@@ -358,29 +358,29 @@ function exportSearchPdf() {
   doc.text("AMS Search Log Report", 55, 21);
   doc.setTextColor(0);
 
-  /* ===== META INFO ===== */
+  /* ===== META ===== */
   const startY = 55;
   const now = new Date();
-
   doc.setFontSize(11);
   doc.text(`Generated: ${now.toLocaleString()}`, 14, startY);
   doc.text(`Total Records: ${records.length}`, 14, startY + 8);
 
   /* ===== TABLE DATA ===== */
   const tableData = records.map(r => [
-  r.date || "",
-  r.time || "",
-  r.firstName || r.first || "",
-  r.lastName || r.last || "",
-  r.company || "",
-  r.reason || "",
-  Array.isArray(r.services) ? r.services.join(", ") : "",
-  ""
-]);
+    r.date || "",
+    r.time || "",
+    r.firstName || r.first || "",
+    r.lastName || r.last || "",
+    r.company || "",
+    r.reason || "",
+    Array.isArray(r.services) ? r.services.join(", ") : "",
+    "" // Signature placeholder
+  ]);
 
   /* ===== TABLE ===== */
   doc.autoTable({
     startY: startY + 18,
+
     head: [[
       "Date",
       "Time",
@@ -391,6 +391,7 @@ function exportSearchPdf() {
       "Services",
       "Signature"
     ]],
+
     body: tableData,
 
     styles: {
@@ -409,12 +410,24 @@ function exportSearchPdf() {
       fillColor: [245, 248, 252]
     },
 
+    columnStyles: {
+      0: { cellWidth: 26 }, // Date
+      1: { cellWidth: 22 }, // Time
+      2: { cellWidth: 26 }, // First
+      3: { cellWidth: 26 }, // Last
+      4: { cellWidth: 60 }, // Company
+      5: { cellWidth: 36 }, // Reason
+      6: { cellWidth: 50 }, // Services
+      7: { cellWidth: 30 }  // Signature
+    },
+
     didDrawCell: function (data) {
-      if (data.section === "body" && data.column.index === 6) {
+      // ✅ SIGNATURE COLUMN ONLY
+      if (data.section === "body" && data.column.index === 7) {
         const rec = records[data.row.index];
         if (rec.signature && rec.signature.startsWith("data:image")) {
-          const imgWidth = 30;
-          const imgHeight = 10;
+          const imgWidth = 24;
+          const imgHeight = 8;
           const x = data.cell.x + (data.cell.width - imgWidth) / 2;
           const y = data.cell.y + (data.cell.height - imgHeight) / 2;
           doc.addImage(rec.signature, "PNG", x, y, imgWidth, imgHeight);
