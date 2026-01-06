@@ -365,3 +365,4 @@ function exportSearchLogExcel() {
   XLSX.utils.book_append_sheet(wb, ws, "Search Log");
   XLSX.writeFile(wb, "AMS_Search_Log.xlsx");
 }
+});
