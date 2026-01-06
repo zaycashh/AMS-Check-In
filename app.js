@@ -190,6 +190,35 @@ if (!finalReason) {
   alert("Please select or enter a Reason for Testing.");
   return; // ⛔ STOP submission
 }
+   // ===============================
+// REQUIRED SERVICES VALIDATION
+// ===============================
+const selectedServices = document.querySelectorAll(
+  'input[name="services"]:checked'
+);
+
+if (selectedServices.length === 0) {
+  alert("Please select at least one Service.");
+  return; // ⛔ STOP submission
+}
+
+// If "Other" service is selected, require text
+const otherServiceChecked = Array.from(selectedServices).some(
+  s => s.value === "Other"
+);
+
+if (otherServiceChecked) {
+  const otherServiceText = document
+    .getElementById("srvOtherText")
+    .value
+    .trim();
+
+  if (!otherServiceText) {
+    alert("Please enter the Other Service.");
+    return; // ⛔ STOP submission
+  }
+}
+
    const record = {
   date: now.toISOString().split("T")[0], // ✅ YYYY-MM-DD (CRITICAL)
   time: now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
