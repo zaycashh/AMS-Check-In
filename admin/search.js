@@ -279,6 +279,8 @@ window.clearSearch = function () {
 
   if (startDate) startDate.value = "";
   if (endDate) endDate.value = "";
+  
+  window.clearSearch = function () {
 
   // Clear results table + counter
   clearSearchTable();
