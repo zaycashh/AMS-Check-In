@@ -281,6 +281,7 @@ window.clearSearch = function () {
 };
 function exportSearchPdf() {
   const records = window.searchResults || [];
+  
   if (!records.length) {
   alert("No records to export.");
   return;
