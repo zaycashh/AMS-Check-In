@@ -100,6 +100,10 @@ window.runSearch = function () {
       if (endInput) endDate = normalizeDate(endInput);
       break;
   }
+  // ✅ Ensure endDate includes the full day
+if (endDate) {
+  endDate.setHours(23, 59, 59, 999);
+}
 
   /* ===============================
      FILTER LOGS
