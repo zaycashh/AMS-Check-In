@@ -357,9 +357,11 @@ function exportSearchPdf() {
   ]);
 
   doc.autoTable({
-    head: [["Date", "Time", "First", "Last", "Company", "Reason", "Signature"]],
-    body: tableData,
-    didDrawCell: data => {
+    doc.autoTable({
+  startY: 70, // ✅ PUSH TABLE BELOW HEADER (FIXES OVERLAP)
+  head: [["Date", "Time", "First", "Last", "Company", "Reason", "Signature"]],
+  body: tableData,
+  didDrawCell: data => {
       if (data.column.index === 6) {
         const rec = records[data.row.index];
         if (rec.signature) {
