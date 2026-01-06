@@ -419,14 +419,3 @@ function exportSearchLogExcel() {
   const today = new Date().toISOString().split("T")[0];
   XLSX.writeFile(workbook, `AMS_Search_Log_${today}.xlsx`);
 }
-
-document.addEventListener("click", function (e) {
-  if (e.target && e.target.id === "exportPdfBtn") {
-    exportSearchPdf();
-  }
-
-  if (e.target && e.target.id === "exportExcelBtn") {
-    exportSearchLogExcel();
-  }
-});
-
