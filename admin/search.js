@@ -108,6 +108,8 @@ if (company && !entry.company?.toLowerCase().includes(company)) return false;
 return true;
 });
   
+  window.searchResults = filtered;
+
   renderSearchResults(filtered);
 };
 
