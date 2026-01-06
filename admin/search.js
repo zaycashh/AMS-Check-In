@@ -311,7 +311,7 @@ function exportSearchPdf() {
   5: { cellWidth: 28 }, // Reason
   6: { cellWidth: "auto" }, // Services (auto-wrap)
   7: { cellWidth: 24, halign: "center", valign: "middle" } // Signature
-}
+},
     didDrawCell: function (data) {
       if (data.column.index === 7 && data.cell.section === "body") {
         const img = data.cell.raw;
