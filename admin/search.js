@@ -167,7 +167,7 @@ function renderSearchResults(results) {
   if (results.length === 0) {
     table.innerHTML = `
       <tr>
-        <td colspan="7" style="text-align:center;opacity:.6;">
+        <td colspan="8" style="text-align:center;opacity:.6;">
           No matching records
         </td>
       </tr>`;
@@ -176,20 +176,26 @@ function renderSearchResults(results) {
 
   results.forEach(r => {
     const row = document.createElement("tr");
-    row.innerHTML = `
-      <td>${r.date || ""}</td>
-      <td>${r.time || ""}</td>
-      <td>${r.firstName || r.first || r.fname || ""}</td>
-      <td>${r.lastName || r.last || r.lname || ""}</td>
-      <td>${r.company || ""}</td>
-      <td>${r.reason || ""}</td>
-      <td>
-        ${
-          r.signature
-            ? `<img src="${r.signature}" style="width:120px;height:40px;object-fit:contain;border:1px solid #ccc;background:#fff;">`
-            : ""
-        }
-      </td>`;
+    const servicesText = Array.isArray(r.services)
+  ? r.services.join(", ")
+  : "";
+
+row.innerHTML = `
+  <td>${r.date || ""}</td>
+  <td>${r.time || ""}</td>
+  <td>${r.firstName || r.first || r.fname || ""}</td>
+  <td>${r.lastName || r.last || r.lname || ""}</td>
+  <td>${r.company || ""}</td>
+  <td>${r.reason || ""}</td>
+  <td>${servicesText}</td>
+  <td>
+    ${
+      r.signature
+        ? `<img src="${r.signature}" style="width:120px;height:40px;object-fit:contain;border:1px solid #ccc;background:#fff;">`
+        : ""
+    }
+  </td>`;
+    
     table.appendChild(row);
   });
 }
@@ -362,14 +368,15 @@ function exportSearchPdf() {
 
   /* ===== TABLE DATA ===== */
   const tableData = records.map(r => [
-    r.date || "",
-    r.time || "",
-    r.firstName || r.first || "",
-    r.lastName || r.last || "",
-    r.company || "",
-    r.reason || "",
-    "" // signature placeholder
-  ]);
+  r.date || "",
+  r.time || "",
+  r.firstName || r.first || "",
+  r.lastName || r.last || "",
+  r.company || "",
+  r.reason || "",
+  Array.isArray(r.services) ? r.services.join(", ") : "",
+  ""
+]);
 
   /* ===== TABLE ===== */
   doc.autoTable({
@@ -381,6 +388,7 @@ function exportSearchPdf() {
       "Last",
       "Company",
       "Reason",
+      "Services",
       "Signature"
     ]],
     body: tableData,
@@ -436,6 +444,7 @@ function exportSearchLogExcel() {
     "Last Name": (r.lastName || r.last || "").toUpperCase(),
     Company: r.company || "",
     Reason: r.reason || "",
+    Services: r.services || "",
     Signature: r.signature ? "Signed" : "—"
   }));
 
