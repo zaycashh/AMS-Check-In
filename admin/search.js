@@ -87,14 +87,16 @@ switch (range) {
     if (endInput) endDate = normalizeDate(endInput);
     break;
 }
-  const filtered = logs.filter(entry => {
-  // Normalize log date
-  const logDate = normalizeDate(entry.date);
-  if (!logDate) return false;
+  // Normalize log datetime (date + time safe)
+const logTime = entry.timestamp
+  ? new Date(entry.timestamp)
+  : new Date(`${entry.date} ${entry.time}`);
 
-  // Apply date range
-  if (startDate && logDate < startDate) return false;
-  if (endDate && logDate > endDate) return false;
+logTime.setSeconds(0, 0);
+
+// Apply date range
+if (startDate && logTime < startDate) return false;
+if (endDate && logTime > endDate) return false;
 
   // Name filters (support legacy keys)
 const entryFirst = entry.firstName || entry.first || entry.fname || "";
