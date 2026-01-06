@@ -378,67 +378,67 @@ function exportSearchPdf() {
   ]);
 
   /* ===== TABLE ===== */
-  doc.autoTable({
-    startY: startY + 18,
+    doc.autoTable({
+  startY: startY + 18,
 
-    head: [[
-      "Date",
-      "Time",
-      "First",
-      "Last",
-      "Company",
-      "Reason",
-      "Services",
-      "Signature"
-    ]],
+  head: [[
+    "Date",
+    "Time",
+    "First",
+    "Last",
+    "Company",
+    "Reason",
+    "Services",
+    "Signature"
+  ]],
 
-    body: tableData,
+  body: tableData,
 
-    styles: {
-      fontSize: 9,
-      cellPadding: 4,
-      valign: "middle"
-    },
+  styles: {
+    fontSize: 8,
+    cellPadding: 3,
+    valign: "middle",
+    overflow: "linebreak"
+  },
 
-    headStyles: {
-      fillColor: [30, 94, 150],
-      textColor: 255,
-      fontStyle: "bold"
-    },
+  headStyles: {
+    fillColor: [30, 94, 150],
+    textColor: 255,
+    fontStyle: "bold"
+  },
 
-    alternateRowStyles: {
-      fillColor: [245, 248, 252]
-    },
+  alternateRowStyles: {
+    fillColor: [245, 248, 252]
+  },
 
-    columnStyles: {
-      0: { cellWidth: 26 }, // Date
-      1: { cellWidth: 22 }, // Time
-      2: { cellWidth: 26 }, // First
-      3: { cellWidth: 26 }, // Last
-      4: { cellWidth: 60 }, // Company
-      5: { cellWidth: 36 }, // Reason
-      6: { cellWidth: 50 }, // Services
-      7: { cellWidth: 30 }  // Signature
-    },
+  columnStyles: {
+    0: { cellWidth: 24 }, // Date
+    1: { cellWidth: 18 }, // Time
+    2: { cellWidth: 22 }, // First
+    3: { cellWidth: 22 }, // Last
+    4: { cellWidth: 52 }, // Company
+    5: { cellWidth: 32 }, // Reason
+    6: { cellWidth: 46 }, // Services
+    7: { cellWidth: 28 }  // Signature
+  },
 
-    didDrawCell: function (data) {
-      // ✅ SIGNATURE COLUMN ONLY
-      if (data.section === "body" && data.column.index === 7) {
-        const rec = records[data.row.index];
-        if (rec.signature && rec.signature.startsWith("data:image")) {
-          const imgWidth = 24;
-          const imgHeight = 8;
-          const x = data.cell.x + (data.cell.width - imgWidth) / 2;
-          const y = data.cell.y + (data.cell.height - imgHeight) / 2;
-          doc.addImage(rec.signature, "PNG", x, y, imgWidth, imgHeight);
-        }
+  didDrawCell: function (data) {
+    if (data.section === "body" && data.column.index === 7) {
+      const rec = records[data.row.index];
+      if (rec.signature && rec.signature.startsWith("data:image")) {
+        const imgWidth = 22;
+        const imgHeight = 7;
+        const x = data.cell.x + (data.cell.width - imgWidth) / 2;
+        const y = data.cell.y + (data.cell.height - imgHeight) / 2;
+        doc.addImage(rec.signature, "PNG", x, y, imgWidth, imgHeight);
       }
     }
-  });
-
-  const today = new Date().toISOString().split("T")[0];
-  doc.save(`AMS_Search_Log_${today}.pdf`);
-}
+  }
+});
+  
+    const today = new Date().toISOString().split("T")[0];
+    doc.save(`AMS_Search_Log_${today}.pdf`);
+  }
 
 /* =========================================================
    EXPORT EXCEL
