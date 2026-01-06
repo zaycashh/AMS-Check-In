@@ -174,9 +174,7 @@ function renderSearchResults(results) {
     return;
   }
 
-  results.forEach(r => {
-    const row = document.createElement("tr");
-    const servicesText = Array.isArray(r.services)
+  const servicesText = Array.isArray(r.services)
   ? r.services.join(", ")
   : "";
 
@@ -187,14 +185,28 @@ row.innerHTML = `
   <td>${r.lastName || r.last || r.lname || ""}</td>
   <td>${r.company || ""}</td>
   <td>${r.reason || ""}</td>
-  <td>${servicesText}</td>
-  <td>
+  <td style="max-width:220px;white-space:normal;">
+    ${servicesText}
+  </td>
+  <td style="text-align:center;vertical-align:middle;">
     ${
       r.signature
-        ? `<img src="${r.signature}" style="width:120px;height:40px;object-fit:contain;border:1px solid #ccc;background:#fff;">`
+        ? `<img 
+            src="${r.signature}" 
+            style="
+              width:100px;
+              height:35px;
+              object-fit:contain;
+              display:block;
+              margin:0 auto;
+              border:1px solid #ccc;
+              background:#fff;
+            "
+          >`
         : ""
     }
-  </td>`;
+  </td>
+`;
     
     table.appendChild(row);
   });
