@@ -303,15 +303,15 @@ function exportSearchPdf() {
       valign: "middle"
     },
     columnStyles: {
-      0: { cellWidth: 26 },
-      1: { cellWidth: 22 },
-      2: { cellWidth: 22 },
-      3: { cellWidth: 22 },
-      4: { cellWidth: 45 },
-      5: { cellWidth: 30 },
-      6: { cellWidth: 26 },
-      7: { cellWidth: 28, halign: "center", valign: "middle" }
-    },
+  0: { cellWidth: 24 }, // Date
+  1: { cellWidth: 20 }, // Time
+  2: { cellWidth: 20 }, // First
+  3: { cellWidth: 20 }, // Last
+  4: { cellWidth: 40 }, // Company (slightly smaller)
+  5: { cellWidth: 28 }, // Reason
+  6: { cellWidth: "auto" }, // Services (auto-wrap)
+  7: { cellWidth: 24, halign: "center", valign: "middle" } // Signature
+}
     didDrawCell: function (data) {
       if (data.column.index === 7 && data.cell.section === "body") {
         const img = data.cell.raw;
