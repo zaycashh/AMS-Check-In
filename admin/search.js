@@ -302,15 +302,15 @@ function exportSearchPdf() {
       halign: "center",
       valign: "middle"
     },
-    columnStyles: {
-  0: { cellWidth: 24 }, // Date
-  1: { cellWidth: 20 }, // Time
-  2: { cellWidth: 20 }, // First
-  3: { cellWidth: 20 }, // Last
-  4: { cellWidth: 40 }, // Company (slightly smaller)
-  5: { cellWidth: 28 }, // Reason
-  6: { cellWidth: "auto" }, // Services (auto-wrap)
-  7: { cellWidth: 24, halign: "center", valign: "middle" } // Signature
+     columnStyles: {
+  0: { cellWidth: 24 },
+  1: { cellWidth: 20 },
+  2: { cellWidth: 20 },
+  3: { cellWidth: 20 },
+  4: { cellWidth: 40 },
+  5: { cellWidth: 28 },
+  6: { cellWidth: "auto" },
+  7: { cellWidth: 24, halign: "center", valign: "middle" }
 },
     didDrawCell: function (data) {
       if (data.column.index === 7 && data.cell.section === "body") {
