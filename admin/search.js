@@ -320,7 +320,10 @@ window.clearSearch = function () {
    EXPORT PDF
 ========================================================= */
 function exportSearchPdf() {
-  const records = window.searchResults || [];
+  const records = Array.isArray(window.searchResults)
+    ? window.searchResults
+    : [];
+
   if (!records.length) {
     alert("Please run a search before exporting the PDF.");
     return;
@@ -329,9 +332,11 @@ function exportSearchPdf() {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF("landscape");
 
+  /* ===== HEADER BAR ===== */
   doc.setFillColor(30, 94, 150);
   doc.rect(0, 0, doc.internal.pageSize.width, 32, "F");
 
+  /* ===== LOGO ===== */
   const logoImg = document.getElementById("amsLogoBase64");
   if (logoImg && logoImg.complete) {
     const c = document.createElement("canvas");
@@ -341,36 +346,77 @@ function exportSearchPdf() {
     doc.addImage(c.toDataURL("image/png"), "PNG", 14, 8, 32, 22);
   }
 
+  /* ===== TITLE ===== */
   doc.setTextColor(255);
   doc.setFontSize(16);
   doc.text("AMS Search Log Report", 55, 21);
   doc.setTextColor(0);
 
+  /* ===== META INFO ===== */
+  const startY = 55;
+  const now = new Date();
+
+  doc.setFontSize(11);
+  doc.text(`Generated: ${now.toLocaleString()}`, 14, startY);
+  doc.text(`Total Records: ${records.length}`, 14, startY + 8);
+
+  /* ===== TABLE DATA ===== */
   const tableData = records.map(r => [
     r.date || "",
     r.time || "",
-    r.first || r.firstName || "",
-    r.last || r.lastName || "",
+    r.firstName || r.first || "",
+    r.lastName || r.last || "",
     r.company || "",
     r.reason || "",
-    ""
+    "" // signature placeholder
   ]);
-  
-    doc.autoTable({
-  startY: 70, // ✅ PUSH TABLE BELOW HEADER (FIXES OVERLAP)
-  head: [["Date", "Time", "First", "Last", "Company", "Reason", "Signature"]],
-  body: tableData,
-  didDrawCell: data => {
-      if (data.column.index === 6) {
+
+  /* ===== TABLE ===== */
+  doc.autoTable({
+    startY: startY + 18,
+    head: [[
+      "Date",
+      "Time",
+      "First",
+      "Last",
+      "Company",
+      "Reason",
+      "Signature"
+    ]],
+    body: tableData,
+
+    styles: {
+      fontSize: 9,
+      cellPadding: 4,
+      valign: "middle"
+    },
+
+    headStyles: {
+      fillColor: [30, 94, 150],
+      textColor: 255,
+      fontStyle: "bold"
+    },
+
+    alternateRowStyles: {
+      fillColor: [245, 248, 252]
+    },
+
+    didDrawCell: function (data) {
+      if (data.section === "body" && data.column.index === 6) {
         const rec = records[data.row.index];
-        if (rec.signature) {
-          doc.addImage(rec.signature, "PNG", data.cell.x + 5, data.cell.y + 2, 35, 12);
+        if (rec.signature && rec.signature.startsWith("data:image")) {
+          const imgWidth = 30;
+          const imgHeight = 10;
+          const x = data.cell.x + (data.cell.width - imgWidth) / 2;
+          const y = data.cell.y + (data.cell.height - imgHeight) / 2;
+          doc.addImage(rec.signature, "PNG", x, y, imgWidth, imgHeight);
         }
       }
     }
   });
 
-  doc.save(`AMS_Search_Log_${new Date().toISOString().split("T")[0]}.pdf`);
+  const today = new Date().toISOString().split("T")[0];
+  doc.save(`AMS_Search_Log_${today}.pdf`);
 }
 
 /* =========================================================
