@@ -392,41 +392,46 @@ function exportSearchPdf() {
     "Signature"
   ]],
 
-  body: tableData,
+  body: records.map(r => [
+    r.date || "",
+    r.time || "",
+    r.firstName || r.first || "",
+    r.lastName || r.last || "",
+    r.company || "",
+    r.reason || "",
+    Array.isArray(r.services) ? r.services.join(", ") : "",
+    "" // signature placeholder
+  ]),
 
+  tableWidth: "auto",          // ✅ KEY FIX
+  horizontalPageBreak: true,   // ✅ prevents overflow
   styles: {
     fontSize: 8,
     cellPadding: 3,
-    valign: "middle",
-    overflow: "linebreak"
+    overflow: "linebreak",
+    valign: "middle"
   },
 
   headStyles: {
     fillColor: [30, 94, 150],
     textColor: 255,
-    fontStyle: "bold"
+    fontStyle: "bold",
+    halign: "center"
+  },
+
+  bodyStyles: {
+    halign: "left"
   },
 
   alternateRowStyles: {
     fillColor: [245, 248, 252]
   },
 
-  columnStyles: {
-    0: { cellWidth: 24 }, // Date
-    1: { cellWidth: 18 }, // Time
-    2: { cellWidth: 22 }, // First
-    3: { cellWidth: 22 }, // Last
-    4: { cellWidth: 52 }, // Company
-    5: { cellWidth: 32 }, // Reason
-    6: { cellWidth: 46 }, // Services
-    7: { cellWidth: 28 }  // Signature
-  },
-
   didDrawCell: function (data) {
     if (data.section === "body" && data.column.index === 7) {
       const rec = records[data.row.index];
       if (rec.signature && rec.signature.startsWith("data:image")) {
-        const imgWidth = 22;
+        const imgWidth = 20;
         const imgHeight = 7;
         const x = data.cell.x + (data.cell.width - imgWidth) / 2;
         const y = data.cell.y + (data.cell.height - imgHeight) / 2;
