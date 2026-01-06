@@ -284,11 +284,13 @@ window.clearSearch = function () {
   clearSearchTable();
 };
 function exportSearchPdf() {
-  // ✅ STABLE SOURCE OF TRUTH (AS REQUESTED)
-  const records = JSON.parse(localStorage.getItem("ams_logs") || "[]");
+  // ✅ USE FILTERED RESULTS ONLY
+  const records = Array.isArray(window.searchResults)
+    ? window.searchResults
+    : [];
 
   if (!records.length) {
-    alert("No records to export.");
+    alert("Please run a search before exporting the PDF.");
     return;
   }
 
@@ -310,17 +312,17 @@ function exportSearchPdf() {
   }
 
   /* TITLE */
-  doc.setTextColor(255, 255, 255);
+  doc.setTextColor(255);
   doc.setFontSize(16);
   doc.text("AMS Search Log Report", 55, 21);
-  doc.setTextColor(0, 0, 0);
+  doc.setTextColor(0);
 
   const startY = 55;
   const now = new Date();
 
   doc.setFontSize(12);
   doc.text(`Generated: ${now.toLocaleString()}`, 14, startY);
-  doc.text(`Total Records: ${records.length}`, 14, startY + 10);
+  doc.text(`Filtered Records: ${records.length}`, 14, startY + 10);
 
   const tableData = records.map(r => [
     r.date || "",
@@ -329,7 +331,7 @@ function exportSearchPdf() {
     r.last || r.lastName || "",
     r.company || "",
     r.reason || "",
-    "" // signature drawn manually
+    "" // signature drawn below
   ]);
 
   doc.autoTable({
@@ -343,8 +345,7 @@ function exportSearchPdf() {
     headStyles: {
       fillColor: [30, 94, 150],
       textColor: 255,
-      fontStyle: "bold",
-      fontSize: 9
+      fontStyle: "bold"
     },
     alternateRowStyles: {
       fillColor: [245, 248, 252]
@@ -355,20 +356,18 @@ function exportSearchPdf() {
         if (record.signature && record.signature.startsWith("data:image")) {
           const imgWidth = 35;
           const imgHeight = 12;
-
           const x = data.cell.x + (data.cell.width - imgWidth) / 2;
           const y = data.cell.y + (data.cell.height - imgHeight) / 2;
-
           doc.addImage(record.signature, "PNG", x, y, imgWidth, imgHeight);
         }
       }
     }
   });
 
-  // ✅ SAVE
   const today = new Date().toISOString().split("T")[0];
-  doc.save(`AMS_Search_Log_${today}.pdf`);
+  doc.save(`AMS_Search_Log_FILTERED_${today}.pdf`);
 }
+
 
 function exportSearchLogExcel() {
   const results = window.searchResults || [];
