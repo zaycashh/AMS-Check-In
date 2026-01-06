@@ -145,16 +145,6 @@ if (company === "__OTHER__") {
 } else {
   finalCompany = company;
 }
-   
-   // BLOCK if Reason = Other but empty
-if (reason === "other") {
-  const otherReason = document.getElementById("otherReasonInput").value.trim();
-  if (!otherReason) {
-    alert("Please enter the reason for testing.");
-    document.getElementById("otherReasonInput").focus();
-    return;
-  }
-}
 
     const services = Array.from(
         document.querySelectorAll('input[name="services"]:checked')
