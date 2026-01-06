@@ -81,7 +81,11 @@ function renderRecentCheckIns() {
 
     const servicesText = Array.isArray(entry.services)
   ? entry.services.join(", ")
-  : "";
+  : entry.services
+    ? entry.services
+    : entry.service
+      ? entry.service
+      : "";
 
 html += `
 <tr>
