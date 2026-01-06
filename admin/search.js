@@ -355,8 +355,7 @@ function exportSearchPdf() {
     r.reason || "",
     ""
   ]);
-
-  doc.autoTable({
+  
     doc.autoTable({
   startY: 70, // ✅ PUSH TABLE BELOW HEADER (FIXES OVERLAP)
   head: [["Date", "Time", "First", "Last", "Company", "Reason", "Signature"]],
