@@ -20,13 +20,13 @@ function setupSignaturePad() {
 
   let drawing = false;
 
-  const getPos = e => {
+  const getPos = (e) => {
     const rect = canvas.getBoundingClientRect();
     const p = e.touches ? e.touches[0] : e;
     return { x: p.clientX - rect.left, y: p.clientY - rect.top };
   };
 
-  const draw = e => {
+  const draw = (e) => {
     if (!drawing) return;
     const { x, y } = getPos(e);
     ctx.lineTo(x, y);
@@ -36,14 +36,14 @@ function setupSignaturePad() {
     if (e.touches) e.preventDefault();
   };
 
-  canvas.addEventListener("mousedown", e => {
-  drawing = true;
-  hasSigned = true; // ✅ USER SIGNED
-  placeholder.style.display = "none";
-  const { x, y } = getPos(e);
-  ctx.beginPath();
-  ctx.moveTo(x, y);
-});
+  canvas.addEventListener("mousedown", (e) => {
+    drawing = true;
+    hasSigned = true;
+    placeholder.style.display = "none";
+    const { x, y } = getPos(e);
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+  });
 
   canvas.addEventListener("mouseup", () => {
     drawing = false;
@@ -52,15 +52,15 @@ function setupSignaturePad() {
 
   canvas.addEventListener("mousemove", draw);
 
-  canvas.addEventListener("touchstart", e => {
-  drawing = true;
-  hasSigned = true; // ✅ USER SIGNED
-  placeholder.style.display = "none";
-  const { x, y } = getPos(e);
-  ctx.beginPath();
-  ctx.moveTo(x, y);
-  e.preventDefault();
-});
+  canvas.addEventListener("touchstart", (e) => {
+    drawing = true;
+    hasSigned = true;
+    placeholder.style.display = "none";
+    const { x, y } = getPos(e);
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    e.preventDefault();
+  });
 
   canvas.addEventListener("touchend", () => {
     drawing = false;
@@ -70,27 +70,28 @@ function setupSignaturePad() {
   canvas.addEventListener("touchmove", draw);
 
   document.getElementById("clearSigBtn").addEventListener("click", () => {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  placeholder.style.display = "block";
-  hasSigned = false; // 🔁 RESET SIGNATURE
-});
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    placeholder.style.display = "block";
+    hasSigned = false;
+  });
+}
 
 /* =========================================================
    DROPDOWN LOGIC
 ========================================================= */
-document.getElementById("companySelect").addEventListener("change", e => {
+document.getElementById("companySelect").addEventListener("change", (e) => {
   document.getElementById("otherCompanyWrapper").style.display =
     e.target.value === "__OTHER__" ? "block" : "none";
 });
 
-document.getElementById("reasonSelect").addEventListener("change", e => {
+document.getElementById("reasonSelect").addEventListener("change", (e) => {
   document.getElementById("otherReasonWrapper").style.display =
     e.target.value === "other" ? "block" : "none";
 });
 
 document
   .querySelector('input[value="Other"]')
-  .addEventListener("change", e => {
+  .addEventListener("change", (e) => {
     document.getElementById("otherServiceWrapper").style.display =
       e.target.checked ? "block" : "none";
   });
@@ -127,8 +128,7 @@ document.getElementById("submitBtn").addEventListener("click", () => {
   =============================== */
   const reasonSelect = document.getElementById("reasonSelect").value;
   const otherReason = document.getElementById("otherReasonInput").value.trim();
-  const finalReason =
-    reasonSelect === "other" ? otherReason : reasonSelect;
+  const finalReason = reasonSelect === "other" ? otherReason : reasonSelect;
 
   if (!finalReason) {
     alert("Please select or enter a Reason for Testing.");
@@ -148,7 +148,6 @@ document.getElementById("submitBtn").addEventListener("click", () => {
   }
 
   const services = [];
-
   for (const cb of selectedServices) {
     if (cb.value === "Other") {
       const custom = document.getElementById("srvOtherText").value.trim();
@@ -161,15 +160,16 @@ document.getElementById("submitBtn").addEventListener("click", () => {
       services.push(cb.value);
     }
   }
-   
-// ===============================
-// REQUIRED SIGNATURE VALIDATION
-// ===============================
-if (!hasSigned) {
-  alert("Please provide a signature before submitting.");
-  return; // ⛔ HARD STOP
-}
-   
+
+  /* ===============================
+     REQUIRED SIGNATURE VALIDATION
+  =============================== */
+  if (!hasSigned) {
+    alert("Please provide a signature before submitting.");
+    return;
+  }
+
+  const canvas = document.getElementById("signaturePad");
   const signature = canvas.toDataURL();
 
   /* ===============================
@@ -241,7 +241,7 @@ document.getElementById("exitAdminBtn").addEventListener("click", () => {
 });
 
 /* =========================================================
-   SEARCH INIT (SAFE)
+   SEARCH INIT
 ========================================================= */
 function initRunSearch() {
   const btn = document.getElementById("runSearch");
@@ -252,9 +252,7 @@ function initRunSearch() {
     const logs = JSON.parse(localStorage.getItem("ams_logs") || "[]");
 
     box.innerHTML = logs.length
-      ? logs
-          .map(
-            r => `
+      ? logs.map(r => `
         <tr>
           <td>${r.date}</td>
           <td>${r.time}</td>
@@ -263,9 +261,8 @@ function initRunSearch() {
           <td>${r.company}</td>
           <td>${r.services}</td>
           <td>${r.reason}</td>
-        </tr>`
-          )
-          .join("")
+        </tr>
+      `).join("")
       : "<tr><td colspan='7'>No results found</td></tr>";
   });
 }
@@ -273,14 +270,14 @@ function initRunSearch() {
 /* =========================================================
    AUTO CAPS
 ========================================================= */
-document.addEventListener("input", e => {
+document.addEventListener("input", (e) => {
   if (e.target.tagName === "INPUT" && e.target.type === "text") {
     e.target.value = e.target.value.toUpperCase();
   }
 });
 
 /* =========================================================
-   COMPANY DROPDOWN (SINGLE VERSION)
+   COMPANY DROPDOWN
 ========================================================= */
 function populateCompanyDropdown() {
   const select = document.getElementById("companySelect");
