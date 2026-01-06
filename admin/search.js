@@ -286,11 +286,6 @@ function exportSearchPdf() {
   return;
 }
 
-  if (!records.length) {
-    alert("No records found.");
-    return;
-  }
-
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF("landscape");
 
