@@ -146,7 +146,7 @@ document.getElementById("submitBtn").addEventListener("click", () => {
 
   const services = [];
 
-  selectedServices.forEach(cb => {
+  for (const cb of selectedServices) {
     if (cb.value === "Other") {
       const custom = document.getElementById("srvOtherText").value.trim();
       if (!custom) {
@@ -157,14 +157,27 @@ document.getElementById("submitBtn").addEventListener("click", () => {
     } else {
       services.push(cb.value);
     }
-  });
+  }
 
   /* ===============================
-     SIGNATURE
+     REQUIRED SIGNATURE VALIDATION
   =============================== */
   const canvas = document.getElementById("signaturePad");
+
+  const blankCanvas = document.createElement("canvas");
+  blankCanvas.width = canvas.width;
+  blankCanvas.height = canvas.height;
+
+  if (canvas.toDataURL() === blankCanvas.toDataURL()) {
+    alert("Please provide a signature before submitting.");
+    return;
+  }
+
   const signature = canvas.toDataURL();
 
+  /* ===============================
+     SAVE RECORD
+  =============================== */
   const now = new Date();
 
   const record = {
@@ -199,7 +212,10 @@ document
 ========================================================= */
 document.getElementById("toggleAdminBtn").addEventListener("click", () => {
   const pin = prompt("Enter Admin PIN:");
-  if (pin !== ADMIN_PIN) return alert("Incorrect PIN");
+  if (pin !== ADMIN_PIN) {
+    alert("Incorrect PIN");
+    return;
+  }
 
   document.getElementById("adminArea").style.display = "block";
   document.getElementById("checkInSection").style.display = "none";
@@ -228,7 +244,7 @@ document.getElementById("exitAdminBtn").addEventListener("click", () => {
 });
 
 /* =========================================================
-   SEARCH
+   SEARCH INIT (SAFE)
 ========================================================= */
 function initRunSearch() {
   const btn = document.getElementById("runSearch");
@@ -237,6 +253,7 @@ function initRunSearch() {
 
   btn.addEventListener("click", () => {
     const logs = JSON.parse(localStorage.getItem("ams_logs") || "[]");
+
     box.innerHTML = logs.length
       ? logs
           .map(
