@@ -378,50 +378,40 @@ function exportSearchPdf() {
 }
 
 function exportSearchLogExcel() {
-    const results = window.searchResults || [];
+  const results = window.searchResults || [];
 
-    if (!results.length) {
-        alert("No records to export.");
-        return;
-    }
+  if (!results.length) {
+    alert("No records to export.");
+    return;
+  }
 
-    // ===== MAIN LOG SHEET =====
-    const logData = results.map(log => ({
-        "Date": log.date || "",
-        "Time": log.time || "",
-        "First Name": (log.firstName || "").toUpperCase(),
-        "Last Name": (log.lastName || "").toUpperCase(),
-        "Company": log.company || "",
-        "Reason for Test": log.reason || "",
-        "Collector": log.collector || "",
-        "Signature": log.signature ? "Signed" : "—"
-    }));
+  const data = results.map(log => ({
+    "Date": log.date || "",
+    "Time": log.time || "",
+    "First Name": (log.firstName || log.first || log.fname || "").toUpperCase(),
+    "Last Name": (log.lastName || log.last || log.lname || "").toUpperCase(),
+    "Company": log.company || "",
+    "Reason for Test": log.reason || "",
+    "Collector": log.collector || "",
+    "Signature": log.signature ? "Signed" : "—"
+  }));
 
-    const logSheet = XLSX.utils.json_to_sheet(logData);
-    logSheet["!cols"] = [
-        { wch: 12 }, { wch: 10 }, { wch: 16 }, { wch: 16 },
-        { wch: 26 }, { wch: 22 }, { wch: 20 }, { wch: 12 }
-    ];
+  const worksheet = XLSX.utils.json_to_sheet(data);
 
-    // ===== SIGNATURE SHEET =====
-    const sigRows = [["First Name", "Last Name", "Signature"]];
-    results.forEach(log => {
-        if (log.signature) {
-            sigRows.push([
-                (log.firstName || "").toUpperCase(),
-                (log.lastName || "").toUpperCase(),
-                log.signature // base64 image
-            ]);
-        }
-    });
+  worksheet["!cols"] = [
+    { wch: 12 }, // Date
+    { wch: 10 }, // Time
+    { wch: 16 }, // First Name
+    { wch: 16 }, // Last Name
+    { wch: 26 }, // Company
+    { wch: 22 }, // Reason
+    { wch: 20 }, // Collector
+    { wch: 12 }  // Signature
+  ];
 
-    const sigSheet = XLSX.utils.aoa_to_sheet(sigRows);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Search Log");
 
-    // ===== WORKBOOK =====
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, logSheet, "Search Log");
-    XLSX.utils.book_append_sheet(workbook, sigSheet, "Signatures");
-
-    const today = new Date().toISOString().split("T")[0];
-    XLSX.writeFile(workbook, `AMS_Search_Log_${today}.xlsx`);
+  const today = new Date().toISOString().split("T")[0];
+  XLSX.writeFile(workbook, `AMS_Search_Log_${today}.xlsx`);
 }
