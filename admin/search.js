@@ -280,7 +280,11 @@ window.clearSearch = function () {
   clearSearchTable();
 };
 function exportSearchPdf() {
-  const records = JSON.parse(localStorage.getItem("ams_logs") || "[]");
+  const records = window.searchResults || [];
+  if (!records.length) {
+  alert("No records to export.");
+  return;
+}
 
   if (!records.length) {
     alert("No records found.");
