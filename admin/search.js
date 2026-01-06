@@ -103,7 +103,11 @@ const entryLast = entry.lastName || entry.last || entry.lname || "";
 if (first && !entryFirst.toLowerCase().includes(first)) return false;
 if (last && !entryLast.toLowerCase().includes(last)) return false;
 // Company filter
-if (company && !entry.company?.toLowerCase().includes(company)) return false;
+if (
+  company &&
+  company !== "" &&
+  !entry.company?.toLowerCase().includes(company)
+) return false;
 
 return true;
 });
