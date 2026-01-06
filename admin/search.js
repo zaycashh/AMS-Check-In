@@ -327,6 +327,8 @@ function exportSearchPdf() {
   });
 }
 
+window.exportSearchPdf = exportSearchPdf;
+
 /* =========================================================
    EXPORT EXCEL
 ========================================================= */
