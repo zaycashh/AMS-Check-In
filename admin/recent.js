@@ -57,6 +57,7 @@ function renderRecentCheckIns() {
           <th>Last Name</th>
           <th>Company</th>
           <th>Reason</th>
+          <th>Services</th>
           <th>Signature</th>
         </tr>
       </thead>
@@ -78,17 +79,23 @@ function renderRecentCheckIns() {
       ? `<img src="${entry.signature}" style="max-width:120px; max-height:40px;">`
       : "";
 
-    html += `
-      <tr>
-        <td>${entry.date}</td>
-        <td>${entry.time}</td>
-        <td>${firstName}</td>
-        <td>${lastName}</td>
-        <td>${entry.company}</td>
-        <td>${entry.reason}</td>
-        <td>${signatureHtml}</td>
-      </tr>
-    `;
+    const servicesText = Array.isArray(entry.services)
+  ? entry.services.join(", ")
+  : "";
+
+html += `
+<tr>
+  <td>${entry.date || ""}</td>
+  <td>${entry.time || ""}</td>
+  <td>${firstName}</td>
+  <td>${lastName}</td>
+  <td>${entry.company || ""}</td>
+  <td>${entry.reason || ""}</td>
+  <td>${servicesText}</td>
+  <td>${signatureHtml}</td>
+</tr>
+`;
+
   });
 
   html += `
