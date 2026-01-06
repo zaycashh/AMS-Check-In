@@ -122,7 +122,7 @@ filtered.sort((a, b) => {
 
 window.searchResults = filtered;
 renderSearchResults(filtered);
-};
+}; // ✅ CLOSE runSearch HERE
 
 function renderSearchResults(results) {
   const table = document.getElementById("searchResultsTable");
