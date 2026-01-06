@@ -375,6 +375,8 @@ function exportSearchPdf() {
     }
   }
 });
+}
+
 function exportSearchLogExcel() {
     const results = window.searchResults || [];
 
