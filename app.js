@@ -2,6 +2,7 @@
    GLOBAL VARIABLES
 ========================================================= */
 const ADMIN_PIN = "2468";
+let hasSigned = false;
 
 /* =========================================================
    SIGNATURE PAD INITIALIZATION
@@ -36,12 +37,13 @@ function setupSignaturePad() {
   };
 
   canvas.addEventListener("mousedown", e => {
-    drawing = true;
-    placeholder.style.display = "none";
-    const { x, y } = getPos(e);
-    ctx.beginPath();
-    ctx.moveTo(x, y);
-  });
+  drawing = true;
+  hasSigned = true; // ✅ USER SIGNED
+  placeholder.style.display = "none";
+  const { x, y } = getPos(e);
+  ctx.beginPath();
+  ctx.moveTo(x, y);
+});
 
   canvas.addEventListener("mouseup", () => {
     drawing = false;
@@ -51,13 +53,14 @@ function setupSignaturePad() {
   canvas.addEventListener("mousemove", draw);
 
   canvas.addEventListener("touchstart", e => {
-    drawing = true;
-    placeholder.style.display = "none";
-    const { x, y } = getPos(e);
-    ctx.beginPath();
-    ctx.moveTo(x, y);
-    e.preventDefault();
-  });
+  drawing = true;
+  hasSigned = true; // ✅ USER SIGNED
+  placeholder.style.display = "none";
+  const { x, y } = getPos(e);
+  ctx.beginPath();
+  ctx.moveTo(x, y);
+  e.preventDefault();
+});
 
   canvas.addEventListener("touchend", () => {
     drawing = false;
@@ -67,10 +70,10 @@ function setupSignaturePad() {
   canvas.addEventListener("touchmove", draw);
 
   document.getElementById("clearSigBtn").addEventListener("click", () => {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    placeholder.style.display = "block";
-  });
-}
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  placeholder.style.display = "block";
+  hasSigned = false; // 🔁 RESET SIGNATURE
+});
 
 /* =========================================================
    DROPDOWN LOGIC
@@ -158,21 +161,15 @@ document.getElementById("submitBtn").addEventListener("click", () => {
       services.push(cb.value);
     }
   }
-
-  /* ===============================
-     REQUIRED SIGNATURE VALIDATION
-  =============================== */
-  const canvas = document.getElementById("signaturePad");
-
-  const blankCanvas = document.createElement("canvas");
-  blankCanvas.width = canvas.width;
-  blankCanvas.height = canvas.height;
-
-  if (canvas.toDataURL() === blankCanvas.toDataURL()) {
-    alert("Please provide a signature before submitting.");
-    return;
-  }
-
+   
+// ===============================
+// REQUIRED SIGNATURE VALIDATION
+// ===============================
+if (!hasSigned) {
+  alert("Please provide a signature before submitting.");
+  return; // ⛔ HARD STOP
+}
+   
   const signature = canvas.toDataURL();
 
   /* ===============================
