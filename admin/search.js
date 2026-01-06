@@ -415,3 +415,5 @@ function exportSearchLogExcel() {
   const today = new Date().toISOString().split("T")[0];
   XLSX.writeFile(workbook, `AMS_Search_Log_${today}.xlsx`);
 }
+
+window.exportSearchPdf = exportSearchPdf;
