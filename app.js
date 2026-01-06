@@ -177,14 +177,20 @@ if (reason === "other") {
     const signature = canvas.toDataURL();
 
    const now = new Date();
-   
-// ✅ Ensure finalReason always exists
-const finalReason =
-  document.querySelector('input[name="reason"]:checked')?.value ||
-  document.getElementById("reasonOtherText")?.value ||
-  "";
+// ===============================
+// REQUIRED REASON VALIDATION
+// ===============================
+const reasonSelect = document.getElementById("reasonSelect").value;
+const otherReason = document.getElementById("otherReasonInput").value.trim();
 
-const record = {
+const finalReason =
+  reasonSelect === "other" ? otherReason : reasonSelect;
+
+if (!finalReason) {
+  alert("Please select or enter a Reason for Testing.");
+  return; // ⛔ STOP submission
+}
+   const record = {
   date: now.toISOString().split("T")[0], // ✅ YYYY-MM-DD (CRITICAL)
   time: now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
   first,
