@@ -377,11 +377,11 @@ horizontalPageBreak: true,
     body: rows,
 
     styles: {
-  fontSize: 11,
-  cellPadding: 6,
-      valign: "middle",
-      overflow: "linebreak"
-    },
+  fontSize: 9,
+  cellPadding: 4,
+  valign: "middle",
+  minCellHeight: 14   // ✅ CRITICAL FIX
+},
 
     headStyles: {
       fillColor: [28, 86, 145],
