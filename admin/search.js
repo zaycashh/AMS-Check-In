@@ -16,6 +16,16 @@ function normalizeDate(dateStr) {
 document.addEventListener("DOMContentLoaded", () => {
   populateSearchCompanies();
   clearSearchTable();
+
+  // ✅ Bind Export PDF button safely
+  const pdfBtn = document.getElementById("exportPdfBtn");
+  if (pdfBtn) {
+    pdfBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      console.log("Export PDF clicked");
+      window.exportSearchPdf();
+    });
+  }
 });
 
 /* =========================================================
