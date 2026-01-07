@@ -378,22 +378,24 @@ window.exportSearchPdf = function () {
   },
 
   headStyles: {
-    fillColor: [28, 86, 145],
-    textColor: 255,
-    fontStyle: "bold",
-    halign: "center"
-  },
+  fillColor: [28, 86, 145],
+  textColor: 255,
+  fontStyle: "bold",
+  fontSize: 10,
+  halign: "left",        // 👈 GLOBAL HEADER ALIGNMENT
+  valign: "middle"
+},
 
-  columnStyles: {
-    0: { cellWidth: 24 },  // Date
-    1: { cellWidth: 22 },  // Time
-    2: { cellWidth: 26 },  // First
-    3: { cellWidth: 26 },  // Last
-    4: { cellWidth: 48 },  // Company
-    5: { cellWidth: 38 },  // Reason
-    6: { cellWidth: 46 },  // Services
-    7: { cellWidth: 24, halign: "center" } // Signature
-  },
+columnStyles: {
+  0: { cellWidth: 24, halign: "left" },   // Date
+  1: { cellWidth: 22, halign: "left" },   // Time
+  2: { cellWidth: 26, halign: "left" },   // First
+  3: { cellWidth: 26, halign: "left" },   // Last
+  4: { cellWidth: 50, halign: "left" },   // Company ⬅️
+  5: { cellWidth: 40, halign: "left" },   // Reason ⬅️
+  6: { cellWidth: 48, halign: "left" },   // Services ⬅️
+  7: { cellWidth: 30, halign: "center" }  // Signature ⬅️ wider so it won’t wrap
+},
 
   didDrawCell: function (data) {
     if (
