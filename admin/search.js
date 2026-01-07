@@ -313,6 +313,7 @@ function exportSearchLogExcel() {
   XLSX.utils.book_append_sheet(wb, ws, "Search Log");
   XLSX.writeFile(wb, "AMS_Search_Log.xlsx");
 }
+
 window.exportSearchPdf = function () {
   const records = window.searchResults || [];
   if (!records.length) {
@@ -328,8 +329,7 @@ window.exportSearchPdf = function () {
 });
   
   const pageWidth = doc.internal.pageSize.width;
-
-  /* ================= HEADER ================= */
+  
   // HEADER BAR
 doc.setFillColor(30, 94, 150);
 // HEADER BAR (BIGGER, SAME STYLE)
@@ -416,3 +416,5 @@ doc.setTextColor(0);
     }
   }
 });
+doc.save("AMS_Search_Log.pdf");
+};
