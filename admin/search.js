@@ -343,7 +343,9 @@ window.exportSearchPdf = function () {
   ]);
 
   doc.autoTable({
-  startY: 38,
+  startY: 36,
+
+  margin: { left: 8, right: 8 }, // ⬅ SHIFT ENTIRE TABLE LEFT
 
   head: [[
     "Date",
@@ -360,7 +362,7 @@ window.exportSearchPdf = function () {
 
   styles: {
     fontSize: 9,
-    cellPadding: { top: 6, right: 4, bottom: 6, left: 4 },
+    cellPadding: 5,
     valign: "middle",
     overflow: "linebreak"
   },
@@ -369,34 +371,33 @@ window.exportSearchPdf = function () {
     fillColor: [28, 86, 145],
     textColor: 255,
     fontStyle: "bold",
-    halign: "left",
-    valign: "middle"
+    halign: "center"
   },
 
   columnStyles: {
-    0: { cellWidth: 30 },             // Date (NO WRAP)
-    1: { cellWidth: 30 },             // Time (AM/PM fits)
-    2: { cellWidth: 28 },             // First
-    3: { cellWidth: 28 },             // Last
-    4: { cellWidth: 58 },             // Company (wraps)
-    5: { cellWidth: 44 },             // Reason (wraps)
-    6: { cellWidth: 52 },             // Services (wraps)
-    7: { cellWidth: 32, halign: "center" } // Signature
+    0: { cellWidth: 26 },
+    1: { cellWidth: 26 },
+    2: { cellWidth: 26 },
+    3: { cellWidth: 26 },
+    4: { cellWidth: 52 },
+    5: { cellWidth: 42 },
+    6: { cellWidth: 44 },
+    7: { cellWidth: 28, halign: "center" }
   },
 
   didDrawCell: function (data) {
     if (data.column.index === 7 && data.cell.section === "body") {
       const record = records[data.row.index];
       const img = record?.signature;
-
       if (img && img.startsWith("data:image")) {
-        const imgWidth = 20;
-        const imgHeight = 9;
-
-        const x = data.cell.x + data.cell.width / 2 - imgWidth / 2;
-        const y = data.cell.y + data.cell.height / 2 - imgHeight / 2;
-
-        doc.addImage(img, "PNG", x, y, imgWidth, imgHeight);
+        doc.addImage(
+          img,
+          "PNG",
+          data.cell.x + (data.cell.width - 18) / 2,
+          data.cell.y + (data.cell.height - 8) / 2,
+          18,
+          8
+        );
       }
     }
   }
