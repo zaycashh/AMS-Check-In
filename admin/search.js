@@ -313,7 +313,7 @@ function exportSearchLogExcel() {
     Last: r.lastName || r.last,
     Company: r.company,
     Reason: r.reason,
-    Services: Array.isArray(r.services) ? r.services.join(", ") : "",
+    Services: getServicesText(r),
     Signature: r.signature ? "Signed" : ""
   }));
 
