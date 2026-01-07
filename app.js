@@ -177,17 +177,26 @@ document.getElementById("submitBtn").addEventListener("click", () => {
   =============================== */
   const now = new Date();
 
-  const record = {
-    date: now.toISOString().split("T")[0],
-    time: now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-    first,
-    last,
-    company: finalCompany,
-    reason: finalReason,
-    services: services.join(", "),
-    signature,
-    timestamp: Date.now()
-  };
+const record = {
+  date:
+    now.getFullYear() + "-" +
+    String(now.getMonth() + 1).padStart(2, "0") + "-" +
+    String(now.getDate()).padStart(2, "0"),
+
+  time: now.toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true
+  }),
+
+  first,
+  last,
+  company: finalCompany,
+  reason: finalReason,
+  services: services.join(", "),
+  signature,
+  timestamp: Date.now()
+};
 
   const logs = JSON.parse(localStorage.getItem("ams_logs") || "[]");
   logs.push(record);
