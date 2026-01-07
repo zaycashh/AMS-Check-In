@@ -393,14 +393,14 @@ horizontalPageBreak: true,
     /* 🧮 COLUMN WIDTHS — BALANCED & LEFT-LOCKED */
     
     columnStyles: {
-  0: { cellWidth: 95 },  // Date (no wrap)
-  1: { cellWidth: 75 },  // Time
-  2: { cellWidth: 85 },  // First
-  3: { cellWidth: 85 },  // Last
-  4: { cellWidth: 200 }, // Company
-  5: { cellWidth: 160 }, // Reason
-  6: { cellWidth: 160 }, // Services
-  7: { cellWidth: 95, halign: "center" } // Signature
+  0: { cellWidth: 55 },  // Date
+  1: { cellWidth: 55 },  // Time
+  2: { cellWidth: 60 },  // First
+  3: { cellWidth: 60 },  // Last
+  4: { cellWidth: 150 }, // Company
+  5: { cellWidth: 130 }, // Reason
+  6: { cellWidth: 110 }, // Services
+  7: { cellWidth: 50, halign: "center" } // ✅ Signature (smaller)
 },
     
     /* ✍️ SIGNATURE DRAW */
