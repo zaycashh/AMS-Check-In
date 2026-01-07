@@ -39,7 +39,6 @@ window.runSearch = function () {
 
   const logs = JSON.parse(localStorage.getItem("ams_logs") || "[]");
 
-  /* ===== DATE RANGE ===== */
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
@@ -91,7 +90,6 @@ window.runSearch = function () {
 
   if (endDate) endDate.setHours(23, 59, 59, 999);
 
-  /* ===== FILTER ===== */
   const filtered = logs.filter(entry => {
     const logTime = entry.timestamp
       ? new Date(entry.timestamp)
@@ -105,7 +103,6 @@ window.runSearch = function () {
 
     if (first && !f.toLowerCase().includes(first)) return false;
     if (last && !l.toLowerCase().includes(last)) return false;
-
     if (company && !entry.company?.toLowerCase().includes(company)) return false;
 
     return true;
@@ -149,7 +146,13 @@ function renderSearchResults(results) {
   }
 
   results.forEach(r => {
-    const servicesText = Array.isArray(r.services) ? r.services.join(", ") : "";
+    const servicesValue =
+      Array.isArray(r.services) ? r.services :
+      Array.isArray(r.tests) ? r.tests :
+      typeof r.services === "string" ? [r.services] :
+      typeof r.tests === "string" ? [r.tests] : [];
+
+    const servicesText = servicesValue.join(", ");
 
     const row = document.createElement("tr");
     row.innerHTML = `
@@ -169,8 +172,7 @@ function renderSearchResults(results) {
                         border:1px solid #ccc;background:#fff;">`
             : ""
         }
-      </td>
-    `;
+      </td>`;
     table.appendChild(row);
   });
 }
@@ -199,14 +201,8 @@ function populateSearchCompanies() {
 window.toggleSearchCompanyText = function (value) {
   const input = document.getElementById("searchFilterCompanyText");
   if (!input) return;
-
-  if (value === "__custom__") {
-    input.style.display = "block";
-    input.focus();
-  } else {
-    input.style.display = "none";
-    input.value = "";
-  }
+  input.style.display = value === "__custom__" ? "block" : "none";
+  if (value === "__custom__") input.focus();
 };
 
 /* =========================================================
@@ -215,15 +211,15 @@ window.toggleSearchCompanyText = function (value) {
 function clearSearchTable() {
   const table = document.getElementById("searchResultsTable");
   const counter = document.getElementById("searchResultCount");
-  if (!table) return;
-
   if (counter) counter.textContent = "";
-  table.innerHTML = `
-    <tr>
-      <td colspan="8" style="text-align:center;opacity:.6;">
-        Use filters and click Search to view records
-      </td>
-    </tr>`;
+  if (table) {
+    table.innerHTML = `
+      <tr>
+        <td colspan="8" style="text-align:center;opacity:.6;">
+          Use filters and click Search to view records
+        </td>
+      </tr>`;
+  }
 }
 
 window.clearSearch = function () {
@@ -240,15 +236,6 @@ window.clearSearch = function () {
 };
 
 /* =========================================================
-   KEYBOARD SEARCH
-========================================================= */
-document.addEventListener("keydown", e => {
-  if (e.key === "Enter") {
-    window.runSearch();
-  }
-});
-
-/* =========================================================
    EXPORT PDF
 ========================================================= */
 window.exportSearchPdf = function () {
@@ -258,74 +245,59 @@ window.exportSearchPdf = function () {
     return;
   }
 
-  // ✅ FIX: build rows properly
-  const rows = records.map(r => [
-    r.date || "",
-    r.time || "",
-    r.firstName || r.first || "",
-    r.lastName || r.last || "",
-    r.company || "",
-    r.reason || "",
-    Array.isArray(r.services) ? r.services.join(", ") : "",
-    r.signature || ""
-  ]);
+  const rows = records.map(r => {
+    const servicesValue =
+      Array.isArray(r.services) ? r.services :
+      Array.isArray(r.tests) ? r.tests :
+      typeof r.services === "string" ? [r.services] :
+      typeof r.tests === "string" ? [r.tests] : [];
+
+    return [
+      r.date || "",
+      r.time || "",
+      r.firstName || r.first || "",
+      r.lastName || r.last || "",
+      r.company || "",
+      r.reason || "",
+      servicesValue.join(", "),
+      r.signature || ""
+    ];
+  });
 
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF("landscape");
 
   doc.setFillColor(30, 94, 150);
   doc.rect(0, 0, doc.internal.pageSize.width, 30, "F");
-
   doc.setTextColor(255);
   doc.setFontSize(16);
   doc.text("AMS Search Log Report", 50, 20);
   doc.setTextColor(0);
 
   doc.autoTable({
-    head: [[
-      "Date",
-      "Time",
-      "First",
-      "Last",
-      "Company",
-      "Reason",
-      "Services",
-      "Signature"
-    ]],
+    head: [["Date","Time","First","Last","Company","Reason","Services","Signature"]],
     body: rows,
-    startY: 90,
+    startY: 40,
     styles: { fontSize: 9, cellPadding: 6, valign: "middle" },
-    headStyles: {
-      fillColor: [28, 86, 145],
-      textColor: 255,
-      fontStyle: "bold",
-      halign: "center",
-      valign: "middle"
+    columnStyles: {
+      6: { cellWidth: "auto" },
+      7: { cellWidth: 24, halign: "center" }
     },
-     columnStyles: {
-  0: { cellWidth: 24 },
-  1: { cellWidth: 20 },
-  2: { cellWidth: 20 },
-  3: { cellWidth: 20 },
-  4: { cellWidth: 40 },
-  5: { cellWidth: 28 },
-  6: { cellWidth: "auto" },
-  7: { cellWidth: 24, halign: "center", valign: "middle" }
-},
     didDrawCell: function (data) {
       if (data.column.index === 7 && data.cell.section === "body") {
         const img = data.cell.raw;
         if (img && img.startsWith("data:image")) {
-          const imgWidth = 18;
-          const imgHeight = 8;
-          const x = data.cell.x + data.cell.width / 2 - imgWidth / 2;
-          const y = data.cell.y + data.cell.height / 2 - imgHeight / 2;
-          doc.addImage(img, "PNG", x, y, imgWidth, imgHeight);
+          doc.addImage(img, "PNG",
+            data.cell.x + 3,
+            data.cell.y + 2,
+            18,
+            8
+          );
         }
       }
     }
   });
-}
+};
 
 /* =========================================================
    EXPORT EXCEL
