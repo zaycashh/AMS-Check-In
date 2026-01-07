@@ -251,7 +251,7 @@ document.addEventListener("keydown", e => {
 /* =========================================================
    EXPORT PDF
 ========================================================= */
-function exportSearchPdf() {
+window.exportSearchPdf = function () {
   const records = window.searchResults || [];
   if (!records.length) {
     alert("Please run a search first.");
@@ -350,4 +350,3 @@ function exportSearchLogExcel() {
   XLSX.utils.book_append_sheet(wb, ws, "Search Log");
   XLSX.writeFile(wb, "AMS_Search_Log.xlsx");
 }
-window.exportSearchPdf = exportSearchPdf;
