@@ -16,18 +16,7 @@ function normalizeDate(dateStr) {
 document.addEventListener("DOMContentLoaded", () => {
   populateSearchCompanies();
   clearSearchTable();
-
-  // ✅ Bind Export PDF button safely
-  const pdfBtn = document.getElementById("exportPdfBtn");
-  if (pdfBtn) {
-    pdfBtn.addEventListener("click", (e) => {
-      e.preventDefault();
-      console.log("Export PDF clicked");
-      window.exportSearchPdf();
-    });
-  }
-});
-
+   
 /* =========================================================
    RUN SEARCH
 ========================================================= */
@@ -278,73 +267,6 @@ function getServicesText(r) {
 
   return list.join(", ");
 }
-
-/* =========================================================
-   EXPORT PDF
-========================================================= */
-window.exportSearchPdf = function () {
-  const records = window.searchResults || [];
-  if (!records.length) {
-    alert("Please run a search first.");
-    return;
-  }
-
-  const rows = records.map(r => {
-    const servicesValue =
-      Array.isArray(r.services) ? r.services :
-      Array.isArray(r.tests) ? r.tests :
-      typeof r.services === "string" ? [r.services] :
-      typeof r.tests === "string" ? [r.tests] : [];
-
-    return [
-      r.date || "",
-      r.time || "",
-      r.firstName || r.first || "",
-      r.lastName || r.last || "",
-      r.company || "",
-      r.reason || "",
-      servicesValue.join(", "),
-      r.signature || ""
-    ];
-  });
-
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF("landscape");
-
-  doc.setFillColor(30, 94, 150);
-  doc.rect(0, 0, doc.internal.pageSize.width, 30, "F");
-  doc.setTextColor(255);
-  doc.setFontSize(16);
-  doc.text("AMS Search Log Report", 50, 20);
-  doc.setTextColor(0);
-
-  doc.autoTable({
-    head: [["Date","Time","First","Last","Company","Reason","Services","Signature"]],
-    body: rows,
-    startY: 40,
-    styles: { fontSize: 9, cellPadding: 6, valign: "middle" },
-    columnStyles: {
-      6: { cellWidth: "auto" },
-      7: { cellWidth: 24, halign: "center" }
-    },
-    didDrawCell: function (data) {
-      if (data.column.index === 7 && data.cell.section === "body") {
-        const img = data.cell.raw;
-        if (img && img.startsWith("data:image")) {
-          doc.addImage(img, "PNG",
-            data.cell.x + 3,
-            data.cell.y + 2,
-            18,
-            8
-          );
-        }
-      }
-    }
-  });
-};
-
-doc.save("AMS_Search_Log.pdf");
-
 /* =========================================================
    EXPORT EXCEL
 ========================================================= */
