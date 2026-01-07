@@ -317,91 +317,91 @@ window.exportSearchPdf = function () {
 
   /* ================= HEADER ================= */
   doc.setFillColor(30, 94, 150);
-  doc.rect(0, 0, doc.internal.pageSize.width, 30, "F");
+  doc.rect(0, 0, doc.internal.pageSize.width, 28, "F");
 
   if (window.amsLogoBase64) {
-    doc.addImage(amsLogoBase64, "PNG", 10, 6, 28, 18);
+    doc.addImage(amsLogoBase64, "PNG", 10, 5, 26, 18);
   }
 
   doc.setTextColor(255);
   doc.setFontSize(16);
-  doc.text("AMS Search Log Report", doc.internal.pageSize.width / 2, 20, {
-    align: "center"
-  });
+  doc.text(
+    "AMS Search Log Report",
+    doc.internal.pageSize.width / 2,
+    18,
+    { align: "center" }
+  );
   doc.setTextColor(0);
 
   /* ================= TABLE DATA ================= */
   const rows = records.map(r => [
-    (r.date || "").replace(/\s+/g, ""),
-    (r.time || "").replace(/\s+/g, " "),
+    r.date || "",
+    r.time || "",
     r.firstName || r.first || "",
     r.lastName || r.last || "",
     r.company || "",
     r.reason || "",
-    getServicesText(r),
-    ""
+    getServicesText(r)
   ]);
 
   doc.autoTable({
-  startY: 36,
+    startY: 36,
+    head: [[
+      "Date",
+      "Time",
+      "First",
+      "Last",
+      "Company",
+      "Reason",
+      "Services"
+    ]],
+    body: rows,
 
-  margin: { left: 8, right: 8 }, // ⬅ SHIFT ENTIRE TABLE LEFT
+    styles: {
+      fontSize: 9,
+      cellPadding: 5,
+      valign: "middle",
+      overflow: "linebreak"
+    },
 
-  head: [[
-    "Date",
-    "Time",
-    "First",
-    "Last",
-    "Company",
-    "Reason",
-    "Services",
-    "Signature"
-  ]],
+    headStyles: {
+      fillColor: [28, 86, 145],
+      textColor: 255,
+      fontStyle: "bold",
+      halign: "left"
+    },
 
-  body: rows,
+    columnStyles: {
+      0: { cellWidth: 26 }, // Date
+      1: { cellWidth: 26 }, // Time
+      2: { cellWidth: 28 }, // First
+      3: { cellWidth: 28 }, // Last
+      4: { cellWidth: 60 }, // Company
+      5: { cellWidth: 48 }, // Reason
+      6: { cellWidth: 50 }  // Services
+    },
 
-  styles: {
-    fontSize: 9,
-    cellPadding: 5,
-    valign: "middle",
-    overflow: "linebreak"
-  },
+    /* ================= GENERATED TIMESTAMP ================= */
+    didDrawPage: function () {
+      const generatedAt = new Date().toLocaleString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true
+      });
 
-  headStyles: {
-  fillColor: [28, 86, 145],
-  textColor: 255,
-  fontStyle: "bold"
-},
-
-  columnStyles: {
-  0: { cellWidth: 26 },                 // Date
-  1: { cellWidth: 26 },                 // Time
-  2: { cellWidth: 26 },                 // First
-  3: { cellWidth: 26 },                 // Last
-  4: { cellWidth: 52 },                 // Company
-  5: { cellWidth: 42, halign: "left" }, // Reason ⬅️
-  6: { cellWidth: 44, halign: "left" }, // Services ⬅️
-  7: { cellWidth: 28, halign: "center"} // Signature
-},
-
-  didDrawCell: function (data) {
-    if (data.column.index === 7 && data.cell.section === "body") {
-      const record = records[data.row.index];
-      const img = record?.signature;
-      if (img && img.startsWith("data:image")) {
-        doc.addImage(
-          img,
-          "PNG",
-          data.cell.x + (data.cell.width - 18) / 2,
-          data.cell.y + (data.cell.height - 8) / 2,
-          18,
-          8
-        );
-      }
+      doc.setFontSize(8);
+      doc.setTextColor(150);
+      doc.text(
+        `Generated: ${generatedAt}`,
+        doc.internal.pageSize.width - 14,
+        doc.internal.pageSize.height - 10,
+        { align: "right" }
+      );
     }
-  }
-});
+  });
 
   doc.save("AMS_Search_Log.pdf");
 };
-
