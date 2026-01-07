@@ -300,6 +300,19 @@ window.exportSearchPdf = function () {
     return;
   }
 
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF("landscape");
+
+  // Header bar
+  doc.setFillColor(28, 86, 145);
+  doc.rect(0, 0, doc.internal.pageSize.width, 28, "F");
+
+  doc.setTextColor(255);
+  doc.setFontSize(15);
+  doc.text("AMS Search Log Report", 14, 18);
+  doc.setTextColor(0);
+
+  // Build table rows (SIGNATURE MUST BE EMPTY STRING)
   const rows = records.map(r => [
     r.date || "",
     r.time || "",
@@ -308,45 +321,68 @@ window.exportSearchPdf = function () {
     r.company || "",
     r.reason || "",
     getServicesText(r),
-    r.signature || ""
+    "" // ⚠️ IMPORTANT: DO NOT PUT BASE64 HERE
   ]);
 
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF("landscape");
-
-  doc.setFillColor(30, 94, 150);
-  doc.rect(0, 0, doc.internal.pageSize.width, 28, "F");
-
-  doc.setTextColor(255);
-  doc.setFontSize(15);
-  doc.text("AMS Search Log Report", 14, 18);
-  doc.setTextColor(0);
-
   doc.autoTable({
-    head: [["Date","Time","First","Last","Company","Reason","Services","Signature"]],
+    startY: 36,
+    head: [[
+      "Date",
+      "Time",
+      "First",
+      "Last",
+      "Company",
+      "Reason",
+      "Services",
+      "Signature"
+    ]],
     body: rows,
-    startY: 35,
     styles: {
       fontSize: 9,
       cellPadding: 5,
       valign: "middle"
     },
-    columnStyles: {
-      6: { cellWidth: "auto" },
-      7: { cellWidth: 26, halign: "center" }
+    headStyles: {
+      fillColor: [28, 86, 145],
+      textColor: 255,
+      fontStyle: "bold",
+      halign: "center"
     },
+    columnStyles: {
+      0: { cellWidth: 24 },
+      1: { cellWidth: 22 },
+      2: { cellWidth: 22 },
+      3: { cellWidth: 22 },
+      4: { cellWidth: 42 },
+      5: { cellWidth: 30 },
+      6: { cellWidth: "auto" },
+      7: { cellWidth: 30, halign: "center" }
+    },
+
+    // ✅ DRAW SIGNATURE IMAGE PROPERLY
     didDrawCell: function (data) {
-      if (data.column.index === 7 && data.cell.section === "body") {
-        const img = data.cell.raw;
+      if (
+        data.column.index === 7 &&
+        data.cell.section === "body"
+      ) {
+        const record = records[data.row.index];
+        const img = record?.signature;
+
         if (img && img.startsWith("data:image")) {
-          doc.addImage(
-            img,
-            "PNG",
-            data.cell.x + 3,
-            data.cell.y + 2,
-            18,
-            8
-          );
+          const imgWidth = 18;
+          const imgHeight = 8;
+
+          const x =
+            data.cell.x +
+            data.cell.width / 2 -
+            imgWidth / 2;
+
+          const y =
+            data.cell.y +
+            data.cell.height / 2 -
+            imgHeight / 2;
+
+          doc.addImage(img, "PNG", x, y, imgWidth, imgHeight);
         }
       }
     }
@@ -354,4 +390,3 @@ window.exportSearchPdf = function () {
 
   doc.save("AMS_Search_Log.pdf");
 };
-
