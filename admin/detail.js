@@ -345,6 +345,22 @@ function exportCompanyExcel() {
     return;
   }
 
+  function getServicesText(r) {
+  if (Array.isArray(r.services)) return r.services.join(", ");
+  if (Array.isArray(r.tests)) return r.tests.join(", ");
+
+  if (typeof r.services === "string") return r.services;
+  if (typeof r.tests === "string") return r.tests;
+
+  const list = [];
+  if (r.dot) list.push("DOT Drug Test");
+  if (r.nonDot) list.push("NON-DOT Drug Test");
+  if (r.vision) list.push("Vision Test");
+  if (r.alcohol) list.push("Alcohol Test");
+
+  return list.join(", ");
+}
+  
   // ===============================
   // BUILD EXCEL DATA
   // ===============================
@@ -358,14 +374,14 @@ function exportCompanyExcel() {
     ["Date", "Time", "First", "Last", "Reason", "Services"]
   ];
 
-  const dataRows = records.map(r => [
-    r.date || "",
-    r.time || "",
-    r.first || "",
-    r.last || "",
-    r.reason || "",
-    Array.isArray(r.services) ? r.services.join(", ") : ""
-  ]);
+  const data = records.map(r => ({
+  Date: r.date,
+  Time: r.time,
+  First: r.first || r.firstName || "",
+  Last: r.last || r.lastName || "",
+  Reason: r.reason || "",
+  Services: getServicesText(r) // ✅ FIXED
+}));
 
   const sheetData = [...headerRows, ...dataRows];
   const ws = XLSX.utils.aoa_to_sheet(sheetData);
