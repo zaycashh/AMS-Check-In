@@ -260,41 +260,41 @@ doc.setTextColor(0, 0, 0);
   body: tableData,
 
   styles: {
-    fontSize: 9,       // body font (matches Search Log)
+    fontSize: 9,
     cellPadding: 4
   },
 
- headStyles: {
-  fillColor: [30, 94, 150],
-  textColor: 255,
-  fontStyle: "bold",
-  fontSize: 9
-},   // ← THIS COMMA IS REQUIRED
+  headStyles: {
+    fillColor: [30, 94, 150],
+    textColor: 255,
+    fontStyle: "bold",
+    fontSize: 9
+  },
 
   columnStyles: {
-  0: { cellWidth: 90 },  // Date
-  1: { cellWidth: 80 },  // Time
-  2: { cellWidth: 90 },  // First
-  3: { cellWidth: 90 },  // Last
-  4: { cellWidth: 200 }, // Reason
-  5: { cellWidth: 200 }, // Services
-  6: { cellWidth: 100, halign: "center" } // Signature
-},
-    
-didDrawCell(data) {
-  if (data.column.index === 6 && data.cell.section === "body") {
-    const record = records[data.row.index];
-    const img = record?.signature;
+    0: { cellWidth: 90 },   // Date
+    1: { cellWidth: 80 },   // Time
+    2: { cellWidth: 90 },   // First
+    3: { cellWidth: 90 },   // Last
+    4: { cellWidth: 200 },  // Reason
+    5: { cellWidth: 200 },  // Services
+    6: { cellWidth: 100, halign: "center" } // Signature
+  },
 
-    if (img && img.startsWith("data:image")) {
-      const w = 40;
-      const h = 18;
-      const x = data.cell.x + (data.cell.width - w) / 2;
-      const y = data.cell.y + (data.cell.height - h) / 2;
-      doc.addImage(img, "PNG", x, y, w, h);
+  didDrawCell(data) {
+    if (data.column.index === 6 && data.cell.section === "body") {
+      const record = records[data.row.index];
+      const img = record?.signature;
+
+      if (img && img.startsWith("data:image")) {
+        const w = 40;
+        const h = 18;
+        const x = data.cell.x + (data.cell.width - w) / 2;
+        const y = data.cell.y + (data.cell.height - h) / 2;
+        doc.addImage(img, "PNG", x, y, w, h);
+      }
     }
-  }
-}
+  },  // ✅ THIS COMMA WAS MISSING
 
   alternateRowStyles: {
     fillColor: [245, 248, 252]
