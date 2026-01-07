@@ -343,8 +343,9 @@ window.exportSearchPdf = function () {
      TABLE DATA
   ======================= */
   const rows = records.map(r => [
-    r.date || "",
-    r.time || "",
+    const rows = records.map(r => [
+  (r.date || "").replace(/\s+/g, ""), // prevent wrap
+  (r.time || "").replace(/\s+/g, " "), // keep "09:35 PM" together
     r.firstName || r.first || "",
     r.lastName || r.last || "",
     r.company || "",
@@ -387,14 +388,14 @@ window.exportSearchPdf = function () {
 },
 
 columnStyles: {
-  0: { cellWidth: 24, halign: "left" },   // Date
-  1: { cellWidth: 22, halign: "left" },   // Time
-  2: { cellWidth: 26, halign: "left" },   // First
-  3: { cellWidth: 26, halign: "left" },   // Last
-  4: { cellWidth: 50, halign: "left" },   // Company ⬅️
-  5: { cellWidth: 40, halign: "left" },   // Reason ⬅️
-  6: { cellWidth: 48, halign: "left" },   // Services ⬅️
-  7: { cellWidth: 30, halign: "center" }  // Signature ⬅️ wider so it won’t wrap
+  0: { cellWidth: 28, halign: "left", valign: "middle", overflow: "hidden" }, // Date
+  1: { cellWidth: 28, halign: "left", valign: "middle", overflow: "hidden" }, // Time
+  2: { cellWidth: 26, halign: "left", valign: "middle" }, // First
+  3: { cellWidth: 26, halign: "left", valign: "middle" }, // Last
+  4: { cellWidth: 50, halign: "left", valign: "middle" }, // Company
+  5: { cellWidth: 40, halign: "left", valign: "middle" }, // Reason
+  6: { cellWidth: 48, halign: "left", valign: "middle" }, // Services
+  7: { cellWidth: 30, halign: "center", valign: "middle" } // Signature
 },
 
   didDrawCell: function (data) {
