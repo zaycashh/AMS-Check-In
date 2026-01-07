@@ -256,7 +256,7 @@ doc.setTextColor(0, 0, 0);
 
   doc.autoTable({
   startY: startY + 30,
-  head: [["Date", "Time", "First", "Last", "Reason", "Services", "Signature"]
+  head: [["Date", "Time", "First", "Last", "Reason", "Services", "Signature"]],
   body: tableData,
 
   styles: {
