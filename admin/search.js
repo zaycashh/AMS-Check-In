@@ -358,7 +358,7 @@ doc.setTextColor(0);
   doc.autoTable({
     tableWidth: "wrap",
 horizontalPageBreak: true,
-    startY: 36,
+    startY: 46,
 
     /* 🔴 THIS IS THE KEY FIX */
     margin: { left: 8, right: 8 },
@@ -377,8 +377,8 @@ horizontalPageBreak: true,
     body: rows,
 
     styles: {
-  fontSize: 10.5,
-  cellPadding: 5,
+  fontSize: 11,
+  cellPadding: 6,
       valign: "middle",
       overflow: "linebreak"
     },
@@ -391,17 +391,18 @@ horizontalPageBreak: true,
     },
 
     /* 🧮 COLUMN WIDTHS — BALANCED & LEFT-LOCKED */
+    
     columnStyles: {
-  0: { cellWidth: 55 }, // Date
-  1: { cellWidth: 55 }, // Time
-  2: { cellWidth: 60 }, // First
-  3: { cellWidth: 60 }, // Last
-  4: { cellWidth: 140 }, // Company
-  5: { cellWidth: 120 }, // Reason
-  6: { cellWidth: 120 }, // Services
-  7: { cellWidth: 80, halign: "center" } // Signature
+  0: { cellWidth: 90 },  // Date (no wrap)
+  1: { cellWidth: 75 },  // Time
+  2: { cellWidth: 85 },  // First
+  3: { cellWidth: 85 },  // Last
+  4: { cellWidth: 190 }, // Company
+  5: { cellWidth: 160 }, // Reason
+  6: { cellWidth: 160 }, // Services
+  7: { cellWidth: 95, halign: "center" } // Signature
 },
-
+    
     /* ✍️ SIGNATURE DRAW */
     didDrawCell(data) {
       if (data.column.index === 7 && data.cell.section === "body") {
@@ -409,8 +410,8 @@ horizontalPageBreak: true,
         const img = record?.signature;
 
         if (img && img.startsWith("data:image")) {
-          const w = 18;
-          const h = 8;
+          const w = 42;
+          const h = 18;
           const x = data.cell.x + (data.cell.width - w) / 2;
           const y = data.cell.y + (data.cell.height - h) / 2;
           doc.addImage(img, "PNG", x, y, w, h);
