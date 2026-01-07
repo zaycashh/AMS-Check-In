@@ -35,6 +35,9 @@ document.addEventListener("DOMContentLoaded", () => {
    RUN SEARCH
 ========================================================= */
 window.runSearch = function () {
+  
+  clearSearchTable();
+
   const first = document.getElementById("filterFirstName")?.value.trim().toLowerCase();
   const last = document.getElementById("filterLastName")?.value.trim().toLowerCase();
 
@@ -120,6 +123,12 @@ window.runSearch = function () {
 
     return true;
   });
+
+  if (filtered.length === 0) {
+  window.searchResults = [];
+  renderSearchResults([]);
+  return;
+}
 
   filtered.sort((a, b) => {
     const ta = a.timestamp || new Date(a.date).getTime();
