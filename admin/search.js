@@ -15,6 +15,7 @@ function normalizeDate(dateStr) {
 document.addEventListener("DOMContentLoaded", () => {
   populateSearchCompanies();
   clearSearchTable();
+});
    
 /* =========================================================
    RUN SEARCH
@@ -289,3 +290,68 @@ function exportSearchLogExcel() {
   XLSX.utils.book_append_sheet(wb, ws, "Search Log");
   XLSX.writeFile(wb, "AMS_Search_Log.xlsx");
 }
+/* =========================================================
+   EXPORT PDF (SEARCH LOG)
+========================================================= */
+window.exportSearchPdf = function () {
+  const records = window.searchResults || [];
+  if (!records.length) {
+    alert("Please run a search first.");
+    return;
+  }
+
+  const rows = records.map(r => [
+    r.date || "",
+    r.time || "",
+    r.firstName || r.first || "",
+    r.lastName || r.last || "",
+    r.company || "",
+    r.reason || "",
+    getServicesText(r),
+    r.signature || ""
+  ]);
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF("landscape");
+
+  doc.setFillColor(30, 94, 150);
+  doc.rect(0, 0, doc.internal.pageSize.width, 28, "F");
+
+  doc.setTextColor(255);
+  doc.setFontSize(15);
+  doc.text("AMS Search Log Report", 14, 18);
+  doc.setTextColor(0);
+
+  doc.autoTable({
+    head: [["Date","Time","First","Last","Company","Reason","Services","Signature"]],
+    body: rows,
+    startY: 35,
+    styles: {
+      fontSize: 9,
+      cellPadding: 5,
+      valign: "middle"
+    },
+    columnStyles: {
+      6: { cellWidth: "auto" },
+      7: { cellWidth: 26, halign: "center" }
+    },
+    didDrawCell: function (data) {
+      if (data.column.index === 7 && data.cell.section === "body") {
+        const img = data.cell.raw;
+        if (img && img.startsWith("data:image")) {
+          doc.addImage(
+            img,
+            "PNG",
+            data.cell.x + 3,
+            data.cell.y + 2,
+            18,
+            8
+          );
+        }
+      }
+    }
+  });
+
+  doc.save("AMS_Search_Log.pdf");
+};
+
