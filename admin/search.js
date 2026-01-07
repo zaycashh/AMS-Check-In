@@ -317,22 +317,29 @@ window.exportSearchPdf = function () {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF("landscape");
 
-  // Header bar
-   doc.setFillColor(30, 94, 150);
-doc.rect(0, 0, doc.internal.pageSize.width, 30, "F");
+  /* =========================================================
+     HEADER BAR + TITLE
+  ========================================================= */
+  doc.setFillColor(30, 94, 150);
+  doc.rect(0, 0, doc.internal.pageSize.width, 30, "F");
 
-if (amsLogoBase64) {
-  doc.addImage(amsLogoBase64, "PNG", 10, 6, 28, 18);
-}
+  if (window.amsLogoBase64) {
+    doc.addImage(window.amsLogoBase64, "PNG", 10, 6, 28, 18);
+  }
 
-doc.setTextColor(255);
-doc.setFontSize(16);
-doc.text("AMS Search Log Report", doc.internal.pageSize.width / 2, 20, {
-  align: "center"
-});
-doc.setTextColor(0);
+  doc.setTextColor(255);
+  doc.setFontSize(16);
+  doc.text(
+    "AMS Search Log Report",
+    doc.internal.pageSize.width / 2,
+    20,
+    { align: "center" }
+  );
+  doc.setTextColor(0);
 
-  // Build table rows (SIGNATURE MUST BE EMPTY STRING)
+  /* =========================================================
+     TABLE DATA (SIGNATURE COLUMN LEFT EMPTY)
+  ========================================================= */
   const rows = records.map(r => [
     r.date || "",
     r.time || "",
@@ -341,7 +348,7 @@ doc.setTextColor(0);
     r.company || "",
     r.reason || "",
     getServicesText(r),
-    "" // ⚠️ IMPORTANT: DO NOT PUT BASE64 HERE
+    "" // IMPORTANT: signature drawn later, not here
   ]);
 
   doc.autoTable({
@@ -357,35 +364,38 @@ doc.setTextColor(0);
       "Signature"
     ]],
     body: rows,
+
+    /* =========================
+       GLOBAL STYLES
+    ========================= */
     styles: {
       fontSize: 9,
       cellPadding: 5,
-      valign: "middle"
+      valign: "middle",
+      overflow: "linebreak"
     },
+
     headStyles: {
       fillColor: [28, 86, 145],
       textColor: 255,
       fontStyle: "bold",
       halign: "center"
     },
-    columnStyles: {
-  0: { cellWidth: 24 }, // Date
-  1: { cellWidth: 22 }, // Time
-  2: { cellWidth: 26 }, // First
-  3: { cellWidth: 26 }, // Last
-  4: { cellWidth: 50 }, // Company
-  5: { cellWidth: 38 }, // Reason
-  6: { cellWidth: 48 }, // Services
-  7: { cellWidth: 24, halign: "center" } // Signature
-}
-       styles: {
-  fontSize: 9,
-  cellPadding: 5,
-  valign: "middle",
-  overflow: "linebreak"
-},
 
-    // ✅ DRAW SIGNATURE IMAGE PROPERLY
+    columnStyles: {
+      0: { cellWidth: 24 }, // Date
+      1: { cellWidth: 22 }, // Time
+      2: { cellWidth: 26 }, // First
+      3: { cellWidth: 26 }, // Last
+      4: { cellWidth: 50 }, // Company
+      5: { cellWidth: 38 }, // Reason
+      6: { cellWidth: 48 }, // Services
+      7: { cellWidth: 24, halign: "center" } // Signature
+    },
+
+    /* =========================
+       DRAW SIGNATURE IMAGE
+    ========================= */
     didDrawCell: function (data) {
       if (
         data.column.index === 7 &&
@@ -416,3 +426,4 @@ doc.setTextColor(0);
 
   doc.save("AMS_Search_Log.pdf");
 };
+
