@@ -1,4 +1,18 @@
 console.log("Admin Search Module Loaded");
+
+let amsLogoBase64 = null;
+
+(function loadLogo() {
+  const img = new Image();
+  img.src = "logo.png";
+  img.onload = function () {
+    const canvas = document.createElement("canvas");
+    canvas.width = img.width;
+    canvas.height = img.height;
+    canvas.getContext("2d").drawImage(img, 0, 0);
+    amsLogoBase64 = canvas.toDataURL("image/png");
+  };
+})();
 /* =========================================================
    DATE NORMALIZATION
 ========================================================= */
@@ -304,13 +318,19 @@ window.exportSearchPdf = function () {
   const doc = new jsPDF("landscape");
 
   // Header bar
-  doc.setFillColor(28, 86, 145);
-  doc.rect(0, 0, doc.internal.pageSize.width, 28, "F");
+   doc.setFillColor(30, 94, 150);
+doc.rect(0, 0, doc.internal.pageSize.width, 30, "F");
 
-  doc.setTextColor(255);
-  doc.setFontSize(15);
-  doc.text("AMS Search Log Report", 14, 18);
-  doc.setTextColor(0);
+if (amsLogoBase64) {
+  doc.addImage(amsLogoBase64, "PNG", 10, 6, 28, 18);
+}
+
+doc.setTextColor(255);
+doc.setFontSize(16);
+doc.text("AMS Search Log Report", doc.internal.pageSize.width / 2, 20, {
+  align: "center"
+});
+doc.setTextColor(0);
 
   // Build table rows (SIGNATURE MUST BE EMPTY STRING)
   const rows = records.map(r => [
@@ -349,15 +369,21 @@ window.exportSearchPdf = function () {
       halign: "center"
     },
     columnStyles: {
-      0: { cellWidth: 24 },
-      1: { cellWidth: 22 },
-      2: { cellWidth: 22 },
-      3: { cellWidth: 22 },
-      4: { cellWidth: 42 },
-      5: { cellWidth: 30 },
-      6: { cellWidth: "auto" },
-      7: { cellWidth: 30, halign: "center" }
-    },
+  0: { cellWidth: 24 }, // Date
+  1: { cellWidth: 22 }, // Time
+  2: { cellWidth: 26 }, // First
+  3: { cellWidth: 26 }, // Last
+  4: { cellWidth: 50 }, // Company
+  5: { cellWidth: 38 }, // Reason
+  6: { cellWidth: 48 }, // Services
+  7: { cellWidth: 24, halign: "center" } // Signature
+}
+       styles: {
+  fontSize: 9,
+  cellPadding: 5,
+  valign: "middle",
+  overflow: "linebreak"
+},
 
     // ✅ DRAW SIGNATURE IMAGE PROPERLY
     didDrawCell: function (data) {
