@@ -304,9 +304,7 @@ function exportSearchLogExcel() {
   XLSX.utils.book_append_sheet(wb, ws, "Search Log");
   XLSX.writeFile(wb, "AMS_Search_Log.xlsx");
 }
-/* =========================================================
-   EXPORT PDF (SEARCH LOG)
-========================================================= */
+
 window.exportSearchPdf = function () {
   const records = window.searchResults || [];
   if (!records.length) {
@@ -317,29 +315,33 @@ window.exportSearchPdf = function () {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF("landscape");
 
-  /* =========================================================
-     HEADER BAR + TITLE
-  ========================================================= */
-  doc.setFillColor(30, 94, 150);
-  doc.rect(0, 0, doc.internal.pageSize.width, 30, "F");
+  const pageWidth = doc.internal.pageSize.width;
 
+  /* =======================
+     HEADER BAR
+  ======================= */
+  doc.setFillColor(30, 94, 150);
+  doc.rect(0, 0, pageWidth, 32, "F");
+
+  // Logo
   if (window.amsLogoBase64) {
-    doc.addImage(window.amsLogoBase64, "PNG", 10, 6, 28, 18);
+    doc.addImage(amsLogoBase64, "PNG", 12, 6, 26, 18);
   }
 
+  // Title
   doc.setTextColor(255);
   doc.setFontSize(16);
   doc.text(
     "AMS Search Log Report",
-    doc.internal.pageSize.width / 2,
+    pageWidth / 2,
     20,
     { align: "center" }
   );
   doc.setTextColor(0);
 
-  /* =========================================================
-     TABLE DATA (SIGNATURE COLUMN LEFT EMPTY)
-  ========================================================= */
+  /* =======================
+     TABLE DATA
+  ======================= */
   const rows = records.map(r => [
     r.date || "",
     r.time || "",
@@ -348,11 +350,11 @@ window.exportSearchPdf = function () {
     r.company || "",
     r.reason || "",
     getServicesText(r),
-    "" // IMPORTANT: signature drawn later, not here
+    "" // signature rendered separately
   ]);
 
   doc.autoTable({
-    startY: 36,
+    startY: 40,
     head: [[
       "Date",
       "Time",
@@ -365,12 +367,9 @@ window.exportSearchPdf = function () {
     ]],
     body: rows,
 
-    /* =========================
-       GLOBAL STYLES
-    ========================= */
     styles: {
       fontSize: 9,
-      cellPadding: 5,
+      cellPadding: 6,
       valign: "middle",
       overflow: "linebreak"
     },
@@ -383,19 +382,19 @@ window.exportSearchPdf = function () {
     },
 
     columnStyles: {
-      0: { cellWidth: 24 }, // Date
-      1: { cellWidth: 22 }, // Time
-      2: { cellWidth: 26 }, // First
-      3: { cellWidth: 26 }, // Last
-      4: { cellWidth: 50 }, // Company
-      5: { cellWidth: 38 }, // Reason
-      6: { cellWidth: 48 }, // Services
-      7: { cellWidth: 24, halign: "center" } // Signature
+      0: { cellWidth: 26 },  // Date
+      1: { cellWidth: 24 },  // Time
+      2: { cellWidth: 28 },  // First
+      3: { cellWidth: 28 },  // Last
+      4: { cellWidth: 54 },  // Company
+      5: { cellWidth: 40 },  // Reason
+      6: { cellWidth: 54 },  // Services
+      7: { cellWidth: 28, halign: "center" } // Signature
     },
 
-    /* =========================
-       DRAW SIGNATURE IMAGE
-    ========================= */
+    /* =======================
+       SIGNATURE RENDERING
+    ======================= */
     didDrawCell: function (data) {
       if (
         data.column.index === 7 &&
@@ -405,7 +404,7 @@ window.exportSearchPdf = function () {
         const img = record?.signature;
 
         if (img && img.startsWith("data:image")) {
-          const imgWidth = 18;
+          const imgWidth = 20;
           const imgHeight = 8;
 
           const x =
@@ -426,4 +425,3 @@ window.exportSearchPdf = function () {
 
   doc.save("AMS_Search_Log.pdf");
 };
-
