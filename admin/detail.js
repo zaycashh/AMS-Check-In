@@ -254,14 +254,30 @@ doc.setTextColor(0, 0, 0);
     Array.isArray(r.services) ? r.services.join(", ") : (r.services || "")
   ]);
 
-  doc.autoTable({
-  startY: startY + 30,
-  head: [["Date", "Time", "First", "Last", "Reason", "Services", "Signature"]],
+  const pageWidth = doc.internal.pageSize.width;
+
+doc.autoTable({
+  startY: startY + 28,
+  margin: { left: 8, right: 8 },
+  tableWidth: pageWidth - 16,
+
+  head: [[
+    "Date",
+    "Time",
+    "First",
+    "Last",
+    "Reason",
+    "Services",
+    "Signature"
+  ]],
+
   body: tableData,
 
   styles: {
     fontSize: 9,
-    cellPadding: 4
+    cellPadding: 4,
+    valign: "middle",
+    overflow: "linebreak"
   },
 
   headStyles: {
@@ -271,14 +287,18 @@ doc.setTextColor(0, 0, 0);
     fontSize: 9
   },
 
+  alternateRowStyles: {
+    fillColor: [245, 248, 252]
+  },
+
   columnStyles: {
-    0: { cellWidth: 90 },   // Date
-    1: { cellWidth: 80 },   // Time
-    2: { cellWidth: 90 },   // First
-    3: { cellWidth: 90 },   // Last
-    4: { cellWidth: 200 },  // Reason
-    5: { cellWidth: 200 },  // Services
-    6: { cellWidth: 100, halign: "center" } // Signature
+    0: { cellWidth: 28 },  // Date
+    1: { cellWidth: 26 },  // Time
+    2: { cellWidth: 30 },  // First
+    3: { cellWidth: 30 },  // Last
+    4: { cellWidth: 65 },  // Reason
+    5: { cellWidth: 60 },  // Services
+    6: { cellWidth: 30, halign: "center" } // Signature
   },
 
   didDrawCell(data) {
@@ -287,20 +307,15 @@ doc.setTextColor(0, 0, 0);
       const img = record?.signature;
 
       if (img && img.startsWith("data:image")) {
-        const w = 40;
-        const h = 18;
+        const w = 18;
+        const h = 8;
         const x = data.cell.x + (data.cell.width - w) / 2;
         const y = data.cell.y + (data.cell.height - h) / 2;
         doc.addImage(img, "PNG", x, y, w, h);
       }
     }
-  },  // ✅ THIS COMMA WAS MISSING
-
-  alternateRowStyles: {
-    fillColor: [245, 248, 252]
   }
 });
-
   /* ===============================
      SAVE
   =============================== */
