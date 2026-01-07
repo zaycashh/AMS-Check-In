@@ -374,14 +374,14 @@ function exportCompanyExcel() {
     ["Date", "Time", "First", "Last", "Reason", "Services"]
   ];
 
-  const data = records.map(r => ({
-  Date: r.date,
-  Time: r.time,
-  First: r.first || r.firstName || "",
-  Last: r.last || r.lastName || "",
-  Reason: r.reason || "",
-  Services: getServicesText(r) // ✅ FIXED
-}));
+  const dataRows = records.map(r => ([
+  r.date || "",
+  r.time || "",
+  r.first || r.firstName || "",
+  r.last || r.lastName || "",
+  r.reason || "",
+  getServicesText(r)
+]));
 
   const sheetData = [...headerRows, ...data];
   const ws = XLSX.utils.aoa_to_sheet(sheetData);
