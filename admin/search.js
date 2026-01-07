@@ -234,6 +234,21 @@ window.clearSearch = function () {
   window.searchResults = [];
   clearSearchTable();
 };
+/* =========================================================
+   SERVICES NORMALIZER (USED BY TABLE, PDF, EXCEL)
+========================================================= */
+function getServicesText(r) {
+  if (Array.isArray(r.services)) return r.services.join(", ");
+  if (typeof r.services === "string") return r.services;
+
+  const list = [];
+
+  if (r.dot) list.push("DOT Drug Test");
+  if (r.nonDot) list.push("NON-DOT Drug Test");
+  if (r.vision) list.push("Vision Test");
+
+  return list.join(", ");
+}
 
 /* =========================================================
    EXPORT PDF
