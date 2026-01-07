@@ -383,7 +383,7 @@ function exportCompanyExcel() {
   Services: getServicesText(r) // ✅ FIXED
 }));
 
-  const sheetData = [...headerRows, ...dataRows];
+  const sheetData = [...headerRows, ...data];
   const ws = XLSX.utils.aoa_to_sheet(sheetData);
 
   // ===============================
