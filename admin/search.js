@@ -332,15 +332,15 @@ window.exportSearchPdf = function () {
   /* ================= HEADER ================= */
   // HEADER BAR
 doc.setFillColor(30, 94, 150);
-doc.rect(0, 0, pageWidth, 38, "F");
+// HEADER BAR (BIGGER, SAME STYLE)
+doc.rect(0, 0, pageWidth, 46, "F");
 
-// LOGO
-doc.addImage(amsLogoBase64, "PNG", 14, 7, 32, 24);
+// LOGO (BIGGER)
+doc.addImage(amsLogoBase64, "PNG", 16, 8, 40, 30);
 
-// TITLE
-doc.setTextColor(255);
-doc.setFontSize(17);
-doc.text("AMS Search Log Report", pageWidth / 2, 24, { align: "center" });
+// TITLE (BOLDER VISUALLY)
+doc.setFontSize(19);
+doc.text("AMS Search Log Report", pageWidth / 2, 30, { align: "center" });
 doc.setTextColor(0);
 
   /* ================= TABLE DATA ================= */
@@ -393,11 +393,11 @@ horizontalPageBreak: true,
     /* 🧮 COLUMN WIDTHS — BALANCED & LEFT-LOCKED */
     
     columnStyles: {
-  0: { cellWidth: 90 },  // Date (no wrap)
+  0: { cellWidth: 95 },  // Date (no wrap)
   1: { cellWidth: 75 },  // Time
   2: { cellWidth: 85 },  // First
   3: { cellWidth: 85 },  // Last
-  4: { cellWidth: 190 }, // Company
+  4: { cellWidth: 200 }, // Company
   5: { cellWidth: 160 }, // Reason
   6: { cellWidth: 160 }, // Services
   7: { cellWidth: 95, halign: "center" } // Signature
