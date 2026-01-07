@@ -343,61 +343,64 @@ window.exportSearchPdf = function () {
   ]);
 
   doc.autoTable({
-    startY: 36,
-    head: [[
-      "Date",
-      "Time",
-      "First",
-      "Last",
-      "Company",
-      "Reason",
-      "Services",
-      "Signature"
-    ]],
-    body: rows,
+  startY: 38,
 
-    styles: {
-      fontSize: 9,
-      cellPadding: 6,
-      valign: "middle",
-      overflow: "hidden"
-    },
+  head: [[
+    "Date",
+    "Time",
+    "First",
+    "Last",
+    "Company",
+    "Reason",
+    "Services",
+    "Signature"
+  ]],
 
-    headStyles: {
-      fillColor: [28, 86, 145],
-      textColor: 255,
-      fontStyle: "bold",
-      halign: "left"
-    },
+  body: rows,
 
-    columnStyles: {
-      0: { cellWidth: 28 },
-      1: { cellWidth: 28 },
-      2: { cellWidth: 26 },
-      3: { cellWidth: 26 },
-      4: { cellWidth: 50 },
-      5: { cellWidth: 40 },
-      6: { cellWidth: 48 },
-      7: { cellWidth: 30, halign: "center" }
-    },
+  styles: {
+    fontSize: 9,
+    cellPadding: { top: 6, right: 4, bottom: 6, left: 4 },
+    valign: "middle",
+    overflow: "linebreak"
+  },
 
-    didDrawCell: function (data) {
-      if (data.column.index === 7 && data.cell.section === "body") {
-        const record = records[data.row.index];
-        const img = record?.signature;
+  headStyles: {
+    fillColor: [28, 86, 145],
+    textColor: 255,
+    fontStyle: "bold",
+    halign: "left",
+    valign: "middle"
+  },
 
-        if (img && img.startsWith("data:image")) {
-          const imgWidth = 18;
-          const imgHeight = 8;
+  columnStyles: {
+    0: { cellWidth: 30 },             // Date (NO WRAP)
+    1: { cellWidth: 30 },             // Time (AM/PM fits)
+    2: { cellWidth: 28 },             // First
+    3: { cellWidth: 28 },             // Last
+    4: { cellWidth: 58 },             // Company (wraps)
+    5: { cellWidth: 44 },             // Reason (wraps)
+    6: { cellWidth: 52 },             // Services (wraps)
+    7: { cellWidth: 32, halign: "center" } // Signature
+  },
 
-          const x = data.cell.x + data.cell.width / 2 - imgWidth / 2;
-          const y = data.cell.y + data.cell.height / 2 - imgHeight / 2;
+  didDrawCell: function (data) {
+    if (data.column.index === 7 && data.cell.section === "body") {
+      const record = records[data.row.index];
+      const img = record?.signature;
 
-          doc.addImage(img, "PNG", x, y, imgWidth, imgHeight);
-        }
+      if (img && img.startsWith("data:image")) {
+        const imgWidth = 20;
+        const imgHeight = 9;
+
+        const x = data.cell.x + data.cell.width / 2 - imgWidth / 2;
+        const y = data.cell.y + data.cell.height / 2 - imgHeight / 2;
+
+        doc.addImage(img, "PNG", x, y, imgWidth, imgHeight);
       }
     }
-  });
+  }
+});
 
   doc.save("AMS_Search_Log.pdf");
 };
