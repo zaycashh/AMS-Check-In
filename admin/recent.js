@@ -19,15 +19,26 @@ const endOfToday = new Date();
 endOfToday.setHours(23, 59, 59, 999);
 
 const recent = logs
+  .map(log => {
+    let ts = log.timestamp;
+
+    // 🔁 BACKWARD COMPATIBILITY FIX
+    if (!ts && log.date) {
+      const timePart = log.time ? log.time : "00:00";
+      ts = new Date(`${log.date} ${timePart}`).getTime();
+    }
+
+    return { ...log, _ts: ts };
+  })
   .filter(log => {
-    if (!log.timestamp) return false;
+    if (!log._ts) return false;
 
     return (
-      log.timestamp >= startOfToday.getTime() &&
-      log.timestamp <= endOfToday.getTime()
+      log._ts >= startOfToday.getTime() &&
+      log._ts <= endOfToday.getTime()
     );
   })
-  .sort((a, b) => b.timestamp - a.timestamp)
+  .sort((a, b) => b._ts - a._ts)
   .slice(0, 20);
 
   const todayCount = recent.length;
