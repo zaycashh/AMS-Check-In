@@ -330,17 +330,18 @@ window.exportSearchPdf = function () {
   const pageWidth = doc.internal.pageSize.width;
 
   /* ================= HEADER ================= */
-  doc.setFillColor(30, 94, 150);
-  doc.rect(0, 0, pageWidth, 30, "F");
+  // HEADER BAR
+doc.setFillColor(30, 94, 150);
+doc.rect(0, 0, pageWidth, 38, "F");
 
-  if (window.amsLogoBase64) {
-    doc.addImage(amsLogoBase64, "PNG", 8, 6, 26, 18);
-  }
+// LOGO
+doc.addImage(amsLogoBase64, "PNG", 14, 7, 32, 24);
 
-  doc.setTextColor(255);
-  doc.setFontSize(16);
-  doc.text("AMS Search Log Report", pageWidth / 2, 20, { align: "center" });
-  doc.setTextColor(0);
+// TITLE
+doc.setTextColor(255);
+doc.setFontSize(17);
+doc.text("AMS Search Log Report", pageWidth / 2, 24, { align: "center" });
+doc.setTextColor(0);
 
   /* ================= TABLE DATA ================= */
   const rows = records.map(r => [
