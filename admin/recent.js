@@ -11,25 +11,24 @@ function renderRecentCheckIns() {
     return;
   }
 
-  // TODAY ONLY
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  // TODAY ONLY (TIMESTAMP SAFE)
+const startOfToday = new Date();
+startOfToday.setHours(0, 0, 0, 0);
 
-  const recent = logs
-    .filter(log => {
-      if (!log.date) return false;
+const endOfToday = new Date();
+endOfToday.setHours(23, 59, 59, 999);
 
-      const logDate = new Date(log.date + "T00:00:00");
-      logDate.setHours(0, 0, 0, 0);
+const recent = logs
+  .filter(log => {
+    if (!log.timestamp) return false;
 
-      return logDate.getTime() === today.getTime();
-    })
-    .sort((a, b) => {
-      const aDate = new Date(`${a.date} ${a.time}`);
-      const bDate = new Date(`${b.date} ${b.time}`);
-      return bDate - aDate;
-    })
-    .slice(0, 20);
+    return (
+      log.timestamp >= startOfToday.getTime() &&
+      log.timestamp <= endOfToday.getTime()
+    );
+  })
+  .sort((a, b) => b.timestamp - a.timestamp)
+  .slice(0, 20);
 
   const todayCount = recent.length;
 
