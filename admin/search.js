@@ -321,8 +321,12 @@ window.exportSearchPdf = function () {
   }
 
   const { jsPDF } = window.jspdf;
-  const doc = new jsPDF("landscape");
-
+  const doc = new jsPDF({
+  orientation: "landscape",
+  unit: "pt",
+  format: "letter" // widest safe option
+});
+  
   const pageWidth = doc.internal.pageSize.width;
 
   /* ================= HEADER ================= */
@@ -351,6 +355,8 @@ window.exportSearchPdf = function () {
   ]);
 
   doc.autoTable({
+    tableWidth: "wrap",
+horizontalPageBreak: true,
     startY: 36,
 
     /* 🔴 THIS IS THE KEY FIX */
@@ -385,15 +391,15 @@ window.exportSearchPdf = function () {
 
     /* 🧮 COLUMN WIDTHS — BALANCED & LEFT-LOCKED */
     columnStyles: {
-      0: { cellWidth: 26 }, // Date
-      1: { cellWidth: 26 }, // Time
-      2: { cellWidth: 26 }, // First
-      3: { cellWidth: 26 }, // Last
-      4: { cellWidth: 58 }, // Company
-      5: { cellWidth: 44 }, // Reason
-      6: { cellWidth: 48 }, // Services
-      7: { cellWidth: 30, halign: "center" } // Signature
-    },
+  0: { cellWidth: 55 }, // Date
+  1: { cellWidth: 55 }, // Time
+  2: { cellWidth: 60 }, // First
+  3: { cellWidth: 60 }, // Last
+  4: { cellWidth: 140 }, // Company
+  5: { cellWidth: 120 }, // Reason
+  6: { cellWidth: 120 }, // Services
+  7: { cellWidth: 80, halign: "center" } // Signature
+},
 
     /* ✍️ SIGNATURE DRAW */
     didDrawCell(data) {
