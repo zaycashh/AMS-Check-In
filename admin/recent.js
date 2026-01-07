@@ -29,7 +29,7 @@ function renderRecentCheckIns() {
       const bDate = new Date(`${b.date} ${b.time}`);
       return bDate - aDate;
     })
-    .slice(0, 10);
+    .slice(0, 20);
 
   const todayCount = recent.length;
 
