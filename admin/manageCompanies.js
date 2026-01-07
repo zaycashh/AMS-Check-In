@@ -87,15 +87,23 @@ function renderCompanyManager() {
      DELETE COMPANY
   ========================= */
   container.querySelectorAll(".delete-company").forEach(btn => {
-    btn.onclick = () => {
-      const index = Number(btn.dataset.index);
-      companies.splice(index, 1);
-      saveCompanies(companies);
-      renderCompanyManager();
-    };
-  });
+  btn.onclick = () => {
+    const index = Number(btn.dataset.index);
+    const companyName = companies[index];
 
-  /* =========================
+    const confirmDelete = confirm(
+      `Are you sure you want to delete "${companyName}"?\n\nThis will NOT remove past check-ins.`
+    );
+
+    if (!confirmDelete) return;
+
+    companies.splice(index, 1);
+    saveCompanies(companies);
+    renderCompanyManager();
+  };
+});
+   
+   /* =========================
      EDIT COMPANY
   ========================= */
   container.querySelectorAll(".edit-company").forEach(btn => {
