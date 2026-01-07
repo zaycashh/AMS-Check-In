@@ -39,21 +39,37 @@ function renderCompanyManager() {
   const list = container.querySelector("#companyList");
 
   if (companies.length === 0) {
-    list.innerHTML = "<p>No companies added yet.</p>";
-  } else {
     list.innerHTML = companies
-      .map(
-        (c, i) => `
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-            <span>${c}</span>
-            <button data-index="${i}" class="secondary-btn delete-company">
-              Delete
-            </button>
-          </div>
-        `
-      )
-      .join("");
-  }
+  .map((c, i) => `
+    <div class="company-row" style="display:flex; gap:8px; align-items:center; margin-bottom:8px;">
+      
+      <input
+        type="text"
+        class="company-edit-input"
+        data-index="${i}"
+        value="${c}"
+        disabled
+        style="flex:1; padding:6px;"
+      />
+
+      <button
+        class="secondary-btn edit-company"
+        data-index="${i}"
+      >
+        Edit
+      </button>
+
+      <button
+        class="secondary-btn delete-company"
+        data-index="${i}"
+      >
+        Delete
+      </button>
+
+    </div>
+  `)
+  .join("");
+
 
   // ADD COMPANY
   container.querySelector("#addCompanyBtn").onclick = () => {
@@ -77,6 +93,35 @@ function renderCompanyManager() {
     };
   });
 }
+// EDIT COMPANY
+container.querySelectorAll(".edit-company").forEach(btn => {
+  btn.onclick = () => {
+    const index = Number(btn.dataset.index);
+    const input = container.querySelector(
+      `.company-edit-input[data-index="${index}"]`
+    );
+
+    if (!input) return;
+
+    // SAVE MODE
+    if (!input.disabled) {
+      const newName = input.value.trim();
+      if (!newName) {
+        alert("Company name cannot be empty");
+        return;
+      }
+
+      companies[index] = newName;
+      saveCompanies(companies);
+      renderCompanyManager();
+      return;
+    }
+
+    // EDIT MODE
+    input.disabled = false;
+    input.focus();
+  };
+});
 
 // expose globally
 window.renderCompanyManager = renderCompanyManager;
