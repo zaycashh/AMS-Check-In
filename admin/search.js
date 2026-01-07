@@ -376,8 +376,8 @@ horizontalPageBreak: true,
     body: rows,
 
     styles: {
-      fontSize: 9,
-      cellPadding: 4,
+  fontSize: 10.5,
+  cellPadding: 5,
       valign: "middle",
       overflow: "linebreak"
     },
