@@ -204,6 +204,25 @@ window.toggleSearchCompanyText = function (value) {
   input.style.display = value === "__custom__" ? "block" : "none";
   if (value === "__custom__") input.focus();
 };
+/* =========================================================
+   CUSTOM DATE RANGE TOGGLE
+========================================================= */
+window.toggleCustomDateRange = function (value) {
+  const start = document.getElementById("filterStartDate");
+  const end = document.getElementById("filterEndDate");
+
+  if (!start || !end) return;
+
+  if (value === "custom") {
+    start.style.display = "inline-block";
+    end.style.display = "inline-block";
+  } else {
+    start.style.display = "none";
+    end.style.display = "none";
+    start.value = "";
+    end.value = "";
+  }
+};
 
 /* =========================================================
    CLEAR SEARCH
