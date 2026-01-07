@@ -221,19 +221,19 @@ window.toggleSearchCompanyText = function (value) {
    CUSTOM DATE RANGE TOGGLE
 ========================================================= */
 window.toggleCustomDateRange = function (value) {
-  const start = document.getElementById("filterStartDate");
-  const end = document.getElementById("filterEndDate");
-
-  if (!start || !end) return;
+  const wrapper = document.getElementById("customDateRange");
+  if (!wrapper) return;
 
   if (value === "custom") {
-    start.style.display = "inline-block";
-    end.style.display = "inline-block";
+    wrapper.style.display = "block";
   } else {
-    start.style.display = "none";
-    end.style.display = "none";
-    start.value = "";
-    end.value = "";
+    wrapper.style.display = "none";
+
+    // clear values when not custom
+    const start = document.getElementById("filterStartDate");
+    const end = document.getElementById("filterEndDate");
+    if (start) start.value = "";
+    if (end) end.value = "";
   }
 };
 
