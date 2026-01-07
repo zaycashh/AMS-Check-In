@@ -315,116 +315,90 @@ window.exportSearchPdf = function () {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF("landscape");
 
-  const pageWidth = doc.internal.pageSize.width;
-
-  /* =======================
-     HEADER BAR
-  ======================= */
+  /* ================= HEADER ================= */
   doc.setFillColor(30, 94, 150);
-  doc.rect(0, 0, pageWidth, 32, "F");
+  doc.rect(0, 0, doc.internal.pageSize.width, 30, "F");
 
-  // Logo
   if (window.amsLogoBase64) {
-    doc.addImage(amsLogoBase64, "PNG", 12, 6, 26, 18);
+    doc.addImage(amsLogoBase64, "PNG", 10, 6, 28, 18);
   }
 
-  // Title
   doc.setTextColor(255);
   doc.setFontSize(16);
-  doc.text(
-    "AMS Search Log Report",
-    pageWidth / 2,
-    20,
-    { align: "center" }
-  );
+  doc.text("AMS Search Log Report", doc.internal.pageSize.width / 2, 20, {
+    align: "center"
+  });
   doc.setTextColor(0);
 
-  /* =======================
-     TABLE DATA
-  ======================= */
+  /* ================= TABLE DATA ================= */
   const rows = records.map(r => [
-    const rows = records.map(r => [
-  (r.date || "").replace(/\s+/g, ""), // prevent wrap
-  (r.time || "").replace(/\s+/g, " "), // keep "09:35 PM" together
+    (r.date || "").replace(/\s+/g, ""),
+    (r.time || "").replace(/\s+/g, " "),
     r.firstName || r.first || "",
     r.lastName || r.last || "",
     r.company || "",
     r.reason || "",
     getServicesText(r),
-    "" // signature rendered separately
+    ""
   ]);
 
   doc.autoTable({
-  startY: 40,
-  tableWidth: "wrap",
+    startY: 36,
+    head: [[
+      "Date",
+      "Time",
+      "First",
+      "Last",
+      "Company",
+      "Reason",
+      "Services",
+      "Signature"
+    ]],
+    body: rows,
 
-  head: [[
-    "Date",
-    "Time",
-    "First",
-    "Last",
-    "Company",
-    "Reason",
-    "Services",
-    "Signature"
-  ]],
-
-  body: rows,
-
- styles: {
+    styles: {
       fontSize: 9,
       cellPadding: 6,
       valign: "middle",
       overflow: "hidden"
     },
 
-  headStyles: {
-  fillColor: [28, 86, 145],
-  textColor: 255,
-  fontStyle: "bold",
-  fontSize: 10,
-  halign: "left",        // 👈 GLOBAL HEADER ALIGNMENT
-  valign: "middle"
-},
+    headStyles: {
+      fillColor: [28, 86, 145],
+      textColor: 255,
+      fontStyle: "bold",
+      halign: "left"
+    },
 
-columnStyles: {
-  0: { cellWidth: 28, halign: "left", valign: "middle", overflow: "hidden" }, // Date
-  1: { cellWidth: 28, halign: "left", valign: "middle", overflow: "hidden" }, // Time
-  2: { cellWidth: 26, halign: "left", valign: "middle" }, // First
-  3: { cellWidth: 26, halign: "left", valign: "middle" }, // Last
-  4: { cellWidth: 50, halign: "left", valign: "middle" }, // Company
-  5: { cellWidth: 40, halign: "left", valign: "middle" }, // Reason
-  6: { cellWidth: 48, halign: "left", valign: "middle" }, // Services
-  7: { cellWidth: 30, halign: "center", valign: "middle" } // Signature
-},
+    columnStyles: {
+      0: { cellWidth: 28 },
+      1: { cellWidth: 28 },
+      2: { cellWidth: 26 },
+      3: { cellWidth: 26 },
+      4: { cellWidth: 50 },
+      5: { cellWidth: 40 },
+      6: { cellWidth: 48 },
+      7: { cellWidth: 30, halign: "center" }
+    },
 
-  didDrawCell: function (data) {
-    if (
-      data.column.index === 7 &&
-      data.cell.section === "body"
-    ) {
-      const record = records[data.row.index];
-      const img = record?.signature;
+    didDrawCell: function (data) {
+      if (data.column.index === 7 && data.cell.section === "body") {
+        const record = records[data.row.index];
+        const img = record?.signature;
 
-      if (img && img.startsWith("data:image")) {
-        const imgWidth = 18;
-        const imgHeight = 7;
+        if (img && img.startsWith("data:image")) {
+          const imgWidth = 18;
+          const imgHeight = 8;
 
-        const x =
-          data.cell.x +
-          data.cell.width / 2 -
-          imgWidth / 2;
+          const x = data.cell.x + data.cell.width / 2 - imgWidth / 2;
+          const y = data.cell.y + data.cell.height / 2 - imgHeight / 2;
 
-        const y =
-          data.cell.y +
-          data.cell.height / 2 -
-          imgHeight / 2;
-
-        doc.addImage(img, "PNG", x, y, imgWidth, imgHeight);
+          doc.addImage(img, "PNG", x, y, imgWidth, imgHeight);
+        }
       }
     }
-  }
-});
+  });
 
   doc.save("AMS_Search_Log.pdf");
 };
+
