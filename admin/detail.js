@@ -264,13 +264,13 @@ doc.setTextColor(0, 0, 0);
     cellPadding: 4
   },
 
-  headStyles: {
-    fillColor: [30, 94, 150],
-    textColor: 255,
-    fontStyle: "bold",
-    fontSize: 9        // ✅ THIS was missing
-  },
-  
+ headStyles: {
+  fillColor: [30, 94, 150],
+  textColor: 255,
+  fontStyle: "bold",
+  fontSize: 9
+},   // ← THIS COMMA IS REQUIRED
+
   columnStyles: {
   0: { cellWidth: 90 },  // Date
   1: { cellWidth: 80 },  // Time
@@ -280,6 +280,7 @@ doc.setTextColor(0, 0, 0);
   5: { cellWidth: 200 }, // Services
   6: { cellWidth: 100, halign: "center" } // Signature
 },
+    
 didDrawCell(data) {
   if (data.column.index === 6 && data.cell.section === "body") {
     const record = records[data.row.index];
