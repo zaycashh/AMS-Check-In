@@ -356,80 +356,63 @@ doc.setTextColor(0);
   ]);
 
   doc.autoTable({
-    tableWidth: "wrap",
-horizontalPageBreak: true,
-    startY: 46,
+  startY: 36,
+  margin: { left: 10, right: 10 },
 
-    /* 🔴 THIS IS THE KEY FIX */
-    margin: { left: 8, right: 8 },
+  head: [[
+    "Date",
+    "Time",
+    "First",
+    "Last",
+    "Company",
+    "Reason",
+    "Services",
+    "Signature"
+  ]],
 
-    head: [[
-      "Date",
-      "Time",
-      "First",
-      "Last",
-      "Company",
-      "Reason",
-      "Services",
-      "Signature"
-    ]],
+  body: rows,
 
-    body: rows,
+  styles: {
+    fontSize: 9,
+    cellPadding: 4,
+    valign: "middle",
+    overflow: "linebreak"
+  },
 
-    styles: {
-  fontSize: 9,
-  cellPadding: 4,
-  valign: "middle",
-  minCellHeight: 14   // ✅ CRITICAL FIX
-},
+  headStyles: {
+    fillColor: [28, 86, 145],
+    textColor: 255,
+    fontStyle: "bold",
+    halign: "left"
+  },
 
-    headStyles: {
-      fillColor: [28, 86, 145],
-      textColor: 255,
-      fontStyle: "bold",
-      halign: "left"
-    },
+  alternateRowStyles: {
+    fillColor: [245, 248, 252]
+  },
 
-    /* 🧮 COLUMN WIDTHS — BALANCED & LEFT-LOCKED */
-    
-    columnStyles: {
-  0: { cellWidth: 55 },  // Date
-  1: { cellWidth: 55 },  // Time
-  2: { cellWidth: 60 },  // First
-  3: { cellWidth: 60 },  // Last
-  4: { cellWidth: 150 }, // Company
-  5: { cellWidth: 130 }, // Reason
-  6: { cellWidth: 110 }, // Services
-  7: { cellWidth: 50, halign: "center" } // ✅ Signature (smaller)
-},
-    
-    /* ✍️ SIGNATURE DRAW */
-    didDrawCell(data) {
-      if (data.column.index === 7 && data.cell.section === "body") {
-        const record = records[data.row.index];
-        const img = record?.signature;
+  columnStyles: {
+    0: { cellWidth: 55 },   // Date
+    1: { cellWidth: 55 },   // Time
+    2: { cellWidth: 60 },   // First
+    3: { cellWidth: 60 },   // Last
+    4: { cellWidth: 160 },  // Company
+    5: { cellWidth: 140 },  // Reason
+    6: { cellWidth: 120 },  // Services
+    7: { cellWidth: 70, halign: "center" } // Signature
+  },
 
-        if (img && img.startsWith("data:image")) {
-          const w = 42;
-          const h = 18;
-          const x = data.cell.x + (data.cell.width - w) / 2;
-          const y = data.cell.y + (data.cell.height - h) / 2;
-          doc.addImage(img, "PNG", x, y, w, h);
-        }
+  didDrawCell(data) {
+    if (data.column.index === 7 && data.cell.section === "body") {
+      const record = records[data.row.index];
+      const img = record?.signature;
+
+      if (img && img.startsWith("data:image")) {
+        const w = 22;
+        const h = 10;
+        const x = data.cell.x + (data.cell.width - w) / 2;
+        const y = data.cell.y + (data.cell.height - h) / 2;
+        doc.addImage(img, "PNG", x, y, w, h);
       }
     }
-  });
-
-  /* ================= GENERATED TIMESTAMP ================= */
-  const generated = new Date().toLocaleString();
-  doc.setFontSize(9);
-  doc.setTextColor(120);
-  doc.text(
-    `Generated: ${generated}`,
-    pageWidth - 8,
-    doc.internal.pageSize.height - 6,
-    { align: "right" }
-  );
-
-  doc.save("AMS_Search_Log.pdf");
-};
+  }
+});
