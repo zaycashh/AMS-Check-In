@@ -1,5 +1,8 @@
 console.log("Manage Companies Module Loaded");
 
+/* =========================================================
+   STORAGE HELPERS
+========================================================= */
 function getCompanies() {
   return JSON.parse(localStorage.getItem("ams_companies")) || [];
 }
@@ -8,6 +11,9 @@ function saveCompanies(companies) {
   localStorage.setItem("ams_companies", JSON.stringify(companies));
 }
 
+/* =========================================================
+   RENDER MANAGER
+========================================================= */
 function renderCompanyManager() {
   const container = document.getElementById("tabManage");
   if (!container) return;
@@ -17,18 +23,14 @@ function renderCompanyManager() {
   container.innerHTML = `
     <h2 class="section-title">Manage Companies</h2>
 
-    <div style="max-width:500px; margin-bottom:20px;">
+    <div style="max-width:500px;margin-bottom:20px;">
       <input
         id="companyInput"
         type="text"
         placeholder="Enter company name"
-        style="width:100%; padding:12px; margin-bottom:12px;"
+        style="width:100%;padding:12px;margin-bottom:12px;"
       />
-      <button
-        id="addCompanyBtn"
-        type="button"
-        class="primary-btn"
-      >
+      <button id="addCompanyBtn" class="primary-btn" type="button">
         Add Company
       </button>
     </div>
@@ -39,39 +41,37 @@ function renderCompanyManager() {
   const list = container.querySelector("#companyList");
 
   if (companies.length === 0) {
+    list.innerHTML = `<p>No companies added yet.</p>`;
+  } else {
     list.innerHTML = companies
-  .map((c, i) => `
-    <div class="company-row" style="display:flex; gap:8px; align-items:center; margin-bottom:8px;">
-      
-      <input
-        type="text"
-        class="company-edit-input"
-        data-index="${i}"
-        value="${c}"
-        disabled
-        style="flex:1; padding:6px;"
-      />
+      .map(
+        (company, index) => `
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <span>${company}</span>
+          <div>
+            <button
+              class="secondary-btn edit-company"
+              data-index="${index}"
+              style="margin-right:6px;"
+            >
+              Edit
+            </button>
+            <button
+              class="secondary-btn delete-company"
+              data-index="${index}"
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+      `
+      )
+      .join("");
+  }
 
-      <button
-        class="secondary-btn edit-company"
-        data-index="${i}"
-      >
-        Edit
-      </button>
-
-      <button
-        class="secondary-btn delete-company"
-        data-index="${i}"
-      >
-        Delete
-      </button>
-
-    </div>
-  `)
-  .join("");
-
-
-  // ADD COMPANY
+  /* =========================
+     ADD COMPANY
+  ========================= */
   container.querySelector("#addCompanyBtn").onclick = () => {
     const input = container.querySelector("#companyInput");
     const name = input.value.trim();
@@ -83,7 +83,9 @@ function renderCompanyManager() {
     renderCompanyManager();
   };
 
-  // DELETE COMPANY
+  /* =========================
+     DELETE COMPANY
+  ========================= */
   container.querySelectorAll(".delete-company").forEach(btn => {
     btn.onclick = () => {
       const index = Number(btn.dataset.index);
@@ -92,36 +94,26 @@ function renderCompanyManager() {
       renderCompanyManager();
     };
   });
-}
-// EDIT COMPANY
-container.querySelectorAll(".edit-company").forEach(btn => {
-  btn.onclick = () => {
-    const index = Number(btn.dataset.index);
-    const input = container.querySelector(
-      `.company-edit-input[data-index="${index}"]`
-    );
 
-    if (!input) return;
+  /* =========================
+     EDIT COMPANY
+  ========================= */
+  container.querySelectorAll(".edit-company").forEach(btn => {
+    btn.onclick = () => {
+      const index = Number(btn.dataset.index);
+      const current = companies[index];
 
-    // SAVE MODE
-    if (!input.disabled) {
-      const newName = input.value.trim();
-      if (!newName) {
-        alert("Company name cannot be empty");
-        return;
-      }
+      const updated = prompt("Edit company name:", current);
+      if (!updated) return;
 
-      companies[index] = newName;
+      companies[index] = updated.trim();
       saveCompanies(companies);
       renderCompanyManager();
-      return;
-    }
+    };
+  });
+}
 
-    // EDIT MODE
-    input.disabled = false;
-    input.focus();
-  };
-});
-
-// expose globally
+/* =========================================================
+   EXPOSE GLOBALLY
+========================================================= */
 window.renderCompanyManager = renderCompanyManager;
