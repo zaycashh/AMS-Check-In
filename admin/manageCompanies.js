@@ -23,8 +23,10 @@ function renderCompanyManager() {
   // ✅ Normalize + sort alphabetically
   companies = companies
     .map(c => c.trim())
-    .filter(c => c !== "")
-    .sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }));
+    .filter(Boolean)
+    .sort((a, b) =>
+      a.localeCompare(b, undefined, { sensitivity: "base" })
+    );
 
   saveCompanies(companies);
 
@@ -83,15 +85,12 @@ function renderCompanyManager() {
   container.querySelector("#addCompanyBtn").onclick = () => {
     const input = container.querySelector("#companyInput");
     let name = input.value.trim();
-
     if (!name) return;
 
-    // 🔒 Normalize name (Title Case)
     name = name
       .toLowerCase()
       .replace(/\b\w/g, c => c.toUpperCase());
 
-    // ❌ Prevent duplicates
     const exists = companies.some(
       c => c.toLowerCase() === name.toLowerCase()
     );
@@ -115,11 +114,7 @@ function renderCompanyManager() {
       const index = Number(btn.dataset.index);
       const companyName = companies[index];
 
-      const confirmDelete = confirm(
-        `Delete "${companyName}"?\n\nPast check-ins will NOT be removed.`
-      );
-
-      if (!confirmDelete) return;
+      if (!confirm(`Delete "${companyName}"?\n\nPast check-ins will NOT be removed.`)) return;
 
       companies.splice(index, 1);
       saveCompanies(companies);
@@ -143,35 +138,16 @@ function renderCompanyManager() {
         .toLowerCase()
         .replace(/\b\w/g, c => c.toUpperCase());
 
-      if (
-        companies.some(
-          (c, i) =>
-            c.toLowerCase() === updated.toLowerCase() && i !== index
-        )
-      ) {
+      const exists = companies.some(
+        (c, i) => c.toLowerCase() === updated.toLowerCase() && i !== index
+      );
+
+      if (exists) {
         alert("A company with this name already exists.");
         return;
       }
 
       companies[index] = updated;
-      saveCompanies(companies);
-      renderCompanyManager();
-    };
-  });
-}
-
-  /* =========================
-     EDIT COMPANY
-  ========================= */
-  container.querySelectorAll(".edit-company").forEach(btn => {
-    btn.onclick = () => {
-      const index = Number(btn.dataset.index);
-      const current = companies[index];
-
-      const updated = prompt("Edit company name:", current);
-      if (!updated) return;
-
-      companies[index] = updated.trim();
       saveCompanies(companies);
       renderCompanyManager();
     };
