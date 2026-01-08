@@ -332,7 +332,7 @@ window.exportSearchPdf = function () {
 
   /* ================= HEADER ================= */
   doc.setFillColor(30, 94, 150);
-  doc.rect(0, 0, pageWidth, 46, "F");
+  doc.rect(0, 0, pageWidth, 54, "F");
 
   if (window.amsLogoBase64) {
     doc.addImage(amsLogoBase64, "PNG", 16, 8, 40, 30);
@@ -343,7 +343,7 @@ window.exportSearchPdf = function () {
   doc.text("AMS Search Log Report", pageWidth / 2, 30, { align: "center" });
   doc.setTextColor(0);
 
-  const startY = 60;
+  const startY = 72;
 
   /* ================= TABLE ROWS ================= */
   const rows = records.map(r => ({
@@ -380,7 +380,7 @@ window.exportSearchPdf = function () {
     body: rows.map(r => r.data),
 
     styles: {
-      fontSize: 9,
+      fontSize: 10,
       cellPadding: 4,
       valign: "middle",
       overflow: "linebreak"
@@ -397,15 +397,15 @@ window.exportSearchPdf = function () {
     },
 
     columnStyles: {
-      0: { cellWidth: 55 },
-      1: { cellWidth: 50 },
-      2: { cellWidth: 60 },
-      3: { cellWidth: 60 },
-      4: { cellWidth: 110 },
-      5: { cellWidth: 100 },
-      6: { cellWidth: 90 },
-      7: { cellWidth: 50, halign: "center" }
-    },
+  0: { cellWidth: 70 },   // Date
+  1: { cellWidth: 65 },   // Time
+  2: { cellWidth: 80 },   // First
+  3: { cellWidth: 80 },   // Last
+  4: { cellWidth: 160 },  // Company
+  5: { cellWidth: 140 },  // Reason
+  6: { cellWidth: 120 },  // Services
+  7: { cellWidth: 60, halign: "center" } // Signature
+}
 
     didDrawCell(data) {
       if (data.column.index === 7 && data.cell.section === "body") {
@@ -413,8 +413,8 @@ window.exportSearchPdf = function () {
         const img = record?.signature;
 
         if (img && img.startsWith("data:image")) {
-          const w = 22;
-          const h = 10;
+          const w = 26;
+          const h = 12;
           const x = data.cell.x + (data.cell.width - w) / 2;
           const y = data.cell.y + (data.cell.height - h) / 2;
           doc.addImage(img, "PNG", x, y, w, h);
