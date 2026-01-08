@@ -45,8 +45,8 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       // 🔑 MANAGE COMPANIES
-      if (targetId === "tabManage" && typeof renderCompanyManager === "function") {
-        renderCompanyManager();
+      if (targetId === "tabCompanies" && typeof renderCompanyManager === "function") {
+      renderCompanyManager();
       }
     });
   });
