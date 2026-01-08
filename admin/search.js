@@ -105,12 +105,12 @@ window.runSearch = function () {
   if (endDate) endDate.setHours(23, 59, 59, 999);
 
   const filtered = logs.filter(entry => {
-    const logTime = entry.timestamp
-      ? new Date(entry.timestamp)
-      : new Date(`${entry.date} ${entry.time || "00:00"}`);
+    const logDate = normalizeDate(entry.date);
+if (!logDate) return false;
 
-    if (startDate && logTime < startDate) return false;
-    if (endDate && logTime > endDate) return false;
+if (startDate && logDate < startDate) return false;
+if (endDate && logDate > endDate) return false;
+
 
     const f = entry.firstName || entry.first || "";
     const l = entry.lastName || entry.last || "";
