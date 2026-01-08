@@ -391,15 +391,15 @@ window.exportSearchPdf = function () {
     fillColor: [245, 248, 252]
   },
     columnStyles: {
-  0: { cellWidth: 64 },   // ✅ Date (wider so it never wraps)
-  1: { cellWidth: 42 },   // Time
-  2: { cellWidth: 48 },   // First
-  3: { cellWidth: 48 },   // Last
-  4: { cellWidth: 120 },  // Company
-  5: { cellWidth: 110 },  // Reason
-  6: { cellWidth: 90 },   // Services
-  7: { cellWidth: 55, halign: "center" } // Signature
-},
+      0: { cellWidth: 26 }, // Date
+      1: { cellWidth: 26 }, // Time
+      2: { cellWidth: 26 }, // First
+      3: { cellWidth: 26 }, // Last
+      4: { cellWidth: 58 }, // Company
+      5: { cellWidth: 44 }, // Reason
+      6: { cellWidth: 48 }, // Services
+      7: { cellWidth: 30, halign: "center" } // Signature
+    },
 
   // ✅ COMMA ABOVE IS CRITICAL
   didDrawCell(data) {
