@@ -5,7 +5,7 @@
 console.log("Admin Nav Module Loaded");
 
 document.addEventListener("DOMContentLoaded", () => {
-  const tabs = document.querySelectorAll(".sidebar-menu .tab");
+  const tabs = document.querySelectorAll(".admin-nav .tab");
   const contents = document.querySelectorAll(".tab-content");
 
   tabs.forEach(tab => {
