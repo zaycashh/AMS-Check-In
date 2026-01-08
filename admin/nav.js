@@ -72,4 +72,3 @@ document.addEventListener("click", (e) => {
     dropdown.classList.remove("open");
   }
 });
-
