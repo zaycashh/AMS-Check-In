@@ -15,8 +15,12 @@ function saveCompanies(companies) {
    RENDER MANAGER
 ========================================================= */
 function renderCompanyManager() {
-  const container = document.getElementById("tabManage");
-  if (!container) return;
+  // ✅ FIX: MATCH HTML + NAV
+  const container = document.getElementById("tabCompanies");
+  if (!container) {
+    console.error("tabCompanies container not found");
+    return;
+  }
 
   const companies = getCompanies();
 
@@ -87,23 +91,23 @@ function renderCompanyManager() {
      DELETE COMPANY
   ========================= */
   container.querySelectorAll(".delete-company").forEach(btn => {
-  btn.onclick = () => {
-    const index = Number(btn.dataset.index);
-    const companyName = companies[index];
+    btn.onclick = () => {
+      const index = Number(btn.dataset.index);
+      const companyName = companies[index];
 
-    const confirmDelete = confirm(
-      `Are you sure you want to delete "${companyName}"?\n\nThis will NOT remove past check-ins.`
-    );
+      const confirmDelete = confirm(
+        `Are you sure you want to delete "${companyName}"?\n\nThis will NOT remove past check-ins.`
+      );
 
-    if (!confirmDelete) return;
+      if (!confirmDelete) return;
 
-    companies.splice(index, 1);
-    saveCompanies(companies);
-    renderCompanyManager();
-  };
-});
-   
-   /* =========================
+      companies.splice(index, 1);
+      saveCompanies(companies);
+      renderCompanyManager();
+    };
+  });
+
+  /* =========================
      EDIT COMPANY
   ========================= */
   container.querySelectorAll(".edit-company").forEach(btn => {
