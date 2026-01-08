@@ -357,8 +357,8 @@ window.exportSearchPdf = function () {
 
   doc.autoTable({
   startY: 60,
-  margin: { left: 20, right: 20 },
-  tableWidth: "auto",
+  margin: { left: 8, right: 8 },
+  tableWidth: pageWidth - 16,
 
   head: [[
     "Date",
@@ -374,19 +374,16 @@ window.exportSearchPdf = function () {
   body: rows,
 
   styles: {
-    fontSize: 10,
-    cellPadding: 6,
+    fontSize: 9,
+    cellPadding: 4,
     valign: "middle",
-    overflow: "linebreak",
-    lineWidth: 0.1
+    overflow: "linebreak"
   },
 
   headStyles: {
     fillColor: [30, 94, 150],
     textColor: 255,
-    fontStyle: "bold",
-    fontSize: 10,
-    halign: "center"
+    fontStyle: "bold"
   },
 
   alternateRowStyles: {
@@ -394,24 +391,25 @@ window.exportSearchPdf = function () {
   },
 
   columnStyles: {
-  0: { cellWidth: 40 },  // Date ✅ wider so it doesn't wrap
-  1: { cellWidth: 32 },  // Time
-  2: { cellWidth: 38 },  // First
-  3: { cellWidth: 38 },  // Last
-  4: { cellWidth: 90 },  // Company
-  5: { cellWidth: 80 },  // Reason
-  6: { cellWidth: 70 },  // Services
-  7: { cellWidth: 40, halign: "center" } // Signature
-}
+    0: { cellWidth: 40 }, // Date (prevents wrap)
+    1: { cellWidth: 32 }, // Time
+    2: { cellWidth: 38 }, // First
+    3: { cellWidth: 38 }, // Last
+    4: { cellWidth: 95 }, // Company
+    5: { cellWidth: 80 }, // Reason
+    6: { cellWidth: 70 }, // Services
+    7: { cellWidth: 40, halign: "center" } // Signature
+  },
 
-  didDrawCell: function (data) {
+  // ✅ COMMA ABOVE IS CRITICAL
+  didDrawCell(data) {
     if (data.column.index === 7 && data.cell.section === "body") {
       const record = records[data.row.index];
       const img = record?.signature;
 
       if (img && img.startsWith("data:image")) {
-        const w = 40;
-        const h = 16;
+        const w = 18;
+        const h = 8;
         const x = data.cell.x + (data.cell.width - w) / 2;
         const y = data.cell.y + (data.cell.height - h) / 2;
         doc.addImage(img, "PNG", x, y, w, h);
