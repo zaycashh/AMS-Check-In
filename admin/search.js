@@ -389,17 +389,16 @@ window.exportSearchPdf = function () {
   alternateRowStyles: {
     fillColor: [245, 248, 252]
   },
-
-  columnStyles: {
-    0: { cellWidth: 40 }, // Date (prevents wrap)
-    1: { cellWidth: 32 }, // Time
-    2: { cellWidth: 38 }, // First
-    3: { cellWidth: 38 }, // Last
-    4: { cellWidth: 95 }, // Company
-    5: { cellWidth: 80 }, // Reason
-    6: { cellWidth: 70 }, // Services
-    7: { cellWidth: 40, halign: "center" } // Signature
-  },
+    columnStyles: {
+  0: { cellWidth: 64 },   // ✅ Date (wider so it never wraps)
+  1: { cellWidth: 42 },   // Time
+  2: { cellWidth: 48 },   // First
+  3: { cellWidth: 48 },   // Last
+  4: { cellWidth: 120 },  // Company
+  5: { cellWidth: 110 },  // Reason
+  6: { cellWidth: 90 },   // Services
+  7: { cellWidth: 55, halign: "center" } // Signature
+},
 
   // ✅ COMMA ABOVE IS CRITICAL
   didDrawCell(data) {
