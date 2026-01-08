@@ -356,69 +356,69 @@ window.exportSearchPdf = function () {
   ]);
 
   doc.autoTable({
-    startY: 60,
-    margin: { left: 8, right: 8 },
-    tableWidth: pageWidth - 16,
+  startY: 60,
+  margin: { left: 20, right: 20 },
+  tableWidth: "auto",
 
-    head: [[
-      "Date",
-      "Time",
-      "First",
-      "Last",
-      "Company",
-      "Reason",
-      "Services",
-      "Signature"
-    ]],
+  head: [[
+    "Date",
+    "Time",
+    "First",
+    "Last",
+    "Company",
+    "Reason",
+    "Services",
+    "Signature"
+  ]],
 
-    body: rows,
+  body: rows,
 
-    styles: {
-      fontSize: 9,
-      cellPadding: 4,
-      valign: "middle",
-      overflow: "linebreak"
-    },
+  styles: {
+    fontSize: 10,
+    cellPadding: 6,
+    valign: "middle",
+    overflow: "linebreak",
+    lineWidth: 0.1
+  },
 
-    headStyles: {
-      fillColor: [30, 94, 150],
-      textColor: 255,
-      fontStyle: "bold",
-      fontSize: 9
-    },
+  headStyles: {
+    fillColor: [30, 94, 150],
+    textColor: 255,
+    fontStyle: "bold",
+    fontSize: 10,
+    halign: "center"
+  },
 
-    alternateRowStyles: {
-      fillColor: [245, 248, 252]
-    },
+  alternateRowStyles: {
+    fillColor: [245, 248, 252]
+  },
 
-    columnStyles: {
-      0: { cellWidth: 28 },
-      1: { cellWidth: 26 },
-      2: { cellWidth: 30 },
-      3: { cellWidth: 30 },
-      4: { cellWidth: 70 },
-      5: { cellWidth: 60 },
-      6: { cellWidth: 55 },
-      7: { cellWidth: 30, halign: "center" }
-    },
+  columnStyles: {
+    0: { cellWidth: 60 },   // Date
+    1: { cellWidth: 55 },   // Time
+    2: { cellWidth: 70 },   // First
+    3: { cellWidth: 70 },   // Last
+    4: { cellWidth: 160 },  // Company
+    5: { cellWidth: 140 },  // Reason
+    6: { cellWidth: 130 },  // Services
+    7: { cellWidth: 80, halign: "center" } // Signature
+  },
 
-    // ✅ COMMA WAS MISSING BEFORE THIS
-    didDrawCell: function (data) {
-      if (data.column.index === 7 && data.cell.section === "body") {
-        const record = records[data.row.index];
-        const img = record?.signature;
+  didDrawCell: function (data) {
+    if (data.column.index === 7 && data.cell.section === "body") {
+      const record = records[data.row.index];
+      const img = record?.signature;
 
-        if (img && img.startsWith("data:image")) {
-          const w = 18;
-          const h = 8;
-          const x = data.cell.x + (data.cell.width - w) / 2;
-          const y = data.cell.y + (data.cell.height - h) / 2;
-          doc.addImage(img, "PNG", x, y, w, h);
-        }
+      if (img && img.startsWith("data:image")) {
+        const w = 40;
+        const h = 16;
+        const x = data.cell.x + (data.cell.width - w) / 2;
+        const y = data.cell.y + (data.cell.height - h) / 2;
+        doc.addImage(img, "PNG", x, y, w, h);
       }
     }
-  });
+  }
+});
 
   doc.save("AMS_Search_Log_Report.pdf");
 };
-
