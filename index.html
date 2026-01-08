@@ -132,13 +132,26 @@
     Exit Admin Mode
   </button>
 
-  <div class="sidebar-menu">
-    <div class="tab" data-tab="tabSearch">Search Log</div>
-    <div class="tab" data-tab="tabGeneral">General Report</div>
-    <div class="tab" data-tab="tabCompany">Detail Company Report</div>
-    <div class="tab" data-tab="tabRecent">Recent Check-Ins</div>
-    <div class="tab" data-tab="tabManage">Manage Companies</div>
+  <div class="admin-nav">
+
+  <!-- REPORTS DROPDOWN -->
+  <div class="admin-dropdown">
+    <button class="dropdown-toggle" type="button">
+      Reports ▾
+    </button>
+
+    <div class="dropdown-menu">
+      <button class="tab" data-tab="tabSearch">Search Log</button>
+      <button class="tab" data-tab="tabGeneral">General Report</button>
+      <button class="tab" data-tab="tabCompany">Detail Company Report</button>
+    </div>
   </div>
+
+  <!-- STANDALONE ITEMS -->
+  <button class="tab" data-tab="tabRecent">Recent Check-Ins</button>
+  <button class="tab" data-tab="tabCompanies">Manage Companies</button>
+
+</div>
 
   <!-- ================= GENERAL REPORT ================= -->
   <div id="tabGeneral" class="tab-content" style="display:none;">
