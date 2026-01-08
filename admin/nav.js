@@ -57,3 +57,19 @@ document.addEventListener("DOMContentLoaded", () => {
     defaultRecentTab.click();
   }
 });
+// ===============================
+// REPORTS DROPDOWN TOGGLE
+// ===============================
+document.addEventListener("click", (e) => {
+  const dropdown = document.querySelector(".admin-dropdown");
+  const toggle = document.querySelector(".dropdown-toggle");
+
+  if (!dropdown || !toggle) return;
+
+  if (toggle.contains(e.target)) {
+    dropdown.classList.toggle("open");
+  } else {
+    dropdown.classList.remove("open");
+  }
+});
+
