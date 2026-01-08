@@ -15,14 +15,18 @@ function saveCompanies(companies) {
    RENDER MANAGER
 ========================================================= */
 function renderCompanyManager() {
-  // ✅ FIX: MATCH HTML + NAV
   const container = document.getElementById("tabCompanies");
-  if (!container) {
-    console.error("tabCompanies container not found");
-    return;
-  }
+  if (!container) return;
 
-  const companies = getCompanies();
+  let companies = getCompanies();
+
+  // ✅ Normalize + sort alphabetically
+  companies = companies
+    .map(c => c.trim())
+    .filter(c => c !== "")
+    .sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }));
+
+  saveCompanies(companies);
 
   container.innerHTML = `
     <h2 class="section-title">Manage Companies</h2>
@@ -74,12 +78,28 @@ function renderCompanyManager() {
   }
 
   /* =========================
-     ADD COMPANY
+     ADD COMPANY (NO DUPES)
   ========================= */
   container.querySelector("#addCompanyBtn").onclick = () => {
     const input = container.querySelector("#companyInput");
-    const name = input.value.trim();
+    let name = input.value.trim();
+
     if (!name) return;
+
+    // 🔒 Normalize name (Title Case)
+    name = name
+      .toLowerCase()
+      .replace(/\b\w/g, c => c.toUpperCase());
+
+    // ❌ Prevent duplicates
+    const exists = companies.some(
+      c => c.toLowerCase() === name.toLowerCase()
+    );
+
+    if (exists) {
+      alert("This company already exists.");
+      return;
+    }
 
     companies.push(name);
     saveCompanies(companies);
@@ -96,7 +116,7 @@ function renderCompanyManager() {
       const companyName = companies[index];
 
       const confirmDelete = confirm(
-        `Are you sure you want to delete "${companyName}"?\n\nThis will NOT remove past check-ins.`
+        `Delete "${companyName}"?\n\nPast check-ins will NOT be removed.`
       );
 
       if (!confirmDelete) return;
@@ -106,6 +126,39 @@ function renderCompanyManager() {
       renderCompanyManager();
     };
   });
+
+  /* =========================
+     EDIT COMPANY (NO DUPES)
+  ========================= */
+  container.querySelectorAll(".edit-company").forEach(btn => {
+    btn.onclick = () => {
+      const index = Number(btn.dataset.index);
+      const current = companies[index];
+
+      let updated = prompt("Edit company name:", current);
+      if (!updated) return;
+
+      updated = updated
+        .trim()
+        .toLowerCase()
+        .replace(/\b\w/g, c => c.toUpperCase());
+
+      if (
+        companies.some(
+          (c, i) =>
+            c.toLowerCase() === updated.toLowerCase() && i !== index
+        )
+      ) {
+        alert("A company with this name already exists.");
+        return;
+      }
+
+      companies[index] = updated;
+      saveCompanies(companies);
+      renderCompanyManager();
+    };
+  });
+}
 
   /* =========================
      EDIT COMPANY
