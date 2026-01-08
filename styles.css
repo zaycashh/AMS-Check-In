@@ -545,3 +545,62 @@ body {
 .primary-btn:hover {
   background: #3f733a;
 }
+/* ===============================
+   ADMIN DROPDOWN
+================================ */
+
+.admin-nav {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.admin-dropdown {
+  position: relative;
+}
+
+.dropdown-toggle {
+  background: #1e5e96;
+  color: #fff;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.dropdown-toggle:hover {
+  background: #174a76;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 110%;
+  left: 0;
+  background: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  min-width: 220px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  display: none;
+  z-index: 1000;
+}
+
+.dropdown-menu .tab {
+  width: 100%;
+  text-align: left;
+  padding: 10px 14px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.dropdown-menu .tab:hover {
+  background: #f2f6fb;
+}
+
+/* Show dropdown */
+.admin-dropdown.open .dropdown-menu {
+  display: block;
+}
