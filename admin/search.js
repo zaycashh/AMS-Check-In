@@ -394,7 +394,7 @@ window.exportSearchPdf = function () {
   },
 
   columnStyles: {
-    0: { cellWidth: 50 },   // Date
+    0: { cellWidth: 40 },   // Date
     1: { cellWidth: 55 },   // Time
     2: { cellWidth: 70 },   // First
     3: { cellWidth: 70 },   // Last
