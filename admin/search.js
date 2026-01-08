@@ -35,9 +35,6 @@ document.addEventListener("DOMContentLoaded", () => {
    RUN SEARCH
 ========================================================= */
 window.runSearch = function () {
-  
-  clearSearchTable();
-
   const first = document.getElementById("filterFirstName")?.value.trim().toLowerCase();
   const last = document.getElementById("filterLastName")?.value.trim().toLowerCase();
 
@@ -123,12 +120,6 @@ window.runSearch = function () {
 
     return true;
   });
-
-  if (filtered.length === 0) {
-  window.searchResults = [];
-  renderSearchResults([]);
-  return;
-}
 
   filtered.sort((a, b) => {
     const ta = a.timestamp || new Date(a.date).getTime();
@@ -230,19 +221,19 @@ window.toggleSearchCompanyText = function (value) {
    CUSTOM DATE RANGE TOGGLE
 ========================================================= */
 window.toggleCustomDateRange = function (value) {
-  const wrapper = document.getElementById("customDateRange");
-  if (!wrapper) return;
+  const start = document.getElementById("filterStartDate");
+  const end = document.getElementById("filterEndDate");
+
+  if (!start || !end) return;
 
   if (value === "custom") {
-    wrapper.style.display = "block";
+    start.style.display = "inline-block";
+    end.style.display = "inline-block";
   } else {
-    wrapper.style.display = "none";
-
-    // clear values when not custom
-    const start = document.getElementById("filterStartDate");
-    const end = document.getElementById("filterEndDate");
-    if (start) start.value = "";
-    if (end) end.value = "";
+    start.style.display = "none";
+    end.style.display = "none";
+    start.value = "";
+    end.value = "";
   }
 };
 
@@ -313,7 +304,6 @@ function exportSearchLogExcel() {
   XLSX.utils.book_append_sheet(wb, ws, "Search Log");
   XLSX.writeFile(wb, "AMS_Search_Log.xlsx");
 }
-
 window.exportSearchPdf = function () {
   const records = window.searchResults || [];
   if (!records.length) {
@@ -322,25 +312,21 @@ window.exportSearchPdf = function () {
   }
 
   const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({
-    orientation: "landscape",
-    unit: "pt",
-    format: "letter"
-  });
+  const doc = new jsPDF("landscape");
 
   const pageWidth = doc.internal.pageSize.width;
 
   /* ================= HEADER ================= */
   doc.setFillColor(30, 94, 150);
-  doc.rect(0, 0, pageWidth, 46, "F");
+  doc.rect(0, 0, pageWidth, 30, "F");
 
   if (window.amsLogoBase64) {
-    doc.addImage(amsLogoBase64, "PNG", 16, 8, 40, 30);
+    doc.addImage(amsLogoBase64, "PNG", 8, 6, 26, 18);
   }
 
-  doc.setFontSize(19);
   doc.setTextColor(255);
-  doc.text("AMS Search Log Report", pageWidth / 2, 30, { align: "center" });
+  doc.setFontSize(16);
+  doc.text("AMS Search Log Report", pageWidth / 2, 20, { align: "center" });
   doc.setTextColor(0);
 
   /* ================= TABLE DATA ================= */
@@ -356,40 +342,39 @@ window.exportSearchPdf = function () {
   ]);
 
   doc.autoTable({
-  startY: 60,
-  margin: { left: 8, right: 8 },
-  tableWidth: pageWidth - 16,
+    startY: 36,
 
-  head: [[
-    "Date",
-    "Time",
-    "First",
-    "Last",
-    "Company",
-    "Reason",
-    "Services",
-    "Signature"
-  ]],
+    /* 🔴 THIS IS THE KEY FIX */
+    margin: { left: 8, right: 8 },
 
-  body: rows,
+    head: [[
+      "Date",
+      "Time",
+      "First",
+      "Last",
+      "Company",
+      "Reason",
+      "Services",
+      "Signature"
+    ]],
 
-  styles: {
-  fontSize: 10,
-  cellPadding: 6,
-  valign: "middle",
-  overflow: "linebreak", // OK
-  halign: "left"
-},
+    body: rows,
 
-  headStyles: {
-    fillColor: [30, 94, 150],
-    textColor: 255,
-    fontStyle: "bold"
-  },
+    styles: {
+      fontSize: 9,
+      cellPadding: 4,
+      valign: "middle",
+      overflow: "linebreak"
+    },
 
-  alternateRowStyles: {
-    fillColor: [245, 248, 252]
-  },
+    headStyles: {
+      fillColor: [28, 86, 145],
+      textColor: 255,
+      fontStyle: "bold",
+      halign: "left"
+    },
+
+    /* 🧮 COLUMN WIDTHS — BALANCED & LEFT-LOCKED */
     columnStyles: {
       0: { cellWidth: 26 }, // Date
       1: { cellWidth: 26 }, // Time
@@ -401,22 +386,33 @@ window.exportSearchPdf = function () {
       7: { cellWidth: 30, halign: "center" } // Signature
     },
 
-  // ✅ COMMA ABOVE IS CRITICAL
-  didDrawCell(data) {
-    if (data.column.index === 7 && data.cell.section === "body") {
-      const record = records[data.row.index];
-      const img = record?.signature;
+    /*✍️ SIGNATURE DRAW */
+    didDrawCell(data) {
+      if (data.column.index === 7 && data.cell.section === "body") {
+        const record = records[data.row.index];
+        const img = record?.signature;
 
-      if (img && img.startsWith("data:image")) {
-        const w = 18;
-        const h = 8;
-        const x = data.cell.x + (data.cell.width - w) / 2;
-        const y = data.cell.y + (data.cell.height - h) / 2;
-        doc.addImage(img, "PNG", x, y, w, h);
+        if (img && img.startsWith("data:image")) {
+          const w = 18;
+          const h = 8;
+          const x = data.cell.x + (data.cell.width - w) / 2;
+          const y = data.cell.y + (data.cell.height - h) / 2;
+          doc.addImage(img, "PNG", x, y, w, h);
+        }
       }
     }
-  }
-});
+  });
 
-  doc.save("AMS_Search_Log_Report.pdf");
+  /* ================= GENERATED TIMESTAMP ================= */
+  const generated = new Date().toLocaleString();
+  doc.setFontSize(9);
+  doc.setTextColor(120);
+  doc.text(
+    `Generated: ${generated}`,
+    pageWidth - 8,
+    doc.internal.pageSize.height - 6,
+    { align: "right" }
+  );
+
+  doc.save("AMS_Search_Log.pdf");
 };
