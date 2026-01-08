@@ -374,11 +374,12 @@ window.exportSearchPdf = function () {
   body: rows,
 
   styles: {
-    fontSize: 9,
-    cellPadding: 4,
-    valign: "middle",
-    overflow: "linebreak"
-  },
+  fontSize: 10,
+  cellPadding: 6,
+  valign: "middle",
+  overflow: "linebreak", // OK
+  halign: "left"
+},
 
   headStyles: {
     fillColor: [30, 94, 150],
