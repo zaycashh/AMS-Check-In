@@ -332,7 +332,7 @@ window.exportSearchPdf = function () {
 
   /* ================= HEADER ================= */
   doc.setFillColor(30, 94, 150);
-  doc.rect(0, 0, pageWidth, 54, "F");
+  doc.rect(0, 0, pageWidth, 46, "F");
 
   if (window.amsLogoBase64) {
     doc.addImage(amsLogoBase64, "PNG", 16, 8, 40, 30);
@@ -343,26 +343,20 @@ window.exportSearchPdf = function () {
   doc.text("AMS Search Log Report", pageWidth / 2, 30, { align: "center" });
   doc.setTextColor(0);
 
-  const startY = 72;
+  /* ================= TABLE DATA ================= */
+  const rows = records.map(r => [
+    r.date || "",
+    r.time || "",
+    r.firstName || r.first || "",
+    r.lastName || r.last || "",
+    r.company || "",
+    r.reason || "",
+    getServicesText(r),
+    "" // signature drawn manually
+  ]);
 
-  /* ================= TABLE ROWS ================= */
-  const rows = records.map(r => ({
-    __record: r,
-    data: [
-      r.date || "",
-      r.time || "",
-      r.firstName || r.first || "",
-      r.lastName || r.last || "",
-      r.company || "",
-      r.reason || "",
-      getServicesText(r),
-      "" // signature column
-    ]
-  }));
-
-  /* ================= TABLE ================= */
   doc.autoTable({
-    startY,
+    startY: 60,
     margin: { left: 8, right: 8 },
     tableWidth: pageWidth - 16,
 
@@ -377,10 +371,10 @@ window.exportSearchPdf = function () {
       "Signature"
     ]],
 
-    body: rows.map(r => r.data),
+    body: rows,
 
     styles: {
-      fontSize: 10,
+      fontSize: 9,
       cellPadding: 4,
       valign: "middle",
       overflow: "linebreak"
@@ -389,7 +383,8 @@ window.exportSearchPdf = function () {
     headStyles: {
       fillColor: [30, 94, 150],
       textColor: 255,
-      fontStyle: "bold"
+      fontStyle: "bold",
+      fontSize: 9
     },
 
     alternateRowStyles: {
@@ -397,24 +392,25 @@ window.exportSearchPdf = function () {
     },
 
     columnStyles: {
-  0: { cellWidth: 70 },   // Date
-  1: { cellWidth: 65 },   // Time
-  2: { cellWidth: 80 },   // First
-  3: { cellWidth: 80 },   // Last
-  4: { cellWidth: 160 },  // Company
-  5: { cellWidth: 140 },  // Reason
-  6: { cellWidth: 120 },  // Services
-  7: { cellWidth: 60, halign: "center" } // Signature
-}
+      0: { cellWidth: 28 },
+      1: { cellWidth: 26 },
+      2: { cellWidth: 30 },
+      3: { cellWidth: 30 },
+      4: { cellWidth: 70 },
+      5: { cellWidth: 60 },
+      6: { cellWidth: 55 },
+      7: { cellWidth: 30, halign: "center" }
+    },
 
-    didDrawCell(data) {
+    // ✅ COMMA WAS MISSING BEFORE THIS
+    didDrawCell: function (data) {
       if (data.column.index === 7 && data.cell.section === "body") {
-        const record = rows[data.row.index]?.__record;
+        const record = records[data.row.index];
         const img = record?.signature;
 
         if (img && img.startsWith("data:image")) {
-          const w = 26;
-          const h = 12;
+          const w = 18;
+          const h = 8;
           const x = data.cell.x + (data.cell.width - w) / 2;
           const y = data.cell.y + (data.cell.height - h) / 2;
           doc.addImage(img, "PNG", x, y, w, h);
@@ -423,6 +419,6 @@ window.exportSearchPdf = function () {
     }
   });
 
-  /* ================= SAVE ================= */
   doc.save("AMS_Search_Log_Report.pdf");
 };
+
