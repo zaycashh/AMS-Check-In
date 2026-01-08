@@ -394,15 +394,15 @@ window.exportSearchPdf = function () {
   },
 
   columnStyles: {
-    0: { cellWidth: 40 },   // Date
-    1: { cellWidth: 55 },   // Time
-    2: { cellWidth: 70 },   // First
-    3: { cellWidth: 70 },   // Last
-    4: { cellWidth: 160 },  // Company
-    5: { cellWidth: 140 },  // Reason
-    6: { cellWidth: 130 },  // Services
-    7: { cellWidth: 80, halign: "center" } // Signature
-  },
+  0: { cellWidth: 40 },  // Date ✅ wider so it doesn't wrap
+  1: { cellWidth: 32 },  // Time
+  2: { cellWidth: 38 },  // First
+  3: { cellWidth: 38 },  // Last
+  4: { cellWidth: 90 },  // Company
+  5: { cellWidth: 80 },  // Reason
+  6: { cellWidth: 70 },  // Services
+  7: { cellWidth: 40, halign: "center" } // Signature
+}
 
   didDrawCell: function (data) {
     if (data.column.index === 7 && data.cell.section === "body") {
