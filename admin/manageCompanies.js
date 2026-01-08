@@ -18,17 +18,18 @@ function renderCompanyManager() {
   const container = document.getElementById("tabCompanies");
   if (!container) return;
 
-  let companies = getCompanies();
+   let companies = getCompanies();
 
-  // ✅ Normalize + sort alphabetically
-  companies = companies
-    .map(c => c.trim())
-    .filter(Boolean)
-    .sort((a, b) =>
-      a.localeCompare(b, undefined, { sensitivity: "base" })
-    );
+// ✅ ONE-TIME CLEANUP: TRIM → CAPS → DEDUPE → SORT
+companies = Array.from(
+  new Set(
+    companies
+      .map(c => c.trim().toUpperCase())
+      .filter(Boolean)
+  )
+).sort((a, b) => a.localeCompare(b));
 
-  saveCompanies(companies);
+saveCompanies(companies);
 
   container.innerHTML = `
     <h2 class="section-title">Manage Companies</h2>
@@ -87,9 +88,7 @@ function renderCompanyManager() {
     let name = input.value.trim();
     if (!name) return;
 
-    name = name
-      .toLowerCase()
-      .replace(/\b\w/g, c => c.toUpperCase());
+    name = name.toUpperCase();
 
     const exists = companies.some(
       c => c.toLowerCase() === name.toLowerCase()
@@ -133,10 +132,7 @@ function renderCompanyManager() {
       let updated = prompt("Edit company name:", current);
       if (!updated) return;
 
-      updated = updated
-        .trim()
-        .toLowerCase()
-        .replace(/\b\w/g, c => c.toUpperCase());
+      updated = updated.trim().toUpperCase();
 
       const exists = companies.some(
         (c, i) => c.toLowerCase() === updated.toLowerCase() && i !== index
