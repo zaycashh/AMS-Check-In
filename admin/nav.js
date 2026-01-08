@@ -5,58 +5,72 @@
 console.log("Admin Nav Module Loaded");
 
 document.addEventListener("DOMContentLoaded", () => {
-  const tabs = document.querySelectorAll(".admin-nav .tab");
+  const adminNav = document.querySelector(".admin-nav");
+  if (!adminNav) {
+    console.error("Admin nav container not found");
+    return;
+  }
+
   const contents = document.querySelectorAll(".tab-content");
 
-  tabs.forEach(tab => {
-    tab.addEventListener("click", () => {
-      const targetId = tab.dataset.tab;
+  // ===============================
+  // TAB CLICK HANDLER (DELEGATED)
+  // ===============================
+  adminNav.addEventListener("click", (e) => {
+    const tab = e.target.closest(".tab");
+    if (!tab) return;
 
-      // Hide all tab contents
-      contents.forEach(c => (c.style.display = "none"));
+    const targetId = tab.dataset.tab;
+    if (!targetId) return;
 
-      // Remove active state from tabs
-      tabs.forEach(t => t.classList.remove("active"));
+    // Hide all tab contents
+    contents.forEach(c => (c.style.display = "none"));
 
-      // Show selected tab
-      const target = document.getElementById(targetId);
-      if (!target) {
-        console.error("Admin tab not found:", targetId);
-        return;
-      }
-
-      target.style.display = "block";
-      tab.classList.add("active");
-
-      // 🔑 SEARCH LOG (AUTO-RUN)
-      if (targetId === "tabSearch") {
-  if (typeof clearSearchTable === "function") {
-    clearSearchTable();
-  }
-}
-      // 🔑 GENERAL REPORT
-      if (targetId === "tabGeneral" && typeof initGeneralReport === "function") {
-        initGeneralReport();
-      }
-
-      // 🔑 RECENT CHECK-INS
-      if (targetId === "tabRecent" && typeof renderRecentCheckIns === "function") {
-        renderRecentCheckIns();
-      }
-
-      // 🔑 MANAGE COMPANIES
-      if (targetId === "tabManage" && typeof renderCompanyManager === "function") {
-        renderCompanyManager();
-      }
+    // Remove active state from all tabs
+    adminNav.querySelectorAll(".tab").forEach(t => {
+      t.classList.remove("active");
     });
+
+    // Show selected tab
+    const target = document.getElementById(targetId);
+    if (!target) {
+      console.error("Admin tab not found:", targetId);
+      return;
+    }
+
+    target.style.display = "block";
+    tab.classList.add("active");
+
+    // 🔑 SEARCH LOG
+    if (targetId === "tabSearch" && typeof clearSearchTable === "function") {
+      clearSearchTable();
+    }
+
+    // 🔑 GENERAL REPORT
+    if (targetId === "tabGeneral" && typeof initGeneralReport === "function") {
+      initGeneralReport();
+    }
+
+    // 🔑 RECENT CHECK-INS
+    if (targetId === "tabRecent" && typeof renderRecentCheckIns === "function") {
+      renderRecentCheckIns();
+    }
+
+    // 🔑 MANAGE COMPANIES (FIXED ID)
+    if (targetId === "tabCompanies" && typeof renderCompanyManager === "function") {
+      renderCompanyManager();
+    }
   });
 
-  // ✅ DEFAULT ADMIN TAB = RECENT CHECK-INS
-  const defaultRecentTab = document.querySelector('.tab[data-tab="tabRecent"]');
+  // ===============================
+  // DEFAULT TAB = RECENT CHECK-INS
+  // ===============================
+  const defaultRecentTab = adminNav.querySelector('.tab[data-tab="tabRecent"]');
   if (defaultRecentTab) {
     defaultRecentTab.click();
   }
 });
+
 // ===============================
 // REPORTS DROPDOWN TOGGLE
 // ===============================
@@ -68,7 +82,7 @@ document.addEventListener("click", (e) => {
 
   if (toggle.contains(e.target)) {
     dropdown.classList.toggle("open");
-  } else {
+  } else if (!dropdown.contains(e.target)) {
     dropdown.classList.remove("open");
   }
 });
