@@ -318,14 +318,15 @@ doc.autoTable({
   },
 
    columnStyles: {
-  0: { cellWidth: 24, halign: "center" }, // Date
-  1: { cellWidth: 22, halign: "center" }, // Time
-  2: { cellWidth: 26 },                  // First
-  3: { cellWidth: 26 },                  // Last
-  4: { cellWidth: 70 },                  // Reason (wider)
-  5: { cellWidth: 70 },                  // Services (wider)
-  6: { cellWidth: 26, halign: "center" } // Signature (tight + centered)
+  0: { cellWidth: 26, halign: "center" }, // Date
+  1: { cellWidth: 24, halign: "center" }, // Time
+  2: { cellWidth: 28 },                  // First
+  3: { cellWidth: 28 },                  // Last
+  4: { cellWidth: 42 },                  // Reason (⬅ reduced)
+  5: { cellWidth: 42 },                  // Services (⬅ reduced)
+  6: { cellWidth: 24, halign: "center" } // Signature (⬅ tighter)
 },
+
 
   didDrawCell(data) {
     if (data.column.index === 6 && data.cell.section === "body") {
