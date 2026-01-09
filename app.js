@@ -70,6 +70,41 @@ function scrollToTop() {
     behavior: "smooth"
   });
 }
+/* =========================================================
+   RESET FORM FUNCTION
+========================================================= */
+function resetForm() {
+  // Clear text inputs
+  document.querySelectorAll(
+    "#checkInSection input[type='text']"
+  ).forEach(input => input.value = "");
+
+  // Reset selects
+  document.querySelectorAll(
+    "#checkInSection select"
+  ).forEach(select => select.selectedIndex = 0);
+
+  // Uncheck checkboxes
+  document.querySelectorAll(
+    "#checkInSection input[type='checkbox']"
+  ).forEach(cb => cb.checked = false);
+
+  // Hide conditional fields
+  document.getElementById("otherCompanyWrapper").style.display = "none";
+  document.getElementById("otherReasonWrapper").style.display = "none";
+  document.getElementById("otherServiceWrapper").style.display = "none";
+
+  // Clear signature
+  const canvas = document.getElementById("signaturePad");
+  if (canvas) {
+    const ctx = canvas.getContext("2d");
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+
+  // Reset signature state
+  hasSigned = false;
+  document.getElementById("sigPlaceholder").style.display = "block";
+}
 
 /* =========================================================
    SIGNATURE PAD INITIALIZATION
