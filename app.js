@@ -447,9 +447,58 @@ function populateCompanyDropdown() {
 window.populateCompanyDropdown = populateCompanyDropdown;
 
 /* =========================================================
+   AUTO SYNC OFFLINE RECORDS WHEN ONLINE
+========================================================= */
+async function syncOfflineCheckIns() {
+  if (!navigator.onLine) return;
+
+  const logs = JSON.parse(localStorage.getItem("ams_logs") || "[]");
+
+  let updated = false;
+
+  for (const record of logs) {
+    if (record.synced) continue;
+
+    try {
+      const res = await fetch(
+        "https://ams-checkin-api.josealfonsodejesus.workers.dev/checkin",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(record)
+        }
+      );
+
+      const data = await res.json();
+
+      if (data.success) {
+        record.synced = true;
+        updated = true;
+        console.log("☁️ Synced offline record:", data.id);
+      }
+    } catch (err) {
+      console.warn("⚠️ Sync attempt failed, will retry later");
+      break;
+    }
+  }
+
+  if (updated) {
+    localStorage.setItem("ams_logs", JSON.stringify(logs));
+  }
+}
+/* =========================================================
+   NETWORK LISTENER
+========================================================= */
+window.addEventListener("online", () => {
+  console.log("📶 Internet restored — syncing check-ins");
+  syncOfflineCheckIns();
+});
+
+/* =========================================================
    PAGE LOAD
 ========================================================= */
 document.addEventListener("DOMContentLoaded", () => {
   setupSignaturePad();
   populateCompanyDropdown();
+  syncOfflineCheckIns(); // ✅ SAFE AUTO SYNC
 });
