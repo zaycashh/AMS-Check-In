@@ -1,24 +1,60 @@
-console.log("Manage Companies Module Loaded");
+/* =========================================================
+   CLOUD COMPANIES FETCH (WITH FALLBACK)
+========================================================= */
+async function fetchCompanies() {
+  try {
+    const res = await fetch(
+      "https://ams-checkin-api.josealfonsodejesus.workers.dev/companies"
+    );
+
+    if (!res.ok) throw new Error("Cloud fetch failed");
+
+    const companies = await res.json();
+
+    // Cache locally for offline use
+    localStorage.setItem("ams_companies", JSON.stringify(companies));
+
+    console.log("☁️ Companies loaded from cloud:", companies.length);
+    return companies;
+  } catch (err) {
+    console.warn("⚠️ Using local companies");
+    return JSON.parse(localStorage.getItem("ams_companies") || "[]");
+  }
+}
 
 /* =========================================================
-   STORAGE HELPERS
+   CLOUD SAVE
 ========================================================= */
-function getCompanies() {
-  return JSON.parse(localStorage.getItem("ams_companies")) || [];
+async function saveCompaniesToCloud(companies) {
+  // Always save locally
+  localStorage.setItem("ams_companies", JSON.stringify(companies));
+
+  try {
+    await fetch(
+      "https://ams-checkin-api.josealfonsodejesus.workers.dev/companies",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(companies)
+      }
+    );
+
+    console.log("☁️ Companies saved to cloud");
+  } catch (err) {
+    console.error("❌ Failed to save companies to cloud", err);
+  }
 }
 
-function saveCompanies(companies) {
-  localStorage.setItem("ams_companies", JSON.stringify(companies));
-}
+console.log("Manage Companies Module Loaded");
 
 /* =========================================================
    RENDER MANAGER
 ========================================================= */
-function renderCompanyManager() {
+async function renderCompanyManager() {
   const container = document.getElementById("tabCompanies");
   if (!container) return;
 
-   let companies = getCompanies();
+   let companies = await fetchCompanies();
 
 // ✅ ONE-TIME CLEANUP: TRIM → CAPS → DEDUPE → SORT
 companies = Array.from(
@@ -29,7 +65,7 @@ companies = Array.from(
   )
 ).sort((a, b) => a.localeCompare(b));
 
-saveCompanies(companies);
+saveCompaniesToCloud(companies);
 
   container.innerHTML = `
     <h2 class="section-title">Manage Companies</h2>
@@ -100,7 +136,7 @@ saveCompanies(companies);
     }
 
     companies.push(name);
-    saveCompanies(companies);
+    saveCompaniesToCloud(companies);
     input.value = "";
     renderCompanyManager();
   };
@@ -116,7 +152,7 @@ saveCompanies(companies);
       if (!confirm(`Delete "${companyName}"?\n\nPast check-ins will NOT be removed.`)) return;
 
       companies.splice(index, 1);
-      saveCompanies(companies);
+      saveCompaniesToCloud(companies);
       renderCompanyManager();
     };
   });
@@ -144,7 +180,7 @@ saveCompanies(companies);
       }
 
       companies[index] = updated;
-      saveCompanies(companies);
+      saveCompaniesToCloud(companies);
       renderCompanyManager();
     };
   });
