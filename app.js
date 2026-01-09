@@ -309,6 +309,8 @@ document.getElementById("submitBtn").addEventListener("click", () => {
   const now = new Date();
 
 const record = {
+  id: crypto.randomUUID(), // REQUIRED for offline + cloud sync
+
   date:
     now.getFullYear() + "-" +
     String(now.getMonth() + 1).padStart(2, "0") + "-" +
@@ -326,7 +328,9 @@ const record = {
   reason: finalReason,
   services: services.join(", "),
   signature,
-  timestamp: Date.now()
+
+  timestamp: Date.now(),
+  synced: false
 };
 
   saveCheckIn(record);
