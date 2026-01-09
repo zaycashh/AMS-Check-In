@@ -76,7 +76,7 @@ async function loadDetailCompanyReport() {
 // ===============================
 // POPULATE COMPANY DROPDOWN
 // ===============================
-function populateDetailCompanyDropdown() {
+async function populateDetailCompanyDropdown() {
   const logs = await fetchDetailLogs();
   const select = document.getElementById("detailCompanySelect");
   if (!select) return;
