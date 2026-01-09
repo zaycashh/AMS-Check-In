@@ -1,11 +1,37 @@
+/* =========================================================
+   CLOUD DETAIL FETCH (WITH FALLBACK)
+========================================================= */
+async function fetchDetailLogs() {
+  try {
+    const res = await fetch(
+      "https://ams-checkin-api.josealfonsodejesus.workers.dev/logs"
+    );
+
+    if (!res.ok) throw new Error("Cloud fetch failed");
+
+    const logs = await res.json();
+
+    // Cache for offline use
+    localStorage.setItem("ams_logs", JSON.stringify(logs));
+
+    console.log("☁️ Detail logs loaded from cloud:", logs.length);
+    return logs;
+  } catch (err) {
+    console.warn("⚠️ Using local detail logs");
+    return JSON.parse(localStorage.getItem("ams_logs") || "[]");
+  }
+}
+
 console.log("✅ Detail Company Report Module Loaded");
 
 // ===============================
 // LOAD DETAIL COMPANY TAB
 // ===============================
-function loadDetailCompanyReport() {
+async function loadDetailCompanyReport() {
   const container = document.getElementById("tabCompany");
   if (!container) return;
+
+  await fetchDetailLogs();
 
   container.innerHTML = `
     <h2 class="section-title">Detail Company Report</h2>
@@ -51,7 +77,7 @@ function loadDetailCompanyReport() {
 // POPULATE COMPANY DROPDOWN
 // ===============================
 function populateDetailCompanyDropdown() {
-  const logs = JSON.parse(localStorage.getItem("ams_logs") || "[]");
+  const logs = await fetchDetailLogs();
   const select = document.getElementById("detailCompanySelect");
   if (!select) return;
 
