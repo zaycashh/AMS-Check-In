@@ -312,8 +312,8 @@ function initRunSearch() {
   const box = document.getElementById("searchResultsTable");
   if (!btn || !box) return;
 
-  btn.addEventListener("click", () => {
-    const logs = JSON.parse(localStorage.getItem("ams_logs") || "[]");
+  btn.addEventListener("click", async () => {
+  const logs = await fetchAdminLogs();
 
     box.innerHTML = logs.length
       ? logs.map(r => `
