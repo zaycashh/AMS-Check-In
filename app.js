@@ -397,8 +397,13 @@ function initRunSearch() {
   btn.addEventListener("click", async () => {
   const logs = await fetchAdminLogs();
 
-    box.innerHTML = logs.length
-      ? logs.map(r => `
+  // ✅ REMOVE DUPLICATES BY ID
+  const uniqueLogs = Array.from(
+    new Map(logs.map(r => [r.id, r])).values()
+  );
+
+  box.innerHTML = uniqueLogs.length
+    ? uniqueLogs.map(r => `
         <tr>
           <td>${r.date}</td>
           <td>${r.time}</td>
