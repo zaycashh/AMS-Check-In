@@ -317,7 +317,7 @@ doc.autoTable({
     fillColor: [245, 248, 252]
   },
 
-  columnStyles: {
+   columnStyles: {
   0: { cellWidth: 24, halign: "center" }, // Date
   1: { cellWidth: 22, halign: "center" }, // Time
   2: { cellWidth: 26 },                  // First
