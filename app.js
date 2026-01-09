@@ -19,12 +19,12 @@ async function saveCheckIn(record) {
   // ===============================
   try {
     const res = await fetch("https://ams-checkin-api.josealfonsodejesus.workers.dev/checkin", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(record)
-    });
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify(record)
+});
 
     const data = await res.json();
 
@@ -232,9 +232,7 @@ const record = {
   timestamp: Date.now()
 };
 
-  const logs = JSON.parse(localStorage.getItem("ams_logs") || "[]");
-  logs.push(record);
-  localStorage.setItem("ams_logs", JSON.stringify(logs));
+  saveCheckIn(record);
 
   alert("Check-in submitted!");
   location.reload();
