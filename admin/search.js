@@ -1,3 +1,27 @@
+/* =========================================================
+   CLOUD SEARCH FETCH (WITH FALLBACK)
+========================================================= */
+async function fetchSearchLogs() {
+  try {
+    const res = await fetch(
+      "https://ams-checkin-api.josealfonsodejesus.workers.dev/logs"
+    );
+
+    if (!res.ok) throw new Error("Cloud fetch failed");
+
+    const logs = await res.json();
+
+    // Cache for offline use
+    localStorage.setItem("ams_logs", JSON.stringify(logs));
+
+    console.log("☁️ Search logs loaded from cloud:", logs.length);
+    return logs;
+  } catch (err) {
+    console.warn("⚠️ Using local logs");
+    return JSON.parse(localStorage.getItem("ams_logs") || "[]");
+  }
+}
+
 console.log("Admin Search Module Loaded");
 
 let amsLogoBase64 = null;
@@ -34,7 +58,7 @@ document.addEventListener("DOMContentLoaded", () => {
 /* =========================================================
    RUN SEARCH
 ========================================================= */
-window.runSearch = function () {
+window.runSearch = async function () {
   clearSearchTable();
   const first = document.getElementById("filterFirstName")?.value.trim().toLowerCase();
   const last = document.getElementById("filterLastName")?.value.trim().toLowerCase();
@@ -51,7 +75,7 @@ window.runSearch = function () {
   const startInput = document.getElementById("filterStartDate")?.value;
   const endInput = document.getElementById("filterEndDate")?.value;
 
-  const logs = JSON.parse(localStorage.getItem("ams_logs") || "[]");
+  const logs = await fetchSearchLogs();
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
