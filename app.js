@@ -421,15 +421,34 @@ document.addEventListener("input", (e) => {
     e.target.value = e.target.value.toUpperCase();
   }
 });
+async function fetchCompanies() {
+  try {
+    const res = await fetch(
+      "https://ams-checkin-api.josealfonsodejesus.workers.dev/companies"
+    );
 
+    if (!res.ok) throw new Error("Cloud fetch failed");
+
+    const companies = await res.json();
+
+    // Cache locally for donor side
+    localStorage.setItem("ams_companies", JSON.stringify(companies));
+
+    console.log("☁️ Companies loaded from cloud:", companies.length);
+    return companies;
+  } catch (err) {
+    console.warn("⚠️ Using local companies (offline)");
+    return JSON.parse(localStorage.getItem("ams_companies") || "[]");
+  }
+}
 /* =========================================================
-   COMPANY DROPDOWN
+   COMPANY DROPDOWN (CLOUD + OFFLINE SAFE)
 ========================================================= */
-function populateCompanyDropdown() {
+async function populateCompanyDropdown() {
   const select = document.getElementById("companySelect");
   if (!select) return;
 
-  const companies = JSON.parse(localStorage.getItem("ams_companies")) || [];
+  const companies = await fetchCompanies();
 
   select.innerHTML = `
     <option value="">-- Select Company --</option>
