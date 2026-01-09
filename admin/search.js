@@ -1,3 +1,15 @@
+function dedupeLogsById(logs) {
+  return Array.from(
+    new Map(
+      logs
+        .filter(l => l && (l.id || l.timestamp))
+        .map(l => [
+          l.id || `${l.timestamp}-${l.first}-${l.last}`,
+          l
+        ])
+    ).values()
+  );
+}
 /* =========================================================
    CLOUD SEARCH FETCH (WITH FALLBACK)
 ========================================================= */
@@ -75,7 +87,8 @@ window.runSearch = async function () {
   const startInput = document.getElementById("filterStartDate")?.value;
   const endInput = document.getElementById("filterEndDate")?.value;
 
-  const logs = await fetchSearchLogs();
+  const rawLogs = await fetchSearchLogs();
+  const logs = dedupeLogsById(rawLogs);
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
