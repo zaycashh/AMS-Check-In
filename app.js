@@ -4,6 +4,35 @@
 const ADMIN_PIN = "2468";
 let hasSigned = false;
 /* =========================================================
+   AUTO RESET ON INACTIVITY (KIOSK SAFETY)
+========================================================= */
+let inactivityTimer = null;
+
+// 3 minutes (adjust if needed)
+const INACTIVITY_LIMIT = 3 * 60 * 1000;
+
+function startInactivityTimer() {
+  clearTimeout(inactivityTimer);
+
+  inactivityTimer = setTimeout(() => {
+    console.log("⏱️ Inactivity timeout — resetting form");
+
+    // Only reset if we're on check-in screen
+    const checkInVisible =
+      document.getElementById("checkInSection")?.style.display !== "none";
+
+    if (checkInVisible) {
+      resetForm();
+      scrollToTop();
+    }
+  }, INACTIVITY_LIMIT);
+}
+
+// Reset timer on any interaction
+["click", "input", "touchstart", "keydown"].forEach(evt => {
+  document.addEventListener(evt, startInactivityTimer, true);
+});
+/* =========================================================
    CLOUD + LOCAL SAVE
 ========================================================= */
 async function saveCheckIn(record) {
