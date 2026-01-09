@@ -3,6 +3,40 @@
 ========================================================= */
 const ADMIN_PIN = "2468";
 let hasSigned = false;
+/* =========================================================
+   CLOUD + LOCAL SAVE
+========================================================= */
+async function saveCheckIn(record) {
+  // ===============================
+  // 1. ALWAYS SAVE LOCALLY (BACKUP)
+  // ===============================
+  const logs = JSON.parse(localStorage.getItem("ams_logs") || "[]");
+  logs.push(record);
+  localStorage.setItem("ams_logs", JSON.stringify(logs));
+
+  // ===============================
+  // 2. TRY CLOUD SAVE (PRIMARY)
+  // ===============================
+  try {
+    const res = await fetch("https://ams-checkin-api.josealfonsodejesus.workers.dev/checkin", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(record)
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      console.log("✅ Cloud save OK:", data.id);
+    } else {
+      console.warn("⚠️ Cloud save failed, local only");
+    }
+  } catch (err) {
+    console.warn("⚠️ Offline or Cloudflare unreachable", err);
+  }
+}
 
 /* =========================================================
    SIGNATURE PAD INITIALIZATION
