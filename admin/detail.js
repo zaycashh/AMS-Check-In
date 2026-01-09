@@ -61,7 +61,7 @@ async function loadDetailCompanyReport() {
     </table>
   `;
 
-  populateDetailCompanyDropdown();
+  await populateDetailCompanyDropdown();
   bindDetailCompanyButtons();
 }
 // ===============================
