@@ -37,7 +37,30 @@ async function saveCheckIn(record) {
     console.warn("⚠️ Offline or Cloudflare unreachable", err);
   }
 }
+/* =========================================================
+   CLOUD ADMIN FETCH (WITH FALLBACK)
+========================================================= */
+async function fetchAdminLogs() {
+  try {
+    const res = await fetch(
+      "https://ams-checkin-api.josealfonsodejesus.workers.dev/logs"
+    );
 
+    if (!res.ok) throw new Error("Cloud fetch failed");
+
+    const cloudLogs = await res.json();
+
+    // Cache cloud logs locally for offline use
+    localStorage.setItem("ams_logs", JSON.stringify(cloudLogs));
+
+    console.log("☁️ Admin logs loaded from cloud:", cloudLogs.length);
+
+    return cloudLogs;
+  } catch (err) {
+    console.warn("⚠️ Using local admin logs (offline or error)");
+    return JSON.parse(localStorage.getItem("ams_logs") || "[]");
+  }
+}
 /* =========================================================
    SIGNATURE PAD INITIALIZATION
 ========================================================= */
