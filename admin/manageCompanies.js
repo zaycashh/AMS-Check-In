@@ -65,8 +65,6 @@ companies = Array.from(
   )
 ).sort((a, b) => a.localeCompare(b));
 
-saveCompaniesToCloud(companies);
-
   container.innerHTML = `
     <h2 class="section-title">Manage Companies</h2>
 
