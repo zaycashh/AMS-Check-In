@@ -61,6 +61,16 @@ async function fetchAdminLogs() {
     return JSON.parse(localStorage.getItem("ams_logs") || "[]");
   }
 }
+/* ===============================================
+   SCROLL TO TOP HELPER
+=============================================== */
+function scrollToTop() {
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
+}
+
 /* =========================================================
    SIGNATURE PAD INITIALIZATION
 ========================================================= */
@@ -257,8 +267,9 @@ const record = {
 
   saveCheckIn(record);
 
-  alert("Check-in submitted!");
-  location.reload();
+   alert("Check-in submitted!");
+scrollToTop();
+resetForm();
 });
 
 /* =========================================================
@@ -266,7 +277,10 @@ const record = {
 ========================================================= */
 document
   .getElementById("resetFormBtn")
-  .addEventListener("click", () => location.reload());
+  .addEventListener("click", () => {
+    resetForm();
+    setTimeout(scrollToTop, 50);
+  });
 
 /* =========================================================
    ADMIN LOGIN
