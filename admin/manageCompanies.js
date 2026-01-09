@@ -1,6 +1,10 @@
 /* =========================================================
    CLOUD COMPANIES FETCH (WITH FALLBACK)
 ========================================================= */
+
+// 🔒 In-memory cache to prevent UI wipe on re-render
+let companyCache = null;
+
 async function fetchCompanies() {
   try {
     const res = await fetch(
@@ -13,12 +17,19 @@ async function fetchCompanies() {
 
     // Cache locally for offline use
     localStorage.setItem("ams_companies", JSON.stringify(companies));
+    companyCache = companies;
 
     console.log("☁️ Companies loaded from cloud:", companies.length);
     return companies;
   } catch (err) {
     console.warn("⚠️ Using local companies");
-    return JSON.parse(localStorage.getItem("ams_companies") || "[]");
+
+    const local = JSON.parse(
+      localStorage.getItem("ams_companies") || "[]"
+    );
+
+    companyCache = local;
+    return local;
   }
 }
 
@@ -28,6 +39,7 @@ async function fetchCompanies() {
 async function saveCompaniesToCloud(companies) {
   // Always save locally
   localStorage.setItem("ams_companies", JSON.stringify(companies));
+  companyCache = companies;
 
   try {
     await fetch(
@@ -39,7 +51,7 @@ async function saveCompaniesToCloud(companies) {
       }
     );
 
-    console.log("☁️ Companies saved to cloud");
+    console.log("☁️ Companies saved to cloud:", companies.length);
   } catch (err) {
     console.error("❌ Failed to save companies to cloud", err);
   }
@@ -54,16 +66,25 @@ async function renderCompanyManager() {
   const container = document.getElementById("tabCompanies");
   if (!container) return;
 
-   let companies = await fetchCompanies();
+  let companies;
 
-// ✅ ONE-TIME CLEANUP: TRIM → CAPS → DEDUPE → SORT
-companies = Array.from(
-  new Set(
-    companies
-      .map(c => c.trim().toUpperCase())
-      .filter(Boolean)
-  )
-).sort((a, b) => a.localeCompare(b));
+  // ✅ Fetch from cloud ONCE, then trust cache
+  if (!companyCache) {
+    companies = await fetchCompanies();
+  } else {
+    companies = companyCache;
+  }
+
+  // ✅ CLEANUP: TRIM → CAPS → DEDUPE → SORT
+  companies = Array.from(
+    new Set(
+      companies
+        .map(c => c.trim().toUpperCase())
+        .filter(Boolean)
+    )
+  ).sort((a, b) => a.localeCompare(b));
+
+  companyCache = companies;
 
   container.innerHTML = `
     <h2 class="section-title">Manage Companies</h2>
@@ -147,7 +168,12 @@ companies = Array.from(
       const index = Number(btn.dataset.index);
       const companyName = companies[index];
 
-      if (!confirm(`Delete "${companyName}"?\n\nPast check-ins will NOT be removed.`)) return;
+      if (
+        !confirm(
+          `Delete "${companyName}"?\n\nPast check-ins will NOT be removed.`
+        )
+      )
+        return;
 
       companies.splice(index, 1);
       saveCompaniesToCloud(companies);
@@ -169,7 +195,8 @@ companies = Array.from(
       updated = updated.trim().toUpperCase();
 
       const exists = companies.some(
-        (c, i) => c.toLowerCase() === updated.toLowerCase() && i !== index
+        (c, i) =>
+          c.toLowerCase() === updated.toLowerCase() && i !== index
       );
 
       if (exists) {
