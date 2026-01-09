@@ -29,8 +29,16 @@ async function renderRecentCheckIns() {
   if (!container) return;
 
   const logs = await fetchRecentLogs();
+   // ✅ REMOVE DUPLICATES BY RECORD ID (CRITICAL FIX)
+const uniqueLogs = Array.from(
+  new Map(
+    logs
+      .filter(l => l && l.id) // safety
+      .map(l => [l.id, l])
+  ).values()
+);
 
-  if (logs.length === 0) {
+  if (uniqueLogs.length === 0) {
     container.innerHTML = "<p style='opacity:.6;'>No recent check-ins yet.</p>";
     return;
   }
@@ -42,7 +50,7 @@ startOfToday.setHours(0, 0, 0, 0);
 const endOfToday = new Date();
 endOfToday.setHours(23, 59, 59, 999);
 
-const recent = logs
+const recent = uniqueLogs
   .map(log => {
     let ts = log.timestamp;
 
