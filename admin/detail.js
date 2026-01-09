@@ -325,7 +325,7 @@ doc.autoTable({
   4: { cellWidth: 70 },                  // Reason (wider)
   5: { cellWidth: 70 },                  // Services (wider)
   6: { cellWidth: 26, halign: "center" } // Signature (tight + centered)
-}
+},
 
   didDrawCell(data) {
     if (data.column.index === 6 && data.cell.section === "body") {
