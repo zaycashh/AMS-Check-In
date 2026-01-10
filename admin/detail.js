@@ -1,37 +1,46 @@
 /* =========================================================
-   CLOUD DETAIL FETCH (WITH FALLBACK)
+   CLOUD DETAIL FETCH (SAFE + NON-BLOCKING)
 ========================================================= */
+let detailCloudCache = null;
+let detailCloudAttempted = false;
+
+function getLocalDetailLogs() {
+  return JSON.parse(localStorage.getItem("ams_logs") || "[]");
+}
+
 async function fetchDetailLogs() {
+  if (detailCloudAttempted) return detailCloudCache || getLocalDetailLogs();
+  detailCloudAttempted = true;
+
   try {
     const res = await fetch(
-      "https://ams-checkin-api.josealfonsodejesus.workers.dev/logs"
+      "https://ams-checkin-api.josealfonsodejesus.workers.dev/logs",
+      { cache: "no-store" }
     );
 
     if (!res.ok) throw new Error("Cloud fetch failed");
 
     const logs = await res.json();
+    detailCloudCache = logs;
 
-    // Cache for offline use
     localStorage.setItem("ams_logs", JSON.stringify(logs));
 
     console.log("☁️ Detail logs loaded from cloud:", logs.length);
     return logs;
-  } catch (err) {
+  } catch {
     console.warn("⚠️ Using local detail logs");
-    return JSON.parse(localStorage.getItem("ams_logs") || "[]");
+    return getLocalDetailLogs();
   }
 }
 
 console.log("✅ Detail Company Report Module Loaded");
 
-// ===============================
-// LOAD DETAIL COMPANY TAB
-// ===============================
-async function loadDetailCompanyReport() {
+/* =========================================================
+   LOAD DETAIL COMPANY TAB
+========================================================= */
+function loadDetailCompanyReport() {
   const container = document.getElementById("tabCompany");
   if (!container) return;
-
-  await fetchDetailLogs();
 
   container.innerHTML = `
     <h2 class="section-title">Detail Company Report</h2>
@@ -41,9 +50,7 @@ async function loadDetailCompanyReport() {
       <select id="detailCompanySelect"></select>
 
       <button id="companyDetailExcelBtn">Export Excel</button>
-      <button id="companyDetailPdfBtn" style="margin-left:8px;">
-        Export PDF
-      </button>
+      <button id="companyDetailPdfBtn" style="margin-left:8px;">Export PDF</button>
     </div>
 
     <table class="report-table">
@@ -61,23 +68,21 @@ async function loadDetailCompanyReport() {
     </table>
   `;
 
-  await populateDetailCompanyDropdown();
+  // Instant render from local
+  populateDetailCompanyDropdown(getLocalDetailLogs());
+
+  // Silent cloud refresh
+  fetchDetailLogs().then(logs => {
+    populateDetailCompanyDropdown(logs);
+  });
+
   bindDetailCompanyButtons();
 }
-// ===============================
-// RE-RENDER TABLE ON DATE FILTER CHANGE
-// ===============================
-["detailDateRange", "detailStartDate", "detailEndDate"].forEach(id => {
-  document.getElementById(id)?.addEventListener("change", () => {
-    loadDetailCompanyReport();
-  });
-});
 
-// ===============================
-// POPULATE COMPANY DROPDOWN
-// ===============================
-async function populateDetailCompanyDropdown() {
-  const logs = await fetchDetailLogs();
+/* =========================================================
+   POPULATE COMPANY DROPDOWN
+========================================================= */
+function populateDetailCompanyDropdown(logs) {
   const select = document.getElementById("detailCompanySelect");
   if (!select) return;
 
@@ -92,9 +97,12 @@ async function populateDetailCompanyDropdown() {
     select.appendChild(opt);
   });
 
-  // ✅ MOVE THIS INSIDE
-  select.addEventListener("change", renderCompanyDetailTable);
+  select.onchange = renderCompanyDetailTable;
 }
+
+/* =========================================================
+   DATE FILTER (TIMESTAMP SAFE)
+========================================================= */
 function filterByDateRange(records) {
   const range = document.getElementById("detailDateRange")?.value;
   const startInput = document.getElementById("detailStartDate")?.value;
@@ -102,46 +110,52 @@ function filterByDateRange(records) {
 
   if (!range && !startInput && !endInput) return records;
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  let startTs = null;
+  let endTs = null;
+  const now = Date.now();
 
-  let startDate = null;
-  let endDate = null;
-
-  if (range === "today") {
-    startDate = new Date(today);
-    endDate = new Date(today);
+  switch (range) {
+    case "today": {
+      const d = new Date();
+      d.setHours(0, 0, 0, 0);
+      startTs = d.getTime();
+      endTs = startTs + 86400000 - 1;
+      break;
+    }
+    case "yesterday": {
+      const d = new Date();
+      d.setHours(0, 0, 0, 0);
+      endTs = d.getTime() - 1;
+      startTs = endTs - 86400000 + 1;
+      break;
+    }
+    case "thisMonth": {
+      const d = new Date();
+      startTs = new Date(d.getFullYear(), d.getMonth(), 1).getTime();
+      endTs = now;
+      break;
+    }
   }
 
-  if (range === "yesterday") {
-    startDate = new Date(today);
-    startDate.setDate(today.getDate() - 1);
-    endDate = new Date(startDate);
-  }
-
-  if (range === "thisMonth") {
-    startDate = new Date(today.getFullYear(), today.getMonth(), 1);
-    endDate = new Date(today);
-  }
-
-  if (startInput) startDate = new Date(startInput);
-  if (endInput) endDate = new Date(endInput);
+  if (startInput) startTs = new Date(startInput).getTime();
+  if (endInput) endTs = new Date(endInput).getTime() + 86400000 - 1;
 
   return records.filter(r => {
-    if (!r.date) return false;
-    const recordDate = new Date(r.date);
-    recordDate.setHours(0, 0, 0, 0);
-
-    if (startDate && recordDate < startDate) return false;
-    if (endDate && recordDate > endDate) return false;
-
+    let ts = r.timestamp;
+    if (!ts && r.date) {
+      const time = r.time || "00:00";
+      ts = new Date(`${r.date} ${time}`).getTime();
+    }
+    if (!ts) return false;
+    if (startTs !== null && ts < startTs) return false;
+    if (endTs !== null && ts > endTs) return false;
     return true;
   });
 }
 
-// ===============================
-// RENDER TABLE
-// ===============================
+/* =========================================================
+   RENDER TABLE
+========================================================= */
 function renderCompanyDetailTable() {
   const tbody = document.getElementById("companyDetailBody");
   const companyName = document.getElementById("detailCompanySelect")?.value;
@@ -151,10 +165,13 @@ function renderCompanyDetailTable() {
     return;
   }
 
-  let records = JSON.parse(localStorage.getItem("ams_logs") || "[]")
-  .filter(r => (r.company || "").toUpperCase() === companyName.toUpperCase());
+  const logs = detailCloudCache || getLocalDetailLogs();
 
-records = filterByDateRange(records);
+  let records = logs.filter(
+    r => (r.company || "").toUpperCase() === companyName.toUpperCase()
+  );
+
+  records = filterByDateRange(records);
 
   tbody.innerHTML = "";
 
@@ -162,8 +179,7 @@ records = filterByDateRange(records);
     tbody.innerHTML = `
       <tr>
         <td colspan="6" style="text-align:center;">No records found</td>
-      </tr>
-    `;
+      </tr>`;
     return;
   }
 
@@ -172,186 +188,46 @@ records = filterByDateRange(records);
     tr.innerHTML = `
       <td>${r.date || ""}</td>
       <td>${r.time || ""}</td>
-      <td>${r.first || ""}</td>
-      <td>${r.last || ""}</td>
+      <td>${r.first || r.firstName || ""}</td>
+      <td>${r.last || r.lastName || ""}</td>
       <td>${r.reason || ""}</td>
-      <td>${Array.isArray(r.services) ? r.services.join(", ") : (r.services || "")}</td>
+      <td>${getServicesText(r)}</td>
     `;
     tbody.appendChild(tr);
   });
 }
-// ===============================
-// BIND EXPORT BUTTONS
-// ===============================
-function bindDetailCompanyButtons() {
 
-  // Excel export
-  document
-    .getElementById("companyDetailExcelBtn")
+/* =========================================================
+   SERVICES NORMALIZER
+========================================================= */
+function getServicesText(r) {
+  if (Array.isArray(r.services)) return r.services.join(", ");
+  if (Array.isArray(r.tests)) return r.tests.join(", ");
+  if (typeof r.services === "string") return r.services;
+  if (typeof r.tests === "string") return r.tests;
+
+  const list = [];
+  if (r.dot) list.push("DOT Drug Test");
+  if (r.nonDot) list.push("NON-DOT Drug Test");
+  if (r.vision) list.push("Vision Test");
+  if (r.alcohol) list.push("Alcohol Test");
+  return list.join(", ");
+}
+
+/* =========================================================
+   EXPORT BUTTONS
+========================================================= */
+function bindDetailCompanyButtons() {
+  document.getElementById("companyDetailExcelBtn")
     ?.addEventListener("click", exportCompanyExcel);
 
-  // PDF export
-  document
-    .getElementById("companyDetailPdfBtn")
+  document.getElementById("companyDetailPdfBtn")
     ?.addEventListener("click", exportCompanyPdf);
 }
 
-// ===============================
-// DETAIL COMPANY → PDF (MATCH SEARCH LOG STYLE)
-// ===============================
-function exportCompanyPdf() {
-  const companyName =
-    document.getElementById("detailCompanySelect")?.value;
-
-  if (!companyName) {
-    alert("Please select a company first.");
-    return;
-  }
-
-  let records = JSON.parse(localStorage.getItem("ams_logs") || "[]")
-    .filter(r =>
-      (r.company || "").toUpperCase() === companyName.toUpperCase()
-    );
-
-  // Apply date filter (same behavior as Search Log)
-  records = filterByDateRange(records);
-
-  if (!records.length) {
-    alert("No records found for this company.");
-    return;
-  }
-
-  const { jsPDF } = window.jspdf;
-const doc = new jsPDF("landscape");
-
-/* ===============================
-   HEADER BAR
-================================ */
-doc.setFillColor(30, 94, 150); // AMS blue
-doc.rect(0, 0, doc.internal.pageSize.width, 32, "F");
-
-
-/* ===============================
-   LOGO (SAFE BASE64 RENDER)
-================================ */
-const logoImg = document.getElementById("amsLogoBase64");
-
-if (logoImg && logoImg.complete) {
-  const canvas = document.createElement("canvas");
-  canvas.width = logoImg.naturalWidth;
-  canvas.height = logoImg.naturalHeight;
-
-  const ctx = canvas.getContext("2d");
-  ctx.drawImage(logoImg, 0, 0);
-
-  const logoBase64 = canvas.toDataURL("image/png");
-  doc.addImage(logoBase64, "PNG", 14, 8, 32, 22);
-}
-
-/* ===============================
-   TITLE
-================================ */
-doc.setTextColor(255, 255, 255);
-doc.setFontSize(16);
-doc.text("AMS Detail Company Report", 55, 21);
-
-doc.setTextColor(0, 0, 0);
-
-  /* ===============================
-     META INFO
-  =============================== */
-  const now = new Date();
-  const startY = 55;
-
-  doc.setFontSize(12);
-  doc.text(`Generated: ${now.toLocaleDateString()} ${now.toLocaleTimeString()}`, 14, startY);
-  doc.text(`Company: ${companyName}`, 14, startY + 10);
-  doc.text(`Total Records: ${records.length}`, 14, startY + 20);
-
-  /* ===============================
-     TABLE DATA
-  =============================== */
-  const tableData = records.map(r => [
-    r.date || "",
-    r.time || "",
-    r.first || "",
-    r.last || "",
-    r.reason || "",
-    Array.isArray(r.services) ? r.services.join(", ") : (r.services || "")
-  ]);
-
-  const pageWidth = doc.internal.pageSize.width;
-
-doc.autoTable({
-  startY: startY + 28,
-  margin: { left: 8, right: 8 },
-  tableWidth: pageWidth - 16,
-
-  head: [[
-    "Date",
-    "Time",
-    "First",
-    "Last",
-    "Reason",
-    "Services",
-    "Signature"
-  ]],
-
-  body: tableData,
-
-  styles: {
-    fontSize: 9,
-    cellPadding: 4,
-    valign: "middle",
-    overflow: "linebreak"
-  },
-
-  headStyles: {
-    fillColor: [30, 94, 150],
-    textColor: 255,
-    fontStyle: "bold",
-    fontSize: 9
-  },
-
-  alternateRowStyles: {
-    fillColor: [245, 248, 252]
-  },
-
-   columnStyles: {
-  0: { cellWidth: 26, halign: "center" }, // Date
-  1: { cellWidth: 24, halign: "center" }, // Time
-  2: { cellWidth: 28 },                  // First
-  3: { cellWidth: 28 },                  // Last
-  4: { cellWidth: 42 },                  // Reason (⬅ reduced)
-  5: { cellWidth: 42 },                  // Services (⬅ reduced)
-  6: { cellWidth: 24, halign: "center" } // Signature (⬅ tighter)
-},
-
-
-  didDrawCell(data) {
-    if (data.column.index === 6 && data.cell.section === "body") {
-      const record = records[data.row.index];
-      const img = record?.signature;
-
-      if (img && img.startsWith("data:image")) {
-        const w = 18;
-        const h = 8;
-        const x = data.cell.x + (data.cell.width - w) / 2;
-        const y = data.cell.y + (data.cell.height - h) / 2;
-        doc.addImage(img, "PNG", x, y, w, h);
-      }
-    }
-  }
-});
-  /* ===============================
-     SAVE
-  =============================== */
-  doc.save(`AMS_Detail_Company_${companyName}.pdf`);
-}
-
-// ===============================
-// EXPORT EXCEL
-// ===============================
+/* =========================================================
+   EXPORT EXCEL
+========================================================= */
 function exportCompanyExcel() {
   const companyName =
     document.getElementById("detailCompanySelect")?.value;
@@ -361,10 +237,10 @@ function exportCompanyExcel() {
     return;
   }
 
-  const records = JSON.parse(
-    localStorage.getItem("ams_logs") || "[]"
-  ).filter(
-    r => (r.company || "").toUpperCase() === companyName.toUpperCase()
+  const records = filterByDateRange(
+    (detailCloudCache || getLocalDetailLogs()).filter(
+      r => (r.company || "").toUpperCase() === companyName.toUpperCase()
+    )
   );
 
   if (!records.length) {
@@ -372,28 +248,7 @@ function exportCompanyExcel() {
     return;
   }
 
-  function getServicesText(r) {
-  if (Array.isArray(r.services)) return r.services.join(", ");
-  if (Array.isArray(r.tests)) return r.tests.join(", ");
-
-  if (typeof r.services === "string") return r.services;
-  if (typeof r.tests === "string") return r.tests;
-
-  const list = [];
-  if (r.dot) list.push("DOT Drug Test");
-  if (r.nonDot) list.push("NON-DOT Drug Test");
-  if (r.vision) list.push("Vision Test");
-  if (r.alcohol) list.push("Alcohol Test");
-
-  return list.join(", ");
-}
-  
-  // ===============================
-  // BUILD EXCEL DATA
-  // ===============================
-  const wb = XLSX.utils.book_new();
-
-  const headerRows = [
+  const header = [
     ["AMS Detail Company Report"],
     [`Company: ${companyName}`],
     [`Generated: ${new Date().toLocaleString()}`],
@@ -401,70 +256,99 @@ function exportCompanyExcel() {
     ["Date", "Time", "First", "Last", "Reason", "Services"]
   ];
 
-  const dataRows = records.map(r => ([
-  r.date || "",
-  r.time || "",
-  r.first || r.firstName || "",
-  r.last || r.lastName || "",
-  r.reason || "",
-  getServicesText(r)
-]));
+  const rows = records.map(r => [
+    r.date || "",
+    r.time || "",
+    r.first || r.firstName || "",
+    r.last || r.lastName || "",
+    r.reason || "",
+    getServicesText(r)
+  ]);
 
-  const sheetData = [...headerRows, ...dataRows];
-  const ws = XLSX.utils.aoa_to_sheet(sheetData);
+  const ws = XLSX.utils.aoa_to_sheet([...header, ...rows]);
+  const wb = XLSX.utils.book_new();
 
-  // ===============================
-  // STYLING
-  // ===============================
-
-  // Merge title row
-  ws["!merges"] = [
-    { s: { r: 0, c: 0 }, e: { r: 0, c: 5 } }
-  ];
-
-  // Column widths
+  ws["!merges"] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 5 } }];
   ws["!cols"] = [
-    { wch: 14 },
-    { wch: 10 },
-    { wch: 14 },
-    { wch: 14 },
-    { wch: 20 },
-    { wch: 30 }
+    { wch: 14 }, { wch: 10 }, { wch: 14 },
+    { wch: 14 }, { wch: 20 }, { wch: 30 }
   ];
 
-  // Freeze header row
-  ws["!freeze"] = { ySplit: 5 };
-
-  // Style title
-  ws["A1"].s = {
-    font: { bold: true, sz: 16 },
-    alignment: { horizontal: "center" }
-  };
-
-  // Style table headers
-  for (let c = 0; c <= 5; c++) {
-    const cell = XLSX.utils.encode_cell({ r: 4, c });
-    ws[cell].s = {
-      font: { bold: true, color: { rgb: "FFFFFF" } },
-      fill: { fgColor: { rgb: "1E5E96" } },
-      alignment: { horizontal: "center" }
-    };
-  }
-
-  // ===============================
-  // EXPORT
-  // ===============================
   XLSX.utils.book_append_sheet(wb, ws, "Detail Company");
-
-  XLSX.writeFile(
-    wb,
-    `AMS_Detail_Company_${companyName}.xlsx`
-  );
+  XLSX.writeFile(wb, `AMS_Detail_Company_${companyName}.xlsx`);
 }
 
-// ===============================
-// TAB CLICK HANDLER
-// ===============================
+/* =========================================================
+   EXPORT PDF (MATCH SEARCH LOG)
+========================================================= */
+function exportCompanyPdf() {
+  const companyName =
+    document.getElementById("detailCompanySelect")?.value;
+
+  if (!companyName) {
+    alert("Please select a company first.");
+    return;
+  }
+
+  const records = filterByDateRange(
+    (detailCloudCache || getLocalDetailLogs()).filter(
+      r => (r.company || "").toUpperCase() === companyName.toUpperCase()
+    )
+  );
+
+  if (!records.length) {
+    alert("No records found for this company.");
+    return;
+  }
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF("landscape");
+
+  doc.setFillColor(30, 94, 150);
+  doc.rect(0, 0, doc.internal.pageSize.width, 30, "F");
+
+  doc.setTextColor(255);
+  doc.setFontSize(16);
+  doc.text("AMS Detail Company Report", 14, 20);
+  doc.setTextColor(0);
+
+  const rows = records.map(r => [
+    r.date || "",
+    r.time || "",
+    r.first || r.firstName || "",
+    r.last || r.lastName || "",
+    r.reason || "",
+    getServicesText(r),
+    ""
+  ]);
+
+  doc.autoTable({
+    startY: 36,
+    margin: { left: 8, right: 8 },
+    head: [["Date", "Time", "First", "Last", "Reason", "Services", "Signature"]],
+    body: rows,
+    styles: { fontSize: 9, cellPadding: 4 },
+    headStyles: { fillColor: [30, 94, 150], textColor: 255 },
+    didDrawCell(data) {
+      if (data.column.index === 6 && data.cell.section === "body") {
+        const img = records[data.row.index]?.signature;
+        if (img?.startsWith("data:image")) {
+          doc.addImage(img, "PNG",
+            data.cell.x + 4,
+            data.cell.y + 2,
+            18, 8
+          );
+        }
+      }
+    }
+  });
+
+  doc.save(`AMS_Detail_Company_${companyName}.pdf`);
+}
+
+/* =========================================================
+   TAB HANDLER
+========================================================= */
 document.querySelectorAll(".tab").forEach(tab => {
   tab.addEventListener("click", () => {
     if (tab.dataset.tab === "tabCompany") {
