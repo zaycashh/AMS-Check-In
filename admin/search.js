@@ -351,10 +351,14 @@ function getServicesText(r) {
 }
 /* =========================================================
    EXPORT EXCEL
-========================================================= */
 function exportSearchLogExcel() {
-  const results = window.searchResults || [];
-  if (!results.length) return;
+  const results = window.searchResults;
+
+  // ✅ SAME GUARD AS PDF
+  if (!Array.isArray(results) || results.length === 0) {
+    alert("Please run a search first.");
+    return;
+  }
 
   const data = results.map(r => ({
     Date: r.date,
