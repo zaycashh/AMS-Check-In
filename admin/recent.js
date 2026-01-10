@@ -9,11 +9,6 @@ async function fetchRecentLogs() {
     localStorage.getItem("ams_logs") || "[]"
   );
 
-  // If UI exists, render immediately
-  if (localLogs.length && typeof renderRecentCheckIns === "function") {
-    renderRecentCheckIns(localLogs);
-  }
-
   // 2️⃣ Prevent duplicate cloud calls
   if (recentCloudCache) return recentCloudCache;
 
