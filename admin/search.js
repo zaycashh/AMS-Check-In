@@ -142,12 +142,19 @@ window.runSearch = async function () {
   if (endDate) endDate.setHours(23, 59, 59, 999);
 
   const filtered = logs.filter(entry => {
-    const logDate = normalizeDate(entry.date);
-if (!logDate) return false;
+    // ✅ TIMESTAMP-SAFE DATE FILTER (CRITICAL FIX)
+let logTime = entry.timestamp;
 
-if (startDate && logDate < startDate) return false;
-if (endDate && logDate > endDate) return false;
+// Backward compatibility (old records)
+if (!logTime && entry.date) {
+  const timePart = entry.time || "00:00";
+  logTime = new Date(`${entry.date} ${timePart}`).getTime();
+}
 
+if (!logTime) return false;
+
+if (startDate && logTime < startDate.getTime()) return false;
+if (endDate && logTime > endDate.getTime()) return false;
 
     const f = entry.firstName || entry.first || "";
     const l = entry.lastName || entry.last || "";
