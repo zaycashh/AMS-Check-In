@@ -1,25 +1,10 @@
 /* =========================================================
    CLOUD RECENT FETCH (WITH FALLBACK)
 ========================================================= */
-async function fetchRecentLogs() {
-  try {
-    const res = await fetch(
-      "https://ams-checkin-api.josealfonsodejesus.workers.dev/logs"
-    );
-
-    if (!res.ok) throw new Error("Cloud fetch failed");
-
-    const logs = await res.json();
-
-    // Cache for offline use
-    localStorage.setItem("ams_logs", JSON.stringify(logs));
-
-    console.log("☁️ Recent logs loaded from cloud:", logs.length);
-    return logs;
-  } catch (err) {
-    console.warn("⚠️ Using local recent logs");
-    return JSON.parse(localStorage.getItem("ams_logs") || "[]");
-  }
+function fetchRecentLogs() {
+  // Recent view should ALWAYS be instant
+  // Cloud sync is handled elsewhere
+  return JSON.parse(localStorage.getItem("ams_logs") || "[]");
 }
 
 console.log("Admin Recent Check-Ins Module Loaded");
