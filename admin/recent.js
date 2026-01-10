@@ -1,10 +1,42 @@
 /* =========================================================
    CLOUD RECENT FETCH (WITH FALLBACK)
 ========================================================= */
-function fetchRecentLogs() {
-  // Recent view should ALWAYS be instant
-  // Cloud sync is handled elsewhere
-  return JSON.parse(localStorage.getItem("ams_logs") || "[]");
+let recentCloudCache = null;
+
+async function fetchRecentLogs() {
+  // 1️⃣ Load instantly from local cache
+  const localLogs = JSON.parse(
+    localStorage.getItem("ams_logs") || "[]"
+  );
+
+  // If UI exists, render immediately
+  if (localLogs.length && typeof renderRecentCheckIns === "function") {
+    renderRecentCheckIns(localLogs);
+  }
+
+  // 2️⃣ Prevent duplicate cloud calls
+  if (recentCloudCache) return recentCloudCache;
+
+  // 3️⃣ Silent cloud sync (no console errors)
+  try {
+    const res = await fetch(
+      "https://ams-checkin-api.josealfonsodejesus.workers.dev/logs",
+      { cache: "no-store" }
+    );
+
+    if (!res.ok) return localLogs;
+
+    const logs = await res.json();
+    recentCloudCache = logs;
+
+    // Save for all devices
+    localStorage.setItem("ams_logs", JSON.stringify(logs));
+
+    return logs;
+  } catch {
+    // Stay quiet, keep local
+    return localLogs;
+  }
 }
 
 console.log("Admin Recent Check-Ins Module Loaded");
