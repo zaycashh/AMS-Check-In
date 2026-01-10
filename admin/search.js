@@ -88,15 +88,13 @@ window.runSearch = async function () {
   const endInput = document.getElementById("filterEndDate")?.value;
 
   const rawLogs = await fetchSearchLogs();
-  const logs = dedupeLogsById(rawLogs);
+const logs = dedupeLogsById(rawLogs);
 
-  // ================================
-// TIMESTAMP RANGE CALC (FINAL FIX)
-// ================================
-const now = Date.now();
-
+// 🔒 STEP 4 — HARD RESET DATE RANGE
 let startTs = null;
 let endTs = null;
+
+const now = Date.now();
 
 switch (range) {
   case "today": {
