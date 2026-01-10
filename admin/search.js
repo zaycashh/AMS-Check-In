@@ -90,57 +90,77 @@ window.runSearch = async function () {
   const rawLogs = await fetchSearchLogs();
   const logs = dedupeLogsById(rawLogs);
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  // ================================
+// TIMESTAMP RANGE CALC (FINAL FIX)
+// ================================
+const now = Date.now();
 
-  let startDate = null;
-  let endDate = null;
+let startTs = null;
+let endTs = null;
 
-  switch (range) {
-    case "today":
-      startDate = new Date(today);
-      endDate = new Date(today);
-      break;
-    case "yesterday":
-      startDate = new Date(today);
-      startDate.setDate(today.getDate() - 1);
-      endDate = new Date(startDate);
-      break;
-    case "thisWeek":
-      startDate = new Date(today);
-      startDate.setDate(today.getDate() - today.getDay());
-      endDate = new Date(today);
-      break;
-    case "lastWeek":
-      startDate = new Date(today);
-      startDate.setDate(today.getDate() - today.getDay() - 7);
-      endDate = new Date(startDate);
-      endDate.setDate(startDate.getDate() + 6);
-      break;
-    case "thisMonth":
-      startDate = new Date(today.getFullYear(), today.getMonth(), 1);
-      endDate = new Date(today);
-      break;
-    case "lastMonth":
-      startDate = new Date(today.getFullYear(), today.getMonth() - 1, 1);
-      endDate = new Date(today.getFullYear(), today.getMonth(), 0);
-      break;
-    case "thisYear":
-      startDate = new Date(today.getFullYear(), 0, 1);
-      endDate = new Date(today);
-      break;
-    case "lastYear":
-      startDate = new Date(today.getFullYear() - 1, 0, 1);
-      endDate = new Date(today.getFullYear() - 1, 11, 31);
-      break;
-    case "custom":
-      if (startInput) startDate = normalizeDate(startInput);
-      if (endInput) endDate = normalizeDate(endInput);
-      break;
+switch (range) {
+  case "today": {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    startTs = d.getTime();
+    endTs = startTs + 86400000 - 1;
+    break;
   }
 
-  if (endDate) endDate.setHours(23, 59, 59, 999);
+  case "yesterday": {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    endTs = d.getTime() - 1;
+    startTs = endTs - 86400000 + 1;
+    break;
+  }
 
+  case "thisWeek": {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    startTs = d.getTime() - d.getDay() * 86400000;
+    endTs = now;
+    break;
+  }
+
+  case "lastWeek": {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    endTs = d.getTime() - d.getDay() * 86400000 - 1;
+    startTs = endTs - 7 * 86400000 + 1;
+    break;
+  }
+
+  case "thisMonth": {
+    const d = new Date();
+    startTs = new Date(d.getFullYear(), d.getMonth(), 1).getTime();
+    endTs = now;
+    break;
+  }
+
+  case "lastMonth": {
+    const d = new Date();
+    startTs = new Date(d.getFullYear(), d.getMonth() - 1, 1).getTime();
+    endTs = new Date(d.getFullYear(), d.getMonth(), 0, 23, 59, 59, 999).getTime();
+    break;
+  }
+
+  case "thisYear":
+    startTs = new Date(new Date().getFullYear(), 0, 1).getTime();
+    endTs = now;
+    break;
+
+  case "lastYear":
+    startTs = new Date(new Date().getFullYear() - 1, 0, 1).getTime();
+    endTs = new Date(new Date().getFullYear() - 1, 11, 31, 23, 59, 59, 999).getTime();
+    break;
+
+  case "custom":
+    if (startInput) startTs = new Date(startInput).getTime();
+    if (endInput) endTs = new Date(endInput).getTime() + 86400000 - 1;
+    break;
+}
+  
   const filtered = logs.filter(entry => {
     // ✅ TIMESTAMP-SAFE DATE FILTER (CRITICAL FIX)
 let logTime = entry.timestamp;
@@ -153,8 +173,8 @@ if (!logTime && entry.date) {
 
 if (!logTime) return false;
 
-if (startDate && logTime < startDate.getTime()) return false;
-if (endDate && logTime > endDate.getTime()) return false;
+if (startTs !== null && logTime < startTs) return false;
+if (endTs !== null && logTime > endTs) return false;
 
     const f = entry.firstName || entry.first || "";
     const l = entry.lastName || entry.last || "";
