@@ -351,6 +351,7 @@ function getServicesText(r) {
 }
 /* =========================================================
    EXPORT EXCEL
+========================================================= */
 function exportSearchLogExcel() {
   const results = window.searchResults;
 
@@ -361,12 +362,12 @@ function exportSearchLogExcel() {
   }
 
   const data = results.map(r => ({
-    Date: r.date,
-    Time: r.time,
-    First: r.firstName || r.first,
-    Last: r.lastName || r.last,
-    Company: r.company,
-    Reason: r.reason,
+    Date: r.date || "",
+    Time: r.time || "",
+    First: r.firstName || r.first || "",
+    Last: r.lastName || r.last || "",
+    Company: r.company || "",
+    Reason: r.reason || "",
     Services: getServicesText(r),
     Signature: r.signature ? "Signed" : ""
   }));
@@ -376,6 +377,7 @@ function exportSearchLogExcel() {
   XLSX.utils.book_append_sheet(wb, ws, "Search Log");
   XLSX.writeFile(wb, "AMS_Search_Log.xlsx");
 }
+
 window.exportSearchPdf = function () {
   const records = window.searchResults || [];
   if (!records.length) {
