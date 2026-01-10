@@ -1,3 +1,6 @@
+/* =========================================================
+   DEDUPE
+========================================================= */
 function dedupeLogsById(logs) {
   return Array.from(
     new Map(
@@ -10,32 +13,62 @@ function dedupeLogsById(logs) {
     ).values()
   );
 }
+
 /* =========================================================
-   CLOUD SEARCH FETCH (WITH FALLBACK)
+   LOCAL + CLOUD FETCH (FAST)
 ========================================================= */
-async function fetchSearchLogs() {
+
+function getCachedLogs() {
+  return JSON.parse(localStorage.getItem("ams_logs") || "[]");
+}
+
+function normalizeLogsOnce(logs) {
+  return logs.map(l => {
+    if (!l._ts) {
+      let ts = l.timestamp;
+      if (!ts && l.date) {
+        const t = l.time || "00:00";
+        ts = new Date(`${l.date} ${t}`).getTime();
+      }
+      return { ...l, _ts: ts };
+    }
+    return l;
+  });
+}
+
+async function refreshLogsSilently() {
   try {
     const res = await fetch(
-      "https://ams-checkin-api.josealfonsodejesus.workers.dev/logs"
+      "https://ams-checkin-api.josealfonsodejesus.workers.dev/logs",
+      { cache: "no-store" }
     );
+    if (!res.ok) throw new Error();
 
-    if (!res.ok) throw new Error("Cloud fetch failed");
-
-    const logs = await res.json();
-
-    // Cache for offline use
+    const logs = normalizeLogsOnce(await res.json());
     localStorage.setItem("ams_logs", JSON.stringify(logs));
-
-    console.log("☁️ Search logs loaded from cloud:", logs.length);
     return logs;
-  } catch (err) {
-    console.warn("⚠️ Using local logs");
-    return JSON.parse(localStorage.getItem("ams_logs") || "[]");
+  } catch {
+    return getCachedLogs();
   }
+}
+
+async function fetchSearchLogs() {
+  const cached = getCachedLogs();
+
+  // 🔥 INSTANT SEARCH
+  if (cached.length) {
+    refreshLogsSilently(); // background update
+    return cached;
+  }
+
+  return await refreshLogsSilently();
 }
 
 console.log("Admin Search Module Loaded");
 
+/* =========================================================
+   LOGO LOAD (PDF)
+========================================================= */
 let amsLogoBase64 = null;
 
 (function loadLogo() {
@@ -49,15 +82,6 @@ let amsLogoBase64 = null;
     amsLogoBase64 = canvas.toDataURL("image/png");
   };
 })();
-/* =========================================================
-   DATE NORMALIZATION
-========================================================= */
-function normalizeDate(dateStr) {
-  if (!dateStr) return null;
-  const d = new Date(dateStr + "T00:00:00");
-  d.setHours(0, 0, 0, 0);
-  return d;
-}
 
 /* =========================================================
    INIT
@@ -66,18 +90,18 @@ document.addEventListener("DOMContentLoaded", () => {
   populateSearchCompanies();
   clearSearchTable();
 });
-   
+
 /* =========================================================
    RUN SEARCH
 ========================================================= */
 window.runSearch = async function () {
   clearSearchTable();
+
   const first = document.getElementById("filterFirstName")?.value.trim().toLowerCase();
   const last = document.getElementById("filterLastName")?.value.trim().toLowerCase();
 
   const companySelect = document.getElementById("searchFilterCompany");
   const companyText = document.getElementById("searchFilterCompanyText")?.value.trim().toLowerCase();
-
   const company =
     companySelect?.value === "__custom__"
       ? companyText
@@ -87,115 +111,86 @@ window.runSearch = async function () {
   const startInput = document.getElementById("filterStartDate")?.value;
   const endInput = document.getElementById("filterEndDate")?.value;
 
-  const rawLogs = await fetchSearchLogs();
-const logs = dedupeLogsById(rawLogs);
+  const rawLogs = dedupeLogsById(await fetchSearchLogs());
 
-// 🔒 STEP 4 — HARD RESET DATE RANGE
-let startTs = null;
-let endTs = null;
+  /* ===== DATE RANGE ===== */
+  let startTs = null;
+  let endTs = null;
+  const now = Date.now();
 
-const now = Date.now();
-
-switch (range) {
-  case "today": {
-    const d = new Date();
-    d.setHours(0, 0, 0, 0);
-    startTs = d.getTime();
-    endTs = startTs + 86400000 - 1;
-    break;
+  switch (range) {
+    case "today": {
+      const d = new Date(); d.setHours(0,0,0,0);
+      startTs = d.getTime();
+      endTs = startTs + 86400000 - 1;
+      break;
+    }
+    case "yesterday": {
+      const d = new Date(); d.setHours(0,0,0,0);
+      endTs = d.getTime() - 1;
+      startTs = endTs - 86400000 + 1;
+      break;
+    }
+    case "thisWeek": {
+      const d = new Date(); d.setHours(0,0,0,0);
+      startTs = d.getTime() - d.getDay() * 86400000;
+      endTs = now;
+      break;
+    }
+    case "lastWeek": {
+      const d = new Date(); d.setHours(0,0,0,0);
+      endTs = d.getTime() - d.getDay() * 86400000 - 1;
+      startTs = endTs - 7 * 86400000 + 1;
+      break;
+    }
+    case "thisMonth": {
+      const d = new Date();
+      startTs = new Date(d.getFullYear(), d.getMonth(), 1).getTime();
+      endTs = now;
+      break;
+    }
+    case "lastMonth": {
+      const d = new Date();
+      startTs = new Date(d.getFullYear(), d.getMonth() - 1, 1).getTime();
+      endTs = new Date(d.getFullYear(), d.getMonth(), 0, 23,59,59,999).getTime();
+      break;
+    }
+    case "thisYear":
+      startTs = new Date(new Date().getFullYear(), 0, 1).getTime();
+      endTs = now;
+      break;
+    case "lastYear":
+      startTs = new Date(new Date().getFullYear() - 1, 0, 1).getTime();
+      endTs = new Date(new Date().getFullYear() - 1, 11, 31, 23,59,59,999).getTime();
+      break;
+    case "custom":
+      if (startInput) startTs = new Date(startInput).getTime();
+      if (endInput) endTs = new Date(endInput).getTime() + 86400000 - 1;
+      break;
   }
 
-  case "yesterday": {
-    const d = new Date();
-    d.setHours(0, 0, 0, 0);
-    endTs = d.getTime() - 1;
-    startTs = endTs - 86400000 + 1;
-    break;
-  }
+  const filtered = rawLogs.filter(e => {
+    if (!e._ts) return false;
+    if (startTs !== null && e._ts < startTs) return false;
+    if (endTs !== null && e._ts > endTs) return false;
 
-  case "thisWeek": {
-    const d = new Date();
-    d.setHours(0, 0, 0, 0);
-    startTs = d.getTime() - d.getDay() * 86400000;
-    endTs = now;
-    break;
-  }
-
-  case "lastWeek": {
-    const d = new Date();
-    d.setHours(0, 0, 0, 0);
-    endTs = d.getTime() - d.getDay() * 86400000 - 1;
-    startTs = endTs - 7 * 86400000 + 1;
-    break;
-  }
-
-  case "thisMonth": {
-    const d = new Date();
-    startTs = new Date(d.getFullYear(), d.getMonth(), 1).getTime();
-    endTs = now;
-    break;
-  }
-
-  case "lastMonth": {
-    const d = new Date();
-    startTs = new Date(d.getFullYear(), d.getMonth() - 1, 1).getTime();
-    endTs = new Date(d.getFullYear(), d.getMonth(), 0, 23, 59, 59, 999).getTime();
-    break;
-  }
-
-  case "thisYear":
-    startTs = new Date(new Date().getFullYear(), 0, 1).getTime();
-    endTs = now;
-    break;
-
-  case "lastYear":
-    startTs = new Date(new Date().getFullYear() - 1, 0, 1).getTime();
-    endTs = new Date(new Date().getFullYear() - 1, 11, 31, 23, 59, 59, 999).getTime();
-    break;
-
-  case "custom":
-    if (startInput) startTs = new Date(startInput).getTime();
-    if (endInput) endTs = new Date(endInput).getTime() + 86400000 - 1;
-    break;
-}
-  
-  const filtered = logs.filter(entry => {
-    // ✅ TIMESTAMP-SAFE DATE FILTER (CRITICAL FIX)
-let logTime = entry.timestamp;
-
-// Backward compatibility (old records)
-if (!logTime && entry.date) {
-  const timePart = entry.time || "00:00";
-  logTime = new Date(`${entry.date} ${timePart}`).getTime();
-}
-
-if (!logTime) return false;
-
-if (startTs !== null && logTime < startTs) return false;
-if (endTs !== null && logTime > endTs) return false;
-
-    const f = entry.firstName || entry.first || "";
-    const l = entry.lastName || entry.last || "";
+    const f = e.firstName || e.first || "";
+    const l = e.lastName || e.last || "";
 
     if (first && !f.toLowerCase().includes(first)) return false;
     if (last && !l.toLowerCase().includes(last)) return false;
-    if (company && !entry.company?.toLowerCase().includes(company)) return false;
+    if (company && !e.company?.toLowerCase().includes(company)) return false;
 
     return true;
   });
-  
-  if (filtered.length === 0) {
-  window.searchResults = [];
-  renderSearchResults([]);
-  return;
-}
 
-  filtered.sort((a, b) => {
-    const ta = a.timestamp || new Date(a.date).getTime();
-    const tb = b.timestamp || new Date(b.date).getTime();
-    return tb - ta;
-  });
+  if (!filtered.length) {
+    window.searchResults = [];
+    renderSearchResults([]);
+    return;
+  }
 
+  filtered.sort((a, b) => b._ts - a._ts);
   window.searchResults = filtered;
   renderSearchResults(filtered);
 };
@@ -228,13 +223,9 @@ function renderSearchResults(results) {
   }
 
   results.forEach(r => {
-    const servicesValue =
-      Array.isArray(r.services) ? r.services :
-      Array.isArray(r.tests) ? r.tests :
-      typeof r.services === "string" ? [r.services] :
-      typeof r.tests === "string" ? [r.tests] : [];
-
-    const servicesText = servicesValue.join(", ");
+    const services = Array.isArray(r.services)
+      ? r.services.join(", ")
+      : r.services || r.tests || "";
 
     const row = document.createElement("tr");
     row.innerHTML = `
@@ -244,16 +235,9 @@ function renderSearchResults(results) {
       <td>${r.lastName || r.last || ""}</td>
       <td>${r.company || ""}</td>
       <td>${r.reason || ""}</td>
-      <td style="max-width:220px;white-space:normal;">${servicesText}</td>
-      <td style="text-align:center;vertical-align:middle;">
-        ${
-          r.signature
-            ? `<img src="${r.signature}"
-                 style="width:100px;height:35px;object-fit:contain;
-                        display:block;margin:0 auto;
-                        border:1px solid #ccc;background:#fff;">`
-            : ""
-        }
+      <td>${services}</td>
+      <td style="text-align:center;">
+        ${r.signature ? `<img src="${r.signature}" style="width:100px;height:35px;">` : ""}
       </td>`;
     table.appendChild(row);
   });
@@ -286,6 +270,7 @@ window.toggleSearchCompanyText = function (value) {
   input.style.display = value === "__custom__" ? "block" : "none";
   if (value === "__custom__") input.focus();
 };
+
 /* =========================================================
    CUSTOM DATE RANGE TOGGLE
 ========================================================= */
@@ -293,13 +278,10 @@ window.toggleCustomDateRange = function (value) {
   const wrapper = document.getElementById("customDateRange");
   const start = document.getElementById("filterStartDate");
   const end = document.getElementById("filterEndDate");
-
   if (!wrapper || !start || !end) return;
 
-  if (value === "custom") {
-    wrapper.style.display = "block";
-  } else {
-    wrapper.style.display = "none";
+  wrapper.style.display = value === "custom" ? "block" : "none";
+  if (value !== "custom") {
     start.value = "";
     end.value = "";
   }
@@ -334,28 +316,25 @@ window.clearSearch = function () {
   window.searchResults = [];
   clearSearchTable();
 };
+
 /* =========================================================
-   SERVICES NORMALIZER (USED BY TABLE, PDF, EXCEL)
+   SERVICES NORMALIZER
 ========================================================= */
 function getServicesText(r) {
   if (Array.isArray(r.services)) return r.services.join(", ");
   if (typeof r.services === "string") return r.services;
-
   const list = [];
-
   if (r.dot) list.push("DOT Drug Test");
   if (r.nonDot) list.push("NON-DOT Drug Test");
   if (r.vision) list.push("Vision Test");
-
   return list.join(", ");
 }
+
 /* =========================================================
    EXPORT EXCEL
 ========================================================= */
 function exportSearchLogExcel() {
   const results = window.searchResults;
-
-  // ✅ SAME GUARD AS PDF
   if (!Array.isArray(results) || results.length === 0) {
     alert("Please run a search first.");
     return;
@@ -378,6 +357,9 @@ function exportSearchLogExcel() {
   XLSX.writeFile(wb, "AMS_Search_Log.xlsx");
 }
 
+/* =========================================================
+   EXPORT PDF
+========================================================= */
 window.exportSearchPdf = function () {
   const records = window.searchResults || [];
   if (!records.length) {
@@ -387,10 +369,8 @@ window.exportSearchPdf = function () {
 
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF("landscape");
-
   const pageWidth = doc.internal.pageSize.width;
 
-  /* ================= HEADER ================= */
   doc.setFillColor(30, 94, 150);
   doc.rect(0, 0, pageWidth, 30, "F");
 
@@ -403,7 +383,6 @@ window.exportSearchPdf = function () {
   doc.text("AMS Search Log Report", pageWidth / 2, 20, { align: "center" });
   doc.setTextColor(0);
 
-  /* ================= TABLE DATA ================= */
   const rows = records.map(r => [
     r.date || "",
     r.time || "",
@@ -412,63 +391,22 @@ window.exportSearchPdf = function () {
     r.company || "",
     r.reason || "",
     getServicesText(r),
-    "" // signature drawn manually
+    ""
   ]);
 
   doc.autoTable({
     startY: 36,
-
-    /* 🔴 THIS IS THE KEY FIX */
     margin: { left: 8, right: 8 },
-
     head: [[
-      "Date",
-      "Time",
-      "First",
-      "Last",
-      "Company",
-      "Reason",
-      "Services",
-      "Signature"
+      "Date","Time","First","Last","Company","Reason","Services","Signature"
     ]],
-
     body: rows,
-
-    styles: {
-      fontSize: 9,
-      cellPadding: 4,
-      valign: "middle",
-      overflow: "linebreak"
-    },
-
-    headStyles: {
-      fillColor: [28, 86, 145],
-      textColor: 255,
-      fontStyle: "bold",
-      halign: "left"
-    },
-
-    /* 🧮 COLUMN WIDTHS — BALANCED & LEFT-LOCKED */
-    columnStyles: {
-      0: { cellWidth: 26 }, // Date
-      1: { cellWidth: 26 }, // Time
-      2: { cellWidth: 26 }, // First
-      3: { cellWidth: 26 }, // Last
-      4: { cellWidth: 58 }, // Company
-      5: { cellWidth: 44 }, // Reason
-      6: { cellWidth: 48 }, // Services
-      7: { cellWidth: 30, halign: "center" } // Signature
-    },
-
-    /*✍️ SIGNATURE DRAW */
+    styles: { fontSize: 9, cellPadding: 4 },
     didDrawCell(data) {
       if (data.column.index === 7 && data.cell.section === "body") {
-        const record = records[data.row.index];
-        const img = record?.signature;
-
+        const img = records[data.row.index]?.signature;
         if (img && img.startsWith("data:image")) {
-          const w = 18;
-          const h = 8;
+          const w = 18, h = 8;
           const x = data.cell.x + (data.cell.width - w) / 2;
           const y = data.cell.y + (data.cell.height - h) / 2;
           doc.addImage(img, "PNG", x, y, w, h);
@@ -476,17 +414,6 @@ window.exportSearchPdf = function () {
       }
     }
   });
-
-  /* ================= GENERATED TIMESTAMP ================= */
-  const generated = new Date().toLocaleString();
-  doc.setFontSize(9);
-  doc.setTextColor(120);
-  doc.text(
-    `Generated: ${generated}`,
-    pageWidth - 8,
-    doc.internal.pageSize.height - 6,
-    { align: "right" }
-  );
 
   doc.save("AMS_Search_Log.pdf");
 };
