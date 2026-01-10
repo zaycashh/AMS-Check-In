@@ -1,3 +1,4 @@
+let searchCloudAttempted = false;
 /* =========================================================
    DEDUPE
 ========================================================= */
@@ -36,16 +37,26 @@ function normalizeLogsOnce(logs) {
 }
 
 async function refreshLogsSilently() {
+  // ⛔ prevent repeated failed calls
+  if (searchCloudAttempted) {
+    return getCachedLogs();
+  }
+
+  searchCloudAttempted = true;
+
   try {
     const res = await fetch(
       "https://ams-checkin-api.josealfonsodejesus.workers.dev/logs",
       { cache: "no-store" }
     );
-    if (!res.ok) throw new Error();
+
+    if (!res.ok) throw new Error("Cloud unavailable");
+
     const logs = normalizeLogsOnce(await res.json());
     localStorage.setItem("ams_logs", JSON.stringify(logs));
     return logs;
   } catch {
+    // 🔇 silent fallback
     return getCachedLogs();
   }
 }
