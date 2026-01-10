@@ -15,9 +15,8 @@ function dedupeLogsById(logs) {
 }
 
 /* =========================================================
-   LOCAL + CLOUD FETCH (FAST)
+   FAST LOCAL + CLOUD FETCH
 ========================================================= */
-
 function getCachedLogs() {
   return JSON.parse(localStorage.getItem("ams_logs") || "[]");
 }
@@ -30,7 +29,7 @@ function normalizeLogsOnce(logs) {
         const t = l.time || "00:00";
         ts = new Date(`${l.date} ${t}`).getTime();
       }
-      return { ...l, _ts: ts };
+      return { ...l, _ts: ts || null };
     }
     return l;
   });
@@ -43,7 +42,6 @@ async function refreshLogsSilently() {
       { cache: "no-store" }
     );
     if (!res.ok) throw new Error();
-
     const logs = normalizeLogsOnce(await res.json());
     localStorage.setItem("ams_logs", JSON.stringify(logs));
     return logs;
@@ -54,20 +52,17 @@ async function refreshLogsSilently() {
 
 async function fetchSearchLogs() {
   const cached = getCachedLogs();
-
-  // 🔥 INSTANT SEARCH
   if (cached.length) {
-    refreshLogsSilently(); // background update
+    refreshLogsSilently(); // background refresh
     return cached;
   }
-
   return await refreshLogsSilently();
 }
 
 console.log("Admin Search Module Loaded");
 
 /* =========================================================
-   LOGO LOAD (PDF)
+   LOGO (PDF)
 ========================================================= */
 let amsLogoBase64 = null;
 
@@ -111,9 +106,11 @@ window.runSearch = async function () {
   const startInput = document.getElementById("filterStartDate")?.value;
   const endInput = document.getElementById("filterEndDate")?.value;
 
-  const rawLogs = dedupeLogsById(await fetchSearchLogs());
+  const rawLogs = dedupeLogsById(
+    normalizeLogsOnce(await fetchSearchLogs())
+  );
 
-  /* ===== DATE RANGE ===== */
+  /* ================= DATE RANGE ================= */
   let startTs = null;
   let endTs = null;
   const now = Date.now();
@@ -170,7 +167,9 @@ window.runSearch = async function () {
   }
 
   const filtered = rawLogs.filter(e => {
-    if (!e._ts) return false;
+    // ✅ ONLY require timestamp if date filter is active
+    if ((startTs !== null || endTs !== null) && !e._ts) return false;
+
     if (startTs !== null && e._ts < startTs) return false;
     if (endTs !== null && e._ts > endTs) return false;
 
@@ -184,13 +183,6 @@ window.runSearch = async function () {
     return true;
   });
 
-  if (!filtered.length) {
-    window.searchResults = [];
-    renderSearchResults([]);
-    return;
-  }
-
-  filtered.sort((a, b) => b._ts - a._ts);
   window.searchResults = filtered;
   renderSearchResults(filtered);
 };
@@ -223,9 +215,10 @@ function renderSearchResults(results) {
   }
 
   results.forEach(r => {
-    const services = Array.isArray(r.services)
-      ? r.services.join(", ")
-      : r.services || r.tests || "";
+    const services =
+      Array.isArray(r.services) ? r.services.join(", ") :
+      Array.isArray(r.tests) ? r.tests.join(", ") :
+      r.services || r.tests || "";
 
     const row = document.createElement("tr");
     row.innerHTML = `
