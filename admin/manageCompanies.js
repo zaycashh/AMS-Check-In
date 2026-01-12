@@ -88,26 +88,35 @@ async function renderCompanyManager() {
         Add Company
       </button>
     </div>
+    
+    container.innerHTML = `
+  <h2 class="section-title">Manage Companies</h2>
 
-    <div id="companyList"></div>
-  `;
+  <div style="max-width:500px;margin-bottom:20px;">
+    <input
+      id="companyInput"
+      type="text"
+      placeholder="Enter company name"
+      style="width:100%;padding:12px;margin-bottom:12px;"
+    />
+    <button id="addCompanyBtn" class="primary-btn" type="button">
+      Add Company
+    </button>
+  </div>
 
-  const list = container.querySelector("#companyList");
+  <div style="max-width:500px;">
+    <select id="companySelect" style="width:100%;padding:12px;">
+      <option value="">-- Select Company --</option>
+      ${companies.map(c => `<option value="${c}">${c}</option>`).join("")}
+    </select>
 
-  if (companies.length === 0) {
-    list.innerHTML = `<p>No companies added yet.</p>`;
-  } else {
-    list.innerHTML = `
-      <select id="companySelect" style="width:100%;padding:12px;margin-bottom:12px;">
-        ${companies.map(c => `<option value="${c}">${c}</option>`).join("")}
-      </select>
+    <div style="margin-top:12px;">
+      <button id="editCompanyBtn" class="secondary-btn">Edit</button>
+      <button id="deleteCompanyBtn" class="secondary-btn">Delete</button>
+    </div>
+  </div>
+`;
 
-      <div style="display:flex;gap:10px;">
-        <button id="editCompanyBtn" class="secondary-btn">Edit</button>
-        <button id="deleteCompanyBtn" class="secondary-btn">Delete</button>
-      </div>
-    `;
-  }
 
   // ADD COMPANY
   container.querySelector("#addCompanyBtn").onclick = () => {
