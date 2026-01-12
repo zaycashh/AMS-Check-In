@@ -379,11 +379,36 @@ document.getElementById("toggleAdminBtn").addEventListener("click", () => {
 });
 
 /* =========================================================
-   EXIT ADMIN MODE
+   EXIT ADMIN MODE (CLEAN RESET)
 ========================================================= */
 document.getElementById("exitAdminBtn").addEventListener("click", () => {
+  // Hide admin / show donor
   document.getElementById("adminArea").style.display = "none";
   document.getElementById("checkInSection").style.display = "block";
+
+  // 🔥 CLEAR ALL ADMIN TAB CONTENT
+  document.querySelectorAll(".tab-content").forEach(tab => {
+    tab.style.display = "none";
+    tab.innerHTML = ""; // prevents UI bleed
+  });
+
+  // 🔥 RESET ADMIN TAB STATES
+  document.querySelectorAll(".tab").forEach(tab => {
+    tab.classList.remove("active");
+  });
+
+  // 🔥 RESET SEARCH STATE
+  if (window.searchResults) {
+    window.searchResults = [];
+  }
+
+  // Optional: clear search table safely
+  if (typeof clearSearchTable === "function") {
+    clearSearchTable();
+  }
+
+  // Scroll user back to top of donor form
+  scrollToTop();
 });
 
 /* =========================================================
