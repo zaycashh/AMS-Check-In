@@ -5,6 +5,9 @@
 // In-memory cache
 let companyCache = null;
 
+// Track selected company for edit/rename
+let selectedCompany = null;
+
 async function fetchCompanies() {
   try {
     const res = await fetch(
@@ -54,7 +57,7 @@ async function saveCompaniesToCloud(companies) {
 console.log("Manage Companies Module Loaded");
 
 /* =========================================================
-   MANAGE COMPANIES (SINGLE INPUT FIELD)
+   MANAGE COMPANIES (SINGLE INPUT + EDIT SAFE)
 ========================================================= */
 async function renderCompanyManager() {
   const container = document.getElementById("tabCompanies");
@@ -72,6 +75,7 @@ async function renderCompanyManager() {
   ).sort((a, b) => a.localeCompare(b));
 
   companyCache = companies;
+  selectedCompany = null;
 
   container.innerHTML = `
     <h2 class="section-title">Manage Companies</h2>
@@ -101,17 +105,39 @@ async function renderCompanyManager() {
     </div>
   `;
 
+  const companyInput = document.getElementById("companyInput");
+
   /* =========================
-     ADD / SAVE COMPANY
+     TRACK SELECTION FOR EDIT
+  ========================= */
+  companyInput.addEventListener("input", () => {
+    const value = companyInput.value.trim().toUpperCase();
+    selectedCompany = companyCache.includes(value) ? value : null;
+  });
+
+  /* =========================
+     ADD / EDIT / RENAME
   ========================= */
   document.getElementById("saveCompanyBtn").onclick = async () => {
-    const input = document.getElementById("companyInput");
-    let name = input.value.trim().toUpperCase();
+    const name = companyInput.value.trim().toUpperCase();
     if (!name) return;
 
     let companies = companyCache || await fetchCompanies();
 
-    if (!companies.includes(name)) {
+    // RENAME
+    if (selectedCompany && selectedCompany !== name) {
+      if (companies.includes(name)) {
+        alert("That company already exists.");
+        return;
+      }
+
+      const idx = companies.indexOf(selectedCompany);
+      companies[idx] = name;
+      selectedCompany = null;
+    }
+
+    // ADD
+    else if (!companies.includes(name)) {
       companies.push(name);
     }
 
@@ -120,11 +146,10 @@ async function renderCompanyManager() {
   };
 
   /* =========================
-     DELETE COMPANY
+     DELETE
   ========================= */
   document.getElementById("deleteCompanyBtn").onclick = async () => {
-    const input = document.getElementById("companyInput");
-    const name = input.value.trim().toUpperCase();
+    const name = companyInput.value.trim().toUpperCase();
     if (!name) return;
 
     let companies = companyCache || await fetchCompanies();
@@ -137,6 +162,8 @@ async function renderCompanyManager() {
     if (!confirm(`Delete "${name}"?\n\nPast check-ins will remain.`)) return;
 
     companies = companies.filter(c => c !== name);
+    selectedCompany = null;
+
     await saveCompaniesToCloud(companies);
     renderCompanyManager();
   };
