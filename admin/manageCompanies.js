@@ -102,7 +102,6 @@ async function renderCompanyManager() {
   </div>
 `;
 
-
   // ADD COMPANY
   container.querySelector("#addCompanyBtn").onclick = () => {
     const input = container.querySelector("#companyInput");
@@ -124,10 +123,12 @@ async function renderCompanyManager() {
   const select = container.querySelector("#companySelect");
 
   if (select) {
-    container.querySelector("#editCompanyBtn").onclick = () => {
-      const current = select.value;
-      let updated = prompt("Edit company name:", current);
-      if (!updated) return;
+    const current = select.value;
+if (!current) {
+  alert("Please select a company first.");
+  return;
+}
+let updated = prompt("Edit company name:", current);
 
       updated = updated.trim().toUpperCase();
       if (companies.includes(updated)) {
