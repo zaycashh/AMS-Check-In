@@ -2,7 +2,7 @@
    CLOUD COMPANIES FETCH (WITH FALLBACK)
 ========================================================= */
 
-// 🔒 In-memory cache to prevent UI wipe on re-render
+// In-memory cache
 let companyCache = null;
 
 async function fetchCompanies() {
@@ -15,19 +15,14 @@ async function fetchCompanies() {
 
     const companies = await res.json();
 
-    // Cache locally for offline use
     localStorage.setItem("ams_companies", JSON.stringify(companies));
     companyCache = companies;
 
     console.log("☁️ Companies loaded from cloud:", companies.length);
     return companies;
-  } catch (err) {
+  } catch {
     console.warn("⚠️ Using local companies");
-
-    const local = JSON.parse(
-      localStorage.getItem("ams_companies") || "[]"
-    );
-
+    const local = JSON.parse(localStorage.getItem("ams_companies") || "[]");
     companyCache = local;
     return local;
   }
@@ -37,7 +32,6 @@ async function fetchCompanies() {
    CLOUD SAVE
 ========================================================= */
 async function saveCompaniesToCloud(companies) {
-  // Always save locally
   localStorage.setItem("ams_companies", JSON.stringify(companies));
   companyCache = companies;
 
@@ -58,8 +52,9 @@ async function saveCompaniesToCloud(companies) {
 }
 
 console.log("Manage Companies Module Loaded");
+
 /* =========================================================
-   RENDER MANAGER
+   RENDER MANAGER (SINGLE DROPDOWN UI)
 ========================================================= */
 async function renderCompanyManager() {
   const container = document.getElementById("tabCompanies");
@@ -73,38 +68,40 @@ async function renderCompanyManager() {
   ).sort((a, b) => a.localeCompare(b));
 
   companyCache = companies;
-    
-    container.innerHTML = `
-  <h2 class="section-title">Manage Companies</h2>
 
-  <div style="max-width:500px;margin-bottom:20px;">
-    <input
-      id="companyInput"
-      type="text"
-      placeholder="Enter company name"
-      style="width:100%;padding:12px;margin-bottom:12px;"
-    />
-    <button id="addCompanyBtn" class="primary-btn" type="button">
-      Add Company
-    </button>
-  </div>
+  container.innerHTML = `
+    <h2 class="section-title">Manage Companies</h2>
 
-  <div style="max-width:500px;">
-    <select id="companySelect" style="width:100%;padding:12px;">
-      <option value="">-- Select Company --</option>
-      ${companies.map(c => `<option value="${c}">${c}</option>`).join("")}
-    </select>
-
-    <div style="margin-top:12px;">
-      <button id="editCompanyBtn" class="secondary-btn">Edit</button>
-      <button id="deleteCompanyBtn" class="secondary-btn">Delete</button>
+    <div style="max-width:500px;margin-bottom:20px;">
+      <input
+        id="companyInput"
+        type="text"
+        placeholder="Enter company name"
+        style="width:100%;padding:12px;margin-bottom:12px;"
+      />
+      <button id="addCompanyBtn" class="primary-btn" type="button">
+        Add Company
+      </button>
     </div>
-  </div>
-`;
 
-  // ADD COMPANY
-  container.querySelector("#addCompanyBtn").onclick = () => {
-    const input = container.querySelector("#companyInput");
+    <div style="max-width:500px;">
+      <select id="companySelect" style="width:100%;padding:12px;">
+        <option value="">-- Select Company --</option>
+        ${companies.map(c => `<option value="${c}">${c}</option>`).join("")}
+      </select>
+
+      <div style="margin-top:12px;display:flex;gap:10px;">
+        <button id="editCompanyBtn" class="secondary-btn">Edit</button>
+        <button id="deleteCompanyBtn" class="secondary-btn">Delete</button>
+      </div>
+    </div>
+  `;
+
+  /* =========================
+     ADD COMPANY
+  ========================= */
+  document.getElementById("addCompanyBtn").onclick = () => {
+    const input = document.getElementById("companyInput");
     let name = input.value.trim().toUpperCase();
     if (!name) return;
 
@@ -119,40 +116,54 @@ async function renderCompanyManager() {
     renderCompanyManager();
   };
 
-  // EDIT / DELETE
-  const select = container.querySelector("#companySelect");
+  const select = document.getElementById("companySelect");
 
-  if (select) {
+  /* =========================
+     EDIT COMPANY
+  ========================= */
+  document.getElementById("editCompanyBtn").onclick = () => {
     const current = select.value;
-if (!current) {
-  alert("Please select a company first.");
-  return;
-}
-let updated = prompt("Edit company name:", current);
+    if (!current) {
+      alert("Please select a company first.");
+      return;
+    }
 
-      updated = updated.trim().toUpperCase();
-      if (companies.includes(updated)) {
-        alert("Company already exists.");
-        return;
-      }
+    let updated = prompt("Edit company name:", current);
+    if (!updated) return;
 
-      companies[companies.indexOf(current)] = updated;
-      saveCompaniesToCloud(companies);
-      renderCompanyManager();
-    };
+    updated = updated.trim().toUpperCase();
 
-    container.querySelector("#deleteCompanyBtn").onclick = () => {
-      const current = select.value;
-      if (!confirm(`Delete "${current}"?`)) return;
+    if (companies.includes(updated) && updated !== current) {
+      alert("Company already exists.");
+      return;
+    }
 
-      companies = companies.filter(c => c !== current);
-      saveCompaniesToCloud(companies);
-      renderCompanyManager();
-    };
-  }
+    companies[companies.indexOf(current)] = updated;
+    saveCompaniesToCloud(companies);
+    renderCompanyManager();
+  };
+
+  /* =========================
+     DELETE COMPANY
+  ========================= */
+  document.getElementById("deleteCompanyBtn").onclick = () => {
+    const current = select.value;
+    if (!current) {
+      alert("Please select a company first.");
+      return;
+    }
+
+    if (!confirm(`Delete "${current}"?\n\nPast check-ins will NOT be removed.`)) {
+      return;
+    }
+
+    companies = companies.filter(c => c !== current);
+    saveCompaniesToCloud(companies);
+    renderCompanyManager();
+  };
 }
 
 /* =========================================================
-   EXPOSE GLOBALLY (THIS WAS MISSING / BROKEN)
+   EXPOSE GLOBALLY
 ========================================================= */
 window.renderCompanyManager = renderCompanyManager;
