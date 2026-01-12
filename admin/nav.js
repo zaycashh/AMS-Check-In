@@ -72,3 +72,29 @@ document.addEventListener("click", (e) => {
     dropdown.classList.remove("open");
   }
 });
+// ===============================
+// EXIT ADMIN MODE CLEANUP
+// ===============================
+function resetAdminView() {
+  // Hide all admin tab contents
+  document.querySelectorAll(".tab-content").forEach(el => {
+    el.style.display = "none";
+    el.innerHTML = ""; // 🔥 prevents bleed-through
+  });
+
+  // Remove active state from tabs
+  document.querySelectorAll(".admin-nav .tab").forEach(tab => {
+    tab.classList.remove("active");
+  });
+
+  // Reset search state if present
+  if (window.searchResults) {
+    window.searchResults = [];
+  }
+
+  // Clear Search Log UI safely
+  if (typeof clearSearchTable === "function") {
+    clearSearchTable();
+  }
+}
+
