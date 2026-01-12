@@ -1,4 +1,5 @@
 let searchCloudAttempted = false;
+
 /* =========================================================
    DEDUPE
 ========================================================= */
@@ -37,11 +38,7 @@ function normalizeLogsOnce(logs) {
 }
 
 async function refreshLogsSilently() {
-  // ⛔ prevent repeated failed calls
-  if (searchCloudAttempted) {
-    return getCachedLogs();
-  }
-
+  if (searchCloudAttempted) return getCachedLogs();
   searchCloudAttempted = true;
 
   try {
@@ -56,7 +53,6 @@ async function refreshLogsSilently() {
     localStorage.setItem("ams_logs", JSON.stringify(logs));
     return logs;
   } catch {
-    // 🔇 silent fallback
     return getCachedLogs();
   }
 }
@@ -64,30 +60,13 @@ async function refreshLogsSilently() {
 async function fetchSearchLogs() {
   const cached = getCachedLogs();
   if (cached.length) {
-    refreshLogsSilently(); // background refresh
+    refreshLogsSilently();
     return cached;
   }
   return await refreshLogsSilently();
 }
 
 console.log("Admin Search Module Loaded");
-
-/* =========================================================
-   LOGO (PDF)
-========================================================= */
-let amsLogoBase64 = null;
-
-(function loadLogo() {
-  const img = new Image();
-  img.src = "logo.png";
-  img.onload = function () {
-    const canvas = document.createElement("canvas");
-    canvas.width = img.width;
-    canvas.height = img.height;
-    canvas.getContext("2d").drawImage(img, 0, 0);
-    amsLogoBase64 = canvas.toDataURL("image/png");
-  };
-})();
 
 /* =========================================================
    INIT
@@ -177,10 +156,8 @@ window.runSearch = async function () {
       break;
   }
 
-  const filtered = rawLogs.filter(e => {
-    // ✅ ONLY require timestamp if date filter is active
+  let filtered = rawLogs.filter(e => {
     if ((startTs !== null || endTs !== null) && !e._ts) return false;
-
     if (startTs !== null && e._ts < startTs) return false;
     if (endTs !== null && e._ts > endTs) return false;
 
@@ -193,6 +170,9 @@ window.runSearch = async function () {
 
     return true;
   });
+
+  /* ================= SORT (NEWEST → OLDEST) ================= */
+  filtered.sort((a, b) => (b._ts || 0) - (a._ts || 0));
 
   window.searchResults = filtered;
   renderSearchResults(filtered);
@@ -246,7 +226,6 @@ function renderSearchResults(results) {
     table.appendChild(row);
   });
 }
-
 /* =========================================================
    COMPANY DROPDOWN
 ========================================================= */
