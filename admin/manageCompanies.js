@@ -87,129 +87,96 @@ async function renderCompanyManager() {
   companyCache = companies;
 
   container.innerHTML = `
-    <h2 class="section-title">Manage Companies</h2>
+  <h2 class="section-title">Manage Companies</h2>
 
-    <div style="max-width:500px;margin-bottom:20px;">
-      <input
-        id="companyInput"
-        type="text"
-        placeholder="Enter company name"
-        style="width:100%;padding:12px;margin-bottom:12px;"
-      />
+  <div style="max-width:520px;margin-bottom:20px;">
+    <label style="display:block;margin-bottom:6px;">Select Company</label>
+    <select id="companySelect" style="width:100%;padding:12px;">
+      <option value="">-- Select Company --</option>
+      ${companies.map(c => `<option value="${c}">${c}</option>`).join("")}
+    </select>
+  </div>
+
+  <div style="max-width:520px;margin-bottom:20px;">
+    <input
+      id="companyInput"
+      type="text"
+      placeholder="Enter new / updated company name"
+      style="width:100%;padding:12px;margin-bottom:12px;"
+    />
+
+    <div style="display:flex;gap:10px;">
       <button id="addCompanyBtn" class="primary-btn" type="button">
-        Add Company
+        Add
+      </button>
+      <button id="editCompanyBtn" class="secondary-btn" type="button">
+        Edit
+      </button>
+      <button id="deleteCompanyBtn" class="secondary-btn" type="button">
+        Delete
       </button>
     </div>
+  </div>
+`;
 
-    <div id="companyList"></div>
-  `;
+const select = container.querySelector("#companySelect");
+const input = container.querySelector("#companyInput");
 
-  const list = container.querySelector("#companyList");
+/* =========================
+   ADD COMPANY
+========================= */
+container.querySelector("#addCompanyBtn").onclick = () => {
+  let name = input.value.trim();
+  if (!name) return;
 
-  if (companies.length === 0) {
-    list.innerHTML = `<p>No companies added yet.</p>`;
-  } else {
-    list.innerHTML = companies
-      .map(
-        (company, index) => `
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-          <span>${company}</span>
-          <div>
-            <button
-              class="secondary-btn edit-company"
-              data-index="${index}"
-              style="margin-right:6px;"
-            >
-              Edit
-            </button>
-            <button
-              class="secondary-btn delete-company"
-              data-index="${index}"
-            >
-              Delete
-            </button>
-          </div>
-        </div>
-      `
-      )
-      .join("");
+  name = name.toUpperCase();
+
+  if (companies.some(c => c === name)) {
+    alert("This company already exists.");
+    return;
   }
 
-  /* =========================
-     ADD COMPANY (NO DUPES)
-  ========================= */
-  container.querySelector("#addCompanyBtn").onclick = () => {
-    const input = container.querySelector("#companyInput");
-    let name = input.value.trim();
-    if (!name) return;
+  companies.push(name);
+  saveCompaniesToCloud(companies);
+  renderCompanyManager();
+};
 
-    name = name.toUpperCase();
+/* =========================
+   EDIT COMPANY
+========================= */
+container.querySelector("#editCompanyBtn").onclick = () => {
+  const selected = select.value;
+  if (!selected) return alert("Select a company first.");
 
-    const exists = companies.some(
-      c => c.toLowerCase() === name.toLowerCase()
-    );
+  let updated = input.value.trim().toUpperCase();
+  if (!updated) return;
 
-    if (exists) {
-      alert("This company already exists.");
-      return;
-    }
+  if (companies.includes(updated) && updated !== selected) {
+    alert("Company already exists.");
+    return;
+  }
 
-    companies.push(name);
-    saveCompaniesToCloud(companies);
-    input.value = "";
-    renderCompanyManager();
-  };
+  const index = companies.indexOf(selected);
+  companies[index] = updated;
 
-  /* =========================
-     DELETE COMPANY
-  ========================= */
-  container.querySelectorAll(".delete-company").forEach(btn => {
-    btn.onclick = () => {
-      const index = Number(btn.dataset.index);
-      const companyName = companies[index];
+  saveCompaniesToCloud(companies);
+  renderCompanyManager();
+};
 
-      if (
-        !confirm(
-          `Delete "${companyName}"?\n\nPast check-ins will NOT be removed.`
-        )
-      )
-        return;
+/* =========================
+   DELETE COMPANY
+========================= */
+container.querySelector("#deleteCompanyBtn").onclick = () => {
+  const selected = select.value;
+  if (!selected) return alert("Select a company first.");
 
-      companies.splice(index, 1);
-      saveCompaniesToCloud(companies);
-      renderCompanyManager();
-    };
-  });
+  if (!confirm(`Delete "${selected}"?\n\nPast check-ins will NOT be removed.`))
+    return;
 
-  /* =========================
-     EDIT COMPANY (NO DUPES)
-  ========================= */
-  container.querySelectorAll(".edit-company").forEach(btn => {
-    btn.onclick = () => {
-      const index = Number(btn.dataset.index);
-      const current = companies[index];
-
-      let updated = prompt("Edit company name:", current);
-      if (!updated) return;
-
-      updated = updated.trim().toUpperCase();
-
-      const exists = companies.some(
-        (c, i) =>
-          c.toLowerCase() === updated.toLowerCase() && i !== index
-      );
-
-      if (exists) {
-        alert("A company with this name already exists.");
-        return;
-      }
-
-      companies[index] = updated;
-      saveCompaniesToCloud(companies);
-      renderCompanyManager();
-    };
-  });
-}
+  companies = companies.filter(c => c !== selected);
+  saveCompaniesToCloud(companies);
+  renderCompanyManager();
+};
 
 /* =========================================================
    EXPOSE GLOBALLY
