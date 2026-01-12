@@ -73,21 +73,6 @@ async function renderCompanyManager() {
   ).sort((a, b) => a.localeCompare(b));
 
   companyCache = companies;
-
-  container.innerHTML = `
-    <h2 class="section-title">Manage Companies</h2>
-
-    <div style="max-width:500px;margin-bottom:20px;">
-      <input
-        id="companyInput"
-        type="text"
-        placeholder="Enter company name"
-        style="width:100%;padding:12px;margin-bottom:12px;"
-      />
-      <button id="addCompanyBtn" class="primary-btn" type="button">
-        Add Company
-      </button>
-    </div>
     
     container.innerHTML = `
   <h2 class="section-title">Manage Companies</h2>
