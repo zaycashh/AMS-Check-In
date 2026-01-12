@@ -58,7 +58,6 @@ async function saveCompaniesToCloud(companies) {
 }
 
 console.log("Manage Companies Module Loaded");
-
 /* =========================================================
    RENDER MANAGER
 ========================================================= */
@@ -66,119 +65,99 @@ async function renderCompanyManager() {
   const container = document.getElementById("tabCompanies");
   if (!container) return;
 
-  let companies;
+  let companies = companyCache || await fetchCompanies();
 
-  // ✅ Fetch from cloud ONCE, then trust cache
-  if (!companyCache) {
-    companies = await fetchCompanies();
-  } else {
-    companies = companyCache;
-  }
-
-  // ✅ CLEANUP: TRIM → CAPS → DEDUPE → SORT
+  // CLEAN + DEDUPE + SORT
   companies = Array.from(
-    new Set(
-      companies
-        .map(c => c.trim().toUpperCase())
-        .filter(Boolean)
-    )
+    new Set(companies.map(c => c.trim().toUpperCase()).filter(Boolean))
   ).sort((a, b) => a.localeCompare(b));
 
   companyCache = companies;
 
   container.innerHTML = `
-  <h2 class="section-title">Manage Companies</h2>
+    <h2 class="section-title">Manage Companies</h2>
 
-  <div style="max-width:520px;margin-bottom:20px;">
-    <label style="display:block;margin-bottom:6px;">Select Company</label>
-    <select id="companySelect" style="width:100%;padding:12px;">
-      <option value="">-- Select Company --</option>
-      ${companies.map(c => `<option value="${c}">${c}</option>`).join("")}
-    </select>
-  </div>
-
-  <div style="max-width:520px;margin-bottom:20px;">
-    <input
-      id="companyInput"
-      type="text"
-      placeholder="Enter new / updated company name"
-      style="width:100%;padding:12px;margin-bottom:12px;"
-    />
-
-    <div style="display:flex;gap:10px;">
+    <div style="max-width:500px;margin-bottom:20px;">
+      <input
+        id="companyInput"
+        type="text"
+        placeholder="Enter company name"
+        style="width:100%;padding:12px;margin-bottom:12px;"
+      />
       <button id="addCompanyBtn" class="primary-btn" type="button">
-        Add
-      </button>
-      <button id="editCompanyBtn" class="secondary-btn" type="button">
-        Edit
-      </button>
-      <button id="deleteCompanyBtn" class="secondary-btn" type="button">
-        Delete
+        Add Company
       </button>
     </div>
-  </div>
-`;
 
-const select = container.querySelector("#companySelect");
-const input = container.querySelector("#companyInput");
+    <div id="companyList"></div>
+  `;
 
-/* =========================
-   ADD COMPANY
-========================= */
-container.querySelector("#addCompanyBtn").onclick = () => {
-  let name = input.value.trim();
-  if (!name) return;
+  const list = container.querySelector("#companyList");
 
-  name = name.toUpperCase();
+  if (companies.length === 0) {
+    list.innerHTML = `<p>No companies added yet.</p>`;
+  } else {
+    list.innerHTML = `
+      <select id="companySelect" style="width:100%;padding:12px;margin-bottom:12px;">
+        ${companies.map(c => `<option value="${c}">${c}</option>`).join("")}
+      </select>
 
-  if (companies.some(c => c === name)) {
-    alert("This company already exists.");
-    return;
+      <div style="display:flex;gap:10px;">
+        <button id="editCompanyBtn" class="secondary-btn">Edit</button>
+        <button id="deleteCompanyBtn" class="secondary-btn">Delete</button>
+      </div>
+    `;
   }
 
-  companies.push(name);
-  saveCompaniesToCloud(companies);
-  renderCompanyManager();
-};
+  // ADD COMPANY
+  container.querySelector("#addCompanyBtn").onclick = () => {
+    const input = container.querySelector("#companyInput");
+    let name = input.value.trim().toUpperCase();
+    if (!name) return;
 
-/* =========================
-   EDIT COMPANY
-========================= */
-container.querySelector("#editCompanyBtn").onclick = () => {
-  const selected = select.value;
-  if (!selected) return alert("Select a company first.");
+    if (companies.includes(name)) {
+      alert("Company already exists.");
+      return;
+    }
 
-  let updated = input.value.trim().toUpperCase();
-  if (!updated) return;
+    companies.push(name);
+    saveCompaniesToCloud(companies);
+    input.value = "";
+    renderCompanyManager();
+  };
 
-  if (companies.includes(updated) && updated !== selected) {
-    alert("Company already exists.");
-    return;
+  // EDIT / DELETE
+  const select = container.querySelector("#companySelect");
+
+  if (select) {
+    container.querySelector("#editCompanyBtn").onclick = () => {
+      const current = select.value;
+      let updated = prompt("Edit company name:", current);
+      if (!updated) return;
+
+      updated = updated.trim().toUpperCase();
+      if (companies.includes(updated)) {
+        alert("Company already exists.");
+        return;
+      }
+
+      companies[companies.indexOf(current)] = updated;
+      saveCompaniesToCloud(companies);
+      renderCompanyManager();
+    };
+
+    container.querySelector("#deleteCompanyBtn").onclick = () => {
+      const current = select.value;
+      if (!confirm(`Delete "${current}"?`)) return;
+
+      companies = companies.filter(c => c !== current);
+      saveCompaniesToCloud(companies);
+      renderCompanyManager();
+    };
   }
-
-  const index = companies.indexOf(selected);
-  companies[index] = updated;
-
-  saveCompaniesToCloud(companies);
-  renderCompanyManager();
-};
-
-/* =========================
-   DELETE COMPANY
-========================= */
-container.querySelector("#deleteCompanyBtn").onclick = () => {
-  const selected = select.value;
-  if (!selected) return alert("Select a company first.");
-
-  if (!confirm(`Delete "${selected}"?\n\nPast check-ins will NOT be removed.`))
-    return;
-
-  companies = companies.filter(c => c !== selected);
-  saveCompaniesToCloud(companies);
-  renderCompanyManager();
-};
+}
 
 /* =========================================================
-   EXPOSE GLOBALLY
+   EXPOSE GLOBALLY (THIS WAS MISSING / BROKEN)
 ========================================================= */
 window.renderCompanyManager = renderCompanyManager;
