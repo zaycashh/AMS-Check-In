@@ -2,29 +2,23 @@
    CLOUD COMPANIES FETCH (WITH FALLBACK)
 ========================================================= */
 
-// In-memory cache
 let companyCache = null;
-
-// Track selected company for edit / rename
 let selectedCompany = null;
+let isEditMode = false;
 
 async function fetchCompanies() {
   try {
     const res = await fetch(
       "https://ams-checkin-api.josealfonsodejesus.workers.dev/companies"
     );
-
     if (!res.ok) throw new Error("Cloud fetch failed");
 
     const companies = await res.json();
-
     localStorage.setItem("ams_companies", JSON.stringify(companies));
     companyCache = companies;
 
-    console.log("☁️ Companies loaded from cloud:", companies.length);
     return companies;
   } catch {
-    console.warn("⚠️ Using local companies");
     const local = JSON.parse(localStorage.getItem("ams_companies") || "[]");
     companyCache = local;
     return local;
@@ -47,17 +41,13 @@ async function saveCompaniesToCloud(companies) {
         body: JSON.stringify(companies)
       }
     );
-
-    console.log("☁️ Companies saved to cloud:", companies.length);
   } catch (err) {
-    console.error("❌ Failed to save companies to cloud", err);
+    console.error("Cloud save failed", err);
   }
 }
 
-console.log("Manage Companies Module Loaded");
-
 /* =========================================================
-   MANAGE COMPANIES (SINGLE INPUT + EDIT SAFE)
+   MANAGE COMPANIES (SAFE EDIT MODE)
 ========================================================= */
 async function renderCompanyManager() {
   const container = document.getElementById("tabCompanies");
@@ -65,17 +55,13 @@ async function renderCompanyManager() {
 
   let companies = companyCache || await fetchCompanies();
 
-  // CLEAN + DEDUPE + SORT
   companies = Array.from(
-    new Set(
-      companies
-        .map(c => c.trim().toUpperCase())
-        .filter(Boolean)
-    )
+    new Set(companies.map(c => c.trim().toUpperCase()).filter(Boolean))
   ).sort((a, b) => a.localeCompare(b));
 
   companyCache = companies;
   selectedCompany = null;
+  isEditMode = false;
 
   container.innerHTML = `
     <h2 class="section-title">Manage Companies</h2>
@@ -90,100 +76,116 @@ async function renderCompanyManager() {
         style="width:100%;padding:12px;margin-bottom:6px;"
       />
 
-      <div
-        id="editHint"
-        style="font-size:13px;color:#666;margin-bottom:12px;"
-      ></div>
+      <div id="editHint" style="font-size:13px;color:#666;margin-bottom:12px;"></div>
 
       <datalist id="companyList">
         ${companies.map(c => `<option value="${c}"></option>`).join("")}
       </datalist>
 
-      <div style="display:flex;gap:10px;">
-        <button id="saveCompanyBtn" class="primary-btn" type="button">
-          Add / Save
-        </button>
-        <button id="deleteCompanyBtn" class="secondary-btn" type="button">
-          Delete
-        </button>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button id="addBtn" class="primary-btn">Add</button>
+        <button id="editBtn" class="secondary-btn">Edit</button>
+        <button id="saveBtn" class="primary-btn" disabled>Save Changes</button>
+        <button id="deleteBtn" class="secondary-btn">Delete</button>
       </div>
     </div>
   `;
 
-  const companyInput = document.getElementById("companyInput");
-  const editHint = document.getElementById("editHint");
+  const input = document.getElementById("companyInput");
+  const hint = document.getElementById("editHint");
+
+  const addBtn = document.getElementById("addBtn");
+  const editBtn = document.getElementById("editBtn");
+  const saveBtn = document.getElementById("saveBtn");
+  const deleteBtn = document.getElementById("deleteBtn");
 
   /* =========================
-     TRACK SELECTION / EDIT MODE
+     SELECT COMPANY
   ========================= */
-  companyInput.addEventListener("input", () => {
-    const value = companyInput.value.trim().toUpperCase();
+  input.addEventListener("input", () => {
+    const value = input.value.trim().toUpperCase();
 
     if (companyCache.includes(value)) {
       selectedCompany = value;
-      editHint.textContent = `Editing: ${value}`;
-    } else if (selectedCompany) {
-      editHint.textContent = `Renaming "${selectedCompany}" → "${value}"`;
+      hint.textContent = `Selected: ${value}`;
+      saveBtn.disabled = true;
+      isEditMode = false;
     } else {
-      editHint.textContent = "";
+      selectedCompany = null;
+      hint.textContent = "";
     }
   });
 
   /* =========================
-     ADD / EDIT / RENAME
+     ADD
   ========================= */
-  document.getElementById("saveCompanyBtn").onclick = async () => {
-    const name = companyInput.value.trim().toUpperCase();
+  addBtn.onclick = async () => {
+    const name = input.value.trim().toUpperCase();
     if (!name) return;
 
-    let companies = companyCache || await fetchCompanies();
-
-    // RENAME
-    if (selectedCompany && selectedCompany !== name) {
-      if (companies.includes(name)) {
-        alert("That company already exists.");
-        return;
-      }
-
-      const idx = companies.indexOf(selectedCompany);
-      companies[idx] = name;
-      selectedCompany = null;
+    if (companyCache.includes(name)) {
+      alert("Company already exists.");
+      return;
     }
 
-    // ADD
-    else if (!companies.includes(name)) {
-      companies.push(name);
+    companyCache.push(name);
+    await saveCompaniesToCloud(companyCache);
+    renderCompanyManager();
+  };
+
+  /* =========================
+     EDIT (EXPLICIT)
+  ========================= */
+  editBtn.onclick = () => {
+    if (!selectedCompany) {
+      alert("Select a company to edit.");
+      return;
     }
 
-    await saveCompaniesToCloud(companies);
+    isEditMode = true;
+    saveBtn.disabled = false;
+    hint.textContent = `Editing: ${selectedCompany}`;
+  };
+
+  /* =========================
+     SAVE CHANGES
+  ========================= */
+  saveBtn.onclick = async () => {
+    if (!isEditMode || !selectedCompany) return;
+
+    const newName = input.value.trim().toUpperCase();
+    if (!newName) return;
+
+    if (companyCache.includes(newName) && newName !== selectedCompany) {
+      alert("That company already exists.");
+      return;
+    }
+
+    const idx = companyCache.indexOf(selectedCompany);
+    companyCache[idx] = newName;
+
+    await saveCompaniesToCloud(companyCache);
     renderCompanyManager();
   };
 
   /* =========================
      DELETE
   ========================= */
-  document.getElementById("deleteCompanyBtn").onclick = async () => {
-    const name = companyInput.value.trim().toUpperCase();
-    if (!name) return;
-
-    let companies = companyCache || await fetchCompanies();
-
-    if (!companies.includes(name)) {
-      alert("Company not found.");
+  deleteBtn.onclick = async () => {
+    if (!selectedCompany) {
+      alert("Select a company first.");
       return;
     }
 
-    if (!confirm(`Delete "${name}"?\n\nPast check-ins will remain.`)) return;
+    if (!confirm(`Delete "${selectedCompany}"?\n\nPast check-ins remain.`)) return;
 
-    companies = companies.filter(c => c !== name);
-    selectedCompany = null;
-
-    await saveCompaniesToCloud(companies);
+    companyCache = companyCache.filter(c => c !== selectedCompany);
+    await saveCompaniesToCloud(companyCache);
     renderCompanyManager();
   };
 }
 
 /* =========================================================
-   EXPOSE GLOBALLY
+   EXPOSE
 ========================================================= */
 window.renderCompanyManager = renderCompanyManager;
