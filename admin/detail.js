@@ -331,7 +331,12 @@ if (amsLogoBase64) {
 
 doc.setTextColor(255);
 doc.setFontSize(16);
-doc.text("AMS Detail Company Report", 14, 20);
+doc.text(
+  "AMS Detail Company Report",
+  doc.internal.pageSize.width / 2,
+  20,
+  { align: "center" }
+);
 doc.setTextColor(0);
 
 
