@@ -253,17 +253,18 @@ function exportCompanyExcel() {
     [`Company: ${companyName}`],
     [`Generated: ${new Date().toLocaleString()}`],
     [],
-    ["Date", "Time", "First", "Last", "Reason", "Services"]
+    ["Date", "Time", "First", "Last", "Reason", "Services", "Signed"]
   ];
 
   const rows = records.map(r => [
-    r.date || "",
-    r.time || "",
-    r.first || r.firstName || "",
-    r.last || r.lastName || "",
-    r.reason || "",
-    getServicesText(r)
-  ]);
+  r.date || "",
+  r.time || "",
+  r.first || r.firstName || "",
+  r.last || r.lastName || "",
+  r.reason || "",
+  getServicesText(r),
+  r.signature ? "YES" : "NO"   // ✅ SIGNED COLUMN
+]);
 
   const ws = XLSX.utils.aoa_to_sheet([...header, ...rows]);
   const wb = XLSX.utils.book_new();
