@@ -5,7 +5,7 @@
 // In-memory cache
 let companyCache = null;
 
-// Track selected company for edit/rename
+// Track selected company for edit / rename
 let selectedCompany = null;
 
 async function fetchCompanies() {
@@ -87,8 +87,13 @@ async function renderCompanyManager() {
         id="companyInput"
         list="companyList"
         placeholder="Select or type company name"
-        style="width:100%;padding:12px;margin-bottom:12px;"
+        style="width:100%;padding:12px;margin-bottom:6px;"
       />
+
+      <div
+        id="editHint"
+        style="font-size:13px;color:#666;margin-bottom:12px;"
+      ></div>
 
       <datalist id="companyList">
         ${companies.map(c => `<option value="${c}"></option>`).join("")}
@@ -106,13 +111,22 @@ async function renderCompanyManager() {
   `;
 
   const companyInput = document.getElementById("companyInput");
+  const editHint = document.getElementById("editHint");
 
   /* =========================
-     TRACK SELECTION FOR EDIT
+     TRACK SELECTION / EDIT MODE
   ========================= */
   companyInput.addEventListener("input", () => {
     const value = companyInput.value.trim().toUpperCase();
-    selectedCompany = companyCache.includes(value) ? value : null;
+
+    if (companyCache.includes(value)) {
+      selectedCompany = value;
+      editHint.textContent = `Editing: ${value}`;
+    } else if (selectedCompany) {
+      editHint.textContent = `Renaming "${selectedCompany}" → "${value}"`;
+    } else {
+      editHint.textContent = "";
+    }
   });
 
   /* =========================
