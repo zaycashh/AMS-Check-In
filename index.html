@@ -62,12 +62,22 @@
     </div>
 
     <div class="form-row">
-        <label>Company</label>
-        <select id="companySelect">
-            <option value="">-- Select Company --</option>
-            <option value="__custom__">Other (enter manually)</option>
-        </select>
-    </div>
+  <label>Company</label>
+
+  <!-- Search input -->
+  <input
+    type="text"
+    id="companySearch"
+    placeholder="Type company name..."
+    autocomplete="off"
+  />
+
+  <!-- Filtered dropdown -->
+  <select id="companySelect" size="6">
+    <option value="">-- Select Company --</option>
+    <option value="__OTHER__">Other (enter manually)</option>
+  </select>
+</div>
 
     <div id="otherCompanyWrapper" class="form-row" style="display:none;">
         <label>Enter Company</label>
