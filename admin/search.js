@@ -393,7 +393,6 @@ doc.setTextColor(0);
   // META INFO
   doc.setFontSize(10);
   doc.setTextColor(60);
-  doc.text(rangeLabel, 14, 34);
   doc.text(generatedAt, pageWidth - 14, 34, { align: "right" });
 
   doc.setTextColor(0);
@@ -462,7 +461,7 @@ function getDateRangeLabel(range, startInput, endInput) {
       const end = new Date(start);
       end.setDate(start.getDate() + 6);
 
-      return `Week: ${format(start)} → ${format(end)}`;
+      return `Week: ${format(start)} - ${format(end)}`;
     }
 
     case "lastWeek": {
@@ -476,7 +475,7 @@ function getDateRangeLabel(range, startInput, endInput) {
       const end = new Date(start);
       end.setDate(start.getDate() + 6);
 
-      return `Week: ${format(start)} → ${format(end)}`;
+      return `Week: ${format(start)} - ${format(end)}`;
     }
 
     case "custom":
