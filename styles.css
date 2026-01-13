@@ -604,3 +604,8 @@ body {
 .admin-dropdown.open .dropdown-menu {
   display: block;
 }
+
+#companySearch {
+  margin-bottom: 6px;
+}
+
