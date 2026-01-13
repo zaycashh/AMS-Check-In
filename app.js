@@ -551,3 +551,75 @@ document.addEventListener("DOMContentLoaded", () => {
   populateCompanyDropdown();
   syncOfflineCheckIns(); // ✅ SAFE AUTO SYNC
 });
+/* =========================================================
+   HIDDEN ADMIN ACCESS (LOGO LONG PRESS)
+========================================================= */
+
+let adminHoldTimer = null;
+const ADMIN_HOLD_DURATION = 5000; // 5 seconds
+
+function enterAdminMode() {
+  document.getElementById("adminArea").style.display = "block";
+  document.getElementById("checkInSection").style.display = "none";
+
+  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+  document.querySelectorAll(".tab-content").forEach(c => (c.style.display = "none"));
+
+  const recentTab = document.querySelector('.tab[data-tab="tabRecent"]');
+  const recentContent = document.getElementById("tabRecent");
+
+  if (recentTab && recentContent) {
+    recentTab.classList.add("active");
+    recentContent.style.display = "block";
+    if (typeof renderRecentCheckIns === "function") {
+      renderRecentCheckIns();
+    }
+  }
+}
+
+function promptAdminLogin() {
+  const pin = prompt("Enter Admin PIN:");
+  if (pin === ADMIN_PIN) {
+    enterAdminMode();
+  } else {
+    alert("Incorrect PIN");
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const logo =
+    document.getElementById("amsLogo") ||
+    document.querySelector("header img");
+
+  if (!logo) {
+    console.warn("⚠️ Admin logo trigger not found");
+    return;
+  }
+
+  // DESKTOP
+  logo.addEventListener("mousedown", () => {
+    adminHoldTimer = setTimeout(promptAdminLogin, ADMIN_HOLD_DURATION);
+  });
+
+  logo.addEventListener("mouseup", () => {
+    clearTimeout(adminHoldTimer);
+  });
+
+  logo.addEventListener("mouseleave", () => {
+    clearTimeout(adminHoldTimer);
+  });
+
+  // TOUCH (iPad / kiosk)
+  logo.addEventListener("touchstart", (e) => {
+    e.preventDefault();
+    adminHoldTimer = setTimeout(promptAdminLogin, ADMIN_HOLD_DURATION);
+  });
+
+  logo.addEventListener("touchend", () => {
+    clearTimeout(adminHoldTimer);
+  });
+
+  logo.addEventListener("touchcancel", () => {
+    clearTimeout(adminHoldTimer);
+  });
+});
