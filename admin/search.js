@@ -418,7 +418,48 @@ window.exportSearchPdf = function () {
 
   doc.save("AMS_Search_Log.pdf");
 };
-
 /* =========================================================
-   DATE RANGE LABEL BUILDER (FINAL / FIXED)
-==
+   DATE RANGE LABEL (PDF + EXPORTS)
+========================================================= */
+function getDateRangeLabel(range, startInput, endInput) {
+  const today = new Date();
+
+  const format = d =>
+    d.toISOString().split("T")[0];
+
+  switch (range) {
+    case "today":
+      return `Date: ${format(today)}`;
+
+    case "yesterday": {
+      const d = new Date();
+      d.setDate(d.getDate() - 1);
+      return `Date: ${format(d)}`;
+    }
+
+    case "thisWeek": {
+      const start = new Date();
+      start.setDate(start.getDate() - start.getDay());
+      const end = new Date(start);
+      end.setDate(start.getDate() + 6);
+      return `Week: ${format(start)} → ${format(end)}`;
+    }
+
+    case "lastWeek": {
+      const end = new Date();
+      end.setDate(end.getDate() - end.getDay() - 1);
+      const start = new Date(end);
+      start.setDate(end.getDate() - 6);
+      return `Week: ${format(start)} → ${format(end)}`;
+    }
+
+    case "custom":
+      if (startInput && endInput) {
+        return `Date Range: ${startInput} → ${endInput}`;
+      }
+      return "Custom Date Range";
+
+    default:
+      return "All Dates";
+  }
+}
