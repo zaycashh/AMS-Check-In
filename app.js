@@ -632,4 +632,51 @@ document.getElementById("companySearch").addEventListener("input", e => {
     opt.style.display = opt.textContent.includes(term) ? "" : "none";
   });
 });
+let companyList = [];
 
+async function initCompanyAutocomplete() {
+  companyList = await fetchCompanies();
+}
+
+const companyInput = document.getElementById("companyInput");
+const suggestionBox = document.getElementById("companySuggestions");
+
+companyInput.addEventListener("input", () => {
+  const value = companyInput.value.trim().toUpperCase();
+  suggestionBox.innerHTML = "";
+
+  if (value.length < 2) {
+    suggestionBox.style.display = "none";
+    return;
+  }
+
+  const matches = companyList
+    .filter(c => c.toUpperCase().includes(value))
+    .slice(0, 8); // limit for kiosk UX
+
+  if (!matches.length) {
+    suggestionBox.style.display = "none";
+    return;
+  }
+
+  matches.forEach(company => {
+    const item = document.createElement("div");
+    item.textContent = company;
+
+    item.addEventListener("click", () => {
+      companyInput.value = company;
+      suggestionBox.style.display = "none";
+    });
+
+    suggestionBox.appendChild(item);
+  });
+
+  suggestionBox.style.display = "block";
+});
+
+// Hide suggestions when clicking outside
+document.addEventListener("click", e => {
+  if (!e.target.closest(".company-autocomplete")) {
+    suggestionBox.style.display = "none";
+  }
+});
