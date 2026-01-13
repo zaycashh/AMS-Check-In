@@ -341,7 +341,7 @@ function exportSearchLogExcel() {
 }
 
 /* =========================================================
-   EXPORT PDF
+   EXPORT PDF — SEARCH LOG (FINAL / FIXED)
 ========================================================= */
 window.exportSearchPdf = function () {
   const records = window.searchResults || [];
@@ -349,6 +349,7 @@ window.exportSearchPdf = function () {
     alert("Please run a search first.");
     return;
   }
+
   const range = document.getElementById("filterDateRange")?.value;
   const startInput = document.getElementById("filterStartDate")?.value;
   const endInput = document.getElementById("filterEndDate")?.value;
@@ -360,24 +361,27 @@ window.exportSearchPdf = function () {
   const doc = new jsPDF("landscape");
   const pageWidth = doc.internal.pageSize.width;
 
+  // HEADER BAR
   doc.setFillColor(30, 94, 150);
   doc.rect(0, 0, pageWidth, 30, "F");
 
+  // LOGO
   if (window.amsLogoBase64) {
     doc.addImage(amsLogoBase64, "PNG", 8, 6, 26, 18);
   }
 
+  // TITLE
   doc.setTextColor(255);
   doc.setFontSize(16);
   doc.text("AMS Search Log Report", pageWidth / 2, 20, { align: "center" });
-  doc.setTextColor(0);
 
+  // META INFO
   doc.setFontSize(10);
   doc.setTextColor(60);
   doc.text(rangeLabel, 14, 34);
-  doc.text(generatedAt, doc.internal.pageSize.width - 14, 34, {
-  align: "right"
-});
+  doc.text(generatedAt, pageWidth - 14, 34, { align: "right" });
+
+  doc.setTextColor(0);
 
   const rows = records.map(r => [
     r.date || "",
@@ -391,13 +395,14 @@ window.exportSearchPdf = function () {
   ]);
 
   doc.autoTable({
-    startY: 36,
+    startY: 40,
     margin: { left: 8, right: 8 },
     head: [[
       "Date","Time","First","Last","Company","Reason","Services","Signature"
     ]],
     body: rows,
     styles: { fontSize: 9, cellPadding: 4 },
+    headStyles: { fillColor: [30, 94, 150], textColor: 255 },
     didDrawCell(data) {
       if (data.column.index === 7 && data.cell.section === "body") {
         const img = records[data.row.index]?.signature;
@@ -413,43 +418,7 @@ window.exportSearchPdf = function () {
 
   doc.save("AMS_Search_Log.pdf");
 };
-function getDateRangeLabel(range, startInput, endInput) {
-  const today = new Date();
 
-  const format = d =>
-    d.toISOString().split("T")[0];
-
-  switch (range) {
-    case "today": {
-      return `Date: ${format(today)}`;
-    }
-
-    case "yesterday": {
-      const d = new Date();
-      d.setDate(d.getDate() - 1);
-      return `Date: ${format(d)}`;
-    }
-
-    case "thisWeek": {
-      const start = new Date();
-      start.setDate(start.getDate() - start.getDay());
-      const end = new Date(start);
-      end.setDate(start.getDate() + 6);
-      return `Week: ${format(start)} → ${format(end)}`;
-    }
-
-    case "lastWeek": {
-      const end = new Date();
-      end.setDate(end.getDate() - end.getDay() - 1);
-      const start = new Date(end);
-      start.setDate(end.getDate() - 6);
-      return `Week: ${format(start)} → ${format(end)}`;
-    }
-
-    case "custom":
-      return `Date Range: ${startInput} → ${endInput}`;
-
-    default:
-      return "All Dates";
-  }
-}
+/* =========================================================
+   DATE RANGE LABEL BUILDER (FINAL / FIXED)
+==
