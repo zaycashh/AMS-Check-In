@@ -549,6 +549,7 @@ window.addEventListener("online", () => {
 document.addEventListener("DOMContentLoaded", () => {
   setupSignaturePad();
   populateCompanyDropdown();
+  initCompanyAutocomplete();
   syncOfflineCheckIns(); // ✅ SAFE AUTO SYNC
 });
 /* =========================================================
