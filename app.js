@@ -119,9 +119,8 @@ function resetForm() {
   ).forEach(cb => cb.checked = false);
 
   // Hide conditional fields
-  document.getElementById("otherCompanyWrapper").style.display = "none";
-  document.getElementById("otherReasonWrapper").style.display = "none";
-  document.getElementById("otherServiceWrapper").style.display = "none";
+   document.getElementById("otherReasonWrapper").style.display = "none";
+   document.getElementById("otherServiceWrapper").style.display = "none";
 
   // Clear signature
   const canvas = document.getElementById("signaturePad");
@@ -210,11 +209,6 @@ function setupSignaturePad() {
 /* =========================================================
    DROPDOWN LOGIC
 ========================================================= */
-document.getElementById("companySelect").addEventListener("change", (e) => {
-  document.getElementById("otherCompanyWrapper").style.display =
-    e.target.value === "__OTHER__" ? "block" : "none";
-});
-
 document.getElementById("reasonSelect").addEventListener("change", (e) => {
   document.getElementById("otherReasonWrapper").style.display =
     e.target.value === "other" ? "block" : "none";
@@ -233,26 +227,20 @@ document
 document.getElementById("submitBtn").addEventListener("click", () => {
   const first = document.getElementById("firstName").value.trim();
   const last = document.getElementById("lastName").value.trim();
-  const companyValue = document.getElementById("companySelect").value;
+  const companyValue = document.getElementById("companyInput").value;
 
-  if (!first || !last) {
-    alert("Please enter first and last name.");
-    return;
-  }
+  const companyInput = document.getElementById("companyInput");
+  const finalCompany = companyInput.value.trim();
 
-  if (!companyValue) {
-    alert("Please select a company.");
-    return;
-  }
+if (!first || !last) {
+  alert("Please enter first and last name.");
+  return;
+}
 
-  let finalCompany = companyValue;
-  if (companyValue === "__OTHER__") {
-    finalCompany = document.getElementById("otherCompany").value.trim();
-    if (!finalCompany) {
-      alert("Please enter the company name.");
-      return;
-    }
-  }
+if (!finalCompany) {
+  alert("Please enter or select a company.");
+  return;
+}
 
   /* ===============================
      REQUIRED REASON VALIDATION
@@ -471,29 +459,6 @@ async function fetchCompanies() {
     return JSON.parse(localStorage.getItem("ams_companies") || "[]");
   }
 }
-/* =========================================================
-   COMPANY DROPDOWN (CLOUD + OFFLINE SAFE)
-========================================================= */
-async function populateCompanyDropdown() {
-  const select = document.getElementById("companySelect");
-  if (!select) return;
-
-  const companies = await fetchCompanies();
-
-  select.innerHTML = `
-    <option value="">-- Select Company --</option>
-    <option value="__OTHER__">Other (enter manually)</option>
-  `;
-
-  companies.forEach(c => {
-    const opt = document.createElement("option");
-    opt.value = c;
-    opt.textContent = c;
-    select.insertBefore(opt, select.lastElementChild);
-  });
-}
-
-window.populateCompanyDropdown = populateCompanyDropdown;
 
 /* =========================================================
    AUTO SYNC OFFLINE RECORDS WHEN ONLINE
@@ -624,15 +589,7 @@ document.addEventListener("DOMContentLoaded", () => {
     clearTimeout(adminHoldTimer);
   });
 });
-document.getElementById("companySearch").addEventListener("input", e => {
-  const term = e.target.value.toUpperCase();
-  const select = document.getElementById("companySelect");
 
-  Array.from(select.options).forEach(opt => {
-    if (!opt.value || opt.value === "__OTHER__") return;
-    opt.style.display = opt.textContent.includes(term) ? "" : "none";
-  });
-});
 let companyList = [];
 
 async function initCompanyAutocomplete() {
