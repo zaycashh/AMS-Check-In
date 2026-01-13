@@ -623,3 +623,13 @@ document.addEventListener("DOMContentLoaded", () => {
     clearTimeout(adminHoldTimer);
   });
 });
+document.getElementById("companySearch").addEventListener("input", e => {
+  const term = e.target.value.toUpperCase();
+  const select = document.getElementById("companySelect");
+
+  Array.from(select.options).forEach(opt => {
+    if (!opt.value || opt.value === "__OTHER__") return;
+    opt.style.display = opt.textContent.includes(term) ? "" : "none";
+  });
+});
+
