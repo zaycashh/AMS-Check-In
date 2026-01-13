@@ -373,7 +373,22 @@ window.exportSearchPdf = function () {
   // TITLE
   doc.setTextColor(255);
   doc.setFontSize(16);
-  doc.text("AMS Search Log Report", pageWidth / 2, 20, { align: "center" });
+  doc.text("AMS Search Log Report", pageWidth / 2, 18, { align: "center" });
+
+doc.setFontSize(10);
+doc.setTextColor(230);
+doc.text(rangeLabel, pageWidth / 2, 26, { align: "center" });
+
+doc.setTextColor(255);
+doc.text(
+  generatedAt,
+  pageWidth - 14,
+  26,
+  { align: "right" }
+);
+
+doc.setTextColor(0);
+
 
   // META INFO
   doc.setFontSize(10);
@@ -422,10 +437,9 @@ window.exportSearchPdf = function () {
    DATE RANGE LABEL (PDF + EXPORTS)
 ========================================================= */
 function getDateRangeLabel(range, startInput, endInput) {
-  const today = new Date();
+  const format = d => d.toISOString().split("T")[0];
 
-  const format = d =>
-    d.toISOString().split("T")[0];
+  const today = new Date();
 
   switch (range) {
     case "today":
@@ -438,18 +452,30 @@ function getDateRangeLabel(range, startInput, endInput) {
     }
 
     case "thisWeek": {
-      const start = new Date();
-      start.setDate(start.getDate() - start.getDay());
+      const d = new Date();
+      const day = d.getDay();
+      const diffToMonday = day === 0 ? -6 : 1 - day;
+
+      const start = new Date(d);
+      start.setDate(d.getDate() + diffToMonday);
+
       const end = new Date(start);
       end.setDate(start.getDate() + 6);
+
       return `Week: ${format(start)} → ${format(end)}`;
     }
 
     case "lastWeek": {
-      const end = new Date();
-      end.setDate(end.getDate() - end.getDay() - 1);
-      const start = new Date(end);
-      start.setDate(end.getDate() - 6);
+      const d = new Date();
+      const day = d.getDay();
+      const diffToMonday = day === 0 ? -6 : 1 - day;
+
+      const start = new Date(d);
+      start.setDate(d.getDate() + diffToMonday - 7);
+
+      const end = new Date(start);
+      end.setDate(start.getDate() + 6);
+
       return `Week: ${format(start)} → ${format(end)}`;
     }
 
@@ -463,3 +489,4 @@ function getDateRangeLabel(range, startInput, endInput) {
       return "All Dates";
   }
 }
+
