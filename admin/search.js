@@ -349,6 +349,12 @@ window.exportSearchPdf = function () {
     alert("Please run a search first.");
     return;
   }
+  const range = document.getElementById("filterDateRange")?.value;
+  const startInput = document.getElementById("filterStartDate")?.value;
+  const endInput = document.getElementById("filterEndDate")?.value;
+
+  const rangeLabel = getDateRangeLabel(range, startInput, endInput);
+  const generatedAt = `Generated: ${new Date().toLocaleString()}`;
 
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF("landscape");
@@ -365,6 +371,13 @@ window.exportSearchPdf = function () {
   doc.setFontSize(16);
   doc.text("AMS Search Log Report", pageWidth / 2, 20, { align: "center" });
   doc.setTextColor(0);
+
+  doc.setFontSize(10);
+  doc.setTextColor(60);
+  doc.text(rangeLabel, 14, 34);
+  doc.text(generatedAt, doc.internal.pageSize.width - 14, 34, {
+  align: "right"
+});
 
   const rows = records.map(r => [
     r.date || "",
@@ -400,3 +413,43 @@ window.exportSearchPdf = function () {
 
   doc.save("AMS_Search_Log.pdf");
 };
+function getDateRangeLabel(range, startInput, endInput) {
+  const today = new Date();
+
+  const format = d =>
+    d.toISOString().split("T")[0];
+
+  switch (range) {
+    case "today": {
+      return `Date: ${format(today)}`;
+    }
+
+    case "yesterday": {
+      const d = new Date();
+      d.setDate(d.getDate() - 1);
+      return `Date: ${format(d)}`;
+    }
+
+    case "thisWeek": {
+      const start = new Date();
+      start.setDate(start.getDate() - start.getDay());
+      const end = new Date(start);
+      end.setDate(start.getDate() + 6);
+      return `Week: ${format(start)} → ${format(end)}`;
+    }
+
+    case "lastWeek": {
+      const end = new Date();
+      end.setDate(end.getDate() - end.getDay() - 1);
+      const start = new Date(end);
+      start.setDate(end.getDate() - 6);
+      return `Week: ${format(start)} → ${format(end)}`;
+    }
+
+    case "custom":
+      return `Date Range: ${startInput} → ${endInput}`;
+
+    default:
+      return "All Dates";
+  }
+}
