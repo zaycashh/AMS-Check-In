@@ -387,16 +387,8 @@ doc.text(
   { align: "right" }
 );
 
-doc.setTextColor(0);
-
-
-  // META INFO
-  doc.setFontSize(10);
-  doc.setTextColor(60);
-  doc.text(generatedAt, pageWidth - 14, 34, { align: "right" });
-
-  doc.setTextColor(0);
-
+doc.setTextColor(0)
+   
   const rows = records.map(r => [
     r.date || "",
     r.time || "",
