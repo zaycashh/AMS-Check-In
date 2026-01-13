@@ -61,22 +61,17 @@
         <input id="lastName" type="text">
     </div>
 
-    <div class="form-row">
+    <div class="form-row company-autocomplete">
   <label>Company</label>
 
-  <!-- Search input -->
   <input
     type="text"
-    id="companySearch"
-    placeholder="Type company name..."
+    id="companyInput"
+    placeholder="Start typing company name…"
     autocomplete="off"
   />
 
-  <!-- Filtered dropdown -->
-  <select id="companySelect" size="6">
-    <option value="">-- Select Company --</option>
-    <option value="__OTHER__">Other (enter manually)</option>
-  </select>
+  <div id="companySuggestions" class="company-suggestions"></div>
 </div>
 
     <div id="otherCompanyWrapper" class="form-row" style="display:none;">
