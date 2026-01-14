@@ -227,34 +227,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-/* ===============================
-   HIDDEN LOGO LONG-PRESS (KIOSK)
-=============================== */
-let adminHoldTimer = null;
-const ADMIN_HOLD_DURATION = 5000; // 5 seconds
-
-document.addEventListener("DOMContentLoaded", () => {
-  const logo =
-    document.getElementById("amsLogo") ||
-    document.querySelector("header img");
-
-  if (!logo) return;
-
-  // Desktop
-  logo.addEventListener("mousedown", () => {
-    adminHoldTimer = setTimeout(promptAdminLogin, ADMIN_HOLD_DURATION);
-  });
-  logo.addEventListener("mouseup", () => clearTimeout(adminHoldTimer));
-  logo.addEventListener("mouseleave", () => clearTimeout(adminHoldTimer));
-
-  // iPad / Touch
-  logo.addEventListener("touchstart", e => {
-    e.preventDefault();
-    adminHoldTimer = setTimeout(promptAdminLogin, ADMIN_HOLD_DURATION);
-  });
-  logo.addEventListener("touchend", () => clearTimeout(adminHoldTimer));
-  logo.addEventListener("touchcancel", () => clearTimeout(adminHoldTimer));
-});
 /* =========================================================
    EXIT ADMIN MODE (SAFE + COMPLETE RESET)
 ========================================================= */
@@ -284,5 +256,33 @@ document.addEventListener("DOMContentLoaded", () => {
         setupSignaturePad();
       }
     }, 50);
+  });
+});
+/* =========================================================
+   ADMIN ACCESS (DOUBLE CLICK / DOUBLE TAP)
+========================================================= */
+
+document.addEventListener("DOMContentLoaded", () => {
+  const logo =
+    document.getElementById("amsLogo") ||
+    document.querySelector("header img");
+
+  if (!logo) return;
+
+  // Desktop
+  logo.addEventListener("dblclick", e => {
+    e.preventDefault();
+    promptAdminLogin();
+  });
+
+  // Mobile / iPad double-tap
+  let lastTap = 0;
+  logo.addEventListener("touchend", e => {
+    const now = Date.now();
+    if (now - lastTap < 400) {
+      e.preventDefault();
+      promptAdminLogin();
+    }
+    lastTap = now;
   });
 });
