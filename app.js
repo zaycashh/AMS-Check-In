@@ -346,8 +346,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (!input || !suggestions) return;
 
-  const companies =
-    JSON.parse(localStorage.getItem("ams_companies")) || [];
+  function getCompanies() {
+  return JSON.parse(
+    localStorage.getItem("ams_companies") || "[]"
+  );
+}
 
   input.addEventListener("input", () => {
     const query = input.value.trim().toUpperCase();
@@ -358,9 +361,9 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    const matches = companies.filter(c =>
-      c.toUpperCase().includes(query)
-    );
+    const matches = getCompanies().filter(c =>
+  c.toUpperCase().includes(query)
+);
 
     if (!matches.length) {
       suggestions.style.display = "none";
