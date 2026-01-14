@@ -173,3 +173,86 @@ async function renderCompanyManager() {
    EXPOSE GLOBALLY
 ========================================================= */
 window.renderCompanyManager = renderCompanyManager;
+/* =========================================================
+   ADMIN ACCESS (HIDDEN + SAFE)
+========================================================= */
+
+const ADMIN_PIN = "2468";
+
+/* ===============================
+   ENTER ADMIN MODE
+=============================== */
+function enterAdminMode() {
+  document.getElementById("adminArea").style.display = "block";
+  document.getElementById("checkInSection").style.display = "none";
+
+  // Reset tabs
+  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+  document.querySelectorAll(".tab-content").forEach(c => {
+    c.style.display = "none";
+  });
+
+  // Default to Recent tab
+  const recentTab = document.querySelector('.tab[data-tab="tabRecent"]');
+  const recentContent = document.getElementById("tabRecent");
+
+  if (recentTab && recentContent) {
+    recentTab.classList.add("active");
+    recentContent.style.display = "block";
+    if (typeof renderRecentCheckIns === "function") {
+      renderRecentCheckIns();
+    }
+  }
+}
+
+/* ===============================
+   PROMPT FOR PIN
+=============================== */
+function promptAdminLogin() {
+  const pin = prompt("Enter Admin PIN:");
+  if (pin === ADMIN_PIN) {
+    enterAdminMode();
+  } else {
+    alert("Incorrect PIN");
+  }
+}
+
+/* ===============================
+   ADMIN BUTTON (IF PRESENT)
+=============================== */
+document.addEventListener("DOMContentLoaded", () => {
+  const btn = document.getElementById("toggleAdminBtn");
+  if (btn) {
+    btn.addEventListener("click", promptAdminLogin);
+  }
+});
+
+/* ===============================
+   HIDDEN LOGO LONG-PRESS (KIOSK)
+=============================== */
+let adminHoldTimer = null;
+const ADMIN_HOLD_DURATION = 5000; // 5 seconds
+
+document.addEventListener("DOMContentLoaded", () => {
+  const logo =
+    document.getElementById("amsLogo") ||
+    document.querySelector("header img");
+
+  if (!logo) return;
+
+  // Desktop
+  logo.addEventListener("mousedown", () => {
+    adminHoldTimer = setTimeout(promptAdminLogin, ADMIN_HOLD_DURATION);
+  });
+  logo.addEventListener("mouseup", () => clearTimeout(adminHoldTimer));
+  logo.addEventListener("mouseleave", () => clearTimeout(adminHoldTimer));
+
+  // iPad / Touch
+  logo.addEventListener("touchstart", e => {
+    e.preventDefault();
+    adminHoldTimer = setTimeout(promptAdminLogin, ADMIN_HOLD_DURATION);
+  });
+  logo.addEventListener("touchend", () => clearTimeout(adminHoldTimer));
+  logo.addEventListener("touchcancel", () => clearTimeout(adminHoldTimer));
+});
+
