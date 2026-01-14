@@ -185,8 +185,14 @@ document.getElementById("submitBtn")?.addEventListener("click", () => {
 };
 
   const logs = JSON.parse(localStorage.getItem("ams_logs") || "[]");
+
+// ⛔ prevent duplicate saves
+const exists = logs.some(l => l.id === record.id);
+
+if (!exists) {
   logs.push(record);
   localStorage.setItem("ams_logs", JSON.stringify(logs));
+}
 
   alert("Check-in submitted!");
   resetForm();
