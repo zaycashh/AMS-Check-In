@@ -142,6 +142,9 @@ document
    SUBMIT FORM
 ========================================================= */
 document.getElementById("submitBtn")?.addEventListener("click", () => {
+if (window.__submitting) return;
+window.__submitting = true;
+  
   const first = document.getElementById("firstName").value.trim();
   const last = document.getElementById("lastName").value.trim();
   const companyValue = document.getElementById("companySelect").value;
@@ -193,9 +196,11 @@ if (!exists) {
   logs.push(record);
   localStorage.setItem("ams_logs", JSON.stringify(logs));
 }
-
+  
   alert("Check-in submitted!");
-  resetForm();
+resetForm();
+window.__submitting = false;
+
 });
 
 /* =========================================================
