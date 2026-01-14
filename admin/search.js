@@ -301,7 +301,7 @@ window.clearSearch = function () {
 
 function clearSearchTable() {
   const t = document.getElementById("searchResultsTable");
-  if (t) t.innerHTML = `<tr><td colspan="8" style="text-align:center;opacity:.6;">Run a search</td></tr>`;
+  if (t) t.innerHTML = `<tr><td colspan="9" style="text-align:center;opacity:.6;">Run a search</td></tr>`;
 }
 
 /* =========================================================
