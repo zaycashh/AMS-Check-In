@@ -1,4 +1,4 @@
-lconsole.log("Admin Search Module Loaded");
+console.log("Admin Search Module Loaded");
 
 /* =========================================================
    RENDER SEARCH LOG UI (INJECT HTML)
