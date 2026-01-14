@@ -1,3 +1,6 @@
+function unlockSubmit() {
+  window.__submitting = false;
+}
 function resetForm() {
   // Clear text inputs
   document.querySelectorAll(
@@ -160,14 +163,26 @@ window.__submitting = true;
   const reasonSelect = document.getElementById("reasonSelect").value;
   const otherReason = document.getElementById("otherReasonInput").value.trim();
   const finalReason = reasonSelect === "other" ? otherReason : reasonSelect;
-  if (!finalReason) return alert("Please select a reason.");
+  if (!finalReason) {
+  alert("Please select a reason.");
+  unlockSubmit();
+  return;
+}
 
   const services = Array.from(
     document.querySelectorAll('input[name="services"]:checked')
   ).map(cb => cb.value);
 
-  if (!services.length) return alert("Please select a service.");
-  if (!hasSigned) return alert("Please provide a signature.");
+  if (!services.length) {
+  alert("Please select a service.");
+  unlockSubmit();
+  return;
+}
+  if (!hasSigned) {
+  alert("Please provide a signature.");
+  unlockSubmit();
+  return;
+}
 
   const canvas = document.getElementById("signaturePad");
   const signature = canvas.toDataURL();
