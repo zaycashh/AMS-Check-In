@@ -7,16 +7,14 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="apple-mobile-web-app-title" content="AMS Check-In">
+
   <!-- APP ICONS -->
   <link rel="apple-touch-icon" href="logo.png">
   <link rel="apple-touch-icon" sizes="180x180" href="logo.png">
-  
 
-  <!-- LOCK ZOOM & SCROLL (KIOSK FEEL) -->
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
-  >
+  <!-- LOCK ZOOM & SCROLL -->
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
   <title>AMS Check-In System</title>
 
@@ -26,150 +24,103 @@
 
 <body>
 
-<!-- =========================================================
-     HEADER
-========================================================= -->
+<!-- ================= HEADER ================= -->
 <header class="main-header">
-    <div class="header-left">
-        <img src="logo.png" alt="Logo" class="header-logo">
-        <h1 class="header-title">AMS Check-In System</h1>
-    </div>
-    <button
-  id="toggleAdminBtn"
-  class="admin-btn"
-  style="display:none;"
-  tabindex="-1"
->
-  Admin Login
-   </button>
+  <div class="header-left">
+    <img src="logo.png" alt="Logo" class="header-logo">
+    <h1 class="header-title">AMS Check-In System</h1>
+  </div>
+
+  <button id="toggleAdminBtn"
+          class="admin-btn"
+          style="display:none;"
+          tabindex="-1">
+    Admin Login
+  </button>
 </header>
 
-<!-- =========================================================
-     MAIN CHECK-IN FORM
-========================================================= -->
+<!-- ================= DONOR CHECK-IN ================= -->
 <section id="checkInSection" class="section-card">
 
-    <h2 class="section-title">Donor Check-In</h2>
+  <h2 class="section-title">Donor Check-In</h2>
 
-    <div class="form-row">
-        <label>First Name</label>
-        <input id="firstName" type="text">
-    </div>
+  <div class="form-row">
+    <label>First Name</label>
+    <input id="firstName" type="text">
+  </div>
 
-    <div class="form-row">
-        <label>Last Name</label>
-        <input id="lastName" type="text">
-    </div>
+  <div class="form-row">
+    <label>Last Name</label>
+    <input id="lastName" type="text">
+  </div>
 
-    <div class="form-row company-autocomplete">
-  <label>Company</label>
+  <div class="form-row company-autocomplete">
+    <label>Company</label>
+    <input type="text"
+           id="companyInput"
+           placeholder="Start typing company name…"
+           autocomplete="off">
+    <div id="companySuggestions" class="company-suggestions"></div>
+  </div>
 
-  <input
-    type="text"
-    id="companyInput"
-    placeholder="Start typing company name…"
-    autocomplete="off"
-  />
+  <div class="form-row">
+    <label>Reason for Testing</label>
+    <select id="reasonSelect">
+      <option value="">-- Select reason --</option>
+      <option value="Pre-Employment">Pre-Employment</option>
+      <option value="Random">Random</option>
+      <option value="Reasonable Suspicion/Cause">Reasonable Suspicion/Cause</option>
+      <option value="Post-Accident">Post-Accident</option>
+      <option value="Return-to-Duty">Return-to-Duty</option>
+      <option value="Follow-Up">Follow-Up</option>
+      <option value="other">Other (enter manually)</option>
+    </select>
+  </div>
 
-  <div id="companySuggestions" class="company-suggestions"></div>
-</div>
+  <div id="otherReasonWrapper" class="form-row" style="display:none;">
+    <label>Enter Reason</label>
+    <input id="otherReasonInput" type="text">
+  </div>
 
-    <div id="otherCompanyWrapper" class="form-row" style="display:none;">
-        <label>Enter Company</label>
-        <input id="otherCompany" type="text">
-    </div>
+  <div class="section-divider"></div>
+  <h3 class="section-subtitle">Services</h3>
 
-    <div class="form-row">
-        <label>Reason for Testing</label>
-        <select id="reasonSelect">
-            <option value="">-- Select reason --</option>
-            <option value="Pre-Employment">Pre-Employment</option>
-            <option value="Random">Random</option>
-            <option value="Reasonable Suspicion/Cause">Reasonable Suspicion/Cause</option>
-            <option value="Post-Accident">Post-Accident</option>
-            <option value="Return-to-Duty">Return-to-Duty</option>
-            <option value="Follow-Up">Follow-Up</option>
-            <option value="other">Other (enter manually)</option>
-        </select>
-    </div>
+  <div class="services-group">
+    <label class="service-item"><input type="checkbox" name="services" value="DOT Drug Test"> DOT Drug Test</label>
+    <label class="service-item"><input type="checkbox" name="services" value="Vision Test"> Vision Test</label>
+    <label class="service-item"><input type="checkbox" name="services" value="NON-DOT Drug Test"> NON-DOT Drug Test</label>
+    <label class="service-item"><input type="checkbox" name="services" value="DNA (Paternity Test)"> DNA (Paternity Test)</label>
+    <label class="service-item"><input type="checkbox" name="services" value="DOT Alcohol Test"> DOT Alcohol Test</label>
+    <label class="service-item"><input type="checkbox" name="services" value="DOT Physical"> DOT Physical</label>
+    <label class="service-item"><input type="checkbox" name="services" value="NON-DOT Alcohol Test"> NON-DOT Alcohol Test</label>
+    <label class="service-item"><input type="checkbox" name="services" value="Other"> Other</label>
+  </div>
 
-    <div id="otherReasonWrapper" class="form-row" style="display:none;">
-        <label>Enter Reason</label>
-        <input id="otherReasonInput" type="text">
-    </div>
+  <div class="section-divider"></div>
+  <h3 class="section-subtitle">Signature</h3>
 
-    <!-- SERVICES -->
-    <div class="section-divider"></div>
-    <h3 class="section-subtitle">Services</h3>
+  <div class="signature-pad-wrapper">
+    <canvas id="signaturePad" class="sig-canvas"></canvas>
+    <div id="sigPlaceholder" class="sig-placeholder">Sign Here</div>
+  </div>
 
-    <div class="services-group">
-        <label class="service-item">
-            <input type="checkbox" name="services" value="DOT Drug Test"> DOT Drug Test
-        </label>
-        <label class="service-item">
-            <input type="checkbox" name="services" value="Vision Test"> Vision Test
-        </label>
-        <label class="service-item">
-            <input type="checkbox" name="services" value="NON-DOT Drug Test"> NON-DOT Drug Test
-        </label>
-        <label class="service-item">
-            <input type="checkbox" name="services" value="DNA (Paternity Test)"> DNA (Paternity Test)
-        </label>
-        <label class="service-item">
-            <input type="checkbox" name="services" value="DOT Alcohol Test"> DOT Alcohol Test
-        </label>
-         <label class="service-item">
-            <input type="checkbox" name="services" value="DOT Physical"> DOT Physical
-        </label>
-        <label class="service-item">
-            <input type="checkbox" name="services" value="NON-DOT Alcohol Test"> NON-DOT Alcohol Test
-        </label>
-        <label class="service-item">
-            <input type="checkbox" name="services" value="Other"> Other
-        </label>
-    </div>
+  <button id="clearSigBtn" class="secondary-btn">Clear Signature</button>
 
-    <div id="otherServiceWrapper" class="form-row" style="display:none;">
-        <label>Other Service</label>
-        <input id="srvOtherText" type="text">
-    </div>
-
-    <!-- SIGNATURE -->
-    <div class="section-divider"></div>
-    <h3 class="section-subtitle">Signature</h3>
-
-    <div class="signature-pad-wrapper">
-        <canvas id="signaturePad" class="sig-canvas"></canvas>
-        <div id="sigPlaceholder" class="sig-placeholder">Sign Here</div>
-    </div>
-
-    <button id="clearSigBtn" class="secondary-btn">Clear Signature</button>
-
-    <div style="display:flex; justify-content:flex-end; margin-top:10px;">
-        <button id="resetFormBtn" class="secondary-btn">Reset Form</button>
-    </div>
-
-    <div class="btn-row">
-        <button id="submitBtn" class="primary-btn">Submit Check-In</button>
-    </div>
+  <div class="btn-row">
+    <button id="submitBtn" class="primary-btn">Submit Check-In</button>
+  </div>
 
 </section>
 
-<!-- ADMIN PANEL -->
+<!-- ================= ADMIN PANEL ================= -->
 <section id="adminArea" style="display:none;">
 
-  <button id="exitAdminBtn" class="secondary-btn" style="margin:10px 0;">
-    Exit Admin Mode
-  </button>
+  <button id="exitAdminBtn" class="secondary-btn">Exit Admin Mode</button>
 
   <div class="admin-nav">
 
-    <!-- REPORTS DROPDOWN -->
     <div class="admin-dropdown">
-      <button class="dropdown-toggle" type="button">
-        Reports ▾
-      </button>
-
+      <button class="dropdown-toggle" type="button">Reports ▾</button>
       <div class="dropdown-menu">
         <button class="tab" data-tab="tabSearch">Search Log</button>
         <button class="tab" data-tab="tabGeneral">General Report</button>
@@ -177,157 +128,45 @@
       </div>
     </div>
 
-    <!-- STANDALONE ITEMS -->
     <button class="tab" data-tab="tabRecent">Recent Check-Ins</button>
     <button class="tab" data-tab="tabCompanies">Manage Companies</button>
-
   </div>
 
-  <!-- ================= ADMIN TAB PLACEHOLDERS (JS INJECTS CONTENT) ================= -->
-
+  <!-- 🔑 SINGLE SOURCE ADMIN TAB CONTAINERS -->
   <div id="tabSearch" class="tab-content" style="display:none;"></div>
-
   <div id="tabGeneral" class="tab-content" style="display:none;"></div>
-
   <div id="tabCompany" class="tab-content" style="display:none;"></div>
-
   <div id="tabRecent" class="tab-content" style="display:none;"></div>
-
   <div id="tabCompanies" class="tab-content" style="display:none;"></div>
 
 </section>
 
-  <!-- ================= GENERAL REPORT ================= -->
-  <div id="tabGeneral" class="tab-content" style="display:none;">
-    <h2 class="section-title">General Report</h2>
-
-    <div class="report-cards">
-      <div class="report-card">
-        <h3>Total Check-Ins</h3>
-        <p id="totalCount">0</p>
-      </div>
-
-      <div class="report-card">
-        <h3>Today</h3>
-        <p id="todayCount">0</p>
-      </div>
-
-      <div class="report-card">
-        <h3>This Month</h3>
-        <p id="monthCount">0</p>
-      </div>
-
-      <div class="report-card">
-        <h3>Companies</h3>
-        <p id="companyCount">0</p>
-      </div>
-    </div>
-
-    <h3 style="margin-top:20px;">Daily Activity</h3>
-    <table class="log-table">
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Total Check-Ins</th>
-        </tr>
-      </thead>
-      <tbody id="dailyReportBody"></tbody>
-    </table>
-
-    <h3 style="margin-top:30px;">Top Companies</h3>
-    <table class="log-table">
-      <thead>
-        <tr>
-          <th>Company</th>
-          <th>Total Check-Ins</th>
-        </tr>
-      </thead>
-      <tbody id="topCompaniesBody"></tbody>
-    </table>
-  </div>
-
-  <!-- ================= DETAIL COMPANY REPORT ================= -->
-  <div id="tabCompany" class="tab-content" style="display:none;">
-    <h2 class="section-title">Detail Company Report</h2>
-
-    <div class="export-bar">
-      <select id="filterCompany">
-        <option value="">-- Select Company --</option>
-        <option value="__custom__">Type Company (Custom)</option>
-      </select>
-
-      <input
-        id="filterCompanyText"
-        type="text"
-        placeholder="Enter company name"
-        style="display:none;"
-      />
-
-      <button id="companyDetailExcelBtn">Export Excel</button>
-      <button id="companyDetailPdfBtn" style="margin-left:8px;">
-        Export PDF
-      </button>
-    </div>
-
-    <div id="companyTotals" class="totals-bar" style="margin:10px 0; font-weight:600;">
-      Total Records: <span id="companyTotalCount">0</span>
-    </div>
-
-    <table class="report-table">
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Time</th>
-          <th>First</th>
-          <th>Last</th>
-          <th>Reason</th>
-          <th>Services</th>
-        </tr>
-      </thead>
-      <tbody id="companyDetailBody"></tbody>
-    </table>
-  </div>
-
-  <!-- ================= RECENT CHECK-INS ================= -->
-  <div id="tabRecent" class="tab-content" style="display:none;">
-    <!-- Content injected by recent.js -->
-  </div>
-
-  <!-- ================= MANAGE COMPANIES ================= -->
-  <div id="tabCompanies" class="tab-content" style="display:none;">
-    <!-- Content injected by manageCompanies.js -->
-  </div>
-
-</section>
-
-<!-- SIGNATURE MODAL -->
+<!-- ================= MODALS ================= -->
 <div id="signatureModal" class="modal-bg">
-    <div class="modal-box">
-        <h3>Signature</h3>
-        <img id="signatureModalImg">
-        <button id="closeSignatureModal" class="primary-btn">Close</button>
-    </div>
+  <div class="modal-box">
+    <h3>Signature</h3>
+    <img id="signatureModalImg">
+    <button id="closeSignatureModal" class="primary-btn">Close</button>
+  </div>
 </div>
 
-<!-- PDF Libraries -->
+<!-- ================= LIBRARIES ================= -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
-
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
-
-<!-- APP SCRIPTS -->
+<!-- ================= APP SCRIPTS ================= -->
 <script src="app.js"></script>
-    
 <script src="admin/nav.js"></script>
 <script src="admin/search.js"></script>
 <script src="admin/recent.js"></script>
 <script src="admin/general.js"></script>
 <script src="admin/detail.js"></script>
 <script src="admin/manageCompanies.js"></script>
-                                                                                                                
-<img id="amsLogoBase64" src="logo.png" style="display:none" />
+
+<img id="amsLogoBase64" src="logo.png" style="display:none">
 
 </body>
 </html>
+
     
