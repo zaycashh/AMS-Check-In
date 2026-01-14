@@ -100,6 +100,26 @@ function renderSearchUI() {
 function getCachedLogs() {
   return JSON.parse(localStorage.getItem("ams_logs") || "[]");
 }
+async function fetchLogsFromCloud() {
+  try {
+    const res = await fetch(
+      "https://ams-checkin-api.josealfonsodejesus.workers.dev/logs",
+      { cache: "no-store" }
+    );
+
+    if (!res.ok) throw new Error("Cloud fetch failed");
+
+    const logs = await res.json();
+    localStorage.setItem("ams_logs", JSON.stringify(logs));
+
+    console.log("☁️ Logs loaded from cloud:", logs.length);
+    return logs;
+
+  } catch (err) {
+    console.warn("⚠️ Cloud unavailable, using local logs");
+    return getCachedLogs();
+  }
+}
 
 function dedupeLogsById(logs) {
   return Array.from(
@@ -110,8 +130,8 @@ function dedupeLogsById(logs) {
 /* =========================================================
    SEARCH
 ========================================================= */
-window.runSearch = function () {
-  const logs = dedupeLogsById(getCachedLogs());
+window.runSearch = async function () {
+  const logs = dedupeLogsById(await fetchLogsFromCloud());
 
   const first = document.getElementById("filterFirstName").value.toLowerCase();
   const last = document.getElementById("filterLastName").value.toLowerCase();
@@ -222,4 +242,7 @@ function clearSearchTable() {
 /* =========================================================
    INIT
 ========================================================= */
-document.addEventListener("DOMContentLoaded", renderSearchUI);
+document.addEventListener("DOMContentLoaded", async () => {
+  renderSearchUI();
+  await fetchLogsFromCloud();
+});
