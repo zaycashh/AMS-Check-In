@@ -2,7 +2,7 @@
    CLOUD COMPANIES FETCH (WITH FALLBACK)
 ========================================================= */
 
-let companyCache = null;
+// ❌ REMOVED: let companyCache = null;
 let selectedCompany = null;
 let isEditMode = false;
 
@@ -15,12 +15,14 @@ async function fetchCompanies() {
 
     const companies = await res.json();
     localStorage.setItem("ams_companies", JSON.stringify(companies));
-    companyCache = companies;
+
+    // ✅ USE GLOBAL CACHE
+    window.companyCache = companies;
 
     return companies;
   } catch {
     const local = JSON.parse(localStorage.getItem("ams_companies") || "[]");
-    companyCache = local;
+    window.companyCache = local;
     return local;
   }
 }
@@ -30,7 +32,9 @@ async function fetchCompanies() {
 ========================================================= */
 async function saveCompaniesToCloud(companies) {
   localStorage.setItem("ams_companies", JSON.stringify(companies));
-  companyCache = companies;
+
+  // ✅ USE GLOBAL CACHE
+  window.companyCache = companies;
 
   try {
     await fetch(
@@ -53,13 +57,13 @@ async function renderCompanyManager() {
   const container = document.getElementById("tabCompanies");
   if (!container) return;
 
-  let companies = companyCache || await fetchCompanies();
+  let companies = window.companyCache || await fetchCompanies();
 
   companies = Array.from(
     new Set(companies.map(c => c.trim().toUpperCase()).filter(Boolean))
   ).sort((a, b) => a.localeCompare(b));
 
-  companyCache = companies;
+  window.companyCache = companies;
   selectedCompany = null;
   isEditMode = false;
 
@@ -105,7 +109,7 @@ async function renderCompanyManager() {
   input.addEventListener("input", () => {
     const value = input.value.trim().toUpperCase();
 
-    if (companyCache.includes(value)) {
+    if (window.companyCache.includes(value)) {
       selectedCompany = value;
       hint.textContent = `Selected: ${value}`;
       saveBtn.disabled = true;
@@ -123,18 +127,18 @@ async function renderCompanyManager() {
     const name = input.value.trim().toUpperCase();
     if (!name) return;
 
-    if (companyCache.includes(name)) {
+    if (window.companyCache.includes(name)) {
       alert("Company already exists.");
       return;
     }
 
-    companyCache.push(name);
-    await saveCompaniesToCloud(companyCache);
+    window.companyCache.push(name);
+    await saveCompaniesToCloud(window.companyCache);
     renderCompanyManager();
   };
 
   /* =========================
-     EDIT (EXPLICIT)
+     EDIT
   ========================= */
   editBtn.onclick = () => {
     if (!selectedCompany) {
@@ -156,15 +160,15 @@ async function renderCompanyManager() {
     const newName = input.value.trim().toUpperCase();
     if (!newName) return;
 
-    if (companyCache.includes(newName) && newName !== selectedCompany) {
+    if (window.companyCache.includes(newName) && newName !== selectedCompany) {
       alert("That company already exists.");
       return;
     }
 
-    const idx = companyCache.indexOf(selectedCompany);
-    companyCache[idx] = newName;
+    const idx = window.companyCache.indexOf(selectedCompany);
+    window.companyCache[idx] = newName;
 
-    await saveCompaniesToCloud(companyCache);
+    await saveCompaniesToCloud(window.companyCache);
     renderCompanyManager();
   };
 
@@ -179,8 +183,8 @@ async function renderCompanyManager() {
 
     if (!confirm(`Delete "${selectedCompany}"?\n\nPast check-ins remain.`)) return;
 
-    companyCache = companyCache.filter(c => c !== selectedCompany);
-    await saveCompaniesToCloud(companyCache);
+    window.companyCache = window.companyCache.filter(c => c !== selectedCompany);
+    await saveCompaniesToCloud(window.companyCache);
     renderCompanyManager();
   };
 }
