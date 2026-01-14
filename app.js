@@ -390,3 +390,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
+
+document.getElementById("reasonSelect")?.addEventListener("change", e => {
+  const wrap = document.getElementById("otherReasonWrapper");
+  if (!wrap) return;
+  wrap.style.display = e.target.value === "other" ? "block" : "none";
+});
