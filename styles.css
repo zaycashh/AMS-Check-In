@@ -639,3 +639,32 @@ body {
 .company-suggestions div:hover {
   background: #f0f4ff;
 }
+/* ================================
+   COMPANY AUTOCOMPLETE
+================================ */
+
+.company-autocomplete {
+  position: relative;
+}
+
+.company-suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1px solid #ccc;
+  z-index: 9999;
+  max-height: 180px;
+  overflow-y: auto;
+  display: none;
+}
+
+.company-suggestion-item {
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.company-suggestion-item:hover {
+  background: #f0f0f0;
+}
