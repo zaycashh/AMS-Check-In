@@ -127,6 +127,13 @@ function dedupeLogsById(logs) {
   );
 }
 
+function normalizeDateOnly(dateStr) {
+  if (!dateStr) return null;
+  const d = new Date(dateStr + "T00:00:00");
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
 /* =========================================================
    SEARCH
 ========================================================= */
@@ -144,30 +151,78 @@ window.runSearch = async function () {
   const start = document.getElementById("filterStartDate").value;
   const end = document.getElementById("filterEndDate").value;
 
-  let startTs = null;
-  let endTs = null;
-  const now = new Date();
+  const today = new Date();
+today.setHours(0, 0, 0, 0);
 
-  if (range === "today") {
-    const d = new Date(); d.setHours(0,0,0,0);
-    startTs = d.getTime();
-    endTs = startTs + 86400000 - 1;
-  }
+let startDate = null;
+let endDate = null;
 
-  if (range === "custom" && start && end) {
-    startTs = new Date(start).getTime();
-    endTs = new Date(end).getTime() + 86400000 - 1;
-  }
+switch (range) {
+  case "today":
+    startDate = new Date(today);
+    endDate = new Date(today);
+    break;
 
-  const results = logs.filter(l => {
-    const ts = new Date(`${l.date} ${l.time || "00:00"}`).getTime();
-    if (startTs && ts < startTs) return false;
-    if (endTs && ts > endTs) return false;
-    if (first && !l.first.toLowerCase().includes(first)) return false;
-    if (last && !l.last.toLowerCase().includes(last)) return false;
-    if (company && !l.company.toLowerCase().includes(company)) return false;
-    return true;
-  });
+  case "yesterday":
+    startDate = new Date(today);
+    startDate.setDate(startDate.getDate() - 1);
+    endDate = new Date(startDate);
+    break;
+
+  case "thisWeek":
+    startDate = new Date(today);
+    startDate.setDate(startDate.getDate() - startDate.getDay());
+    endDate = new Date(today);
+    break;
+
+  case "lastWeek":
+    startDate = new Date(today);
+    startDate.setDate(startDate.getDate() - startDate.getDay() - 7);
+    endDate = new Date(startDate);
+    endDate.setDate(endDate.getDate() + 6);
+    break;
+
+  case "thisMonth":
+    startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+    endDate = new Date(today);
+    break;
+
+  case "lastMonth":
+    startDate = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+    endDate = new Date(today.getFullYear(), today.getMonth(), 0);
+    break;
+
+  case "thisYear":
+    startDate = new Date(today.getFullYear(), 0, 1);
+    endDate = new Date(today);
+    break;
+
+  case "lastYear":
+    startDate = new Date(today.getFullYear() - 1, 0, 1);
+    endDate = new Date(today.getFullYear() - 1, 11, 31);
+    break;
+
+  case "custom":
+    if (start && end) {
+      startDate = normalizeDateOnly(start);
+      endDate = normalizeDateOnly(end);
+    }
+    break;
+}
+
+const results = logs.filter(l => {
+  const logDate = normalizeDateOnly(l.date);
+  if (!logDate) return false;
+
+  if (startDate && logDate < startDate) return false;
+  if (endDate && logDate > endDate) return false;
+
+  if (first && !l.first.toLowerCase().includes(first)) return false;
+  if (last && !l.last.toLowerCase().includes(last)) return false;
+  if (company && !l.company.toLowerCase().includes(company)) return false;
+
+  return true;
+});
 
   window.searchResults = results;
   renderSearchResults(results);
