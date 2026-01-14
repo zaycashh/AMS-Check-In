@@ -84,6 +84,7 @@ function renderSearchUI() {
           <th>Reason</th>
           <th>Services</th>
           <th>Signature</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody id="searchResultsTable"></tbody>
@@ -246,20 +247,28 @@ function renderSearchResults(results) {
   }
 
   results.forEach(r => {
-    tbody.innerHTML += `
-      <tr>
-        <td>${r.date}</td>
-        <td>${r.time}</td>
-        <td>${r.first}</td>
-        <td>${r.last}</td>
-        <td>${r.company}</td>
-        <td>${r.reason}</td>
-        <td>${r.services}</td>
-        <td>${r.signature ? `<img src="${r.signature}" style="width:90px;height:30px;">` : ""}</td>
-      </tr>
-    `;
-  });
-}
+  tbody.innerHTML += `
+    <tr>
+      <td>${r.date}</td>
+      <td>${r.time}</td>
+      <td>${r.first}</td>
+      <td>${r.last}</td>
+      <td>${r.company}</td>
+      <td>${r.reason}</td>
+      <td>${r.services}</td>
+      <td>${r.signature ? `<img src="${r.signature}" style="width:90px;height:30px;">` : ""}</td>
+
+      <td>
+        <button
+          onclick="deleteDonor('${r.id}')"
+          class="danger-btn"
+        >
+          🗑 Delete
+        </button>
+      </td>
+    </tr>
+  `;
+});
 
 /* =========================================================
    HELPERS
