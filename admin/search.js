@@ -229,6 +229,31 @@ const results = logs.filter(l => {
   renderSearchResults(results);
 };
 
+async function deleteDonor(id) {
+  if (!confirm("Are you sure you want to delete this donor record?")) {
+    return;
+  }
+
+  // 1️⃣ Remove from local cache
+  let logs = JSON.parse(localStorage.getItem("ams_logs") || "[]");
+  logs = logs.filter(l => l.id !== id);
+  localStorage.setItem("ams_logs", JSON.stringify(logs));
+
+  // 2️⃣ Attempt cloud delete
+  try {
+    await fetch(
+      "https://ams-checkin-api.josealfonsodejesus.workers.dev/logs/" + id,
+      { method: "DELETE" }
+    );
+  } catch (err) {
+    console.warn("Cloud delete failed, local only", err);
+  }
+
+  // 3️⃣ Refresh UI using existing results
+  window.searchResults = window.searchResults.filter(r => r.id !== id);
+  renderSearchResults(window.searchResults);
+}
+
 /* =========================================================
    RENDER RESULTS
 ========================================================= */
