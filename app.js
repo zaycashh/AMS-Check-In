@@ -292,5 +292,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Scroll donor back to top
     window.scrollTo({ top: 0, behavior: "smooth" });
-  });
-});
+     
+     setTimeout(() => {
+  if (typeof setupSignaturePad === "function") {
+    setupSignaturePad();
+  }
+}, 50);
+
