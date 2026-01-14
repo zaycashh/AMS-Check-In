@@ -1,266 +1,168 @@
 /* =========================================================
-   CLOUD COMPANIES FETCH (WITH FALLBACK)
+   GLOBAL VARIABLES
 ========================================================= */
-
-// In-memory cache
-let companyCache = null;
-
-// Track selected company for edit/rename
-let selectedCompany = null;
-
-async function fetchCompanies() {
-  try {
-    const res = await fetch(
-      "https://ams-checkin-api.josealfonsodejesus.workers.dev/companies"
-    );
-
-    if (!res.ok) throw new Error("Cloud fetch failed");
-
-    const companies = await res.json();
-
-    localStorage.setItem("ams_companies", JSON.stringify(companies));
-    companyCache = companies;
-
-    console.log("☁️ Companies loaded from cloud:", companies.length);
-    return companies;
-  } catch {
-    console.warn("⚠️ Using local companies");
-    const local = JSON.parse(localStorage.getItem("ams_companies") || "[]");
-    companyCache = local;
-    return local;
-  }
-}
+const ADMIN_PIN = "2468";
+let hasSigned = false;
 
 /* =========================================================
-   CLOUD SAVE
+   SIGNATURE PAD INITIALIZATION
 ========================================================= */
-async function saveCompaniesToCloud(companies) {
-  localStorage.setItem("ams_companies", JSON.stringify(companies));
-  companyCache = companies;
+function setupSignaturePad() {
+  const canvas = document.getElementById("signaturePad");
+  const placeholder = document.getElementById("sigPlaceholder");
+  if (!canvas) return;
 
-  try {
-    await fetch(
-      "https://ams-checkin-api.josealfonsodejesus.workers.dev/companies",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(companies)
-      }
-    );
+  canvas.width = canvas.offsetWidth;
+  canvas.height = canvas.offsetHeight;
 
-    console.log("☁️ Companies saved to cloud:", companies.length);
-  } catch (err) {
-    console.error("❌ Failed to save companies to cloud", err);
-  }
-}
+  const ctx = canvas.getContext("2d");
+  ctx.lineWidth = 2;
+  ctx.lineCap = "round";
 
-console.log("Manage Companies Module Loaded");
+  let drawing = false;
 
-/* =========================================================
-   MANAGE COMPANIES (SINGLE INPUT + EDIT SAFE)
-========================================================= */
-async function renderCompanyManager() {
-  const container = document.getElementById("tabCompanies");
-  if (!container) return;
+  const getPos = (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const p = e.touches ? e.touches[0] : e;
+    return { x: p.clientX - rect.left, y: p.clientY - rect.top };
+  };
 
-  let companies = companyCache || await fetchCompanies();
+  const draw = (e) => {
+    if (!drawing) return;
+    const { x, y } = getPos(e);
+    ctx.lineTo(x, y);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    if (e.touches) e.preventDefault();
+  };
 
-  // CLEAN + DEDUPE + SORT
-  companies = Array.from(
-    new Set(
-      companies
-        .map(c => c.trim().toUpperCase())
-        .filter(Boolean)
-    )
-  ).sort((a, b) => a.localeCompare(b));
-
-  companyCache = companies;
-  selectedCompany = null;
-
-  container.innerHTML = `
-    <h2 class="section-title">Manage Companies</h2>
-
-    <div style="max-width:500px;">
-      <label><strong>Company</strong></label>
-
-      <input
-        id="companyInput"
-        list="companyList"
-        placeholder="Select or type company name"
-        style="width:100%;padding:12px;margin-bottom:12px;"
-      />
-
-      <datalist id="companyList">
-        ${companies.map(c => `<option value="${c}"></option>`).join("")}
-      </datalist>
-
-      <div style="display:flex;gap:10px;">
-        <button id="saveCompanyBtn" class="primary-btn" type="button">
-          Add / Save
-        </button>
-        <button id="deleteCompanyBtn" class="secondary-btn" type="button">
-          Delete
-        </button>
-      </div>
-    </div>
-  `;
-
-  const companyInput = document.getElementById("companyInput");
-
-  /* =========================
-     TRACK SELECTION FOR EDIT
-  ========================= */
-  companyInput.addEventListener("input", () => {
-    const value = companyInput.value.trim().toUpperCase();
-    selectedCompany = companyCache.includes(value) ? value : null;
+  canvas.addEventListener("mousedown", (e) => {
+    drawing = true;
+    hasSigned = true;
+    placeholder.style.display = "none";
+    const { x, y } = getPos(e);
+    ctx.beginPath();
+    ctx.moveTo(x, y);
   });
 
-  /* =========================
-     ADD / EDIT / RENAME
-  ========================= */
-  document.getElementById("saveCompanyBtn").onclick = async () => {
-    const name = companyInput.value.trim().toUpperCase();
-    if (!name) return;
+  canvas.addEventListener("mouseup", () => {
+    drawing = false;
+    ctx.beginPath();
+  });
 
-    let companies = companyCache || await fetchCompanies();
+  canvas.addEventListener("mousemove", draw);
 
-    // RENAME
-    if (selectedCompany && selectedCompany !== name) {
-      if (companies.includes(name)) {
-        alert("That company already exists.");
-        return;
-      }
+  canvas.addEventListener("touchstart", (e) => {
+    drawing = true;
+    hasSigned = true;
+    placeholder.style.display = "none";
+    const { x, y } = getPos(e);
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    e.preventDefault();
+  });
 
-      const idx = companies.indexOf(selectedCompany);
-      companies[idx] = name;
-      selectedCompany = null;
-    }
+  canvas.addEventListener("touchend", () => {
+    drawing = false;
+    ctx.beginPath();
+  });
 
-    // ADD
-    else if (!companies.includes(name)) {
-      companies.push(name);
-    }
+  canvas.addEventListener("touchmove", draw);
 
-    await saveCompaniesToCloud(companies);
-    renderCompanyManager();
-  };
-
-  /* =========================
-     DELETE
-  ========================= */
-  document.getElementById("deleteCompanyBtn").onclick = async () => {
-    const name = companyInput.value.trim().toUpperCase();
-    if (!name) return;
-
-    let companies = companyCache || await fetchCompanies();
-
-    if (!companies.includes(name)) {
-      alert("Company not found.");
-      return;
-    }
-
-    if (!confirm(`Delete "${name}"?\n\nPast check-ins will remain.`)) return;
-
-    companies = companies.filter(c => c !== name);
-    selectedCompany = null;
-
-    await saveCompaniesToCloud(companies);
-    renderCompanyManager();
-  };
+  document.getElementById("clearSigBtn")?.addEventListener("click", () => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    placeholder.style.display = "block";
+    hasSigned = false;
+  });
 }
 
 /* =========================================================
-   EXPOSE GLOBALLY
+   DROPDOWN LOGIC
 ========================================================= */
-window.renderCompanyManager = renderCompanyManager;
+document.getElementById("companySelect")?.addEventListener("change", (e) => {
+  document.getElementById("otherCompanyWrapper").style.display =
+    e.target.value === "__OTHER__" ? "block" : "none";
+});
+
+document.getElementById("reasonSelect")?.addEventListener("change", (e) => {
+  document.getElementById("otherReasonWrapper").style.display =
+    e.target.value === "other" ? "block" : "none";
+});
+
+document
+  .querySelector('input[value="Other"]')
+  ?.addEventListener("change", (e) => {
+    document.getElementById("otherServiceWrapper").style.display =
+      e.target.checked ? "block" : "none";
+  });
+
 /* =========================================================
-   ADMIN ACCESS (HIDDEN + SAFE)
+   SUBMIT FORM
 ========================================================= */
+document.getElementById("submitBtn")?.addEventListener("click", () => {
+  const first = document.getElementById("firstName").value.trim();
+  const last = document.getElementById("lastName").value.trim();
+  const companyValue = document.getElementById("companySelect").value;
 
-const ADMIN_PIN = "2468";
+  if (!first || !last) return alert("Please enter first and last name.");
+  if (!companyValue) return alert("Please select a company.");
 
-/* ===============================
-   ENTER ADMIN MODE
-=============================== */
+  let finalCompany = companyValue;
+  if (companyValue === "__OTHER__") {
+    finalCompany = document.getElementById("otherCompany").value.trim();
+    if (!finalCompany) return alert("Please enter the company name.");
+  }
+
+  const reasonSelect = document.getElementById("reasonSelect").value;
+  const otherReason = document.getElementById("otherReasonInput").value.trim();
+  const finalReason = reasonSelect === "other" ? otherReason : reasonSelect;
+  if (!finalReason) return alert("Please select a reason.");
+
+  const services = Array.from(
+    document.querySelectorAll('input[name="services"]:checked')
+  ).map(cb => cb.value);
+
+  if (!services.length) return alert("Please select a service.");
+  if (!hasSigned) return alert("Please provide a signature.");
+
+  const canvas = document.getElementById("signaturePad");
+  const signature = canvas.toDataURL();
+  const now = new Date();
+
+  const record = {
+    date: now.toISOString().split("T")[0],
+    time: now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+    first,
+    last,
+    company: finalCompany,
+    reason: finalReason,
+    services: services.join(", "),
+    signature,
+    timestamp: Date.now()
+  };
+
+  const logs = JSON.parse(localStorage.getItem("ams_logs") || "[]");
+  logs.push(record);
+  localStorage.setItem("ams_logs", JSON.stringify(logs));
+
+  alert("Check-in submitted!");
+  location.reload();
+});
+
+/* =========================================================
+   ADMIN LOGIN (DOUBLE CLICK LOGO)
+========================================================= */
 function enterAdminMode() {
   document.getElementById("adminArea").style.display = "block";
   document.getElementById("checkInSection").style.display = "none";
-
-  // Reset tabs
-  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-  document.querySelectorAll(".tab-content").forEach(c => {
-    c.style.display = "none";
-  });
-
-  // Default to Recent tab
-  const recentTab = document.querySelector('.tab[data-tab="tabRecent"]');
-  const recentContent = document.getElementById("tabRecent");
-
-  if (recentTab && recentContent) {
-    recentTab.classList.add("active");
-    recentContent.style.display = "block";
-    if (typeof renderRecentCheckIns === "function") {
-      renderRecentCheckIns();
-    }
-  }
 }
 
-/* ===============================
-   PROMPT FOR PIN
-=============================== */
 function promptAdminLogin() {
   const pin = prompt("Enter Admin PIN:");
-  if (pin === ADMIN_PIN) {
-    enterAdminMode();
-  } else {
-    alert("Incorrect PIN");
-  }
+  if (pin === ADMIN_PIN) enterAdminMode();
+  else alert("Incorrect PIN");
 }
-
-/* ===============================
-   ADMIN BUTTON (IF PRESENT)
-=============================== */
-document.addEventListener("DOMContentLoaded", () => {
-  const btn = document.getElementById("toggleAdminBtn");
-  if (btn) {
-    btn.addEventListener("click", promptAdminLogin);
-  }
-});
-
-/* =========================================================
-   EXIT ADMIN MODE (SAFE + COMPLETE RESET)
-========================================================= */
-document.addEventListener("DOMContentLoaded", () => {
-  const exitBtn = document.getElementById("exitAdminBtn");
-  if (!exitBtn) return;
-
-  exitBtn.addEventListener("click", () => {
-    console.log("🚪 Exiting admin mode");
-
-    document.getElementById("adminArea").style.display = "none";
-    document.getElementById("checkInSection").style.display = "block";
-
-    document.querySelectorAll(".tab-content").forEach(tab => {
-      tab.style.display = "none";
-    });
-
-    document.querySelectorAll(".tab").forEach(tab => {
-      tab.classList.remove("active");
-    });
-
-    window.scrollTo({ top: 0, behavior: "smooth" });
-
-    // ✅ re-init signature
-    setTimeout(() => {
-      if (typeof setupSignaturePad === "function") {
-        setupSignaturePad();
-      }
-    }, 50);
-  });
-});
-/* =========================================================
-   ADMIN ACCESS (DOUBLE CLICK / DOUBLE TAP)
-========================================================= */
 
 document.addEventListener("DOMContentLoaded", () => {
   const logo =
@@ -269,20 +171,55 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (!logo) return;
 
-  // Desktop
-  logo.addEventListener("dblclick", e => {
+  logo.addEventListener("dblclick", (e) => {
     e.preventDefault();
     promptAdminLogin();
   });
+});
 
-  // Mobile / iPad double-tap
-  let lastTap = 0;
-  logo.addEventListener("touchend", e => {
-    const now = Date.now();
-    if (now - lastTap < 400) {
-      e.preventDefault();
-      promptAdminLogin();
-    }
-    lastTap = now;
+/* =========================================================
+   EXIT ADMIN MODE
+========================================================= */
+document.getElementById("exitAdminBtn")?.addEventListener("click", () => {
+  document.getElementById("adminArea").style.display = "none";
+  document.getElementById("checkInSection").style.display = "block";
+});
+
+/* =========================================================
+   AUTO CAPS
+========================================================= */
+document.addEventListener("input", (e) => {
+  if (e.target.tagName === "INPUT" && e.target.type === "text") {
+    e.target.value = e.target.value.toUpperCase();
+  }
+});
+
+/* =========================================================
+   COMPANY DROPDOWN
+========================================================= */
+function populateCompanyDropdown() {
+  const select = document.getElementById("companySelect");
+  if (!select) return;
+
+  const companies = JSON.parse(localStorage.getItem("ams_companies")) || [];
+
+  select.innerHTML = `
+    <option value="">-- Select Company --</option>
+    <option value="__OTHER__">Other (enter manually)</option>
+  `;
+
+  companies.forEach(c => {
+    const opt = document.createElement("option");
+    opt.value = c;
+    opt.textContent = c;
+    select.insertBefore(opt, select.lastElementChild);
   });
+}
+
+/* =========================================================
+   PAGE LOAD
+========================================================= */
+document.addEventListener("DOMContentLoaded", () => {
+  setupSignaturePad();
+  populateCompanyDropdown();
 });
