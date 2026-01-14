@@ -256,13 +256,13 @@ function renderSearchResults(results) {
       <td>${r.company}</td>
       <td>${r.reason}</td>
       <td>${r.services}</td>
-      <td>${r.signature ? `<img src="${r.signature}" style="width:90px;height:30px;">` : ""}</td>
-
+      <td>${
+        r.signature
+          ? `<img src="${r.signature}" style="width:90px;height:30px;">`
+          : ""
+      }</td>
       <td>
-        <button
-          onclick="deleteDonor('${r.id}')"
-          class="danger-btn"
-        >
+        <button onclick="deleteDonor('${r.id}')" class="danger-btn">
           🗑 Delete
         </button>
       </td>
