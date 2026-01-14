@@ -1,7 +1,6 @@
 /* =========================================================
    CLOUD COMPANIES FETCH (WITH FALLBACK)
 ========================================================= */
-
 // ❌ REMOVED: let companyCache = null;
 let selectedCompany = null;
 let isEditMode = false;
