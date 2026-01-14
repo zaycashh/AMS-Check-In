@@ -144,7 +144,22 @@ document
 /* =========================================================
    SUBMIT FORM
 ========================================================= */
-document.getElementById("submitBtn")?.addEventListener("click", () => {
+async function saveCheckIn(record) {
+  const res = await fetch(
+    "https://ams-checkin-api.josealfonsodejesus.workers.dev/checkin",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(record)
+    }
+  );
+
+  if (!res.ok) {
+    throw new Error("Cloud save failed");
+  }
+}
+
+document.getElementById("submitBtn").addEventListener("click", async () => {
 if (window.__submitting) return;
 window.__submitting = true;
   
@@ -200,22 +215,17 @@ window.__submitting = true;
   signature,
   timestamp: now.getTime()
 };
+  try {
+  await saveCheckIn(record);
 
-  const logs = JSON.parse(localStorage.getItem("ams_logs") || "[]");
-
-// ⛔ prevent duplicate saves
-const exists = logs.some(l => l.id === record.id);
-
-if (!exists) {
-  logs.push(record);
-  localStorage.setItem("ams_logs", JSON.stringify(logs));
-}
-  
   alert("Check-in submitted!");
-resetForm();
-window.__submitting = false;
+  resetForm();
+  window.__submitting = false;
 
-});
+} catch (err) {
+  alert("Unable to submit. Please try again.");
+  window.__submitting = false;
+}
 
 /* =========================================================
    ADMIN LOGIN (DOUBLE CLICK LOGO)
