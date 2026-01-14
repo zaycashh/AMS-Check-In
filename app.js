@@ -172,23 +172,24 @@ document.getElementById("submitBtn")?.addEventListener("click", () => {
   const now = new Date();
 
   const record = {
-    date: now.toISOString().split("T")[0],
-    time: now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-    first,
-    last,
-    company: finalCompany,
-    reason: finalReason,
-    services: services.join(", "),
-    signature,
-    timestamp: Date.now()
-  };
+  id: crypto.randomUUID(), // ✅ unique ID (critical)
+  date: now.toISOString().split("T")[0],
+  time: now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+  first,
+  last,
+  company: finalCompany,
+  reason: finalReason,
+  services: services.join(", "),
+  signature,
+  timestamp: now.getTime()
+};
 
   const logs = JSON.parse(localStorage.getItem("ams_logs") || "[]");
   logs.push(record);
   localStorage.setItem("ams_logs", JSON.stringify(logs));
 
   alert("Check-in submitted!");
-  location.resetForm();
+  resetForm();
 });
 
 /* =========================================================
