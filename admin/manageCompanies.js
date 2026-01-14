@@ -1,10 +1,23 @@
 /* =========================================================
-   CLOUD COMPANIES FETCH (WITH FALLBACK)
+   MANAGE COMPANIES MODULE (SAFE / NO GLOBAL COLLISIONS)
 ========================================================= */
-// ❌ REMOVED: let companyCache = null;
-let selectedCompany = null;
+
+/**
+ * IMPORTANT DESIGN NOTES
+ * - No `let` globals that can collide with app.js
+ * - All shared state stored on `window`
+ * - This file is SAFE to load alongside app.js
+ */
+
+// ✅ single global sources (never redeclared)
+window.companyCache = window.companyCache || [];
+window.selectedCompany = null;
+
 let isEditMode = false;
 
+/* =========================================================
+   FETCH COMPANIES (CLOUD + FALLBACK)
+========================================================= */
 async function fetchCompanies() {
   try {
     const res = await fetch(
@@ -14,12 +27,11 @@ async function fetchCompanies() {
 
     const companies = await res.json();
     localStorage.setItem("ams_companies", JSON.stringify(companies));
-
-    // ✅ USE GLOBAL CACHE
     window.companyCache = companies;
 
     return companies;
-  } catch {
+  } catch (err) {
+    console.warn("⚠️ Using local companies");
     const local = JSON.parse(localStorage.getItem("ams_companies") || "[]");
     window.companyCache = local;
     return local;
@@ -27,12 +39,10 @@ async function fetchCompanies() {
 }
 
 /* =========================================================
-   CLOUD SAVE
+   SAVE COMPANIES (CLOUD + LOCAL)
 ========================================================= */
 async function saveCompaniesToCloud(companies) {
   localStorage.setItem("ams_companies", JSON.stringify(companies));
-
-  // ✅ USE GLOBAL CACHE
   window.companyCache = companies;
 
   try {
@@ -45,76 +55,78 @@ async function saveCompaniesToCloud(companies) {
       }
     );
   } catch (err) {
-    console.error("Cloud save failed", err);
+    console.error("⚠️ Cloud save failed", err);
   }
 }
 
 /* =========================================================
-   MANAGE COMPANIES (SAFE EDIT MODE)
+   RENDER MANAGE COMPANIES UI
 ========================================================= */
 async function renderCompanyManager() {
   const container = document.getElementById("tabCompanies");
   if (!container) return;
 
-  let companies = window.companyCache || await fetchCompanies();
+  let companies = window.companyCache.length
+    ? window.companyCache
+    : await fetchCompanies();
 
+  // Normalize
   companies = Array.from(
     new Set(companies.map(c => c.trim().toUpperCase()).filter(Boolean))
   ).sort((a, b) => a.localeCompare(b));
 
   window.companyCache = companies;
-  selectedCompany = null;
+  window.selectedCompany = null;
   isEditMode = false;
 
   container.innerHTML = `
     <h2 class="section-title">Manage Companies</h2>
 
-    <div style="max-width:500px;">
+    <div style="max-width:520px;">
       <label><strong>Company</strong></label>
 
       <input
-        id="companyInput"
-        list="companyList"
-        placeholder="Select or type company name"
+        id="companyManagerInput"
+        list="companyManagerList"
+        placeholder="Type or select a company"
         style="width:100%;padding:12px;margin-bottom:6px;"
       />
 
       <div id="editHint" style="font-size:13px;color:#666;margin-bottom:12px;"></div>
 
-      <datalist id="companyList">
+      <datalist id="companyManagerList">
         ${companies.map(c => `<option value="${c}"></option>`).join("")}
       </datalist>
 
       <div style="display:flex;gap:10px;flex-wrap:wrap;">
         <button id="addBtn" class="primary-btn">Add</button>
         <button id="editBtn" class="secondary-btn">Edit</button>
-        <button id="saveBtn" class="primary-btn" disabled>Save Changes</button>
+        <button id="saveBtn" class="primary-btn" disabled>Save</button>
         <button id="deleteBtn" class="secondary-btn">Delete</button>
       </div>
     </div>
   `;
 
-  const input = document.getElementById("companyInput");
+  const input = document.getElementById("companyManagerInput");
   const hint = document.getElementById("editHint");
-
   const addBtn = document.getElementById("addBtn");
   const editBtn = document.getElementById("editBtn");
   const saveBtn = document.getElementById("saveBtn");
   const deleteBtn = document.getElementById("deleteBtn");
 
   /* =========================
-     SELECT COMPANY
+     SELECT / TYPE
   ========================= */
   input.addEventListener("input", () => {
     const value = input.value.trim().toUpperCase();
 
     if (window.companyCache.includes(value)) {
-      selectedCompany = value;
+      window.selectedCompany = value;
       hint.textContent = `Selected: ${value}`;
       saveBtn.disabled = true;
       isEditMode = false;
     } else {
-      selectedCompany = null;
+      window.selectedCompany = null;
       hint.textContent = "";
     }
   });
@@ -140,31 +152,34 @@ async function renderCompanyManager() {
      EDIT
   ========================= */
   editBtn.onclick = () => {
-    if (!selectedCompany) {
-      alert("Select a company to edit.");
+    if (!window.selectedCompany) {
+      alert("Select a company first.");
       return;
     }
 
     isEditMode = true;
     saveBtn.disabled = false;
-    hint.textContent = `Editing: ${selectedCompany}`;
+    hint.textContent = `Editing: ${window.selectedCompany}`;
   };
 
   /* =========================
-     SAVE CHANGES
+     SAVE
   ========================= */
   saveBtn.onclick = async () => {
-    if (!isEditMode || !selectedCompany) return;
+    if (!isEditMode || !window.selectedCompany) return;
 
     const newName = input.value.trim().toUpperCase();
     if (!newName) return;
 
-    if (window.companyCache.includes(newName) && newName !== selectedCompany) {
+    if (
+      window.companyCache.includes(newName) &&
+      newName !== window.selectedCompany
+    ) {
       alert("That company already exists.");
       return;
     }
 
-    const idx = window.companyCache.indexOf(selectedCompany);
+    const idx = window.companyCache.indexOf(window.selectedCompany);
     window.companyCache[idx] = newName;
 
     await saveCompaniesToCloud(window.companyCache);
@@ -175,14 +190,19 @@ async function renderCompanyManager() {
      DELETE
   ========================= */
   deleteBtn.onclick = async () => {
-    if (!selectedCompany) {
+    if (!window.selectedCompany) {
       alert("Select a company first.");
       return;
     }
 
-    if (!confirm(`Delete "${selectedCompany}"?\n\nPast check-ins remain.`)) return;
+    if (!confirm(`Delete "${window.selectedCompany}"?\n\nPast check-ins remain.`)) {
+      return;
+    }
 
-    window.companyCache = window.companyCache.filter(c => c !== selectedCompany);
+    window.companyCache = window.companyCache.filter(
+      c => c !== window.selectedCompany
+    );
+
     await saveCompaniesToCloud(window.companyCache);
     renderCompanyManager();
   };
@@ -192,3 +212,5 @@ async function renderCompanyManager() {
    EXPOSE
 ========================================================= */
 window.renderCompanyManager = renderCompanyManager;
+
+console.log("Manage Companies Module Loaded");
