@@ -279,3 +279,35 @@ document.addEventListener("DOMContentLoaded", () => {
 
 document.getElementById("resetFormBtn")
   ?.addEventListener("click", resetForm);
+/* =========================================================
+   ONE-TIME DUPLICATE CLEANUP
+   (Keeps newest record per unique check-in)
+========================================================= */
+(function dedupeLogsOnce() {
+  const raw = JSON.parse(localStorage.getItem("ams_logs") || "[]");
+  if (!raw.length) return;
+
+  const map = new Map();
+
+  raw.forEach(log => {
+    // Use ID if available, fallback for old records
+    const key =
+      log.id ||
+      `${log.timestamp}-${log.first}-${log.last}-${log.company}`;
+
+    // Keep the newest version
+    if (!map.has(key) || map.get(key).timestamp < log.timestamp) {
+      map.set(key, log);
+    }
+  });
+
+  const cleaned = Array.from(map.values());
+
+  if (cleaned.length !== raw.length) {
+    console.warn(
+      `🧹 AMS cleanup: ${raw.length - cleaned.length} duplicate(s) removed`
+    );
+    localStorage.setItem("ams_logs", JSON.stringify(cleaned));
+  }
+})();
+
