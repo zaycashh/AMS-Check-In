@@ -188,7 +188,7 @@ document.getElementById("submitBtn")?.addEventListener("click", () => {
   localStorage.setItem("ams_logs", JSON.stringify(logs));
 
   alert("Check-in submitted!");
-  location.reload();
+  location.resetForm();
 });
 
 /* =========================================================
@@ -264,3 +264,6 @@ document.addEventListener("DOMContentLoaded", () => {
   setupSignaturePad();
   populateCompanyDropdown();
 });
+
+document.getElementById("resetFormBtn")
+  ?.addEventListener("click", resetForm);
