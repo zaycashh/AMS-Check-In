@@ -310,4 +310,58 @@ document.getElementById("resetFormBtn")
     localStorage.setItem("ams_logs", JSON.stringify(cleaned));
   }
 })();
+/* =========================================================
+   COMPANY AUTOCOMPLETE
+========================================================= */
+document.addEventListener("DOMContentLoaded", () => {
+  const input = document.getElementById("companyInput");
+  const suggestions = document.getElementById("companySuggestions");
 
+  if (!input || !suggestions) return;
+
+  const companies =
+    JSON.parse(localStorage.getItem("ams_companies")) || [];
+
+  input.addEventListener("input", () => {
+    const query = input.value.trim().toUpperCase();
+    suggestions.innerHTML = "";
+
+    if (query.length < 2) {
+      suggestions.style.display = "none";
+      return;
+    }
+
+    const matches = companies.filter(c =>
+      c.toUpperCase().includes(query)
+    );
+
+    if (!matches.length) {
+      suggestions.style.display = "none";
+      return;
+    }
+
+    matches.forEach(company => {
+      const div = document.createElement("div");
+      div.className = "company-suggestion";
+      div.textContent = company;
+
+      div.addEventListener("click", () => {
+        input.value = company;
+        suggestions.innerHTML = "";
+        suggestions.style.display = "none";
+      });
+
+      suggestions.appendChild(div);
+    });
+
+    suggestions.style.display = "block";
+  });
+
+  // Hide suggestions when clicking outside
+  document.addEventListener("click", e => {
+    if (!e.target.closest(".company-autocomplete")) {
+      suggestions.innerHTML = "";
+      suggestions.style.display = "none";
+    }
+  });
+});
