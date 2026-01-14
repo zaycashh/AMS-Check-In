@@ -255,4 +255,42 @@ document.addEventListener("DOMContentLoaded", () => {
   logo.addEventListener("touchend", () => clearTimeout(adminHoldTimer));
   logo.addEventListener("touchcancel", () => clearTimeout(adminHoldTimer));
 });
+/* =========================================================
+   EXIT ADMIN MODE (SAFE + COMPLETE RESET)
+========================================================= */
 
+document.addEventListener("DOMContentLoaded", () => {
+  const exitBtn = document.getElementById("exitAdminBtn");
+  if (!exitBtn) return;
+
+  exitBtn.addEventListener("click", () => {
+    console.log("🚪 Exiting admin mode");
+
+    // Hide admin / show donor
+    document.getElementById("adminArea").style.display = "none";
+    document.getElementById("checkInSection").style.display = "block";
+
+    // Clear admin tabs (prevents bleed-through)
+    document.querySelectorAll(".tab-content").forEach(tab => {
+      tab.style.display = "none";
+    });
+
+    // Reset tab states
+    document.querySelectorAll(".tab").forEach(tab => {
+      tab.classList.remove("active");
+    });
+
+    // Clear search results if present
+    if (window.searchResults) {
+      window.searchResults = [];
+    }
+
+    // Optional: clear search table safely
+    if (typeof clearSearchTable === "function") {
+      clearSearchTable();
+    }
+
+    // Scroll donor back to top
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+});
