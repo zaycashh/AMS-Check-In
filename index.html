@@ -3,43 +3,34 @@
 <head>
   <meta charset="UTF-8">
 
-  <!-- iOS FULLSCREEN / KIOSK MODE -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="apple-mobile-web-app-title" content="AMS Check-In">
 
-  <!-- APP ICONS -->
   <link rel="apple-touch-icon" href="logo.png">
   <link rel="apple-touch-icon" sizes="180x180" href="logo.png">
 
-  <!-- LOCK ZOOM & SCROLL -->
   <meta name="viewport"
         content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
   <title>AMS Check-In System</title>
 
-  <!-- STYLES -->
   <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
 
-<!-- ================= HEADER ================= -->
 <header class="main-header">
   <div class="header-left">
     <img src="logo.png" alt="Logo" class="header-logo">
     <h1 class="header-title">AMS Check-In System</h1>
   </div>
 
-  <button id="toggleAdminBtn"
-          class="admin-btn"
-          style="display:none;"
-          tabindex="-1">
+  <button id="toggleAdminBtn" class="admin-btn" style="display:none;" tabindex="-1">
     Admin Login
   </button>
 </header>
 
-<!-- ================= DONOR CHECK-IN ================= -->
 <section id="checkInSection" class="section-card">
 
   <h2 class="section-title">Donor Check-In</h2>
@@ -56,10 +47,7 @@
 
   <div class="form-row company-autocomplete">
     <label>Company</label>
-    <input type="text"
-           id="companyInput"
-           placeholder="Start typing company name…"
-           autocomplete="off">
+    <input id="companyInput" type="text" placeholder="Start typing company name…" autocomplete="off">
     <div id="companySuggestions" class="company-suggestions"></div>
   </div>
 
@@ -73,13 +61,8 @@
       <option value="Post-Accident">Post-Accident</option>
       <option value="Return-to-Duty">Return-to-Duty</option>
       <option value="Follow-Up">Follow-Up</option>
-      <option value="other">Other (enter manually)</option>
+      <option value="other">Other</option>
     </select>
-  </div>
-
-  <div id="otherReasonWrapper" class="form-row" style="display:none;">
-    <label>Enter Reason</label>
-    <input id="otherReasonInput" type="text">
   </div>
 
   <div class="section-divider"></div>
@@ -89,11 +72,9 @@
     <label class="service-item"><input type="checkbox" name="services" value="DOT Drug Test"> DOT Drug Test</label>
     <label class="service-item"><input type="checkbox" name="services" value="Vision Test"> Vision Test</label>
     <label class="service-item"><input type="checkbox" name="services" value="NON-DOT Drug Test"> NON-DOT Drug Test</label>
-    <label class="service-item"><input type="checkbox" name="services" value="DNA (Paternity Test)"> DNA (Paternity Test)</label>
+    <label class="service-item"><input type="checkbox" name="services" value="DNA (Paternity Test)"> DNA</label>
     <label class="service-item"><input type="checkbox" name="services" value="DOT Alcohol Test"> DOT Alcohol Test</label>
     <label class="service-item"><input type="checkbox" name="services" value="DOT Physical"> DOT Physical</label>
-    <label class="service-item"><input type="checkbox" name="services" value="NON-DOT Alcohol Test"> NON-DOT Alcohol Test</label>
-    <label class="service-item"><input type="checkbox" name="services" value="Other"> Other</label>
   </div>
 
   <div class="section-divider"></div>
@@ -112,13 +93,11 @@
 
 </section>
 
-<!-- ================= ADMIN PANEL ================= -->
 <section id="adminArea" style="display:none;">
 
   <button id="exitAdminBtn" class="secondary-btn">Exit Admin Mode</button>
 
   <div class="admin-nav">
-
     <div class="admin-dropdown">
       <button class="dropdown-toggle" type="button">Reports ▾</button>
       <div class="dropdown-menu">
@@ -132,7 +111,6 @@
     <button class="tab" data-tab="tabCompanies">Manage Companies</button>
   </div>
 
-  <!-- 🔑 SINGLE SOURCE ADMIN TAB CONTAINERS -->
   <div id="tabSearch" class="tab-content" style="display:none;"></div>
   <div id="tabGeneral" class="tab-content" style="display:none;"></div>
   <div id="tabCompany" class="tab-content" style="display:none;"></div>
@@ -141,7 +119,6 @@
 
 </section>
 
-<!-- ================= MODALS ================= -->
 <div id="signatureModal" class="modal-bg">
   <div class="modal-box">
     <h3>Signature</h3>
@@ -150,12 +127,10 @@
   </div>
 </div>
 
-<!-- ================= LIBRARIES ================= -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
-<!-- ================= APP SCRIPTS ================= -->
 <script src="app.js"></script>
 <script src="admin/nav.js"></script>
 <script src="admin/search.js"></script>
@@ -168,5 +143,3 @@
 
 </body>
 </html>
-
-    
