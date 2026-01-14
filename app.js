@@ -1,3 +1,44 @@
+function resetForm() {
+  // Clear text inputs
+  document.querySelectorAll(
+    "#checkInSection input[type='text']"
+  ).forEach(input => input.value = "");
+
+  // Reset selects
+  document.querySelectorAll(
+    "#checkInSection select"
+  ).forEach(select => select.selectedIndex = 0);
+
+  // Uncheck checkboxes
+  document.querySelectorAll(
+    "#checkInSection input[type='checkbox']"
+  ).forEach(cb => cb.checked = false);
+
+  // Hide conditional fields
+  const otherCompany = document.getElementById("otherCompanyWrapper");
+  const otherReason = document.getElementById("otherReasonWrapper");
+  const otherService = document.getElementById("otherServiceWrapper");
+
+  if (otherCompany) otherCompany.style.display = "none";
+  if (otherReason) otherReason.style.display = "none";
+  if (otherService) otherService.style.display = "none";
+
+  // Clear signature
+  const canvas = document.getElementById("signaturePad");
+  if (canvas) {
+    const ctx = canvas.getContext("2d");
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+
+  // Reset signature state
+  hasSigned = false;
+  const placeholder = document.getElementById("sigPlaceholder");
+  if (placeholder) placeholder.style.display = "block";
+
+  // Scroll back to top (kiosk-friendly)
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
 /* =========================================================
    GLOBAL VARIABLES
 ========================================================= */
