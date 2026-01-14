@@ -242,7 +242,7 @@ function renderSearchResults(results) {
     : "No results";
 
   if (!results.length) {
-    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;opacity:.6;">No records</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;opacity:.6;">No records</td></tr>`;
     return;
   }
 
