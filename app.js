@@ -1,3 +1,25 @@
+async function fetchCompaniesForDonor() {
+  try {
+    const res = await fetch(
+      "https://ams-checkin-api.josealfonsodejesus.workers.dev/companies",
+      { cache: "no-store" }
+    );
+
+    if (!res.ok) throw new Error("Company fetch failed");
+
+    const companies = await res.json();
+
+    localStorage.setItem("ams_companies", JSON.stringify(companies));
+
+    console.log("🏢 Companies loaded for donor:", companies.length);
+    return companies;
+
+  } catch (err) {
+    console.warn("⚠️ Using cached companies");
+    return JSON.parse(localStorage.getItem("ams_companies") || "[]");
+  }
+}
+
 function unlockSubmit() {
   window.__submitting = false;
 }
@@ -299,9 +321,12 @@ function populateCompanyDropdown() {
 /* =========================================================
    PAGE LOAD
 ========================================================= */
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   setupSignaturePad();
-  populateCompanyDropdown();
+
+  await fetchCompaniesForDonor(); // 🔑 REQUIRED FOR AUTOCOMPLETE
+
+  populateCompanyDropdown(); // safe to keep (legacy)
 });
 
 document.getElementById("resetFormBtn")
