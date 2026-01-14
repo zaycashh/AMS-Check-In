@@ -1,483 +1,225 @@
-let searchCloudAttempted = false;
+lconsole.log("Admin Search Module Loaded");
 
 /* =========================================================
-   DEDUPE
+   RENDER SEARCH LOG UI (INJECT HTML)
 ========================================================= */
-function dedupeLogsById(logs) {
-  return Array.from(
-    new Map(
-      logs
-        .filter(l => l && (l.id || l.timestamp))
-        .map(l => [
-          l.id || `${l.timestamp}-${l.first}-${l.last}`,
-          l
-        ])
-    ).values()
-  );
+function renderSearchUI() {
+  const container = document.getElementById("tabSearch");
+  if (!container) return;
+
+  container.innerHTML = `
+    <h2 class="section-title">Search Log</h2>
+
+    <div class="export-bar">
+      <button onclick="exportSearchLogExcel()">Export Excel</button>
+      <button onclick="exportSearchPdf()">Export PDF</button>
+      <span id="searchResultCount" style="margin-left:12px;opacity:.7;"></span>
+    </div>
+
+    <div class="search-form">
+
+      <div class="form-row">
+        <label>First Name</label>
+        <input type="text" id="filterFirstName">
+      </div>
+
+      <div class="form-row">
+        <label>Last Name</label>
+        <input type="text" id="filterLastName">
+      </div>
+
+      <div class="form-row">
+        <label>Company</label>
+        <select id="searchFilterCompany" onchange="toggleSearchCompanyText(this.value)">
+          <option value="">All Companies</option>
+          <option value="__custom__">Type Company (Custom)</option>
+        </select>
+
+        <input
+          id="searchFilterCompanyText"
+          type="text"
+          placeholder="Enter company name"
+          style="display:none;margin-top:6px;"
+        />
+      </div>
+
+      <div class="form-row">
+        <label>Date Range</label>
+        <select id="filterDateRange" onchange="toggleCustomDateRange(this.value)">
+          <option value="">All Dates</option>
+          <option value="today">Today</option>
+          <option value="yesterday">Yesterday</option>
+          <option value="thisWeek">This Week</option>
+          <option value="lastWeek">Last Week</option>
+          <option value="thisMonth">This Month</option>
+          <option value="lastMonth">Last Month</option>
+          <option value="thisYear">This Year</option>
+          <option value="lastYear">Last Year</option>
+          <option value="custom">Custom</option>
+        </select>
+      </div>
+
+      <div class="form-row" id="customDateRange" style="display:none;">
+        <label>Start Date</label>
+        <input type="date" id="filterStartDate">
+        <label style="margin-top:6px;">End Date</label>
+        <input type="date" id="filterEndDate">
+      </div>
+
+      <div class="search-actions">
+        <button onclick="runSearch()">Search</button>
+        <button onclick="clearSearch()">Clear</button>
+      </div>
+
+    </div>
+
+    <table class="results-table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Time</th>
+          <th>First</th>
+          <th>Last</th>
+          <th>Company</th>
+          <th>Reason</th>
+          <th>Services</th>
+          <th>Signature</th>
+        </tr>
+      </thead>
+      <tbody id="searchResultsTable"></tbody>
+    </table>
+  `;
+
+  populateSearchCompanies();
+  clearSearchTable();
 }
 
 /* =========================================================
-   FAST LOCAL + CLOUD FETCH
+   DATA HELPERS
 ========================================================= */
 function getCachedLogs() {
   return JSON.parse(localStorage.getItem("ams_logs") || "[]");
 }
 
-function normalizeLogsOnce(logs) {
-  return logs.map(l => {
-    if (!l._ts) {
-      let ts = l.timestamp;
-      if (!ts && l.date) {
-        const t = l.time || "00:00";
-        ts = new Date(`${l.date} ${t}`).getTime();
-      }
-      return { ...l, _ts: ts || null };
-    }
-    return l;
-  });
-}
-
-async function refreshLogsSilently() {
-  if (searchCloudAttempted) return getCachedLogs();
-  searchCloudAttempted = true;
-
-  try {
-    const res = await fetch(
-      "https://ams-checkin-api.josealfonsodejesus.workers.dev/logs",
-      { cache: "no-store" }
-    );
-
-    if (!res.ok) throw new Error("Cloud unavailable");
-
-    const logs = normalizeLogsOnce(await res.json());
-    localStorage.setItem("ams_logs", JSON.stringify(logs));
-    return logs;
-  } catch {
-    return getCachedLogs();
-  }
-}
-
-async function fetchSearchLogs() {
-  const cached = getCachedLogs();
-  if (cached.length) {
-    refreshLogsSilently();
-    return cached;
-  }
-  return await refreshLogsSilently();
-}
-
-console.log("Admin Search Module Loaded");
-
-/* =========================================================
-   INIT
-========================================================= */
-document.addEventListener("DOMContentLoaded", () => {
-  populateSearchCompanies();
-  clearSearchTable();
-});
-
-/* =========================================================
-   RUN SEARCH
-========================================================= */
-window.runSearch = async function () {
-  clearSearchTable();
-
-  const first = document.getElementById("filterFirstName")?.value.trim().toLowerCase();
-  const last = document.getElementById("filterLastName")?.value.trim().toLowerCase();
-
-  const companySelect = document.getElementById("searchFilterCompany");
-  const companyText = document.getElementById("searchFilterCompanyText")?.value.trim().toLowerCase();
-  const company =
-    companySelect?.value === "__custom__"
-      ? companyText
-      : companySelect?.value.toLowerCase();
-
-  const range = document.getElementById("filterDateRange")?.value;
-  const startInput = document.getElementById("filterStartDate")?.value;
-  const endInput = document.getElementById("filterEndDate")?.value;
-
-  const rawLogs = dedupeLogsById(
-    normalizeLogsOnce(await fetchSearchLogs())
+function dedupeLogsById(logs) {
+  return Array.from(
+    new Map(logs.map(l => [l.id || l.timestamp, l])).values()
   );
+}
 
-  /* ================= DATE RANGE ================= */
+/* =========================================================
+   SEARCH
+========================================================= */
+window.runSearch = function () {
+  const logs = dedupeLogsById(getCachedLogs());
+
+  const first = document.getElementById("filterFirstName").value.toLowerCase();
+  const last = document.getElementById("filterLastName").value.toLowerCase();
+
+  const companySel = document.getElementById("searchFilterCompany").value;
+  const companyTxt = document.getElementById("searchFilterCompanyText").value.toLowerCase();
+  const company = companySel === "__custom__" ? companyTxt : companySel;
+
+  const range = document.getElementById("filterDateRange").value;
+  const start = document.getElementById("filterStartDate").value;
+  const end = document.getElementById("filterEndDate").value;
+
   let startTs = null;
   let endTs = null;
-  const now = Date.now();
+  const now = new Date();
 
-  switch (range) {
-    case "today": {
-      const d = new Date(); d.setHours(0,0,0,0);
-      startTs = d.getTime();
-      endTs = startTs + 86400000 - 1;
-      break;
-    }
-    case "yesterday": {
-      const d = new Date(); d.setHours(0,0,0,0);
-      endTs = d.getTime() - 1;
-      startTs = endTs - 86400000 + 1;
-      break;
-    }
-    case "thisWeek": {
-      const d = new Date(); d.setHours(0,0,0,0);
-      startTs = d.getTime() - d.getDay() * 86400000;
-      endTs = now;
-      break;
-    }
-    case "lastWeek": {
-      const d = new Date(); d.setHours(0,0,0,0);
-      endTs = d.getTime() - d.getDay() * 86400000 - 1;
-      startTs = endTs - 7 * 86400000 + 1;
-      break;
-    }
-    case "thisMonth": {
-      const d = new Date();
-      startTs = new Date(d.getFullYear(), d.getMonth(), 1).getTime();
-      endTs = now;
-      break;
-    }
-    case "lastMonth": {
-      const d = new Date();
-      startTs = new Date(d.getFullYear(), d.getMonth() - 1, 1).getTime();
-      endTs = new Date(d.getFullYear(), d.getMonth(), 0, 23,59,59,999).getTime();
-      break;
-    }
-    case "thisYear":
-      startTs = new Date(new Date().getFullYear(), 0, 1).getTime();
-      endTs = now;
-      break;
-    case "lastYear":
-      startTs = new Date(new Date().getFullYear() - 1, 0, 1).getTime();
-      endTs = new Date(new Date().getFullYear() - 1, 11, 31, 23,59,59,999).getTime();
-      break;
-    case "custom":
-      if (startInput) startTs = new Date(startInput).getTime();
-      if (endInput) endTs = new Date(endInput).getTime() + 86400000 - 1;
-      break;
+  if (range === "today") {
+    const d = new Date(); d.setHours(0,0,0,0);
+    startTs = d.getTime();
+    endTs = startTs + 86400000 - 1;
   }
 
-  let filtered = rawLogs.filter(e => {
-    if ((startTs !== null || endTs !== null) && !e._ts) return false;
-    if (startTs !== null && e._ts < startTs) return false;
-    if (endTs !== null && e._ts > endTs) return false;
+  if (range === "custom" && start && end) {
+    startTs = new Date(start).getTime();
+    endTs = new Date(end).getTime() + 86400000 - 1;
+  }
 
-    const f = e.firstName || e.first || "";
-    const l = e.lastName || e.last || "";
-
-    if (first && !f.toLowerCase().includes(first)) return false;
-    if (last && !l.toLowerCase().includes(last)) return false;
-    if (company && !e.company?.toLowerCase().includes(company)) return false;
-
+  const results = logs.filter(l => {
+    const ts = new Date(`${l.date} ${l.time || "00:00"}`).getTime();
+    if (startTs && ts < startTs) return false;
+    if (endTs && ts > endTs) return false;
+    if (first && !l.first.toLowerCase().includes(first)) return false;
+    if (last && !l.last.toLowerCase().includes(last)) return false;
+    if (company && !l.company.toLowerCase().includes(company)) return false;
     return true;
   });
 
-  /* ================= SORT (NEWEST → OLDEST) ================= */
-  filtered.sort((a, b) => (b._ts || 0) - (a._ts || 0));
-
-  window.searchResults = filtered;
-  renderSearchResults(filtered);
+  window.searchResults = results;
+  renderSearchResults(results);
 };
 
 /* =========================================================
-   RENDER TABLE
+   RENDER RESULTS
 ========================================================= */
 function renderSearchResults(results) {
-  const table = document.getElementById("searchResultsTable");
+  const tbody = document.getElementById("searchResultsTable");
   const counter = document.getElementById("searchResultCount");
-  if (!table) return;
+  tbody.innerHTML = "";
 
-  table.innerHTML = "";
-
-  if (counter) {
-    counter.textContent =
-      results.length === 0
-        ? "No results found"
-        : `${results.length} result${results.length > 1 ? "s" : ""} found`;
-  }
+  counter.textContent = results.length
+    ? `${results.length} record(s)`
+    : "No results";
 
   if (!results.length) {
-    table.innerHTML = `
-      <tr>
-        <td colspan="8" style="text-align:center;opacity:.6;">
-          No matching records
-        </td>
-      </tr>`;
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;opacity:.6;">No records</td></tr>`;
     return;
   }
 
   results.forEach(r => {
-    const services =
-      Array.isArray(r.services) ? r.services.join(", ") :
-      Array.isArray(r.tests) ? r.tests.join(", ") :
-      r.services || r.tests || "";
-
-    const row = document.createElement("tr");
-    row.innerHTML = `
-      <td>${r.date || ""}</td>
-      <td>${r.time || ""}</td>
-      <td>${r.firstName || r.first || ""}</td>
-      <td>${r.lastName || r.last || ""}</td>
-      <td>${r.company || ""}</td>
-      <td>${r.reason || ""}</td>
-      <td>${services}</td>
-      <td style="text-align:center;">
-        ${r.signature ? `<img src="${r.signature}" style="width:100px;height:35px;">` : ""}
-      </td>`;
-    table.appendChild(row);
+    tbody.innerHTML += `
+      <tr>
+        <td>${r.date}</td>
+        <td>${r.time}</td>
+        <td>${r.first}</td>
+        <td>${r.last}</td>
+        <td>${r.company}</td>
+        <td>${r.reason}</td>
+        <td>${r.services}</td>
+        <td>${r.signature ? `<img src="${r.signature}" style="width:90px;height:30px;">` : ""}</td>
+      </tr>
+    `;
   });
 }
+
 /* =========================================================
-   COMPANY DROPDOWN
+   HELPERS
 ========================================================= */
 function populateSearchCompanies() {
-  const select = document.getElementById("searchFilterCompany");
-  if (!select) return;
-
-  select.innerHTML = `
-    <option value="">All Companies</option>
-    <option value="__custom__">Type Company (Custom)</option>
-  `;
-
+  const sel = document.getElementById("searchFilterCompany");
   const companies = JSON.parse(localStorage.getItem("ams_companies") || "[]");
-  companies.forEach(name => {
-    const opt = document.createElement("option");
-    opt.value = name.toLowerCase();
-    opt.textContent = name;
-    select.appendChild(opt);
+  companies.forEach(c => {
+    const o = document.createElement("option");
+    o.value = c.toLowerCase();
+    o.textContent = c;
+    sel.appendChild(o);
   });
 }
 
-window.toggleSearchCompanyText = function (value) {
-  const input = document.getElementById("searchFilterCompanyText");
-  if (!input) return;
-  input.style.display = value === "__custom__" ? "block" : "none";
-  if (value === "__custom__") input.focus();
+window.toggleSearchCompanyText = val => {
+  const i = document.getElementById("searchFilterCompanyText");
+  i.style.display = val === "__custom__" ? "block" : "none";
 };
 
-/* =========================================================
-   CUSTOM DATE RANGE TOGGLE
-========================================================= */
-window.toggleCustomDateRange = function (value) {
-  const wrapper = document.getElementById("customDateRange");
-  const start = document.getElementById("filterStartDate");
-  const end = document.getElementById("filterEndDate");
-  if (!wrapper || !start || !end) return;
-
-  wrapper.style.display = value === "custom" ? "block" : "none";
-  if (value !== "custom") {
-    start.value = "";
-    end.value = "";
-  }
+window.toggleCustomDateRange = val => {
+  document.getElementById("customDateRange").style.display =
+    val === "custom" ? "block" : "none";
 };
-
-/* =========================================================
-   CLEAR SEARCH
-========================================================= */
-function clearSearchTable() {
-  const table = document.getElementById("searchResultsTable");
-  const counter = document.getElementById("searchResultCount");
-  if (counter) counter.textContent = "";
-  if (table) {
-    table.innerHTML = `
-      <tr>
-        <td colspan="8" style="text-align:center;opacity:.6;">
-          Use filters and click Search to view records
-        </td>
-      </tr>`;
-  }
-}
 
 window.clearSearch = function () {
-  document.getElementById("filterFirstName").value = "";
-  document.getElementById("filterLastName").value = "";
-  document.getElementById("searchFilterCompany").value = "";
-  document.getElementById("searchFilterCompanyText").value = "";
-  document.getElementById("searchFilterCompanyText").style.display = "none";
-  document.getElementById("filterDateRange").value = "";
-  document.getElementById("filterStartDate").value = "";
-  document.getElementById("filterEndDate").value = "";
-  window.searchResults = [];
-  clearSearchTable();
+  renderSearchUI();
 };
 
-/* =========================================================
-   SERVICES NORMALIZER
-========================================================= */
-function getServicesText(r) {
-  if (Array.isArray(r.services)) return r.services.join(", ");
-  if (typeof r.services === "string") return r.services;
-  const list = [];
-  if (r.dot) list.push("DOT Drug Test");
-  if (r.nonDot) list.push("NON-DOT Drug Test");
-  if (r.vision) list.push("Vision Test");
-  return list.join(", ");
+function clearSearchTable() {
+  const t = document.getElementById("searchResultsTable");
+  if (t) t.innerHTML = `<tr><td colspan="8" style="text-align:center;opacity:.6;">Run a search</td></tr>`;
 }
 
 /* =========================================================
-   EXPORT EXCEL
+   INIT
 ========================================================= */
-function exportSearchLogExcel() {
-  const results = window.searchResults;
-  if (!Array.isArray(results) || results.length === 0) {
-    alert("Please run a search first.");
-    return;
-  }
-
-  const data = results.map(r => ({
-    Date: r.date || "",
-    Time: r.time || "",
-    First: r.firstName || r.first || "",
-    Last: r.lastName || r.last || "",
-    Company: r.company || "",
-    Reason: r.reason || "",
-    Services: getServicesText(r),
-    Signature: r.signature ? "Signed" : ""
-  }));
-
-  const ws = XLSX.utils.json_to_sheet(data);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "Search Log");
-  XLSX.writeFile(wb, "AMS_Search_Log.xlsx");
-}
-
-/* =========================================================
-   EXPORT PDF — SEARCH LOG (FINAL / FIXED)
-========================================================= */
-window.exportSearchPdf = function () {
-  const records = window.searchResults || [];
-  if (!records.length) {
-    alert("Please run a search first.");
-    return;
-  }
-
-  const range = document.getElementById("filterDateRange")?.value;
-  const startInput = document.getElementById("filterStartDate")?.value;
-  const endInput = document.getElementById("filterEndDate")?.value;
-
-  const rangeLabel = getDateRangeLabel(range, startInput, endInput);
-  const generatedAt = `Generated: ${new Date().toLocaleString()}`;
-
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF("landscape");
-  const pageWidth = doc.internal.pageSize.width;
-
-  // HEADER BAR
-  doc.setFillColor(30, 94, 150);
-  doc.rect(0, 0, pageWidth, 30, "F");
-
-  // LOGO
-  if (window.amsLogoBase64) {
-    doc.addImage(amsLogoBase64, "PNG", 8, 6, 26, 18);
-  }
-
-  // TITLE
-  doc.setTextColor(255);
-  doc.setFontSize(16);
-  doc.text("AMS Search Log Report", pageWidth / 2, 18, { align: "center" });
-
-doc.setFontSize(10);
-doc.setTextColor(230);
-doc.text(rangeLabel, pageWidth / 2, 26, { align: "center" });
-
-doc.setTextColor(255);
-doc.text(
-  generatedAt,
-  pageWidth - 14,
-  26,
-  { align: "right" }
-);
-
-doc.setTextColor(0)
-   
-  const rows = records.map(r => [
-    r.date || "",
-    r.time || "",
-    r.firstName || r.first || "",
-    r.lastName || r.last || "",
-    r.company || "",
-    r.reason || "",
-    getServicesText(r),
-    ""
-  ]);
-
-  doc.autoTable({
-    startY: 40,
-    margin: { left: 8, right: 8 },
-    head: [[
-      "Date","Time","First","Last","Company","Reason","Services","Signature"
-    ]],
-    body: rows,
-    styles: { fontSize: 9, cellPadding: 4 },
-    headStyles: { fillColor: [30, 94, 150], textColor: 255 },
-    didDrawCell(data) {
-      if (data.column.index === 7 && data.cell.section === "body") {
-        const img = records[data.row.index]?.signature;
-        if (img && img.startsWith("data:image")) {
-          const w = 18, h = 8;
-          const x = data.cell.x + (data.cell.width - w) / 2;
-          const y = data.cell.y + (data.cell.height - h) / 2;
-          doc.addImage(img, "PNG", x, y, w, h);
-        }
-      }
-    }
-  });
-
-  doc.save("AMS_Search_Log.pdf");
-};
-/* =========================================================
-   DATE RANGE LABEL (PDF + EXPORTS)
-========================================================= */
-function getDateRangeLabel(range, startInput, endInput) {
-  const format = d => d.toISOString().split("T")[0];
-
-  const today = new Date();
-
-  switch (range) {
-    case "today":
-      return `Date: ${format(today)}`;
-
-    case "yesterday": {
-      const d = new Date();
-      d.setDate(d.getDate() - 1);
-      return `Date: ${format(d)}`;
-    }
-
-    case "thisWeek": {
-      const d = new Date();
-      const day = d.getDay();
-      const diffToMonday = day === 0 ? -6 : 1 - day;
-
-      const start = new Date(d);
-      start.setDate(d.getDate() + diffToMonday);
-
-      const end = new Date(start);
-      end.setDate(start.getDate() + 6);
-
-      return `Week: ${format(start)} - ${format(end)}`;
-    }
-
-    case "lastWeek": {
-      const d = new Date();
-      const day = d.getDay();
-      const diffToMonday = day === 0 ? -6 : 1 - day;
-
-      const start = new Date(d);
-      start.setDate(d.getDate() + diffToMonday - 7);
-
-      const end = new Date(start);
-      end.setDate(start.getDate() + 6);
-
-      return `Week: ${format(start)} - ${format(end)}`;
-    }
-
-    case "custom":
-      if (startInput && endInput) {
-        return `Date Range: ${startInput} → ${endInput}`;
-      }
-      return "Custom Date Range";
-
-    default:
-      return "All Dates";
-  }
-}
-
+document.addEventListener("DOMContentLoaded", renderSearchUI);
