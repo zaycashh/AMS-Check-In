@@ -226,6 +226,7 @@ window.__submitting = true;
   alert("Unable to submit. Please try again.");
   window.__submitting = false;
 }
+});
 
 /* =========================================================
    ADMIN LOGIN (DOUBLE CLICK LOGO)
