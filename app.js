@@ -205,7 +205,9 @@ window.__submitting = true;
 
   const record = {
   id: crypto.randomUUID(), // ✅ unique ID (critical)
-  date: now.toISOString().split("T")[0],
+  date: new Date(
+  now.getTime() - now.getTimezoneOffset() * 60000
+).toISOString().split("T")[0],
   time: now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
   first,
   last,
