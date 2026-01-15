@@ -299,8 +299,26 @@ function renderSearchResults(results) {
     return;
   }
 
-        <td style="white-space:nowrap;">
-          ${r.locked !== false
+        results.forEach(r => {
+  tbody.innerHTML += `
+    <tr>
+      <td>${r.date}</td>
+      <td>${r.time}</td>
+      <td>${r.first}</td>
+      <td>${r.last}</td>
+      <td>${r.company}</td>
+      <td>${r.reason}</td>
+      <td>${r.services}</td>
+      <td>
+        ${
+          r.signature
+            ? `<img src="${r.signature}" style="width:90px;height:30px;">`
+            : ""
+        }
+      </td>
+      <td style="white-space:nowrap;">
+        ${
+          r.locked !== false
             ? `<span style="
                 display:inline-block;
                 padding:2px 6px;
@@ -311,12 +329,13 @@ function renderSearchResults(results) {
                 font-weight:600;
               ">🔒 LOCKED</span>`
             : ""
-          }
-          <button onclick="deleteDonor('${r.id}')">Delete</button>
-        </td>
-      </tr>
-    `;
+        }
+        <button onclick="deleteDonor('${r.id}')">Delete</button>
+      </td>
+    </tr>
+  `;
 });
+
 
 /* =========================================================
    HELPERS
