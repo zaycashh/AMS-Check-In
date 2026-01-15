@@ -244,7 +244,7 @@ async function deleteDonor(id) {
       "This record is LOCKED.\n\nEnter Admin PIN to delete:"
     );
 
-    if (pin !== ADMIN_PIN) {
+    if (pin !== window.ADMIN_PIN) {
       alert("Invalid PIN. Delete cancelled.");
       return;
     }
