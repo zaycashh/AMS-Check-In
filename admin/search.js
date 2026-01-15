@@ -239,7 +239,7 @@ async function deleteDonor(id) {
   }
 
   // 🔒 STEP 1B — LOCK ENFORCEMENT
-  if (log.locked) {
+  if (log.locked !== false) {
     const pin = prompt(
       "This record is LOCKED.\n\nEnter Admin PIN to delete:"
     );
