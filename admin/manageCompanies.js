@@ -1,22 +1,18 @@
-function normalizeCompanyName(val) {
-  return val.trim().toUpperCase();
-}
 /* =========================================================
    MANAGE COMPANIES MODULE (SAFE / NO GLOBAL COLLISIONS)
 ========================================================= */
 
-/**
- * IMPORTANT DESIGN NOTES
- * - No `let` globals that can collide with app.js
- * - All shared state stored on `window`
- * - This file is SAFE to load alongside app.js
- */
-
-// ✅ single global sources (never redeclared)
 window.companyCache = window.companyCache || [];
 window.selectedCompany = null;
 
 let isEditMode = false;
+
+/* =========================================================
+   HELPERS
+========================================================= */
+function normalizeCompanyName(val) {
+  return val.trim().toUpperCase();
+}
 
 /* =========================================================
    FETCH COMPANIES (CLOUD + FALLBACK)
@@ -31,7 +27,6 @@ async function fetchCompanies() {
     const companies = await res.json();
     localStorage.setItem("ams_companies", JSON.stringify(companies));
     window.companyCache = companies;
-
     return companies;
   } catch (err) {
     console.warn("⚠️ Using local companies");
@@ -73,9 +68,8 @@ async function renderCompanyManager() {
     ? window.companyCache
     : await fetchCompanies();
 
-  // Normalize
   companies = Array.from(
-    new Set(companies.map(c => c.trim().toUpperCase()).filter(Boolean))
+    new Set(companies.map(c => normalizeCompanyName(c)).filter(Boolean))
   ).sort((a, b) => a.localeCompare(b));
 
   window.companyCache = companies;
@@ -118,33 +112,10 @@ async function renderCompanyManager() {
   const deleteBtn = document.getElementById("deleteBtn");
 
   /* =========================
-     SELECT / TYPE
-  ========================= */
-  input.addEventListener("input", () => {
-  if (!isEditMode) hint.textContent = "";
-});
-
-  // 🔒 Preserve selected company while editing
-  if (isEditMode) {
-    hint.textContent = `Editing: ${window.selectedCompany} → ${value}`;
-    return;
-  }
-
-  if (window.companyCache.includes(value)) {
-    window.selectedCompany = value;
-    hint.textContent = `Selected: ${value}`;
-    saveBtn.disabled = true;
-  } else {
-    window.selectedCompany = null;
-    hint.textContent = "";
-  }
-});
-
-  /* =========================
      ADD
   ========================= */
   addBtn.onclick = async () => {
-    const name = input.value.trim().toUpperCase();
+    const name = normalizeCompanyName(input.value);
     if (!name) return;
 
     if (window.companyCache.includes(name)) {
@@ -161,67 +132,63 @@ async function renderCompanyManager() {
      EDIT
   ========================= */
   editBtn.onclick = () => {
-  const value = normalizeCompanyName(input.value);
+    const value = normalizeCompanyName(input.value);
 
-  if (!window.companyCache.includes(value)) {
-    alert("Select an existing company from the list first.");
-    return;
-  }
+    if (!window.companyCache.includes(value)) {
+      alert("Select an existing company first.");
+      return;
+    }
 
-  // 🔒 Lock original company name
-  window.selectedCompany = value;
-  isEditMode = true;
+    window.selectedCompany = value;
+    isEditMode = true;
+    saveBtn.disabled = false;
 
-  saveBtn.disabled = false;
-  hint.textContent = `Editing: ${window.selectedCompany}`;
-};
+    hint.textContent = `Editing: ${value}`;
+  };
 
   /* =========================
      SAVE
   ========================= */
   saveBtn.onclick = async () => {
-  if (!isEditMode) return;
+    if (!isEditMode) return;
 
-  const newName = normalizeCompanyName(input.value);
-  if (!newName) return;
+    const newName = normalizeCompanyName(input.value);
+    if (!newName) return;
 
-  if (
-    window.companyCache.includes(newName) &&
-    newName !== window.selectedCompany
-  ) {
-    alert("That company already exists.");
-    return;
-  }
+    if (
+      window.companyCache.includes(newName) &&
+      newName !== window.selectedCompany
+    ) {
+      alert("That company already exists.");
+      return;
+    }
 
-  const idx = window.companyCache.indexOf(window.selectedCompany);
-  if (idx === -1) {
-    alert("Original company not found.");
-    return;
-  }
+    const idx = window.companyCache.indexOf(window.selectedCompany);
+    if (idx === -1) {
+      alert("Original company not found.");
+      return;
+    }
 
-  window.companyCache[idx] = newName;
+    window.companyCache[idx] = newName;
 
-  await saveCompaniesToCloud(window.companyCache);
-  renderCompanyManager();
-};
+    await saveCompaniesToCloud(window.companyCache);
+    renderCompanyManager();
+  };
 
   /* =========================
      DELETE
   ========================= */
   deleteBtn.onclick = async () => {
-    if (!window.selectedCompany) {
+    const value = normalizeCompanyName(input.value);
+
+    if (!window.companyCache.includes(value)) {
       alert("Select a company first.");
       return;
     }
 
-    if (!confirm(`Delete "${window.selectedCompany}"?\n\nPast check-ins remain.`)) {
-      return;
-    }
+    if (!confirm(`Delete "${value}"?\n\nPast check-ins remain.`)) return;
 
-    window.companyCache = window.companyCache.filter(
-      c => c !== window.selectedCompany
-    );
-
+    window.companyCache = window.companyCache.filter(c => c !== value);
     await saveCompaniesToCloud(window.companyCache);
     renderCompanyManager();
   };
