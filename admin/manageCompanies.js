@@ -118,18 +118,23 @@ async function renderCompanyManager() {
      SELECT / TYPE
   ========================= */
   input.addEventListener("input", () => {
-    const value = input.value.trim().toUpperCase();
+  const value = input.value.trim().toUpperCase();
 
-    if (window.companyCache.includes(value)) {
-      window.selectedCompany = value;
-      hint.textContent = `Selected: ${value}`;
-      saveBtn.disabled = true;
-      isEditMode = false;
-    } else {
-      window.selectedCompany = null;
-      hint.textContent = "";
-    }
-  });
+  // 🔒 Preserve selected company while editing
+  if (isEditMode) {
+    hint.textContent = `Editing: ${window.selectedCompany} → ${value}`;
+    return;
+  }
+
+  if (window.companyCache.includes(value)) {
+    window.selectedCompany = value;
+    hint.textContent = `Selected: ${value}`;
+    saveBtn.disabled = true;
+  } else {
+    window.selectedCompany = null;
+    hint.textContent = "";
+  }
+});
 
   /* =========================
      ADD
@@ -152,15 +157,19 @@ async function renderCompanyManager() {
      EDIT
   ========================= */
   editBtn.onclick = () => {
-    if (!window.selectedCompany) {
-      alert("Select a company first.");
-      return;
-    }
+  if (!window.selectedCompany) {
+    alert("Select a company first.");
+    return;
+  }
 
-    isEditMode = true;
-    saveBtn.disabled = false;
-    hint.textContent = `Editing: ${window.selectedCompany}`;
-  };
+  isEditMode = true;
+  saveBtn.disabled = false;
+
+  // 🔒 lock original value so it can't be lost
+  input.value = window.selectedCompany;
+
+  hint.textContent = `Editing: ${window.selectedCompany}`;
+};
 
   /* =========================
      SAVE
