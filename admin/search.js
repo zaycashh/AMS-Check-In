@@ -224,6 +224,10 @@ const results = logs.filter(l => {
 
   return true;
 });
+   
+   results.sort((a, b) => {
+  return (b.timestamp || 0) - (a.timestamp || 0);
+});
 
   window.searchResults = results;
   renderSearchResults(results);
