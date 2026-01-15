@@ -1,3 +1,6 @@
+function normalizeCompanyName(val) {
+  return val.trim().toUpperCase();
+}
 /* =========================================================
    MANAGE COMPANIES MODULE (SAFE / NO GLOBAL COLLISIONS)
 ========================================================= */
@@ -118,7 +121,8 @@ async function renderCompanyManager() {
      SELECT / TYPE
   ========================= */
   input.addEventListener("input", () => {
-  const value = input.value.trim().toUpperCase();
+  if (!isEditMode) hint.textContent = "";
+});
 
   // 🔒 Preserve selected company while editing
   if (isEditMode) {
@@ -157,17 +161,18 @@ async function renderCompanyManager() {
      EDIT
   ========================= */
   editBtn.onclick = () => {
-  if (!window.selectedCompany) {
-    alert("Select a company first.");
+  const value = normalizeCompanyName(input.value);
+
+  if (!window.companyCache.includes(value)) {
+    alert("Select an existing company from the list first.");
     return;
   }
 
+  // 🔒 Lock original company name
+  window.selectedCompany = value;
   isEditMode = true;
+
   saveBtn.disabled = false;
-
-  // 🔒 lock original value so it can't be lost
-  input.value = window.selectedCompany;
-
   hint.textContent = `Editing: ${window.selectedCompany}`;
 };
 
@@ -175,25 +180,30 @@ async function renderCompanyManager() {
      SAVE
   ========================= */
   saveBtn.onclick = async () => {
-    if (!isEditMode || !window.selectedCompany) return;
+  if (!isEditMode) return;
 
-    const newName = input.value.trim().toUpperCase();
-    if (!newName) return;
+  const newName = normalizeCompanyName(input.value);
+  if (!newName) return;
 
-    if (
-      window.companyCache.includes(newName) &&
-      newName !== window.selectedCompany
-    ) {
-      alert("That company already exists.");
-      return;
-    }
+  if (
+    window.companyCache.includes(newName) &&
+    newName !== window.selectedCompany
+  ) {
+    alert("That company already exists.");
+    return;
+  }
 
-    const idx = window.companyCache.indexOf(window.selectedCompany);
-    window.companyCache[idx] = newName;
+  const idx = window.companyCache.indexOf(window.selectedCompany);
+  if (idx === -1) {
+    alert("Original company not found.");
+    return;
+  }
 
-    await saveCompaniesToCloud(window.companyCache);
-    renderCompanyManager();
-  };
+  window.companyCache[idx] = newName;
+
+  await saveCompaniesToCloud(window.companyCache);
+  renderCompanyManager();
+};
 
   /* =========================
      DELETE
