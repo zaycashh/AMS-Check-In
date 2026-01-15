@@ -78,12 +78,17 @@ function setupSignaturePad() {
   const placeholder = document.getElementById("sigPlaceholder");
   if (!canvas) return;
 
-  canvas.width = canvas.offsetWidth;
-  canvas.height = canvas.offsetHeight;
-
   const ctx = canvas.getContext("2d");
-  ctx.lineWidth = 2;
-  ctx.lineCap = "round";
+
+const ratio = window.devicePixelRatio || 1;
+canvas.width = canvas.offsetWidth * ratio;
+canvas.height = canvas.offsetHeight * ratio;
+
+// 🔒 Reset + scale safely (prevents drift)
+ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+
+ctx.lineWidth = 2;
+ctx.lineCap = "round";
 
   let drawing = false;
 
