@@ -369,6 +369,46 @@ function clearSearchTable() {
   const t = document.getElementById("searchResultsTable");
   if (t) t.innerHTML = `<tr><td colspan="9" style="text-align:center;opacity:.6;">Run a search</td></tr>`;
 }
+function exportSearchPdf() {
+  if (!window.searchResults || !window.searchResults.length) {
+    alert("No records to export.");
+    return;
+  }
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF("landscape");
+
+  doc.setFontSize(14);
+  doc.text("AMS Search Log Report", 14, 15);
+
+  doc.autoTable({
+    startY: 22,
+    head: [[
+      "Date",
+      "Time",
+      "First",
+      "Last",
+      "Company",
+      "Reason",
+      "Services",
+      "Status"
+    ]],
+    body: window.searchResults.map(r => [
+      r.date,
+      r.time,
+      r.first,
+      r.last,
+      r.company,
+      r.reason,
+      r.services,
+      r.locked !== false ? "LOCKED" : ""
+    ]),
+    styles: { fontSize: 9 },
+    headStyles: { fillColor: [40, 40, 40] }
+  });
+
+  doc.save("AMS_Search_Log.pdf");
+}
 
 /* =========================================================
    INIT
