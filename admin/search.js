@@ -371,18 +371,45 @@ function clearSearchTable() {
 }
 function exportSearchPdf() {
   if (!window.searchResults || !window.searchResults.length) {
-    alert("No records to export.");
+    alert("No search results to export.");
     return;
   }
 
-  const { jsPDF } = window.jspdf;
   const doc = new jsPDF("landscape");
 
-  doc.setFontSize(14);
-  doc.text("AMS Search Log Report", 14, 15);
+  // ===== LOAD LOGO =====
+  const logoImg = document.getElementById("amsLogoBase64");
+  if (logoImg && logoImg.src) {
+    doc.addImage(logoImg.src, "PNG", 14, 10, 40, 15);
+  }
 
+  // ===== HEADER =====
+  doc.setFontSize(16);
+  doc.text("AMS Search Log Report", 150, 18, { align: "center" });
+
+  doc.setFontSize(10);
+  doc.text(
+    `Generated: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`,
+    150,
+    25,
+    { align: "center" }
+  );
+
+  // ===== TABLE DATA =====
+  const tableBody = window.searchResults.map(r => [
+    r.date || "",
+    r.time || "",
+    r.first || "",
+    r.last || "",
+    r.company || "",
+    r.reason || "",
+    r.services || "",
+    r.signature ? "SIGNED" : ""
+  ]);
+
+  // ===== TABLE =====
   doc.autoTable({
-    startY: 22,
+    startY: 32,
     head: [[
       "Date",
       "Time",
@@ -391,23 +418,41 @@ function exportSearchPdf() {
       "Company",
       "Reason",
       "Services",
-      "Status"
+      "Signature"
     ]],
-    body: window.searchResults.map(r => [
-      r.date,
-      r.time,
-      r.first,
-      r.last,
-      r.company,
-      r.reason,
-      r.services,
-      r.locked !== false ? "LOCKED" : ""
-    ]),
-    styles: { fontSize: 9 },
-    headStyles: { fillColor: [40, 40, 40] }
+    body: tableBody,
+    styles: {
+      fontSize: 9,
+      cellPadding: 3
+    },
+    headStyles: {
+      fillColor: [30, 30, 30],
+      textColor: 255
+    },
+    didDrawCell: function (data) {
+      if (
+        data.column.index === 7 &&
+        data.cell.section === "body"
+      ) {
+        const rowIndex = data.row.index;
+        const sig = window.searchResults[rowIndex].signature;
+
+        if (sig) {
+          doc.addImage(
+            sig,
+            "PNG",
+            data.cell.x + 2,
+            data.cell.y + 1,
+            20,
+            6
+          );
+        }
+      }
+    }
   });
 
-  doc.save("AMS_Search_Log.pdf");
+  // ===== SAVE =====
+  doc.save(`AMS_Search_Log_${Date.now()}.pdf`);
 }
 
 /* =========================================================
