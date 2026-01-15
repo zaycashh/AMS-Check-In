@@ -230,12 +230,36 @@ const results = logs.filter(l => {
 };
 
 async function deleteDonor(id) {
-  if (!confirm("Are you sure you want to delete this donor record?")) {
+  let logs = JSON.parse(localStorage.getItem("ams_logs") || "[]");
+  const log = logs.find(l => l.id === id);
+
+  if (!log) {
+    alert("Record not found.");
+    return;
+  }
+
+  // 🔒 STEP 1B — LOCK ENFORCEMENT
+  if (log.locked) {
+    const pin = prompt(
+      "This record is LOCKED.\n\nEnter Admin PIN to delete:"
+    );
+
+    if (pin !== ADMIN_PIN) {
+      alert("Invalid PIN. Delete cancelled.");
+      return;
+    }
+
+    console.warn("🔐 ADMIN OVERRIDE DELETE", {
+      recordId: id,
+      timestamp: new Date().toISOString()
+    });
+  }
+
+  if (!confirm("Are you sure you want to delete this donor record?\n\nThis cannot be undone.")) {
     return;
   }
 
   // 1️⃣ Remove from local cache
-  let logs = JSON.parse(localStorage.getItem("ams_logs") || "[]");
   logs = logs.filter(l => l.id !== id);
   localStorage.setItem("ams_logs", JSON.stringify(logs));
 
@@ -249,7 +273,7 @@ async function deleteDonor(id) {
     console.warn("Cloud delete failed, local only", err);
   }
 
-  // 3️⃣ Refresh UI using existing results
+  // 3️⃣ Refresh UI
   window.searchResults = window.searchResults.filter(r => r.id !== id);
   renderSearchResults(window.searchResults);
 }
