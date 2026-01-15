@@ -226,10 +226,10 @@ window.__submitting = true;
   const now = new Date();
 
   const record = {
-  id: crypto.randomUUID(), // ✅ unique ID (critical)
+  id: crypto.randomUUID(), // unique ID
   date: new Date(
-  now.getTime() - now.getTimezoneOffset() * 60000
-).toISOString().split("T")[0],
+    now.getTime() - now.getTimezoneOffset() * 60000
+  ).toISOString().split("T")[0],
   time: now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
   first,
   last,
@@ -237,8 +237,13 @@ window.__submitting = true;
   reason: finalReason,
   services: services.join(", "),
   signature,
+
+  // 🔒 AUDIT + COMPLIANCE
+  locked: true, // record cannot be edited/deleted
+  createdAt: new Date().toISOString(),
   timestamp: now.getTime()
 };
+
   try {
   await saveCheckIn(record);
 
