@@ -19,6 +19,42 @@ async function fetchCompaniesForDonor() {
     return JSON.parse(localStorage.getItem("ams_companies") || "[]");
   }
 }
+async function autoAddCompanyIfMissing(companyName) {
+  if (!companyName) return;
+
+  const normalized = companyName.trim().toUpperCase();
+  if (!normalized) return;
+
+  let companies = JSON.parse(
+    localStorage.getItem("ams_companies") || "[]"
+  );
+
+  // Prevent duplicates
+  if (companies.includes(normalized)) return;
+
+  companies.push(normalized);
+  companies.sort((a, b) => a.localeCompare(b));
+
+  // Save locally
+  localStorage.setItem("ams_companies", JSON.stringify(companies));
+
+  // Best-effort cloud save
+  try {
+    await fetch(
+      "https://ams-checkin-api.josealfonsodejesus.workers.dev/companies",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(companies)
+      }
+    );
+  } catch (err) {
+    console.warn("⚠️ Cloud company auto-save failed", err);
+  }
+
+  console.log("🏢 Auto-added company:", normalized);
+}
+
 
 function unlockSubmit() {
   window.__submitting = false;
@@ -251,6 +287,8 @@ window.__submitting = true;
 
   try {
   await saveCheckIn(record);
+  await autoAddCompanyIfMissing(finalCompany);
+
 
   alert("Check-in submitted!");
   resetForm();
