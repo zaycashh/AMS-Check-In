@@ -369,31 +369,43 @@ function clearSearchTable() {
   const t = document.getElementById("searchResultsTable");
   if (t) t.innerHTML = `<tr><td colspan="9" style="text-align:center;opacity:.6;">Run a search</td></tr>`;
 }
+
 function exportSearchPdf() {
   if (!window.searchResults || !window.searchResults.length) {
     alert("No search results to export.");
     return;
   }
 
+  const { jsPDF } = window.jspdf;
   const doc = new jsPDF("landscape");
 
-  // ===== LOAD LOGO =====
+  // ===== COLORS =====
+  const HEADER_BLUE = [25, 90, 140];
+  const DARK_TEXT = [40, 40, 40];
+
+  // ===== LOGO =====
   const logoImg = document.getElementById("amsLogoBase64");
-  if (logoImg && logoImg.src) {
-    doc.addImage(logoImg.src, "PNG", 14, 10, 40, 15);
+  if (logoImg?.src) {
+    doc.addImage(logoImg.src, "PNG", 14, 10, 32, 16);
   }
 
-  // ===== HEADER =====
-  doc.setFontSize(16);
-  doc.text("AMS Search Log Report", 150, 18, { align: "center" });
+  // ===== HEADER BAR =====
+  doc.setFillColor(...HEADER_BLUE);
+  doc.rect(0, 0, 297, 32, "F");
+
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(18);
+  doc.text("AMS Search Log Report", 148, 20, { align: "center" });
 
   doc.setFontSize(10);
   doc.text(
     `Generated: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`,
-    150,
-    25,
+    148,
+    27,
     { align: "center" }
   );
+
+  doc.setTextColor(...DARK_TEXT);
 
   // ===== TABLE DATA =====
   const tableBody = window.searchResults.map(r => [
@@ -404,12 +416,12 @@ function exportSearchPdf() {
     r.company || "",
     r.reason || "",
     r.services || "",
-    r.signature ? "SIGNED" : ""
+    "" // Signature placeholder (image drawn later)
   ]);
 
   // ===== TABLE =====
   doc.autoTable({
-    startY: 32,
+    startY: 40,
     head: [[
       "Date",
       "Time",
@@ -423,11 +435,16 @@ function exportSearchPdf() {
     body: tableBody,
     styles: {
       fontSize: 9,
-      cellPadding: 3
+      cellPadding: 4,
+      valign: "middle"
     },
     headStyles: {
-      fillColor: [30, 30, 30],
-      textColor: 255
+      fillColor: HEADER_BLUE,
+      textColor: 255,
+      fontStyle: "bold"
+    },
+    columnStyles: {
+      7: { cellWidth: 28 } // Signature column width
     },
     didDrawCell: function (data) {
       if (
@@ -441,10 +458,10 @@ function exportSearchPdf() {
           doc.addImage(
             sig,
             "PNG",
-            data.cell.x + 2,
-            data.cell.y + 1,
-            20,
-            6
+            data.cell.x + 3,
+            data.cell.y + 2,
+            22,
+            8
           );
         }
       }
