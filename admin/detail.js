@@ -321,25 +321,49 @@ function exportCompanyPdf() {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF("landscape");
 
-   doc.setFillColor(30, 94, 150);
-   doc.rect(0, 0, doc.internal.pageSize.width, 30, "F");
+  const PAGE_WIDTH = doc.internal.pageSize.width;
 
-// ✅ ADD LOGO
-if (amsLogoBase64) {
-  doc.addImage(amsLogoBase64, "PNG", 8, 6, 26, 18);
-}
+  /* ===============================
+     HEADER BAR
+  =============================== */
+  doc.setFillColor(30, 94, 150);
+  doc.rect(0, 0, PAGE_WIDTH, 34, "F");
 
-doc.setTextColor(255);
-doc.setFontSize(16);
-doc.text(
-  "AMS Detail Company Report",
-  doc.internal.pageSize.width / 2,
-  20,
-  { align: "center" }
-);
-doc.setTextColor(0);
+  /* ===============================
+     LOGO
+  =============================== */
+  if (amsLogoBase64) {
+    doc.addImage(amsLogoBase64, "PNG", 10, 8, 28, 18);
+  }
 
+  /* ===============================
+     TITLE
+  =============================== */
+  doc.setTextColor(255);
+  doc.setFontSize(16);
+  doc.text(
+    "AMS Detail Company Report",
+    PAGE_WIDTH / 2,
+    16,
+    { align: "center" }
+  );
 
+  /* ===============================
+     COMPANY LABEL (RESTORED)
+  =============================== */
+  doc.setFontSize(11);
+  doc.text(
+    `Company: ${companyName}`,
+    PAGE_WIDTH / 2,
+    24,
+    { align: "center" }
+  );
+
+  doc.setTextColor(0);
+
+  /* ===============================
+     TABLE DATA
+  =============================== */
   const rows = records.map(r => [
     r.date || "",
     r.time || "",
@@ -350,28 +374,64 @@ doc.setTextColor(0);
     ""
   ]);
 
+  /* ===============================
+     TABLE
+  =============================== */
   doc.autoTable({
-    startY: 36,
+    startY: 42,
     margin: { left: 8, right: 8 },
-    head: [["Date", "Time", "First", "Last", "Reason", "Services", "Signature"]],
+    head: [[
+      "Date",
+      "Time",
+      "First",
+      "Last",
+      "Reason",
+      "Services",
+      "Signature"
+    ]],
     body: rows,
-    styles: { fontSize: 9, cellPadding: 4 },
-    headStyles: { fillColor: [30, 94, 150], textColor: 255 },
+    styles: {
+      fontSize: 9,
+      cellPadding: 4,
+      valign: "middle"
+    },
+    headStyles: {
+      fillColor: [30, 94, 150],
+      textColor: 255
+    },
+    columnStyles: {
+      6: { cellWidth: 28 }
+    },
     didDrawCell(data) {
       if (data.column.index === 6 && data.cell.section === "body") {
         const img = records[data.row.index]?.signature;
         if (img?.startsWith("data:image")) {
-          doc.addImage(img, "PNG",
+          doc.addImage(
+            img,
+            "PNG",
             data.cell.x + 4,
             data.cell.y + 2,
-            18, 8
+            20,
+            8
           );
         }
       }
     }
   });
 
-  doc.save(`AMS_Detail_Company_${companyName}.pdf`);
+  /* ===============================
+     FOOTER — GENERATED TIME (RESTORED)
+  =============================== */
+  doc.setFontSize(9);
+  doc.setTextColor(100);
+  doc.text(
+    `Generated: ${new Date().toLocaleString()}`,
+    PAGE_WIDTH - 10,
+    doc.internal.pageSize.height - 8,
+    { align: "right" }
+  );
+
+  doc.save(`AMS_Detail_Company_${companyName}_${Date.now()}.pdf`);
 }
 
 /* =========================================================
