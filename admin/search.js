@@ -501,6 +501,37 @@ function exportSearchPdf() {
 
   doc.save(`AMS_Search_Log_${Date.now()}.pdf`);
 }
+window.exportSearchLogExcel = function () {
+  if (!window.searchResults || !window.searchResults.length) {
+    alert("No search results to export.");
+    return;
+  }
+
+  const rows = window.searchResults.map(r => ({
+    Date: r.date || "",
+    Time: r.time || "",
+    First: r.first || "",
+    Last: r.last || "",
+    Company: r.company || "",
+    Reason: r.reason || "",
+    Services: r.services || "",
+    Signature: r.signature ? "SIGNED" : ""
+  }));
+
+  const worksheet = XLSX.utils.json_to_sheet(rows);
+  const workbook = XLSX.utils.book_new();
+
+  XLSX.utils.book_append_sheet(
+    workbook,
+    worksheet,
+    "Search Log"
+  );
+
+  XLSX.writeFile(
+    workbook,
+    `AMS_Search_Log_${Date.now()}.xlsx`
+  );
+};
 
 /* =========================================================
    INIT
