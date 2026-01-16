@@ -501,34 +501,100 @@ function exportSearchPdf() {
 
   doc.save(`AMS_Search_Log_${Date.now()}.pdf`);
 }
+
 window.exportSearchLogExcel = function () {
   if (!window.searchResults || !window.searchResults.length) {
     alert("No search results to export.");
     return;
   }
 
-  const rows = window.searchResults.map(r => ({
-    Date: r.date || "",
-    Time: r.time || "",
-    First: r.first || "",
-    Last: r.last || "",
-    Company: r.company || "",
-    Reason: r.reason || "",
-    Services: r.services || "",
-    Signature: r.signature ? "SIGNED" : ""
-  }));
+  /* ===============================
+     DATE RANGE LABEL (MATCH PDF)
+  =============================== */
+  const range = document.getElementById("filterDateRange")?.value || "";
+  const start = document.getElementById("filterStartDate")?.value;
+  const end = document.getElementById("filterEndDate")?.value;
 
-  const worksheet = XLSX.utils.json_to_sheet(rows);
-  const workbook = XLSX.utils.book_new();
+  let rangeLabel = "ALL DATES";
 
-  XLSX.utils.book_append_sheet(
-    workbook,
-    worksheet,
-    "Search Log"
-  );
+  if (range === "today") rangeLabel = "TODAY";
+  if (range === "yesterday") rangeLabel = "YESTERDAY";
+  if (range === "thisWeek") rangeLabel = "THIS WEEK";
+  if (range === "lastWeek") rangeLabel = "LAST WEEK";
+  if (range === "thisMonth") rangeLabel = "THIS MONTH";
+  if (range === "lastMonth") rangeLabel = "LAST MONTH";
+  if (range === "thisYear") rangeLabel = "THIS YEAR";
+  if (range === "lastYear") rangeLabel = "LAST YEAR";
+
+  if (range === "custom" && start && end) {
+    rangeLabel = `CUSTOM: ${start} – ${end}`;
+  }
+
+  /* ===============================
+     BUILD SHEET (TITLE + META)
+  =============================== */
+  const sheetData = [
+    ["AMS Search Log Report"],
+    [`Date Range: ${rangeLabel}`],
+    [`Generated: ${new Date().toLocaleString()}`],
+    [],
+    [
+      "Date",
+      "Time",
+      "First",
+      "Last",
+      "Company",
+      "Reason",
+      "Services",
+      "Signature"
+    ]
+  ];
+
+  /* ===============================
+     DATA ROWS
+  =============================== */
+  window.searchResults.forEach(r => {
+    sheetData.push([
+      r.date || "",
+      r.time || "",
+      r.first || "",
+      r.last || "",
+      r.company || "",
+      r.reason || "",
+      r.services || "",
+      r.signature ? "SIGNED" : ""
+    ]);
+  });
+
+  /* ===============================
+     CREATE WORKBOOK
+  =============================== */
+  const ws = XLSX.utils.aoa_to_sheet(sheetData);
+
+  // Merge title & meta rows
+  ws["!merges"] = [
+    { s: { r: 0, c: 0 }, e: { r: 0, c: 7 } },
+    { s: { r: 1, c: 0 }, e: { r: 1, c: 7 } },
+    { s: { r: 2, c: 0 }, e: { r: 2, c: 7 } }
+  ];
+
+  // Column widths
+  ws["!cols"] = [
+    { wch: 12 }, // Date
+    { wch: 10 }, // Time
+    { wch: 14 }, // First
+    { wch: 14 }, // Last
+    { wch: 22 }, // Company
+    { wch: 18 }, // Reason
+    { wch: 30 }, // Services
+    { wch: 12 }  // Signature
+  ];
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Search Log");
 
   XLSX.writeFile(
-    workbook,
+    wb,
     `AMS_Search_Log_${Date.now()}.xlsx`
   );
 };
