@@ -379,35 +379,60 @@ function exportSearchPdf() {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF("landscape");
 
-  // ===== COLORS =====
   const HEADER_BLUE = [25, 90, 140];
   const DARK_TEXT = [40, 40, 40];
 
-  // ===== LOGO =====
-  const logoImg = document.getElementById("amsLogoBase64");
-  if (logoImg?.src) {
-    doc.addImage(logoImg.src, "PNG", 14, 10, 32, 16);
+  /* ===============================
+     DATE RANGE LABEL
+  =============================== */
+  const range = document.getElementById("filterDateRange")?.value || "";
+  const start = document.getElementById("filterStartDate")?.value;
+  const end = document.getElementById("filterEndDate")?.value;
+
+  let rangeLabel = "ALL DATES";
+
+  if (range === "today") rangeLabel = "TODAY";
+  if (range === "yesterday") rangeLabel = "YESTERDAY";
+  if (range === "thisWeek") rangeLabel = "THIS WEEK";
+  if (range === "lastWeek") rangeLabel = "LAST WEEK";
+  if (range === "thisMonth") rangeLabel = "THIS MONTH";
+  if (range === "lastMonth") rangeLabel = "LAST MONTH";
+  if (range === "thisYear") rangeLabel = "THIS YEAR";
+  if (range === "lastYear") rangeLabel = "LAST YEAR";
+
+  if (range === "custom" && start && end) {
+    rangeLabel = `CUSTOM: ${start} – ${end}`;
   }
 
-  // ===== HEADER BAR =====
+  /* ===============================
+     HEADER BAR
+  =============================== */
   doc.setFillColor(...HEADER_BLUE);
-  doc.rect(0, 0, 297, 32, "F");
+  doc.rect(0, 0, 297, 34, "F");
 
+  /* ===============================
+     LOGO (DRAW AFTER HEADER)
+  =============================== */
+  const logoImg = document.getElementById("amsLogoBase64");
+  if (logoImg?.src) {
+    doc.addImage(logoImg.src, "PNG", 14, 9, 34, 16);
+  }
+
+  /* ===============================
+     TITLE
+  =============================== */
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(18);
-  doc.text("AMS Search Log Report", 148, 20, { align: "center" });
+  doc.text("AMS Search Log Report", 148, 18, { align: "center" });
 
-  doc.setFontSize(10);
-  doc.text(
-    `Generated: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`,
-    148,
-    27,
-    { align: "center" }
-  );
+  doc.setFontSize(11);
+  doc.text(rangeLabel, 148, 26, { align: "center" });
 
   doc.setTextColor(...DARK_TEXT);
 
-  // ===== TABLE DATA =====
+  /* ===============================
+     TABLE DATA
+  =============================== */
   const tableBody = window.searchResults.map(r => [
     r.date || "",
     r.time || "",
@@ -416,12 +441,14 @@ function exportSearchPdf() {
     r.company || "",
     r.reason || "",
     r.services || "",
-    "" // Signature placeholder (image drawn later)
+    ""
   ]);
 
-  // ===== TABLE =====
+  /* ===============================
+     TABLE
+  =============================== */
   doc.autoTable({
-    startY: 40,
+    startY: 42,
     head: [[
       "Date",
       "Time",
@@ -444,20 +471,13 @@ function exportSearchPdf() {
       fontStyle: "bold"
     },
     columnStyles: {
-      7: { cellWidth: 28 } // Signature column width
+      7: { cellWidth: 28 }
     },
-    didDrawCell: function (data) {
-      if (
-        data.column.index === 7 &&
-        data.cell.section === "body"
-      ) {
-        const rowIndex = data.row.index;
-        const sig = window.searchResults[rowIndex].signature;
-
+    didDrawCell(data) {
+      if (data.column.index === 7 && data.cell.section === "body") {
+        const sig = window.searchResults[data.row.index]?.signature;
         if (sig) {
-          doc.addImage(
-            sig,
-            "PNG",
+          doc.addImage(sig, "PNG",
             data.cell.x + 3,
             data.cell.y + 2,
             22,
@@ -468,7 +488,17 @@ function exportSearchPdf() {
     }
   });
 
-  // ===== SAVE =====
+  /* ===============================
+     FOOTER (BOTTOM-RIGHT)
+  =============================== */
+  doc.setFontSize(9);
+  doc.text(
+    `Generated: ${new Date().toLocaleString()}`,
+    290,
+    200,
+    { align: "right" }
+  );
+
   doc.save(`AMS_Search_Log_${Date.now()}.pdf`);
 }
 
