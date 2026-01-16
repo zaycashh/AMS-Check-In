@@ -290,7 +290,6 @@ window.__submitting = true;
   await autoAddCompanyIfMissing(finalCompany);
 
 
-  alert("Check-in submitted!");
   resetForm();
   window.__submitting = false;
 
