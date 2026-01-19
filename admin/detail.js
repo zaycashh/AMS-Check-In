@@ -467,7 +467,7 @@ function exportCompanyPdf() {
      HEADER BAR
   =============================== */
   doc.setFillColor(30, 94, 150);
-  doc.rect(0, 0, PAGE_WIDTH, 34, "F");
+  doc.rect(0, 0, PAGE_WIDTH, 44, "F");
 
   /* ===============================
      LOGO
@@ -503,18 +503,16 @@ doc.setFontSize(10);
 doc.text(
   `Date Range: ${getDetailDateRangeLabel()}`,
   PAGE_WIDTH / 2,
-  30,
-  { align: "center" }
-);
-   
-doc.setFontSize(10);
-doc.text(
-  `Total Donors: ${records.length}`,
-  PAGE_WIDTH / 2,
-  36,
+  31,
   { align: "center" }
 );
 
+doc.text(
+  `Total Donors: ${records.length}`,
+  PAGE_WIDTH / 2,
+  37,
+  { align: "center" }
+);
 
 
   doc.setTextColor(0);
@@ -536,7 +534,7 @@ doc.text(
      TABLE
   =============================== */
   doc.autoTable({
-    startY: 46,
+    startY: 50,
     margin: { left: 8, right: 8 },
     head: [[
       "Date",
