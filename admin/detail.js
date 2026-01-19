@@ -276,6 +276,8 @@ function renderCompanyDetailTable() {
   );
 
   records = filterByDateRange(records);
+   document.getElementById("detailDonorCount").textContent =
+  `Total Donors: ${records.length}`;
 
   tbody.innerHTML = "";
 
@@ -404,8 +406,10 @@ function exportCompanyExcel() {
   { s: { r: 0, c: 0 }, e: { r: 0, c: 6 } },
   { s: { r: 1, c: 0 }, e: { r: 1, c: 6 } },
   { s: { r: 2, c: 0 }, e: { r: 2, c: 6 } },
-  { s: { r: 3, c: 0 }, e: { r: 3, c: 6 } }
+  { s: { r: 3, c: 0 }, e: { r: 3, c: 6 } },
+  { s: { r: 4, c: 0 }, e: { r: 4, c: 6 } }
 ];
+
    ws["!cols"] = [
   { wch: 14 }, // Date
   { wch: 10 }, // Time
@@ -491,6 +495,15 @@ doc.text(
   30,
   { align: "center" }
 );
+   
+doc.setFontSize(10);
+doc.text(
+  `Total Donors: ${records.length}`,
+  PAGE_WIDTH / 2,
+  36,
+  { align: "center" }
+);
+
 
 
   doc.setTextColor(0);
@@ -512,7 +525,7 @@ doc.text(
      TABLE
   =============================== */
   doc.autoTable({
-    startY: 42,
+    startY: 46,
     margin: { left: 8, right: 8 },
     head: [[
       "Date",
