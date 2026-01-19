@@ -138,6 +138,7 @@ function populateDetailCompanyDropdown(logs) {
     opt.textContent = company;
     select.appendChild(opt);
   });
+}
 
 function bindDetailActionButtons() {
   const searchBtn = document.getElementById("detailSearchBtn");
