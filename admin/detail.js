@@ -376,6 +376,15 @@ function exportCompanyExcel() {
   { s: { r: 2, c: 0 }, e: { r: 2, c: 6 } },
   { s: { r: 3, c: 0 }, e: { r: 3, c: 6 } }
 ];
+   ws["!cols"] = [
+  { wch: 14 }, // Date
+  { wch: 10 }, // Time
+  { wch: 14 }, // First
+  { wch: 14 }, // Last
+  { wch: 20 }, // Reason
+  { wch: 30 }, // Services
+  { wch: 10 }  // Signed
+];
 
   XLSX.utils.book_append_sheet(wb, ws, "Detail Company");
   XLSX.writeFile(wb, `AMS_Detail_Company_${companyName}.xlsx`);
@@ -438,12 +447,19 @@ function exportCompanyPdf() {
      COMPANY LABEL (RESTORED)
   =============================== */
   doc.setFontSize(11);
-  doc.setFontSize(10);
-  doc.text(
-    `Date Range: ${getDetailDateRangeLabel()}`,
-    PAGE_WIDTH / 2,
-    30,
-    { align: "center" }
+doc.text(
+  `Company: ${companyName}`,
+  PAGE_WIDTH / 2,
+  24,
+  { align: "center" }
+);
+
+doc.setFontSize(10);
+doc.text(
+  `Date Range: ${getDetailDateRangeLabel()}`,
+  PAGE_WIDTH / 2,
+  30,
+  { align: "center" }
 );
 
 
