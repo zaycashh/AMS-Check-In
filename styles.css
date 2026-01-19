@@ -669,20 +669,44 @@ body {
   background: #f0f0f0;
 }
 
-/* ==============================
-   DETAIL COMPANY – FILTER BAR FIX
-============================== */
+/* ===============================
+   DETAIL COMPANY – SEARCH / CLEAR
+   Match Search Log Buttons
+================================ */
 
-#tabCompany .filter-bar {
+.detail-actions {
   display: flex;
-  align-items: center;
-  gap: 12px;
-  width: 100%;
+  gap: 10px;
+  justify-content: flex-start;
+  margin-top: 12px;
 }
 
-#tabCompany .export-right {
-  margin-left: auto;
-  display: flex;
-  gap: 8px;
+.detail-actions button {
+  padding: 8px 14px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 1px solid #ccc;
 }
 
+/* Search (same as Search Log) */
+.detail-actions .search-btn {
+  background: #1e5e96;
+  color: #fff;
+  border-color: #1e5e96;
+}
+
+.detail-actions .search-btn:hover {
+  background: #174a76;
+}
+
+/* Clear (same as Search Log) */
+.detail-actions .clear-btn {
+  background: #ffffff;
+  color: #1f2937;
+}
+
+.detail-actions .clear-btn:hover {
+  background: #f3f4f6;
+}
