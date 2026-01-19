@@ -668,15 +668,21 @@ body {
 .company-suggestion-item:hover {
   background: #f0f0f0;
 }
-.filter-bar {
+
+/* ==============================
+   DETAIL COMPANY – FILTER BAR FIX
+============================== */
+
+#tabCompany .filter-bar {
   display: flex;
   align-items: center;
   gap: 12px;
-  flex-wrap: wrap;
+  width: 100%;
 }
 
-.export-right {
+#tabCompany .export-right {
   margin-left: auto;
   display: flex;
   gap: 8px;
 }
+
