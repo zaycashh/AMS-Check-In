@@ -302,6 +302,32 @@ function bindDetailCompanyButtons() {
 /* =========================================================
    EXPORT EXCEL
 ========================================================= */
+function getDetailDateRangeLabel() {
+  const range = document.getElementById("detailDateRange")?.value;
+  const start = document.getElementById("detailStartDate")?.value;
+  const end = document.getElementById("detailEndDate")?.value;
+
+  if (!range) return "ALL DATES";
+
+  switch (range) {
+    case "today": return "TODAY";
+    case "yesterday": return "YESTERDAY";
+    case "thisWeek": return "THIS WEEK";
+    case "lastWeek": return "LAST WEEK";
+    case "thisMonth": return "THIS MONTH";
+    case "lastMonth": return "LAST MONTH";
+    case "thisYear": return "THIS YEAR";
+    case "lastYear": return "LAST YEAR";
+    case "custom":
+      if (start && end) {
+        return `CUSTOM: ${start} – ${end}`;
+      }
+      return "CUSTOM RANGE";
+    default:
+      return "ALL DATES";
+  }
+}
+
 function exportCompanyExcel() {
   const companyName =
     document.getElementById("detailCompanySelect")?.value;
@@ -323,12 +349,13 @@ function exportCompanyExcel() {
   }
 
   const header = [
-    ["AMS Detail Company Report"],
-    [`Company: ${companyName}`],
-    [`Generated: ${new Date().toLocaleString()}`],
-    [],
-    ["Date", "Time", "First", "Last", "Reason", "Services", "Signed"]
-  ];
+  ["AMS Detail Company Report"],
+  [`Company: ${companyName}`],
+  [`Date Range: ${getDetailDateRangeLabel()}`],
+  [`Generated: ${new Date().toLocaleString()}`],
+  [],
+  ["Date", "Time", "First", "Last", "Reason", "Services", "Signed"]
+];
 
   const rows = records.map(r => [
   r.date || "",
@@ -343,11 +370,12 @@ function exportCompanyExcel() {
   const ws = XLSX.utils.aoa_to_sheet([...header, ...rows]);
   const wb = XLSX.utils.book_new();
 
-  ws["!merges"] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 5 } }];
-  ws["!cols"] = [
-    { wch: 14 }, { wch: 10 }, { wch: 14 },
-    { wch: 14 }, { wch: 20 }, { wch: 30 }
-  ];
+  ws["!merges"] = [
+  { s: { r: 0, c: 0 }, e: { r: 0, c: 6 } },
+  { s: { r: 1, c: 0 }, e: { r: 1, c: 6 } },
+  { s: { r: 2, c: 0 }, e: { r: 2, c: 6 } },
+  { s: { r: 3, c: 0 }, e: { r: 3, c: 6 } }
+];
 
   XLSX.utils.book_append_sheet(wb, ws, "Detail Company");
   XLSX.writeFile(wb, `AMS_Detail_Company_${companyName}.xlsx`);
@@ -410,12 +438,14 @@ function exportCompanyPdf() {
      COMPANY LABEL (RESTORED)
   =============================== */
   doc.setFontSize(11);
+  doc.setFontSize(10);
   doc.text(
-    `Company: ${companyName}`,
+    `Date Range: ${getDetailDateRangeLabel()}`,
     PAGE_WIDTH / 2,
-    24,
+    30,
     { align: "center" }
-  );
+);
+
 
   doc.setTextColor(0);
 
