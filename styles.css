@@ -668,3 +668,15 @@ body {
 .company-suggestion-item:hover {
   background: #f0f0f0;
 }
+.filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.export-right {
+  margin-left: auto;
+  display: flex;
+  gap: 8px;
+}
