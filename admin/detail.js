@@ -88,15 +88,6 @@ function loadDetailCompanyReport() {
   <button id="companyDetailPdfBtn" style="margin-left:8px;">Export PDF</button>
 </div>
 
-document.addEventListener("change", e => {
-  if (e.target.id === "detailDateRange") {
-    document.getElementById("detailCustomDates").style.display =
-      e.target.value === "custom" ? "inline-block" : "none";
-
-    renderCompanyDetailTable();
-  }
-});
-
     <table class="report-table">
       <thead>
         <tr>
@@ -159,57 +150,66 @@ function filterByDateRange(records) {
   const now = Date.now();
 
   switch (range) {
-    case "today": {
-      const d = new Date();
-      d.setHours(0, 0, 0, 0);
-      startTs = d.getTime();
-      endTs = startTs + 86400000 - 1;
-      break;
-    }
-    case "yesterday": {
-      const d = new Date();
-      d.setHours(0, 0, 0, 0);
-      endTs = d.getTime() - 1;
-      startTs = endTs - 86400000 + 1;
-      break;
-    }
-    case "thisMonth": {
-      const d = new Date();
-      startTs = new Date(d.getFullYear(), d.getMonth(), 1).getTime();
-      endTs = now;
-      break;
-    }
+  case "today": {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    startTs = d.getTime();
+    endTs = startTs + 86400000 - 1;
+    break;
   }
-   case "thisWeek": {
-  const d = new Date();
-  d.setHours(0, 0, 0, 0);
-  startTs = d.getTime() - d.getDay() * 86400000;
-  endTs = now;
-  break;
-}
 
-case "lastWeek": {
-  const d = new Date();
-  d.setHours(0, 0, 0, 0);
-  endTs = d.getTime() - d.getDay() * 86400000 - 1;
-  startTs = endTs - 7 * 86400000 + 1;
-  break;
-}
+  case "yesterday": {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    endTs = d.getTime() - 1;
+    startTs = endTs - 86400000 + 1;
+    break;
+  }
 
-case "thisYear": {
-  const d = new Date();
-  startTs = new Date(d.getFullYear(), 0, 1).getTime();
-  endTs = now;
-  break;
-}
+  case "thisWeek": {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    startTs = d.getTime() - d.getDay() * 86400000;
+    endTs = now;
+    break;
+  }
 
-case "lastYear": {
-  const y = new Date().getFullYear() - 1;
-  startTs = new Date(y, 0, 1).getTime();
-  endTs = new Date(y, 11, 31, 23, 59, 59).getTime();
-  break;
-}
+  case "lastWeek": {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    endTs = d.getTime() - d.getDay() * 86400000 - 1;
+    startTs = endTs - 7 * 86400000 + 1;
+    break;
+  }
 
+  case "thisMonth": {
+    const d = new Date();
+    startTs = new Date(d.getFullYear(), d.getMonth(), 1).getTime();
+    endTs = now;
+    break;
+  }
+
+  case "lastMonth": {
+    const d = new Date();
+    startTs = new Date(d.getFullYear(), d.getMonth() - 1, 1).getTime();
+    endTs = new Date(d.getFullYear(), d.getMonth(), 0, 23, 59, 59).getTime();
+    break;
+  }
+
+  case "thisYear": {
+    const d = new Date();
+    startTs = new Date(d.getFullYear(), 0, 1).getTime();
+    endTs = now;
+    break;
+  }
+
+  case "lastYear": {
+    const y = new Date().getFullYear() - 1;
+    startTs = new Date(y, 0, 1).getTime();
+    endTs = new Date(y, 11, 31, 23, 59, 59).getTime();
+    break;
+  }
+}
 
   if (startInput) startTs = new Date(startInput).getTime();
   if (endInput) endTs = new Date(endInput).getTime() + 86400000 - 1;
@@ -501,4 +501,15 @@ document.querySelectorAll(".tab").forEach(tab => {
       loadDetailCompanyReport();
     }
   });
+});
+document.addEventListener("change", e => {
+  if (e.target.id === "detailDateRange") {
+    const customWrap = document.getElementById("detailCustomDates");
+    if (customWrap) {
+      customWrap.style.display =
+        e.target.value === "custom" ? "inline-block" : "none";
+    }
+
+    renderCompanyDetailTable();
+  }
 });
