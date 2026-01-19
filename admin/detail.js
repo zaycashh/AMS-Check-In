@@ -59,55 +59,63 @@ function loadDetailCompanyReport() {
   if (!container) return;
 
   container.innerHTML = `
-    <h2 class="section-title">Detail Company Report</h2>
+    container.innerHTML = `
+  <h2 class="section-title">Detail Company Report</h2>
 
-    <div class="filter-bar">
-  <label>Company:</label>
-  <select id="detailCompanySelect"></select>
+  <div class="filter-bar">
+    <label>Company:</label>
+    <select id="detailCompanySelect"></select>
 
-  <label style="margin-left:12px;">Date Range:</label>
-  <select id="detailDateRange">
-    <option value="">All Dates</option>
-    <option value="today">Today</option>
-    <option value="yesterday">Yesterday</option>
-    <option value="thisWeek">This Week</option>
-    <option value="lastWeek">Last Week</option>
-    <option value="thisMonth">This Month</option>
-    <option value="lastMonth">Last Month</option>
-    <option value="thisYear">This Year</option>
-    <option value="lastYear">Last Year</option>
-    <option value="custom">Custom</option>
-  </select>
+    <label style="margin-left:12px;">Date Range:</label>
+    <select id="detailDateRange">
+      <option value="">All Dates</option>
+      <option value="today">Today</option>
+      <option value="yesterday">Yesterday</option>
+      <option value="thisWeek">This Week</option>
+      <option value="lastWeek">Last Week</option>
+      <option value="thisMonth">This Month</option>
+      <option value="lastMonth">Last Month</option>
+      <option value="thisYear">This Year</option>
+      <option value="lastYear">Last Year</option>
+      <option value="custom">Custom</option>
+    </select>
 
-  <span id="detailCustomDates" style="display:none;margin-left:8px;">
-    <input type="date" id="detailStartDate">
-    <input type="date" id="detailEndDate">
-  </span>
+    <span id="detailCustomDates" style="display:none;margin-left:8px;">
+      <input type="date" id="detailStartDate">
+      <input type="date" id="detailEndDate">
+    </span>
 
-  <div class="export-right">
-  <button id="companyDetailExcelBtn">Export Excel</button>
-  <button id="companyDetailPdfBtn">Export PDF</button>
-</div>
+    <!-- ✅ THIS WAS MISSING -->
+    <span id="detailDonorCount"
+          style="margin-left:12px;font-weight:600;">
+      Total Donors: 0
+    </span>
 
-    <table class="report-table">
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Time</th>
-          <th>First</th>
-          <th>Last</th>
-          <th>Reason</th>
-          <th>Services</th>
-        </tr>
-      </thead>
-      <tbody id="companyDetailBody"></tbody>
-    </table>
+    <div class="export-right">
+      <button id="companyDetailExcelBtn">Export Excel</button>
+      <button id="companyDetailPdfBtn">Export PDF</button>
+    </div>
+  </div>
 
-<div class="detail-actions">
-  <button id="detailSearchBtn">Search</button>
-  <button id="detailClearBtn">Clear</button>
-</div>
-  `;
+  <table class="report-table">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Time</th>
+        <th>First</th>
+        <th>Last</th>
+        <th>Reason</th>
+        <th>Services</th>
+      </tr>
+    </thead>
+    <tbody id="companyDetailBody"></tbody>
+  </table>
+
+  <div class="detail-actions">
+    <button id="detailSearchBtn">Search</button>
+    <button id="detailClearBtn">Clear</button>
+  </div>
+`;
 
   // Instant render from local
   populateDetailCompanyDropdown(getLocalDetailLogs());
@@ -276,8 +284,10 @@ function renderCompanyDetailTable() {
   );
 
   records = filterByDateRange(records);
-   document.getElementById("detailDonorCount").textContent =
-  `Total Donors: ${records.length}`;
+   const countEl = document.getElementById("detailDonorCount");
+if (countEl) {
+  countEl.textContent = `Total Donors: ${records.length}`;
+}
 
   tbody.innerHTML = "";
 
