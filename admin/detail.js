@@ -66,7 +66,7 @@ function loadDetailCompanyReport() {
   <select id="detailCompanySelect"></select>
 
   <label style="margin-left:12px;">Date Range:</label>
-  <select id="detailDateRange" onchange="renderCompanyDetailTable()">
+  <select id="detailDateRange">
     <option value="">All Dates</option>
     <option value="today">Today</option>
     <option value="yesterday">Yesterday</option>
@@ -138,9 +138,6 @@ function populateDetailCompanyDropdown(logs) {
     opt.textContent = company;
     select.appendChild(opt);
   });
-
-  select.onchange = renderCompanyDetailTable;
-}
 
 function bindDetailActionButtons() {
   const searchBtn = document.getElementById("detailSearchBtn");
@@ -587,7 +584,5 @@ document.addEventListener("change", e => {
       customWrap.style.display =
         e.target.value === "custom" ? "inline-block" : "none";
     }
-
-    renderCompanyDetailTable();
   }
 });
