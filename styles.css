@@ -668,45 +668,28 @@ body {
 .company-suggestion-item:hover {
   background: #f0f0f0;
 }
-
 /* ===============================
-   DETAIL COMPANY – SEARCH / CLEAR
-   Match Search Log Buttons
+   DETAIL COMPANY – MATCH SEARCH LOG BUTTONS
 ================================ */
 
 .detail-actions {
   display: flex;
-  gap: 10px;
-  justify-content: flex-start;
+  gap: 8px;
   margin-top: 12px;
 }
 
 .detail-actions button {
-  padding: 8px 14px;
-  font-size: 14px;
-  font-weight: 600;
-  border-radius: 6px;
-  cursor: pointer;
-  border: 1px solid #ccc;
-}
-
-/* Search (same as Search Log) */
-.detail-actions .search-btn {
-  background: #1e5e96;
-  color: #fff;
-  border-color: #1e5e96;
-}
-
-.detail-actions .search-btn:hover {
-  background: #174a76;
-}
-
-/* Clear (same as Search Log) */
-.detail-actions .clear-btn {
   background: #ffffff;
-  color: #1f2937;
+  color: #000000;
+  border: 1px solid #bfbfbf;
+  padding: 4px 10px;
+  font-size: 13px;
+  font-weight: normal;
+  border-radius: 2px;
+  cursor: pointer;
 }
 
-.detail-actions .clear-btn:hover {
-  background: #f3f4f6;
+/* Hover like Search Log */
+.detail-actions button:hover {
+  background: #f2f2f2;
 }
