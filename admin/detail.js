@@ -102,6 +102,11 @@ function loadDetailCompanyReport() {
       </thead>
       <tbody id="companyDetailBody"></tbody>
     </table>
+
+<div class="detail-actions">
+  <button id="detailSearchBtn" class="primary-btn small">Search</button>
+  <button id="detailClearBtn" class="secondary-btn">Clear</button>
+</div>
   `;
 
   // Instant render from local
@@ -134,6 +139,31 @@ function populateDetailCompanyDropdown(logs) {
   });
 
   select.onchange = renderCompanyDetailTable;
+}
+
+function bindDetailActionButtons() {
+  const searchBtn = document.getElementById("detailSearchBtn");
+  const clearBtn = document.getElementById("detailClearBtn");
+
+  if (searchBtn) {
+    searchBtn.onclick = () => {
+      renderCompanyDetailTable();
+    };
+  }
+
+  if (clearBtn) {
+    clearBtn.onclick = () => {
+      document.getElementById("detailCompanySelect").value = "";
+      document.getElementById("detailDateRange").value = "";
+      document.getElementById("detailStartDate").value = "";
+      document.getElementById("detailEndDate").value = "";
+
+      const custom = document.getElementById("detailCustomDates");
+      if (custom) custom.style.display = "none";
+
+      document.getElementById("companyDetailBody").innerHTML = "";
+    };
+  }
 }
 
 /* =========================================================
