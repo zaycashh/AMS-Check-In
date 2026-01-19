@@ -84,8 +84,9 @@ function loadDetailCompanyReport() {
     <input type="date" id="detailEndDate">
   </span>
 
-  <button id="companyDetailExcelBtn" style="margin-left:8px;">Export Excel</button>
-  <button id="companyDetailPdfBtn" style="margin-left:8px;">Export PDF</button>
+  <div class="export-right">
+  <button id="companyDetailExcelBtn">Export Excel</button>
+  <button id="companyDetailPdfBtn">Export PDF</button>
 </div>
 
     <table class="report-table">
