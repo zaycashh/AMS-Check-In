@@ -394,6 +394,7 @@ function exportCompanyExcel() {
   ["AMS Detail Company Report"],
   [`Company: ${companyName}`],
   [`Date Range: ${getDetailDateRangeLabel()}`],
+  [`Total Donors: ${records.length}`],
   [`Generated: ${new Date().toLocaleString()}`],
   [],
   ["Date", "Time", "First", "Last", "Reason", "Services", "Signed"]
@@ -413,11 +414,12 @@ function exportCompanyExcel() {
   const wb = XLSX.utils.book_new();
 
   ws["!merges"] = [
-  { s: { r: 0, c: 0 }, e: { r: 0, c: 6 } },
-  { s: { r: 1, c: 0 }, e: { r: 1, c: 6 } },
-  { s: { r: 2, c: 0 }, e: { r: 2, c: 6 } },
-  { s: { r: 3, c: 0 }, e: { r: 3, c: 6 } },
-  { s: { r: 4, c: 0 }, e: { r: 4, c: 6 } }
+  { s: { r: 0, c: 0 }, e: { r: 0, c: 6 } }, // Title
+  { s: { r: 1, c: 0 }, e: { r: 1, c: 6 } }, // Company
+  { s: { r: 2, c: 0 }, e: { r: 2, c: 6 } }, // Date Range
+  { s: { r: 3, c: 0 }, e: { r: 3, c: 6 } }, // Total Donors
+  { s: { r: 4, c: 0 }, e: { r: 4, c: 6 } }, // Generated
+  { s: { r: 5, c: 0 }, e: { r: 5, c: 6 } }  // Spacer
 ];
 
    ws["!cols"] = [
