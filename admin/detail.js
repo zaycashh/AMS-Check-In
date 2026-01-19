@@ -118,6 +118,7 @@ function loadDetailCompanyReport() {
   });
 
   bindDetailCompanyButtons();
+  bindDetailActionButtons();
 }
 
 /* =========================================================
