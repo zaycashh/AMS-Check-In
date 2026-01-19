@@ -117,8 +117,8 @@ function loadDetailCompanyReport() {
     populateDetailCompanyDropdown(logs);
   });
 
-  bindDetailCompanyButtons();
-  bindDetailActionButtons();
+   bindDetailActionButtons();
+   bindDetailCompanyButtons();
 }
 
 /* =========================================================
