@@ -566,8 +566,7 @@ doc.text(
 
   doc.save(`AMS_Detail_Company_${companyName}_${Date.now()}.pdf`);
 }
-
-/* =========================================================
+   /* =========================================================
    TAB HANDLER
 ========================================================= */
 document.querySelectorAll(".tab").forEach(tab => {
@@ -577,6 +576,10 @@ document.querySelectorAll(".tab").forEach(tab => {
     }
   });
 });
+
+/* =========================================================
+   DATE RANGE TOGGLE ONLY (NO AUTO SEARCH)
+========================================================= */
 document.addEventListener("change", e => {
   if (e.target.id === "detailDateRange") {
     const customWrap = document.getElementById("detailCustomDates");
