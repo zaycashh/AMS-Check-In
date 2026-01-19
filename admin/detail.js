@@ -59,7 +59,6 @@ function loadDetailCompanyReport() {
   if (!container) return;
 
   container.innerHTML = `
-    container.innerHTML = `
   <h2 class="section-title">Detail Company Report</h2>
 
   <div class="filter-bar">
