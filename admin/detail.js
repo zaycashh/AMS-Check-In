@@ -62,12 +62,40 @@ function loadDetailCompanyReport() {
     <h2 class="section-title">Detail Company Report</h2>
 
     <div class="filter-bar">
-      <label>Company:</label>
-      <select id="detailCompanySelect"></select>
+  <label>Company:</label>
+  <select id="detailCompanySelect"></select>
 
-      <button id="companyDetailExcelBtn">Export Excel</button>
-      <button id="companyDetailPdfBtn" style="margin-left:8px;">Export PDF</button>
-    </div>
+  <label style="margin-left:12px;">Date Range:</label>
+  <select id="detailDateRange" onchange="renderCompanyDetailTable()">
+    <option value="">All Dates</option>
+    <option value="today">Today</option>
+    <option value="yesterday">Yesterday</option>
+    <option value="thisWeek">This Week</option>
+    <option value="lastWeek">Last Week</option>
+    <option value="thisMonth">This Month</option>
+    <option value="lastMonth">Last Month</option>
+    <option value="thisYear">This Year</option>
+    <option value="lastYear">Last Year</option>
+    <option value="custom">Custom</option>
+  </select>
+
+  <span id="detailCustomDates" style="display:none;margin-left:8px;">
+    <input type="date" id="detailStartDate">
+    <input type="date" id="detailEndDate">
+  </span>
+
+  <button id="companyDetailExcelBtn" style="margin-left:8px;">Export Excel</button>
+  <button id="companyDetailPdfBtn" style="margin-left:8px;">Export PDF</button>
+</div>
+
+document.addEventListener("change", e => {
+  if (e.target.id === "detailDateRange") {
+    document.getElementById("detailCustomDates").style.display =
+      e.target.value === "custom" ? "inline-block" : "none";
+
+    renderCompanyDetailTable();
+  }
+});
 
     <table class="report-table">
       <thead>
@@ -152,6 +180,36 @@ function filterByDateRange(records) {
       break;
     }
   }
+   case "thisWeek": {
+  const d = new Date();
+  d.setHours(0, 0, 0, 0);
+  startTs = d.getTime() - d.getDay() * 86400000;
+  endTs = now;
+  break;
+}
+
+case "lastWeek": {
+  const d = new Date();
+  d.setHours(0, 0, 0, 0);
+  endTs = d.getTime() - d.getDay() * 86400000 - 1;
+  startTs = endTs - 7 * 86400000 + 1;
+  break;
+}
+
+case "thisYear": {
+  const d = new Date();
+  startTs = new Date(d.getFullYear(), 0, 1).getTime();
+  endTs = now;
+  break;
+}
+
+case "lastYear": {
+  const y = new Date().getFullYear() - 1;
+  startTs = new Date(y, 0, 1).getTime();
+  endTs = new Date(y, 11, 31, 23, 59, 59).getTime();
+  break;
+}
+
 
   if (startInput) startTs = new Date(startInput).getTime();
   if (endInput) endTs = new Date(endInput).getTime() + 86400000 - 1;
