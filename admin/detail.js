@@ -104,8 +104,8 @@ function loadDetailCompanyReport() {
     </table>
 
 <div class="detail-actions">
-  <button id="detailSearchBtn" class="primary-btn small">Search</button>
-  <button id="detailClearBtn" class="secondary-btn">Clear</button>
+  <button id="detailSearchBtn">Search</button>
+  <button id="detailClearBtn">Clear</button>
 </div>
   `;
 
