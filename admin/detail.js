@@ -130,6 +130,8 @@ function loadDetailCompanyReport() {
 
    bindDetailActionButtons();
    bindDetailCompanyButtons();
+   fetchDetailLogs();
+   setupDetailCompanyAutocomplete();
 }
 
 
@@ -145,7 +147,8 @@ function bindDetailActionButtons() {
 
   if (clearBtn) {
     clearBtn.onclick = () => {
-      document.getElementById("detailCompanyInput")?.value.trim() = "";
+      document.getElementById("detailCompanyInput").value = "";
+      document.getElementById("detailCompanySuggestions").style.display = "none";
       document.getElementById("detailDateRange").value = "";
       document.getElementById("detailStartDate").value = "";
       document.getElementById("detailEndDate").value = "";
@@ -255,8 +258,7 @@ function filterByDateRange(records) {
 ========================================================= */
 function renderCompanyDetailTable() {
   const tbody = document.getElementById("companyDetailBody");
-  const companyName = document.getElementById("detailCompanySelect")?.value;
-
+  const companyName = document.getElementById("detailCompanyInput")?.value.trim();
   if (!tbody || !companyName) {
     tbody.innerHTML = "";
     return;
@@ -357,7 +359,7 @@ function getDetailDateRangeLabel() {
 
 function exportCompanyExcel() {
   const companyName =
-    document.getElementById("detailCompanySelect")?.value;
+  document.getElementById("detailCompanyInput")?.value.trim();
 
   if (!companyName) {
     alert("Please select a company first.");
@@ -426,7 +428,7 @@ function exportCompanyExcel() {
 ========================================================= */
 function exportCompanyPdf() {
   const companyName =
-    document.getElementById("detailCompanySelect")?.value;
+  document.getElementById("detailCompanyInput")?.value.trim();
 
   if (!companyName) {
     alert("Please select a company first.");
@@ -578,15 +580,69 @@ doc.text(
    /* =========================================================
    TAB HANDLER
 ========================================================= */
-document.querySelectorAll(".tab").forEach(tab => {
-  tab.addEventListener("click", () => {
-    if (tab.dataset.tab === "tabCompany") {
-      loadDetailCompanyReport();
-      setupDetailCompanyAutocomplete();
+function setupDetailCompanyAutocomplete() {
+  const input = document.getElementById("detailCompanyInput");
+  const box = document.getElementById("detailCompanySuggestions");
+  if (!input || !box) return;
+
+  const companies = [
+    ...new Set(
+      (detailCloudCache || getLocalDetailLogs())
+        .map(l => l.company)
+        .filter(Boolean)
+    )
+  ];
+
+  input.oninput = () => {
+    const val = input.value.trim().toLowerCase();
+    box.innerHTML = "";
+
+    if (!val) {
+      box.style.display = "none";
+      return;
+    }
+
+    const matches = companies.filter(c =>
+      c.toLowerCase().includes(val)
+    );
+
+    if (!matches.length) {
+      box.style.display = "none";
+      return;
+    }
+
+    matches.slice(0, 8).forEach(c => {
+      const div = document.createElement("div");
+      div.textContent = c;
+      div.className = "company-suggestion";
+      div.onclick = () => {
+        input.value = c;
+        box.style.display = "none";
+      };
+      box.appendChild(div);
+    });
+
+    box.style.display = "block";
+  });
+
+  document.addEventListener("click", e => {
+    if (!box.contains(e.target) && e.target !== input) {
+      box.style.display = "none";
     }
   });
+}
+/* =========================================================
+   DATE RANGE TOGGLE ONLY (NO AUTO SEARCH)
+========================================================= */
+document.addEventListener("change", e => {
+  if (e.target.id === "detailDateRange") {
+    const customWrap = document.getElementById("detailCustomDates");
+    if (customWrap) {
+      customWrap.style.display =
+        e.target.value === "custom" ? "inline-block" : "none";
+    }
+  }
 });
-
 /* =========================================================
    DATE RANGE TOGGLE ONLY (NO AUTO SEARCH)
 ========================================================= */
