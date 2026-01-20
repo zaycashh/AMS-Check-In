@@ -693,3 +693,19 @@ body {
 .detail-actions button:hover {
   background: #f2f2f2;
 }
+.admin-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.admin-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#exitAdminBtn {
+  margin-left: auto;
+}
