@@ -621,7 +621,6 @@ function setupDetailCompanyAutocomplete() {
     });
 
     box.style.display = "block";
-  });
 
   document.addEventListener("click", e => {
     if (!box.contains(e.target) && e.target !== input) {
