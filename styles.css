@@ -709,3 +709,23 @@ body {
 #exitAdminBtn {
   margin-left: auto;
 }
+.company-suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1px solid #ccc;
+  max-height: 180px;
+  overflow-y: auto;
+  z-index: 1000;
+}
+
+.company-suggestion {
+  padding: 8px 10px;
+  cursor: pointer;
+}
+
+.company-suggestion:hover {
+  background: #f2f2f2;
+}
