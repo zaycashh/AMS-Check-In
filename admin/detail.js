@@ -285,7 +285,7 @@ function renderCompanyDetailTable() {
   records = filterByDateRange(records);
    const countEl = document.getElementById("detailDonorCount");
 if (countEl) {
-  countEl.textContent = `Total Donors: ${records.length}`;
+  countEl.textContent = `Total Records: ${records.length}`;
 }
 
   tbody.innerHTML = "";
@@ -393,7 +393,7 @@ function exportCompanyExcel() {
   ["AMS Detail Company Report"],
   [`Company: ${companyName}`],
   [`Date Range: ${getDetailDateRangeLabel()}`],
-  [`Total Donors: ${records.length}`],
+  [`Total Records: ${records.length}`],
   [`Generated: ${new Date().toLocaleString()}`],
   [],
   ["Date", "Time", "First", "Last", "Reason", "Services", "Signed"]
