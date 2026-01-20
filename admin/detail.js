@@ -138,6 +138,7 @@ function loadDetailCompanyReport() {
 
    bindDetailActionButtons();
    bindDetailCompanyButtons();
+   setupDetailCompanyAutocomplete();
 }
 
 /* =========================================================
@@ -674,3 +675,62 @@ document.addEventListener("change", e => {
     }
   }
 });
+/* =========================================================
+   DETAIL COMPANY AUTOCOMPLETE (TYPE-AHEAD)
+========================================================= */
+function setupDetailCompanyAutocomplete() {
+  const input = document.getElementById("detailCompanyInput");
+  const box = document.getElementById("detailCompanySuggestions");
+  if (!input || !box) return;
+
+  function getCompanies() {
+    return [
+      ...new Set(
+        (detailCloudCache || getLocalDetailLogs())
+          .map(l => l.company)
+          .filter(Boolean)
+      )
+    ];
+  }
+
+  input.addEventListener("input", () => {
+    const val = input.value.trim().toLowerCase();
+    box.innerHTML = "";
+
+    if (!val) {
+      box.style.display = "none";
+      return;
+    }
+
+    const matches = getCompanies().filter(c =>
+      c.toLowerCase().includes(val)
+    );
+
+    if (!matches.length) {
+      box.style.display = "none";
+      return;
+    }
+
+    matches.slice(0, 8).forEach(company => {
+      const div = document.createElement("div");
+      div.className = "company-suggestion";
+      div.textContent = company;
+
+      div.onclick = () => {
+        input.value = company;
+        box.style.display = "none";
+      };
+
+      box.appendChild(div);
+    });
+
+    box.style.display = "block";
+  });
+
+  document.addEventListener("click", e => {
+    if (!box.contains(e.target) && e.target !== input) {
+      box.style.display = "none";
+    }
+  });
+}
+
