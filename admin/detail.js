@@ -643,15 +643,3 @@ document.addEventListener("change", e => {
     }
   }
 });
-/* =========================================================
-   DATE RANGE TOGGLE ONLY (NO AUTO SEARCH)
-========================================================= */
-document.addEventListener("change", e => {
-  if (e.target.id === "detailDateRange") {
-    const customWrap = document.getElementById("detailCustomDates");
-    if (customWrap) {
-      customWrap.style.display =
-        e.target.value === "custom" ? "inline-block" : "none";
-    }
-  }
-});
