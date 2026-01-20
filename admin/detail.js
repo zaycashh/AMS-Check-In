@@ -661,3 +661,16 @@ document.querySelectorAll(".tab").forEach(tab => {
     }
   });
 });
+
+/* =========================================================
+   DATE RANGE TOGGLE (CUSTOM ONLY)
+========================================================= */
+document.addEventListener("change", e => {
+  if (e.target.id === "detailDateRange") {
+    const customWrap = document.getElementById("detailCustomDates");
+    if (customWrap) {
+      customWrap.style.display =
+        e.target.value === "custom" ? "inline-block" : "none";
+    }
+  }
+});
