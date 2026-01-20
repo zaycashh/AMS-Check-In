@@ -130,6 +130,7 @@ function loadDetailCompanyReport() {
 
    bindDetailActionButtons();
    bindDetailCompanyButtons();
+   setupDetailCompanyAutocomplete();
 }
 
 
@@ -145,7 +146,8 @@ function bindDetailActionButtons() {
 
   if (clearBtn) {
     clearBtn.onclick = () => {
-      document.getElementById("detailCompanyInput")?.value.trim() = "";
+      document.getElementById("detailCompanyInput").value = "";
+      document.getElementById("detailCompanySuggestions").style.display = "none";
       document.getElementById("detailDateRange").value = "";
       document.getElementById("detailStartDate").value = "";
       document.getElementById("detailEndDate").value = "";
@@ -424,8 +426,8 @@ function exportCompanyExcel() {
    EXPORT PDF (MATCH SEARCH LOG)
 ========================================================= */
 function exportCompanyPdf() {
-  document.getElementById("detailCompanyInput").value = "";
-  document.getElementById("detailCompanySuggestions").style.display = "none";
+  const companyName =
+  document.getElementById("detailCompanyInput")?.value.trim();
 
   if (!companyName) {
     alert("Please select a company first.");
@@ -577,11 +579,61 @@ doc.text(
    /* =========================================================
    TAB HANDLER
 ========================================================= */
+function setupDetailCompanyAutocomplete() {
+  const input = document.getElementById("detailCompanyInput");
+  const box = document.getElementById("detailCompanySuggestions");
+  if (!input || !box) return;
+
+  const companies = [
+    ...new Set(
+      (detailCloudCache || getLocalDetailLogs())
+        .map(l => l.company)
+        .filter(Boolean)
+    )
+  ];
+
+  input.addEventListener("input", () => {
+    const val = input.value.trim().toLowerCase();
+    box.innerHTML = "";
+
+    if (!val) {
+      box.style.display = "none";
+      return;
+    }
+
+    const matches = companies.filter(c =>
+      c.toLowerCase().includes(val)
+    );
+
+    if (!matches.length) {
+      box.style.display = "none";
+      return;
+    }
+
+    matches.slice(0, 8).forEach(c => {
+      const div = document.createElement("div");
+      div.textContent = c;
+      div.className = "company-suggestion";
+      div.onclick = () => {
+        input.value = c;
+        box.style.display = "none";
+      };
+      box.appendChild(div);
+    });
+
+    box.style.display = "block";
+  });
+
+  document.addEventListener("click", e => {
+    if (!box.contains(e.target) && e.target !== input) {
+      box.style.display = "none";
+    }
+  });
+}
 document.querySelectorAll(".tab").forEach(tab => {
   tab.addEventListener("click", () => {
     if (tab.dataset.tab === "tabCompany") {
       loadDetailCompanyReport();
-      setupDetailCompanyAutocomplete();
     }
   });
 });
