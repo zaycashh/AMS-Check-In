@@ -740,3 +740,4 @@ function setupDetailCompanyAutocomplete() {
   });
 }
 
+}
