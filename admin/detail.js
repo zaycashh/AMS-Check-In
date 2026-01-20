@@ -126,10 +126,8 @@ function loadDetailCompanyReport() {
   `;
 
   bindDetailActionButtons();
-  bindDetailCompanyButtons();
-
   fetchDetailLogs().then(() => {
-    setupDetailCompanyAutocomplete();
+  setupDetailCompanyAutocomplete();
   });
 }
 
