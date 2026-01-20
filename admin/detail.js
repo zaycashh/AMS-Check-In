@@ -681,7 +681,7 @@ document.addEventListener("change", e => {
     }
   }
 });
-/* =========================================================
+     /* =========================================================
    DETAIL COMPANY AUTOCOMPLETE (TYPE-AHEAD)
 ========================================================= */
 function setupDetailCompanyAutocomplete() {
@@ -739,9 +739,10 @@ function setupDetailCompanyAutocomplete() {
     }
   });
 }
-     // ===============================
-// INIT DETAIL COMPANY AUTOCOMPLETE
-// ===============================
+
+/* ===============================
+   INIT
+=============================== */
 document.addEventListener("DOMContentLoaded", () => {
   setupDetailCompanyAutocomplete();
 });
