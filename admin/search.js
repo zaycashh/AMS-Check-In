@@ -408,7 +408,7 @@ function exportSearchPdf() {
      HEADER BAR
   =============================== */
   doc.setFillColor(...HEADER_BLUE);
-  doc.rect(0, 0, 297, 34, "F");
+  doc.rect(0, 0, 297, 44, "F");
 
   /* ===============================
      LOGO (DRAW AFTER HEADER)
@@ -427,6 +427,14 @@ function exportSearchPdf() {
 
   doc.setFontSize(11);
   doc.text(rangeLabel, 148, 26, { align: "center" });
+  doc.setFontSize(10);
+  doc.text(
+  `Total Records: ${window.searchResults.length}`,
+  148,
+  32,
+  { align: "center" }
+);
+
 
   doc.setTextColor(...DARK_TEXT);
 
@@ -448,7 +456,7 @@ function exportSearchPdf() {
      TABLE
   =============================== */
   doc.autoTable({
-    startY: 42,
+    startY: 48,
     head: [[
       "Date",
       "Time",
@@ -534,21 +542,23 @@ window.exportSearchLogExcel = function () {
      BUILD SHEET (TITLE + META)
   =============================== */
   const sheetData = [
-    ["AMS Search Log Report"],
-    [`Date Range: ${rangeLabel}`],
-    [`Generated: ${new Date().toLocaleString()}`],
-    [],
-    [
-      "Date",
-      "Time",
-      "First",
-      "Last",
-      "Company",
-      "Reason",
-      "Services",
-      "Signature"
-    ]
-  ];
+  ["AMS Search Log Report"],
+  [`Date Range: ${rangeLabel}`],
+  [`Total Records: ${window.searchResults.length}`],
+  [`Generated: ${new Date().toLocaleString()}`],
+  [],
+  [
+    "Date",
+    "Time",
+    "First",
+    "Last",
+    "Company",
+    "Reason",
+    "Services",
+    "Signature"
+  ]
+];
+
 
   /* ===============================
      DATA ROWS
@@ -573,10 +583,13 @@ window.exportSearchLogExcel = function () {
 
   // Merge title & meta rows
   ws["!merges"] = [
-    { s: { r: 0, c: 0 }, e: { r: 0, c: 7 } },
-    { s: { r: 1, c: 0 }, e: { r: 1, c: 7 } },
-    { s: { r: 2, c: 0 }, e: { r: 2, c: 7 } }
-  ];
+  { s: { r: 0, c: 0 }, e: { r: 0, c: 7 } }, // Title
+  { s: { r: 1, c: 0 }, e: { r: 1, c: 7 } }, // Date Range
+  { s: { r: 2, c: 0 }, e: { r: 2, c: 7 } }, // Total Records
+  { s: { r: 3, c: 0 }, e: { r: 3, c: 7 } }, // Generated
+  { s: { r: 4, c: 0 }, e: { r: 4, c: 7 } }  // Spacer
+];
+
 
   // Column widths
   ws["!cols"] = [
