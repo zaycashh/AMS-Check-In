@@ -63,7 +63,19 @@ function loadDetailCompanyReport() {
 
   <div class="filter-bar">
     <label>Company:</label>
-    <select id="detailCompanySelect"></select>
+<div class="form-row" style="position:relative;">
+  <input
+    type="text"
+    id="detailCompanyInput"
+    placeholder="Start typing company name..."
+    autocomplete="off"
+  />
+  <div
+    id="detailCompanySuggestions"
+    class="company-suggestions"
+    style="display:none;"
+  ></div>
+</div>
 
     <label style="margin-left:12px;">Date Range:</label>
     <select id="detailDateRange">
@@ -328,7 +340,57 @@ function getServicesText(r) {
   if (r.alcohol) list.push("Alcohol Test");
   return list.join(", ");
 }
+function setupDetailCompanyAutocomplete() {
+  const input = document.getElementById("detailCompanyInput");
+  const box = document.getElementById("detailCompanySuggestions");
+  if (!input || !box) return;
 
+  const companies = [
+    ...new Set(
+      (detailCloudCache || getLocalDetailLogs())
+        .map(l => l.company)
+        .filter(Boolean)
+    )
+  ];
+
+  input.oninput = () => {
+    const val = input.value.trim().toLowerCase();
+    box.innerHTML = "";
+
+    if (!val) {
+      box.style.display = "none";
+      return;
+    }
+
+    const matches = companies.filter(c =>
+      c.toLowerCase().includes(val)
+    );
+
+    if (!matches.length) {
+      box.style.display = "none";
+      return;
+    }
+
+    matches.slice(0, 8).forEach(c => {
+      const div = document.createElement("div");
+      div.textContent = c;
+      div.className = "company-suggestion";
+      div.onclick = () => {
+        input.value = c;
+        box.style.display = "none";
+      };
+      box.appendChild(div);
+    });
+
+    box.style.display = "block";
+  };
+
+  document.addEventListener("click", e => {
+    if (!box.contains(e.target) && e.target !== input) {
+      box.style.display = "none";
+    }
+  });
+}
 /* =========================================================
    EXPORT BUTTONS
 ========================================================= */
