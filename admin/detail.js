@@ -130,6 +130,7 @@ function loadDetailCompanyReport() {
 
    bindDetailActionButtons();
    bindDetailCompanyButtons();
+   fetchDetailLogs();
    setupDetailCompanyAutocomplete();
 }
 
@@ -592,7 +593,7 @@ function setupDetailCompanyAutocomplete() {
     )
   ];
 
-  input.addEventListener("input", () => {
+  input.oninput = () => {
     const val = input.value.trim().toLowerCase();
     box.innerHTML = "";
 
