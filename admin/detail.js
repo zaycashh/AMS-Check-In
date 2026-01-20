@@ -130,7 +130,7 @@ bindDetailCompanyButtons();
 fetchDetailLogs().then(() => {
   setupDetailCompanyAutocomplete();
 });
-
+}
 /* =========================================================
    ACTION BUTTONS
 ========================================================= */
@@ -393,4 +393,3 @@ function exportCompanyPdf() {
 
   doc.save(`AMS_Detail_Company_${company}.pdf`);
 }
-});
