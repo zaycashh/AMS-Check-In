@@ -651,7 +651,7 @@ doc.text(
 
   doc.save(`AMS_Detail_Company_${companyName}_${Date.now()}.pdf`);
 }
-   /* =========================================================
+/* =========================================================
    TAB HANDLER
 ========================================================= */
 document.querySelectorAll(".tab").forEach(tab => {
@@ -660,4 +660,4 @@ document.querySelectorAll(".tab").forEach(tab => {
       loadDetailCompanyReport();
     }
   });
-   
+});
