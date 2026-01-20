@@ -172,18 +172,21 @@ function bindDetailActionButtons() {
 
   if (clearBtn) {
     clearBtn.onclick = () => {
-      document.getElementById("detailCompanySelect").value = "";
-      document.getElementById("detailDateRange").value = "";
-      document.getElementById("detailStartDate").value = "";
-      document.getElementById("detailEndDate").value = "";
+  document.getElementById("detailCompanyInput").value = "";
+  document.getElementById("detailCompanySuggestions").style.display = "none";
 
-      const custom = document.getElementById("detailCustomDates");
-      if (custom) custom.style.display = "none";
+  document.getElementById("detailDateRange").value = "";
+  document.getElementById("detailStartDate").value = "";
+  document.getElementById("detailEndDate").value = "";
 
-      document.getElementById("companyDetailBody").innerHTML = "";
-    };
-  }
-}
+  const custom = document.getElementById("detailCustomDates");
+  if (custom) custom.style.display = "none";
+
+  document.getElementById("companyDetailBody").innerHTML = "";
+
+  const countEl = document.getElementById("detailDonorCount");
+  if (countEl) countEl.textContent = "Total Records: 0";
+};
 
 /* =========================================================
    DATE FILTER (TIMESTAMP SAFE)
@@ -282,7 +285,8 @@ function filterByDateRange(records) {
 ========================================================= */
 function renderCompanyDetailTable() {
   const tbody = document.getElementById("companyDetailBody");
-  const companyName = document.getElementById("detailCompanySelect")?.value;
+  const companyName =
+  document.getElementById("detailCompanyInput")?.value.trim();
 
   if (!tbody || !companyName) {
     tbody.innerHTML = "";
@@ -292,7 +296,9 @@ function renderCompanyDetailTable() {
   const logs = detailCloudCache || getLocalDetailLogs();
 
   let records = logs.filter(
-    r => (r.company || "").toUpperCase() === companyName.toUpperCase()
+    r =>
+  (r.company || "").trim().toLowerCase() ===
+  companyName.toLowerCase()
   );
 
   records = filterByDateRange(records);
