@@ -87,7 +87,7 @@ function loadDetailCompanyReport() {
     <!-- ✅ THIS WAS MISSING -->
     <span id="detailDonorCount"
           style="margin-left:12px;font-weight:600;">
-      Total Donors: 0
+      Total Records: 0
     </span>
 
     <div class="export-right">
@@ -416,7 +416,7 @@ function exportCompanyExcel() {
   { s: { r: 0, c: 0 }, e: { r: 0, c: 6 } }, // Title
   { s: { r: 1, c: 0 }, e: { r: 1, c: 6 } }, // Company
   { s: { r: 2, c: 0 }, e: { r: 2, c: 6 } }, // Date Range
-  { s: { r: 3, c: 0 }, e: { r: 3, c: 6 } }, // Total Donors
+  { s: { r: 3, c: 0 }, e: { r: 3, c: 6 } }, // Total Records
   { s: { r: 4, c: 0 }, e: { r: 4, c: 6 } }, // Generated
   { s: { r: 5, c: 0 }, e: { r: 5, c: 6 } }  // Spacer
 ];
@@ -508,7 +508,7 @@ doc.text(
 );
 
 doc.text(
-  `Total Donors: ${records.length}`,
+  `Total Records: ${records.length}`,
   PAGE_WIDTH / 2,
   37,
   { align: "center" }
