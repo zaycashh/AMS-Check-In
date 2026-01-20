@@ -739,4 +739,9 @@ function setupDetailCompanyAutocomplete() {
     }
   });
 }
-
+     // ===============================
+// INIT DETAIL COMPANY AUTOCOMPLETE
+// ===============================
+document.addEventListener("DOMContentLoaded", () => {
+  setupDetailCompanyAutocomplete();
+});
