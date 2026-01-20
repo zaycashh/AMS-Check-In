@@ -62,20 +62,8 @@ function loadDetailCompanyReport() {
   <h2 class="section-title">Detail Company Report</h2>
 
   <div class="filter-bar">
-  <div class="form-row" style="position:relative;">
-  <label>Company:</label>
-  <input
-    type="text"
-    id="detailCompanyInput"
-    placeholder="Start typing company name..."
-    autocomplete="off"
-  />
-  <div
-    id="detailCompanySuggestions"
-    class="company-suggestions"
-    style="display:none;"
-  ></div>
-</div>
+    <label>Company:</label>
+    <select id="detailCompanySelect"></select>
 
     <label style="margin-left:12px;">Date Range:</label>
     <select id="detailDateRange">
@@ -128,10 +116,36 @@ function loadDetailCompanyReport() {
   </div>
 `;
 
+  // Instant render from local
+  populateDetailCompanyDropdown(getLocalDetailLogs());
+
+  // Silent cloud refresh
+  fetchDetailLogs().then(logs => {
+    populateDetailCompanyDropdown(logs);
+  });
+
    bindDetailActionButtons();
-   fetchDetailLogs();
+   bindDetailCompanyButtons();
 }
 
+/* =========================================================
+   POPULATE COMPANY DROPDOWN
+========================================================= */
+function populateDetailCompanyDropdown(logs) {
+  const select = document.getElementById("detailCompanySelect");
+  if (!select) return;
+
+  const companies = [...new Set(logs.map(l => l.company).filter(Boolean))];
+
+  select.innerHTML = '<option value="">-- Select Company --</option>';
+
+  companies.forEach(company => {
+    const opt = document.createElement("option");
+    opt.value = company;
+    opt.textContent = company;
+    select.appendChild(opt);
+  });
+}
 
 function bindDetailActionButtons() {
   const searchBtn = document.getElementById("detailSearchBtn");
@@ -145,8 +159,7 @@ function bindDetailActionButtons() {
 
   if (clearBtn) {
     clearBtn.onclick = () => {
-      document.getElementById("detailCompanyInput").value = "";
-      document.getElementById("detailCompanySuggestions").style.display = "none";
+      document.getElementById("detailCompanySelect").value = "";
       document.getElementById("detailDateRange").value = "";
       document.getElementById("detailStartDate").value = "";
       document.getElementById("detailEndDate").value = "";
@@ -256,7 +269,8 @@ function filterByDateRange(records) {
 ========================================================= */
 function renderCompanyDetailTable() {
   const tbody = document.getElementById("companyDetailBody");
-  const companyName = document.getElementById("detailCompanyInput")?.value.trim();
+  const companyName = document.getElementById("detailCompanySelect")?.value;
+
   if (!tbody || !companyName) {
     tbody.innerHTML = "";
     return;
@@ -271,7 +285,7 @@ function renderCompanyDetailTable() {
   records = filterByDateRange(records);
    const countEl = document.getElementById("detailDonorCount");
 if (countEl) {
-  countEl.textContent = `Total Records: ${records.length}`;
+  countEl.textContent = `Total Donors: ${records.length}`;
 }
 
   tbody.innerHTML = "";
@@ -357,7 +371,7 @@ function getDetailDateRangeLabel() {
 
 function exportCompanyExcel() {
   const companyName =
-  document.getElementById("detailCompanyInput")?.value.trim();
+    document.getElementById("detailCompanySelect")?.value;
 
   if (!companyName) {
     alert("Please select a company first.");
@@ -379,7 +393,7 @@ function exportCompanyExcel() {
   ["AMS Detail Company Report"],
   [`Company: ${companyName}`],
   [`Date Range: ${getDetailDateRangeLabel()}`],
-  [`Total Records: ${records.length}`],
+  [`Total Donors: ${records.length}`],
   [`Generated: ${new Date().toLocaleString()}`],
   [],
   ["Date", "Time", "First", "Last", "Reason", "Services", "Signed"]
@@ -426,7 +440,7 @@ function exportCompanyExcel() {
 ========================================================= */
 function exportCompanyPdf() {
   const companyName =
-  document.getElementById("detailCompanyInput")?.value.trim();
+    document.getElementById("detailCompanySelect")?.value;
 
   if (!companyName) {
     alert("Please select a company first.");
@@ -578,57 +592,14 @@ doc.text(
    /* =========================================================
    TAB HANDLER
 ========================================================= */
-function setupDetailCompanyAutocomplete() {
-  const input = document.getElementById("detailCompanyInput");
-  const box = document.getElementById("detailCompanySuggestions");
-  if (!input || !box) return;
-
-  const companies = [
-    ...new Set(
-      (detailCloudCache || getLocalDetailLogs())
-        .map(l => l.company)
-        .filter(Boolean)
-    )
-  ];
-
-  input.oninput = () => {
-    const val = input.value.trim().toLowerCase();
-    box.innerHTML = "";
-
-    if (!val) {
-      box.style.display = "none";
-      return;
-    }
-
-    const matches = companies.filter(c =>
-      c.toLowerCase().includes(val)
-    );
-
-    if (!matches.length) {
-      box.style.display = "none";
-      return;
-    }
-
-    matches.slice(0, 8).forEach(c => {
-      const div = document.createElement("div");
-      div.textContent = c;
-      div.className = "company-suggestion";
-      div.onclick = () => {
-        input.value = c;
-        box.style.display = "none";
-      };
-      box.appendChild(div);
-    });
-
-    box.style.display = "block";
-  };
-
-  document.addEventListener("click", e => {
-    if (!box.contains(e.target) && e.target !== input) {
-      box.style.display = "none";
+document.querySelectorAll(".tab").forEach(tab => {
+  tab.addEventListener("click", () => {
+    if (tab.dataset.tab === "tabCompany") {
+      loadDetailCompanyReport();
     }
   });
-}
+});
+
 /* =========================================================
    DATE RANGE TOGGLE ONLY (NO AUTO SEARCH)
 ========================================================= */
