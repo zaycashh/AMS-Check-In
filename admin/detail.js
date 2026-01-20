@@ -126,6 +126,7 @@ function loadDetailCompanyReport() {
   `;
 
   bindDetailActionButtons();
+bindDetailCompanyButtons();
 fetchDetailLogs().then(() => {
   setupDetailCompanyAutocomplete();
 });
@@ -325,18 +326,70 @@ document.querySelectorAll(".tab").forEach(tab => {
     }
   });
 });
-/* =========================================================
-   EXPORT BUTTON BINDINGS (MISSING FUNCTION)
-========================================================= */
-function bindDetailCompanyButtons() {
-  const excelBtn = document.getElementById("companyDetailExcelBtn");
-  const pdfBtn = document.getElementById("companyDetailPdfBtn");
+function exportCompanyExcel() {
+  const company = document.getElementById("detailCompanyInput").value.trim();
+  if (!company) return alert("Select a company first");
 
-  if (excelBtn) {
-    excelBtn.onclick = exportCompanyExcel;
-  }
+  const records = filterByDateRange(
+    (detailCloudCache || getLocalDetailLogs())
+      .filter(r => (r.company || "").toUpperCase() === company.toUpperCase())
+  );
 
-  if (pdfBtn) {
-    pdfBtn.onclick = exportCompanyPdf;
-  }
+  if (!records.length) return alert("No records found");
+
+  const rows = records.map(r => [
+    r.date || "",
+    r.time || "",
+    r.first || r.firstName || "",
+    r.last || r.lastName || "",
+    r.reason || "",
+    getServicesText(r)
+  ]);
+
+  const header = [
+    ["AMS Detail Company Report"],
+    [`Company: ${company}`],
+    [`Total Records: ${records.length}`],
+    [],
+    ["Date","Time","First","Last","Reason","Services"]
+  ];
+
+  const ws = XLSX.utils.aoa_to_sheet([...header, ...rows]);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Detail Company");
+
+  XLSX.writeFile(wb, `AMS_Detail_Company_${company}.xlsx`);
+}
+function exportCompanyPdf() {
+  const company = document.getElementById("detailCompanyInput").value.trim();
+  if (!company) return alert("Select a company first");
+
+  const records = filterByDateRange(
+    (detailCloudCache || getLocalDetailLogs())
+      .filter(r => (r.company || "").toUpperCase() === company.toUpperCase())
+  );
+
+  if (!records.length) return alert("No records found");
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF("landscape");
+
+  doc.text(`AMS Detail Company Report`, 14, 14);
+  doc.text(`Company: ${company}`, 14, 22);
+  doc.text(`Total Records: ${records.length}`, 14, 30);
+
+  doc.autoTable({
+    startY: 36,
+    head: [["Date","Time","First","Last","Reason","Services"]],
+    body: records.map(r => [
+      r.date || "",
+      r.time || "",
+      r.first || r.firstName || "",
+      r.last || r.lastName || "",
+      r.reason || "",
+      getServicesText(r)
+    ])
+  });
+
+  doc.save(`AMS_Detail_Company_${company}.pdf`);
 }
