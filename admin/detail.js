@@ -318,3 +318,13 @@ document.addEventListener("change", e => {
       e.target.value === "custom" ? "inline-block" : "none";
   }
 });
+/* =========================================================
+   TAB CLICK HANDLER (REQUIRED)
+========================================================= */
+document.querySelectorAll(".tab").forEach(tab => {
+  tab.addEventListener("click", () => {
+    if (tab.dataset.tab === "tabCompany") {
+      loadDetailCompanyReport();
+    }
+  });
+});
