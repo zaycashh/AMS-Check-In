@@ -138,7 +138,6 @@ function loadDetailCompanyReport() {
 
    bindDetailActionButtons();
    bindDetailCompanyButtons();
-   setupDetailCompanyAutocomplete();
 }
 
 /* =========================================================
