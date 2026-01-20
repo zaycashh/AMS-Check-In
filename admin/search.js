@@ -28,20 +28,20 @@ function renderSearchUI() {
         <input type="text" id="filterLastName">
       </div>
 
-      <div class="form-row">
-        <label>Company</label>
-        <select id="searchFilterCompany" onchange="toggleSearchCompanyText(this.value)">
-          <option value="">All Companies</option>
-          <option value="__custom__">Type Company (Custom)</option>
-        </select>
-
-        <input
-          id="searchFilterCompanyText"
-          type="text"
-          placeholder="Enter company name"
-          style="display:none;margin-top:6px;"
-        />
-      </div>
+      <div class="form-row" style="position:relative;">
+  <label>Company</label>
+  <input
+    type="text"
+    id="searchCompanyInput"
+    placeholder="Start typing company name..."
+    autocomplete="off"
+  />
+  <div
+    id="searchCompanySuggestions"
+    class="company-suggestions"
+    style="display:none;"
+  ></div>
+</div>
 
       <div class="form-row">
         <label>Date Range</label>
@@ -91,8 +91,8 @@ function renderSearchUI() {
     </table>
   `;
 
-  populateSearchCompanies();
   clearSearchTable();
+setupSearchCompanyAutocomplete();
 }
 
 /* =========================================================
@@ -144,9 +144,10 @@ window.runSearch = async function () {
   const first = document.getElementById("filterFirstName").value.toLowerCase();
   const last = document.getElementById("filterLastName").value.toLowerCase();
 
-  const companySel = document.getElementById("searchFilterCompany").value;
-  const companyTxt = document.getElementById("searchFilterCompanyText").value.toLowerCase();
-  const company = companySel === "__custom__" ? companyTxt : companySel;
+  const company =
+  document.getElementById("searchCompanyInput")?.value
+    .trim()
+    .toLowerCase();
 
   const range = document.getElementById("filterDateRange").value;
   const start = document.getElementById("filterStartDate").value;
@@ -340,26 +341,54 @@ function renderSearchResults(results) {
 /* =========================================================
    HELPERS
 ========================================================= */
-function populateSearchCompanies() {
-  const sel = document.getElementById("searchFilterCompany");
-  const companies = JSON.parse(localStorage.getItem("ams_companies") || "[]");
-  companies.forEach(c => {
-    const o = document.createElement("option");
-    o.value = c.toLowerCase();
-    o.textContent = c;
-    sel.appendChild(o);
+function setupSearchCompanyAutocomplete() {
+  const input = document.getElementById("searchCompanyInput");
+  const box = document.getElementById("searchCompanySuggestions");
+  if (!input || !box) return;
+
+  const companies = JSON.parse(
+    localStorage.getItem("ams_companies") || "[]"
+  );
+
+  input.addEventListener("input", () => {
+    const val = input.value.trim().toLowerCase();
+    box.innerHTML = "";
+
+    if (!val) {
+      box.style.display = "none";
+      return;
+    }
+
+    const matches = companies.filter(c =>
+      c.toLowerCase().includes(val)
+    );
+
+    if (!matches.length) {
+      box.style.display = "none";
+      return;
+    }
+
+    matches.slice(0, 8).forEach(c => {
+      const div = document.createElement("div");
+      div.textContent = c;
+      div.className = "company-suggestion";
+      div.onclick = () => {
+        input.value = c;
+        box.style.display = "none";
+      };
+      box.appendChild(div);
+    });
+
+    box.style.display = "block";
+  });
+
+  document.addEventListener("click", e => {
+    if (!box.contains(e.target) && e.target !== input) {
+      box.style.display = "none";
+    }
   });
 }
 
-window.toggleSearchCompanyText = val => {
-  const i = document.getElementById("searchFilterCompanyText");
-  i.style.display = val === "__custom__" ? "block" : "none";
-};
-
-window.toggleCustomDateRange = val => {
-  document.getElementById("customDateRange").style.display =
-    val === "custom" ? "block" : "none";
-};
 
 window.clearSearch = function () {
   renderSearchUI();
