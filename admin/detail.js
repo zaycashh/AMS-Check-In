@@ -159,7 +159,6 @@ function populateDetailCompanyDropdown(logs) {
     select.appendChild(opt);
   });
 }
-
 function bindDetailActionButtons() {
   const searchBtn = document.getElementById("detailSearchBtn");
   const clearBtn = document.getElementById("detailClearBtn");
@@ -172,22 +171,23 @@ function bindDetailActionButtons() {
 
   if (clearBtn) {
     clearBtn.onclick = () => {
-  document.getElementById("detailCompanyInput").value = "";
-  document.getElementById("detailCompanySuggestions").style.display = "none";
+      document.getElementById("detailCompanyInput").value = "";
+      document.getElementById("detailCompanySuggestions").style.display = "none";
 
-  document.getElementById("detailDateRange").value = "";
-  document.getElementById("detailStartDate").value = "";
-  document.getElementById("detailEndDate").value = "";
+      document.getElementById("detailDateRange").value = "";
+      document.getElementById("detailStartDate").value = "";
+      document.getElementById("detailEndDate").value = "";
 
-  const custom = document.getElementById("detailCustomDates");
-  if (custom) custom.style.display = "none";
+      const custom = document.getElementById("detailCustomDates");
+      if (custom) custom.style.display = "none";
 
-  document.getElementById("companyDetailBody").innerHTML = "";
+      document.getElementById("companyDetailBody").innerHTML = "";
 
-  const countEl = document.getElementById("detailDonorCount");
-  if (countEl) countEl.textContent = "Total Records: 0";
-};
-
+      const countEl = document.getElementById("detailDonorCount");
+      if (countEl) countEl.textContent = "Total Records: 0";
+    };
+  }
+}
 /* =========================================================
    DATE FILTER (TIMESTAMP SAFE)
 ========================================================= */
