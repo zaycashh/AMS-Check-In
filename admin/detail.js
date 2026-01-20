@@ -328,3 +328,18 @@ document.querySelectorAll(".tab").forEach(tab => {
     }
   });
 });
+/* =========================================================
+   EXPORT BUTTON BINDINGS (MISSING FUNCTION)
+========================================================= */
+function bindDetailCompanyButtons() {
+  const excelBtn = document.getElementById("companyDetailExcelBtn");
+  const pdfBtn = document.getElementById("companyDetailPdfBtn");
+
+  if (excelBtn) {
+    excelBtn.onclick = exportCompanyExcel;
+  }
+
+  if (pdfBtn) {
+    pdfBtn.onclick = exportCompanyPdf;
+  }
+}
