@@ -255,8 +255,7 @@ function filterByDateRange(records) {
 ========================================================= */
 function renderCompanyDetailTable() {
   const tbody = document.getElementById("companyDetailBody");
-  const companyName = document.getElementById("detailCompanySelect")?.value;
-
+  const companyName = document.getElementById("detailCompanyInput")?.value.trim();
   if (!tbody || !companyName) {
     tbody.innerHTML = "";
     return;
@@ -357,7 +356,7 @@ function getDetailDateRangeLabel() {
 
 function exportCompanyExcel() {
   const companyName =
-    document.getElementById("detailCompanySelect")?.value;
+  document.getElementById("detailCompanyInput")?.value.trim();
 
   if (!companyName) {
     alert("Please select a company first.");
@@ -425,8 +424,8 @@ function exportCompanyExcel() {
    EXPORT PDF (MATCH SEARCH LOG)
 ========================================================= */
 function exportCompanyPdf() {
-  const companyName =
-    document.getElementById("detailCompanySelect")?.value;
+  document.getElementById("detailCompanyInput").value = "";
+  document.getElementById("detailCompanySuggestions").style.display = "none";
 
   if (!companyName) {
     alert("Please select a company first.");
