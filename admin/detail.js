@@ -126,10 +126,9 @@ function loadDetailCompanyReport() {
   `;
 
   bindDetailActionButtons();
-  fetchDetailLogs().then(() => {
+fetchDetailLogs().then(() => {
   setupDetailCompanyAutocomplete();
-  });
-}
+});
 
 /* =========================================================
    ACTION BUTTONS
