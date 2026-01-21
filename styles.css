@@ -729,3 +729,9 @@ body {
 .company-suggestion:hover {
   background: #f2f2f2;
 }
+.filter-bar {
+  display: flex;
+  align-items: center;   /* 🔥 THIS fixes the vertical misalignment */
+  gap: 10px;
+  flex-wrap: wrap;
+}
