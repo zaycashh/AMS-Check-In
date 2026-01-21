@@ -369,7 +369,7 @@ function getDetailDateRangeLabel() {
 
 function exportCompanyExcel() {
   const companyName =
-    document.getElementById("detailCompanySelect")?.value;
+  document.getElementById("detailCompanyInput")?.value.trim();
 
   if (!companyName) {
     alert("Please select a company first.");
@@ -438,7 +438,7 @@ function exportCompanyExcel() {
 ========================================================= */
 function exportCompanyPdf() {
   const companyName =
-    document.getElementById("detailCompanySelect")?.value;
+  document.getElementById("detailCompanyInput")?.value.trim();
 
   if (!companyName) {
     alert("Please select a company first.");
