@@ -128,36 +128,17 @@ function loadDetailCompanyReport() {
   </div>
 `;
 
-  // Instant render from local
-  populateDetailCompanyDropdown(getLocalDetailLogs());
-
   // Silent cloud refresh
-  fetchDetailLogs().then(logs => {
-    populateDetailCompanyDropdown(logs);
-  });
+  fetchDetailLogs();
 
    bindDetailActionButtons();
    bindDetailCompanyButtons();
+   setupDetailCompanyAutocomplete();
 }
 
 /* =========================================================
    POPULATE COMPANY DROPDOWN
 ========================================================= */
-function populateDetailCompanyDropdown(logs) {
-  const select = document.getElementById("detailCompanySelect");
-  if (!select) return;
-
-  const companies = [...new Set(logs.map(l => l.company).filter(Boolean))];
-
-  select.innerHTML = '<option value="">-- Select Company --</option>';
-
-  companies.forEach(company => {
-    const opt = document.createElement("option");
-    opt.value = company;
-    opt.textContent = company;
-    select.appendChild(opt);
-  });
-}
 function bindDetailActionButtons() {
   const searchBtn = document.getElementById("detailSearchBtn");
   const clearBtn = document.getElementById("detailClearBtn");
@@ -345,57 +326,6 @@ function getServicesText(r) {
   if (r.vision) list.push("Vision Test");
   if (r.alcohol) list.push("Alcohol Test");
   return list.join(", ");
-}
-function setupDetailCompanyAutocomplete() {
-  const input = document.getElementById("detailCompanyInput");
-  const box = document.getElementById("detailCompanySuggestions");
-  if (!input || !box) return;
-
-  const companies = [
-    ...new Set(
-      (detailCloudCache || getLocalDetailLogs())
-        .map(l => l.company)
-        .filter(Boolean)
-    )
-  ];
-
-  input.oninput = () => {
-    const val = input.value.trim().toLowerCase();
-    box.innerHTML = "";
-
-    if (!val) {
-      box.style.display = "none";
-      return;
-    }
-
-    const matches = companies.filter(c =>
-      c.toLowerCase().includes(val)
-    );
-
-    if (!matches.length) {
-      box.style.display = "none";
-      return;
-    }
-
-    matches.slice(0, 8).forEach(c => {
-      const div = document.createElement("div");
-      div.textContent = c;
-      div.className = "company-suggestion";
-      div.onclick = () => {
-        input.value = c;
-        box.style.display = "none";
-      };
-      box.appendChild(div);
-    });
-
-    box.style.display = "block";
-  };
-
-  document.addEventListener("click", e => {
-    if (!box.contains(e.target) && e.target !== input) {
-      box.style.display = "none";
-    }
-  });
 }
 /* =========================================================
    EXPORT BUTTONS
