@@ -735,3 +735,20 @@ body {
   gap: 10px;
   flex-wrap: wrap;
 }
+.filter-bar label {
+  margin: 0;
+  line-height: 1;
+}
+
+.filter-bar input,
+.filter-bar select,
+.filter-bar button {
+  height: 34px;           /* consistent control height */
+  line-height: 34px;
+}
+.filter-bar .form-row {
+  margin: 0;
+}
+.filter-bar label {
+  margin-right: 4px;
+}
