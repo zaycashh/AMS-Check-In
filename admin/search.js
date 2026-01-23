@@ -102,22 +102,26 @@ function getCachedLogs() {
 }
 
 async function fetchLogsFromCloud() {
-  const res = await fetch(
-    "https://ams-checkin-api.josealfonsodejesus.workers.dev/logs",
-    { cache: "no-store" }
-  );
+  try {
+    const res = await fetch(
+      "https://ams-checkin-api.josealfonsodejesus.workers.dev/logs",
+      { cache: "no-store" }
+    );
 
-  if (!res.ok) {
-    throw new Error("Cloud fetch failed");
+    if (!res.ok) throw new Error("Cloud fetch failed");
+
+    const logs = await res.json();
+
+    console.log("☁️ Logs loaded from cloud:", logs.length);
+
+    // ❌ DO NOT STORE IN LOCALSTORAGE (too large)
+    return logs;
+
+  } catch (err) {
+    console.warn("⚠️ Cloud unavailable, using local logs");
+    return getCachedLogs(); // fallback only
   }
-
-  const logs = await res.json();
-  localStorage.setItem("ams_logs", JSON.stringify(logs));
-
-  console.log("☁️ Logs loaded from cloud:", logs.length);
-  return logs;
 }
-
 
 function dedupeLogsById(logs) {
   return Array.from(
