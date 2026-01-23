@@ -2,16 +2,12 @@
    CLOUD DETAIL FETCH (SAFE + NON-BLOCKING)
 ========================================================= */
 let detailCloudCache = null;
-let detailCloudAttempted = false;
 
 function getLocalDetailLogs() {
   return JSON.parse(localStorage.getItem("ams_logs") || "[]");
 }
 
 async function fetchDetailLogs() {
-  if (detailCloudAttempted) return detailCloudCache || getLocalDetailLogs();
-  detailCloudAttempted = true;
-
   try {
     const res = await fetch(
       "https://ams-checkin-api.josealfonsodejesus.workers.dev/logs",
@@ -23,15 +19,17 @@ async function fetchDetailLogs() {
     const logs = await res.json();
     detailCloudCache = logs;
 
-    localStorage.setItem("ams_logs", JSON.stringify(logs));
-
     console.log("☁️ Detail logs loaded from cloud:", logs.length);
+
+    // ✅ DO NOT write to localStorage (prevents quota issues)
     return logs;
-  } catch {
-    console.warn("⚠️ Using local detail logs");
+
+  } catch (err) {
+    console.warn("⚠️ Cloud unavailable, using local detail logs");
     return getLocalDetailLogs();
   }
 }
+
 /* =========================================================
    LOGO (PDF)
 ========================================================= */
