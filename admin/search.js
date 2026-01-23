@@ -45,7 +45,7 @@ function renderSearchUI() {
 
       <div class="form-row">
         <label>Date Range</label>
-        <select id="filterDateRange" onchange="toggleCustomDateRange(this.value)">
+        <select id="filterDateRange">
           <option value="">All Dates</option>
           <option value="today">Today</option>
           <option value="yesterday">Yesterday</option>
@@ -93,6 +93,13 @@ function renderSearchUI() {
 
   clearSearchTable();
 setupSearchCompanyAutocomplete();
+}
+
+const rangeSelect = document.getElementById("filterDateRange");
+if (rangeSelect) {
+  rangeSelect.addEventListener("change", e => {
+    toggleCustomDateRange(e.target.value);
+  });
 }
 
 /* =========================================================
@@ -393,6 +400,13 @@ function setupSearchCompanyAutocomplete() {
 window.clearSearch = function () {
   renderSearchUI();
 };
+
+function toggleCustomDateRange(value) {
+  const box = document.getElementById("customDateRange");
+  if (!box) return;
+
+  box.style.display = value === "custom" ? "block" : "none";
+}
 
 function clearSearchTable() {
   const t = document.getElementById("searchResultsTable");
