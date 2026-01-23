@@ -338,6 +338,7 @@ function renderSearchResults(results) {
                 ">🔒 LOCKED</span>`
               : ""
           }
+          <button onclick="editDonor('${r.id}')">Edit</button>
           <button onclick="deleteDonor('${r.id}')">Delete</button>
         </td>
       </tr>
@@ -654,6 +655,41 @@ window.exportSearchLogExcel = function () {
     `AMS_Search_Log_${Date.now()}.xlsx`
   );
 };
+
+async function editDonor(id) {
+  const logs = await fetchLogsFromCloud();
+  const record = logs.find(l => l.id === id);
+  if (!record) return alert("Record not found");
+
+  const company = prompt("Edit Company:", record.company);
+  if (company === null) return;
+
+  const services = prompt("DOT or NON-DOT:", record.services);
+  if (services === null) return;
+
+  const updated = {
+    company: company.trim(),
+    services: services.trim()
+  };
+
+  const res = await fetch(
+    `https://ams-checkin-api.josealfonsodejesus.workers.dev/logs/${id}`,
+    {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(updated)
+    }
+  );
+
+  if (!res.ok) {
+    alert("Update failed");
+    return;
+  }
+
+  alert("Record updated successfully");
+
+  await runSearch(); // refresh table
+}
 
 /* =========================================================
    INIT
