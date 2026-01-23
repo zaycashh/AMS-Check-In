@@ -94,40 +94,30 @@ function renderSearchUI() {
   clearSearchTable();
 setupSearchCompanyAutocomplete();
 }
-
-const rangeSelect = document.getElementById("filterDateRange");
-if (rangeSelect) {
-  rangeSelect.addEventListener("change", e => {
-    toggleCustomDateRange(e.target.value);
-  });
-}
-
 /* =========================================================
    DATA HELPERS
 ========================================================= */
 function getCachedLogs() {
   return JSON.parse(localStorage.getItem("ams_logs") || "[]");
 }
+
 async function fetchLogsFromCloud() {
-  try {
-    const res = await fetch(
-      "https://ams-checkin-api.josealfonsodejesus.workers.dev/logs",
-      { cache: "no-store" }
-    );
+  const res = await fetch(
+    "https://ams-checkin-api.josealfonsodejesus.workers.dev/logs",
+    { cache: "no-store" }
+  );
 
-    if (!res.ok) throw new Error("Cloud fetch failed");
-
-    const logs = await res.json();
-    localStorage.setItem("ams_logs", JSON.stringify(logs));
-
-    console.log("☁️ Logs loaded from cloud:", logs.length);
-    return logs;
-
-  } catch (err) {
-    console.warn("⚠️ Cloud unavailable, using local logs");
-    return getCachedLogs();
+  if (!res.ok) {
+    throw new Error("Cloud fetch failed");
   }
+
+  const logs = await res.json();
+  localStorage.setItem("ams_logs", JSON.stringify(logs));
+
+  console.log("☁️ Logs loaded from cloud:", logs.length);
+  return logs;
 }
+
 
 function dedupeLogsById(logs) {
   return Array.from(
