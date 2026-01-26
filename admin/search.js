@@ -45,7 +45,7 @@ function renderSearchUI() {
 
       <div class="form-row">
         <label>Date Range</label>
-        <select id="filterDateRange">
+        <select id="filterDateRange" onchange="toggleCustomDateRange(this.value)">
           <option value="">All Dates</option>
           <option value="today">Today</option>
           <option value="yesterday">Yesterday</option>
