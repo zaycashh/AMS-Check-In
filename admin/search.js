@@ -151,6 +151,8 @@ function normalizeDateOnly(dateStr) {
    SEARCH
 ========================================================= */
 window.runSearch = async function () {
+  document.getElementById("searchResultCount").textContent = "Searching...";
+   
   const logs = dedupeLogsById(await fetchLogsFromCloud());
 
   const first = document.getElementById("filterFirstName").value.toLowerCase();
