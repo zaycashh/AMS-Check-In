@@ -282,13 +282,6 @@ async function deleteDonor(id) {
   // 3️⃣ Refresh UI
   window.searchResults = window.searchResults.filter(r => r.id !== id);
   renderSearchResults(window.searchResults);
-   const rangeSelect = document.getElementById("filterDateRange");
-  if (rangeSelect) {
-    rangeSelect.addEventListener("change", e => {
-      toggleCustomDateRange(e.target.value);
-    });
-  }
-}
 
 /* =========================================================
    RENDER RESULTS
