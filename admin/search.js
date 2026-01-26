@@ -217,12 +217,13 @@ switch (range) {
     break;
 
   case "custom":
-    if (start && end) {
-      startDate = normalizeDateOnly(start);
-      endDate = normalizeDateOnly(end);
-    }
-    break;
-}
+  if (!start || !end) {
+    alert("Please select both a Start Date and End Date.");
+    return;
+  }
+  startDate = normalizeDateOnly(start);
+  endDate = normalizeDateOnly(end);
+  break;
 
 const results = logs.filter(l => {
   const logDate = normalizeDateOnly(l.date);
@@ -408,6 +409,7 @@ function setupSearchCompanyAutocomplete() {
 
 window.clearSearch = function () {
   renderSearchUI();
+  toggleCustomDateRange(""); // hide custom date inputs
 };
 
 function toggleCustomDateRange(value) {
