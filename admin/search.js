@@ -1,3 +1,13 @@
+/* =========================================================
+   ADMIN SECURITY CONFIG
+========================================================= */
+const ADMIN_PIN_VALUE = "2468"; // CHANGE THIS
+Object.defineProperty(window, "ADMIN_PIN", {
+  value: ADMIN_PIN_VALUE,
+  writable: false,
+  configurable: false
+});
+
 console.log("Admin Search Module Loaded");
 
 /* =========================================================
@@ -245,10 +255,10 @@ async function deleteDonor(id) {
     return;
   }
 
-  // 🔒 STEP 1B — LOCK ENFORCEMENT
+  // 🔒 LOCKED RECORD → REQUIRE PIN
   if (log.locked !== false) {
     const pin = prompt(
-      "This record is LOCKED.\n\nEnter Admin PIN to delete:"
+      "🔒 This record is LOCKED.\n\nEnter Admin PIN to delete:"
     );
 
     if (pin !== window.ADMIN_PIN) {
@@ -256,17 +266,20 @@ async function deleteDonor(id) {
       return;
     }
 
-    console.warn("🔐 ADMIN OVERRIDE DELETE", {
+    console.warn("🔐 ADMIN DELETE OVERRIDE", {
       recordId: id,
+      action: "DELETE",
       timestamp: new Date().toISOString()
     });
   }
 
-  if (!confirm("Are you sure you want to delete this donor record?\n\nThis cannot be undone.")) {
+  if (!confirm(
+    "Are you sure you want to delete this donor record?\n\nThis cannot be undone."
+  )) {
     return;
   }
 
-  // 1️⃣ Remove from local cache
+  // 1️⃣ Remove locally
   logs = logs.filter(l => l.id !== id);
   localStorage.setItem("ams_logs", JSON.stringify(logs));
 
@@ -654,7 +667,28 @@ window.exportSearchLogExcel = function () {
 async function editDonor(id) {
   const logs = await fetchLogsFromCloud();
   const record = logs.find(l => l.id === id);
-  if (!record) return alert("Record not found");
+  if (!record) {
+    alert("Record not found.");
+    return;
+  }
+
+  // 🔒 LOCKED RECORD → REQUIRE PIN
+  if (record.locked !== false) {
+    const pin = prompt(
+      "🔒 This record is LOCKED.\n\nEnter Admin PIN to edit:"
+    );
+
+    if (pin !== window.ADMIN_PIN) {
+      alert("Invalid PIN. Edit cancelled.");
+      return;
+    }
+
+    console.warn("🔐 ADMIN EDIT OVERRIDE", {
+      recordId: id,
+      action: "EDIT",
+      timestamp: new Date().toISOString()
+    });
+  }
 
   const company = prompt("Edit Company:", record.company);
   if (company === null) return;
@@ -681,9 +715,14 @@ async function editDonor(id) {
     return;
   }
 
-  alert("Record updated successfully");
+  console.warn("✏️ ADMIN EDIT", {
+    recordId: id,
+    changes: updated,
+    timestamp: new Date().toISOString()
+  });
 
-  await runSearch(); // refresh table
+  alert("Record updated successfully");
+  await runSearch();
 }
 
 /* =========================================================
