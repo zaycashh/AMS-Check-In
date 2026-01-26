@@ -218,14 +218,14 @@ switch (range) {
     endDate = new Date(today.getFullYear() - 1, 11, 31);
     break;
 
-  case "custom":
-  if (!start || !end) {
-    alert("Please select both a Start Date and End Date.");
-    return;
-  }
-  startDate = normalizeDateOnly(start);
-  endDate = normalizeDateOnly(end);
-  break;
+    case "custom":
+    if (!start || !end) {
+      alert("Please select both a Start Date and End Date.");
+      return;
+    }
+    startDate = normalizeDateOnly(start);
+    endDate = normalizeDateOnly(end);
+    break;
 }
 
 const results = logs.filter(l => {
@@ -241,6 +241,7 @@ const results = logs.filter(l => {
 
   return true;
 });
+
    
    results.sort((a, b) => {
   return (b.timestamp || 0) - (a.timestamp || 0);
