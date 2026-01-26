@@ -226,6 +226,7 @@ switch (range) {
   startDate = normalizeDateOnly(start);
   endDate = normalizeDateOnly(end);
   break;
+}
 
 const results = logs.filter(l => {
   const logDate = normalizeDateOnly(l.date);
