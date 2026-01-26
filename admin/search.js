@@ -94,6 +94,7 @@ function renderSearchUI() {
   clearSearchTable();
 setupSearchCompanyAutocomplete();
 }
+
 /* =========================================================
    DATA HELPERS
 ========================================================= */
@@ -282,6 +283,7 @@ async function deleteDonor(id) {
   // 3️⃣ Refresh UI
   window.searchResults = window.searchResults.filter(r => r.id !== id);
   renderSearchResults(window.searchResults);
+}
 
 /* =========================================================
    RENDER RESULTS
