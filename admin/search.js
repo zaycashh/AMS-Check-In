@@ -548,10 +548,12 @@ const tableBody = rows.map(row =>
   },
   columnStyles: {
   1: {
-    cellWidth: 24,
+    cellWidth: 32,
+    overflow: "visible",
     whiteSpace: "nowrap"
   }
 },
+
   didDrawCell(data) {
     if (data.column.index === 7 && data.cell.section === "body") {
       const row = rows[data.row.index];
