@@ -257,7 +257,22 @@ function filterByDateRange(records) {
     return true;
   });
 }
+/* =========================================================
+   SORT RECORDS (NEWEST → OLDEST)
+========================================================= */
+function sortByNewest(records) {
+  return records.sort((a, b) => {
+    const ta =
+      a.timestamp ||
+      new Date(`${a.date} ${a.time || "00:00"}`).getTime();
 
+    const tb =
+      b.timestamp ||
+      new Date(`${b.date} ${b.time || "00:00"}`).getTime();
+
+    return tb - ta; // newest first
+  });
+}
 /* =========================================================
    RENDER TABLE
 ========================================================= */
@@ -280,6 +295,7 @@ function renderCompanyDetailTable() {
   );
 
   records = filterByDateRange(records);
+  records = sortByNewest(records);
    const countEl = document.getElementById("detailDonorCount");
 if (countEl) {
   countEl.textContent = `Total Donors: ${records.length}`;
@@ -374,11 +390,13 @@ function exportCompanyExcel() {
     return;
   }
 
-  const records = filterByDateRange(
+  const records = sortByNewest(
+  filterByDateRange(
     (detailCloudCache || getLocalDetailLogs()).filter(
       r => (r.company || "").toUpperCase() === companyName.toUpperCase()
     )
-  );
+  )
+);
 
   if (!records.length) {
     alert("No records found for this company.");
@@ -443,11 +461,13 @@ function exportCompanyPdf() {
     return;
   }
 
-  const records = filterByDateRange(
+  const records = sortByNewest(
+  filterByDateRange(
     (detailCloudCache || getLocalDetailLogs()).filter(
       r => (r.company || "").toUpperCase() === companyName.toUpperCase()
     )
-  );
+  )
+);
 
   if (!records.length) {
     alert("No records found for this company.");
