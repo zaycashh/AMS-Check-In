@@ -530,46 +530,54 @@ doc.text(
      TABLE
   =============================== */
   doc.autoTable({
-    startY: 50,
-    margin: { left: 8, right: 8 },
-    head: [[
-      "Date",
-      "Time",
-      "First",
-      "Last",
-      "Reason",
-      "Services",
-      "Signature"
-    ]],
-    body: rows,
-    styles: {
-      fontSize: 9,
-      cellPadding: 4,
-      valign: "middle"
-    },
-    headStyles: {
-      fillColor: [30, 94, 150],
-      textColor: 255
-    },
-    columnStyles: {
-      6: { cellWidth: 28 }
-    },
-    didDrawCell(data) {
-      if (data.column.index === 6 && data.cell.section === "body") {
-        const img = records[data.row.index]?.signature;
-        if (img?.startsWith("data:image")) {
-          doc.addImage(
-            img,
-            "PNG",
-            data.cell.x + 4,
-            data.cell.y + 2,
-            20,
-            8
-          );
-        }
+  startY: 48,
+  tableWidth: "auto",
+  head: [[
+    "Date",
+    "Time",
+    "First",
+    "Last",
+    "Reason",
+    "Services",
+    "Signature"
+  ]],
+  body: tableBody,
+  styles: {
+    font: "helvetica",
+    fontSize: 10,
+    cellPadding: 5,
+    valign: "middle",
+    overflow: "linebreak",
+    lineWidth: 0.1
+  },
+  rowPageBreak: "avoid",
+  headStyles: {
+    fillColor: HEADER_BLUE,
+    textColor: 255,
+    fontStyle: "bold"
+  },
+  columnStyles: {
+    6: { cellWidth: 28 }
+  },
+  didDrawCell(data) {
+    if (data.column.index === 6 && data.cell.section === "body") {
+      const row = rows[data.row.index];
+      const img = row?.querySelector("img");
+      const sig = img?.src;
+
+      if (sig) {
+        doc.addImage(
+          sig,
+          "PNG",
+          data.cell.x + 3,
+          data.cell.y + 2,
+          22,
+          8
+        );
       }
     }
-  });
+  }
+});
 
   /* ===============================
      FOOTER — GENERATED TIME (RESTORED)
