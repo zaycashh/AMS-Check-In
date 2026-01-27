@@ -756,5 +756,4 @@ async function editDonor(id) {
 ========================================================= */
 document.addEventListener("DOMContentLoaded", async () => {
   renderSearchUI();
-  await fetchLogsFromCloud();
 });
