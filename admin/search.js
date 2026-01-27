@@ -544,7 +544,22 @@ const tableBody = rows.map(row =>
     7: { cellWidth: 28 }
   },
   didDrawCell(data) {
-    ...
+    if (data.column.index === 7 && data.cell.section === "body") {
+      const row = rows[data.row.index];
+      const img = row?.querySelector("img");
+      const sig = img?.src;
+
+      if (sig) {
+        doc.addImage(
+          sig,
+          "PNG",
+          data.cell.x + 3,
+          data.cell.y + 2,
+          22,
+          8
+        );
+      }
+    }
   }
 });
 
