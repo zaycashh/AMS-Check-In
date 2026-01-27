@@ -460,10 +460,10 @@ function exportCompanyPdf() {
   const PAGE_WIDTH = doc.internal.pageSize.width;
 
   /* ===============================
-     HEADER BAR
-  =============================== */
-  doc.setFillColor(30, 94, 150);
-  doc.rect(0, 0, PAGE_WIDTH, 44, "F");
+   HEADER BAR (MATCH SEARCH LOG)
+=============================== */
+doc.setFillColor(...HEADER_BLUE);
+doc.rect(0, 0, 297, 44, "F");
 
   /* ===============================
      LOGO
@@ -541,7 +541,7 @@ doc.text(
     "Services",
     "Signature"
   ]],
-  body: tableBody,
+  body: rows,
   styles: {
     font: "helvetica",
     fontSize: 10,
