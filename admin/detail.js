@@ -456,6 +456,7 @@ function exportCompanyPdf() {
 
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF("landscape");
+  const HEADER_BLUE = [25, 90, 140];
 
   const PAGE_WIDTH = doc.internal.pageSize.width;
 
