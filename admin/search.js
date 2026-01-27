@@ -541,8 +541,11 @@ const tableBody = rows.map(row =>
     fontStyle: "bold"
   },
   columnStyles: {
-    7: { cellWidth: 28 }
-  },
+  1: {
+    cellWidth: 24,
+    whiteSpace: "nowrap"
+  }
+},
   didDrawCell(data) {
     if (data.column.index === 7 && data.cell.section === "body") {
       const row = rows[data.row.index];
