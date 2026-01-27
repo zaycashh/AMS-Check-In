@@ -497,18 +497,17 @@ function exportSearchPdf() {
   doc.setTextColor(...DARK_TEXT);
 
   /* ===============================
-     TABLE DATA
-  =============================== */
-  const tableBody = window.searchResults.map(r => [
-    r.date || "",
-    r.time || "",
-    r.first || "",
-    r.last || "",
-    r.company || "",
-    r.reason || "",
-    r.services || "",
-    ""
-  ]);
+   TABLE DATA (EXPORT ONLY REAL ROWS)
+=============================== */
+const rows = Array.from(
+  document.querySelectorAll("#searchResultsTable tr.export-row")
+);
+
+const tableBody = rows.map(row =>
+  Array.from(row.children)
+    .slice(0, 8) // ignore Actions column
+    .map(td => td.innerText.trim())
+);
 
   /* ===============================
      TABLE
