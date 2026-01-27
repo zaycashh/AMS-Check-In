@@ -505,8 +505,14 @@ const rows = Array.from(
 
 const tableBody = rows.map(row =>
   Array.from(row.children)
-    .slice(0, 8) // ignore Actions column
-    .map(td => td.innerText.trim())
+    .slice(0, 8)
+    .map((td, index) => {
+      // 🔧 FIX TIME COLUMN (index 1)
+      if (index === 1) {
+        return td.innerText.replace(/\s+/g, " ").trim();
+      }
+      return td.innerText.trim();
+    })
 );
 
   /* ===============================
