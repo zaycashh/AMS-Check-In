@@ -530,7 +530,7 @@ doc.text(
   /* ===============================
      TABLE
   =============================== */
-  doc.autoTable({
+   doc.autoTable({
   startY: 48,
   tableWidth: "auto",
   head: [[
