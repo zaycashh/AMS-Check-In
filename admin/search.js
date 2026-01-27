@@ -514,6 +514,7 @@ const tableBody = rows.map(row =>
   =============================== */
   doc.autoTable({
   startY: 48,
+  tableWidth: "auto",
   head: [[
     "Date",
     "Time",
@@ -526,10 +527,12 @@ const tableBody = rows.map(row =>
   ]],
   body: tableBody,
   styles: {
-    fontSize: 9,
-    cellPadding: 4,
+    font: "helvetica",
+    fontSize: 10,
+    cellPadding: 5,
     valign: "middle",
-    overflow: "linebreak"
+    overflow: "linebreak",
+    lineWidth: 0.1
   },
   rowPageBreak: "avoid",
   headStyles: {
@@ -541,19 +544,7 @@ const tableBody = rows.map(row =>
     7: { cellWidth: 28 }
   },
   didDrawCell(data) {
-    if (data.column.index === 7 && data.cell.section === "body") {
-      const sig = window.searchResults[data.row.index]?.signature;
-      if (sig) {
-        doc.addImage(
-          sig,
-          "PNG",
-          data.cell.x + 3,
-          data.cell.y + 2,
-          22,
-          8
-        );
-      }
-    }
+    ...
   }
 });
 
