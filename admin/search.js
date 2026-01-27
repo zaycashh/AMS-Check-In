@@ -322,7 +322,7 @@ function renderSearchResults(results) {
 
   results.forEach(r => {
     tbody.innerHTML += `
-      <tr>
+      <tr class="export-row">
         <td>${r.date}</td>
         <td>${r.time}</td>
         <td>${r.first}</td>
