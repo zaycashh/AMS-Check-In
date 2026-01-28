@@ -151,7 +151,8 @@ function normalizeDateOnly(dateStr) {
    SEARCH
 ========================================================= */
 window.runSearch = async function () {
-  document.getElementById("searchResultCount").textContent = "Searching...";
+  const counter = document.getElementById("searchResultCount");
+ if (counter) counter.textContent = "Searching...";
    
   const logs = dedupeLogsById(await fetchLogsFromCloud());
 
@@ -427,6 +428,8 @@ function clearSearchTable() {
   const t = document.getElementById("searchResultsTable");
   if (t) t.innerHTML = `<tr><td colspan="9" style="text-align:center;opacity:.6;">Run a search</td></tr>`;
 }
+const counter = document.getElementById("searchResultCount");
+if (counter) counter.textContent = "";
 
 function exportSearchPdf() {
   if (!window.searchResults || !window.searchResults.length) {
