@@ -101,9 +101,14 @@ function renderSearchUI() {
     </table>
   `;
 
-  clearSearchTable();
+  // 🔒 FORCE EMPTY STATE — NOTHING RENDERS UNTIL SEARCH
+window.searchResults = [];
+clearSearchTable();
+
+const counter = document.getElementById("searchResultCount");
+if (counter) counter.textContent = "";
+
 setupSearchCompanyAutocomplete();
-}
 
 /* =========================================================
    DATA HELPERS
@@ -151,7 +156,7 @@ function normalizeDateOnly(dateStr) {
    SEARCH
 ========================================================= */
 window.runSearch = async function () {
-   
+
   const counter = document.getElementById("searchResultCount");
   if (counter) counter.textContent = "Searching...";
    
