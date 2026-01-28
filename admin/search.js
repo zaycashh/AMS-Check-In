@@ -54,20 +54,26 @@ function renderSearchUI() {
 </div>
 
       <div class="form-row">
-        <label>Date Range</label>
-        <select id="filterDateRange" onchange="toggleCustomDateRange(this.value)">
-          <option value="">All Dates</option>
-          <option value="today">Today</option>
-          <option value="yesterday">Yesterday</option>
-          <option value="thisWeek">This Week</option>
-          <option value="lastWeek">Last Week</option>
-          <option value="thisMonth">This Month</option>
-          <option value="lastMonth">Last Month</option>
-          <option value="thisYear">This Year</option>
-          <option value="lastYear">Last Year</option>
-          <option value="custom">Custom</option>
-        </select>
-      </div>
+  <label>Date Range</label>
+  <select id="filterDateRange" onchange="toggleCustomDateRange(this.value)">
+    <option value="">All Dates</option>
+
+    <!-- CURRENT -->
+    <option value="today">Today</option>
+    <option value="thisWeek">This Week</option>
+    <option value="thisMonth">This Month</option>
+    <option value="thisYear">This Year</option>
+
+    <!-- PAST -->
+    <option value="yesterday">Yesterday</option>
+    <option value="lastWeek">Last Week</option>
+    <option value="lastMonth">Last Month</option>
+    <option value="lastYear">Last Year</option>
+
+    <!-- CUSTOM -->
+    <option value="custom">Custom</option>
+  </select>
+</div>
 
       <div class="form-row" id="customDateRange" style="display:none;">
         <label>Start Date</label>
