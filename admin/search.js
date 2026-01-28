@@ -725,15 +725,22 @@ async function editDonor(id) {
   }
 
   const company = prompt("Edit Company:", record.company);
-  if (company === null) return;
+if (company === null) return;
 
-  const services = prompt("DOT or NON-DOT:", record.services);
-  if (services === null) return;
+const services = prompt("Edit Services:", record.services);
+if (services === null) return;
 
-  const updated = {
-    company: company.trim(),
-    services: services.trim()
-  };
+const reason = prompt(
+  "Edit Reason for Testing:",
+  record.reason || ""
+);
+if (reason === null) return;
+
+const updated = {
+  company: company.trim(),
+  services: services.trim(),
+  reason: reason.trim()
+};
 
   const res = await fetch(
     `https://ams-checkin-api.josealfonsodejesus.workers.dev/logs/${id}`,
