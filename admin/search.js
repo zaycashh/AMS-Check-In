@@ -109,6 +109,7 @@ const counter = document.getElementById("searchResultCount");
 if (counter) counter.textContent = "";
 
 setupSearchCompanyAutocomplete();
+}
 
 /* =========================================================
    DATA HELPERS
