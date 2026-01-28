@@ -77,18 +77,23 @@ function loadDetailCompanyReport() {
 
     <label style="margin-left:12px;">Date Range:</label>
     <select id="detailDateRange">
-      <option value="">All Dates</option>
-      <option value="today">Today</option>
-      <option value="yesterday">Yesterday</option>
-      <option value="thisWeek">This Week</option>
-      <option value="lastWeek">Last Week</option>
-      <option value="thisMonth">This Month</option>
-      <option value="lastMonth">Last Month</option>
-      <option value="thisYear">This Year</option>
-      <option value="lastYear">Last Year</option>
-      <option value="custom">Custom</option>
-    </select>
+  <option value="">All Dates</option>
 
+  <!-- CURRENT -->
+  <option value="today">Today</option>
+  <option value="thisWeek">This Week</option>
+  <option value="thisMonth">This Month</option>
+  <option value="thisYear">This Year</option>
+
+  <!-- PAST -->
+  <option value="yesterday">Yesterday</option>
+  <option value="lastWeek">Last Week</option>
+  <option value="lastMonth">Last Month</option>
+  <option value="lastYear">Last Year</option>
+
+  <!-- CUSTOM -->
+  <option value="custom">Custom</option>
+</select>
     <span id="detailCustomDates" style="display:none;margin-left:8px;">
       <input type="date" id="detailStartDate">
       <input type="date" id="detailEndDate">
