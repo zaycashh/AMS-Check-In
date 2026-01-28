@@ -34,11 +34,6 @@ if (targetId === "tabSearch") {
     renderSearchUI(); //
   }
 
-  if (typeof runSearch === "function") {
-    runSearch();
-  }
-}
-
       // 🔑 GENERAL REPORT
       if (targetId === "tabGeneral" && typeof initGeneralReport === "function") {
         initGeneralReport();
