@@ -28,11 +28,12 @@ document.addEventListener("DOMContentLoaded", () => {
       target.style.display = "block";
       tab.classList.add("active");
 
-       // 🔑 SEARCH LOG (RENDER + AUTO-RUN)
+// 🔑 SEARCH LOG (RENDER ONLY — NO AUTO SEARCH)
 if (targetId === "tabSearch") {
   if (typeof renderSearchUI === "function") {
-    renderSearchUI(); //
+    renderSearchUI();
   }
+}
 
       // 🔑 GENERAL REPORT
       if (targetId === "tabGeneral" && typeof initGeneralReport === "function") {
