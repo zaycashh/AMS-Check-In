@@ -334,7 +334,12 @@ function renderSearchResults(results) {
     : "No results";
 
   if (!results.length) {
-    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;opacity:.6;">No records</td></tr>`;
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="9" style="text-align:center;opacity:.6;">
+          No records
+        </td>
+      </tr>`;
     return;
   }
 
@@ -369,15 +374,19 @@ function renderSearchResults(results) {
                 ">🔒 LOCKED</span>`
               : ""
           }
-          ${
-  ${
-  r.id
-    ? `<button onclick="editDonor('${r.id}')">Edit</button>`
-    : `<button disabled title="Legacy record – cannot edit">Edit</button>`
-}
 
-      <button onclick="deleteDonor('${r.id}')">Delete</button>
-</td>
+          ${
+            r.id
+              ? `<button onclick="editDonor('${r.id}')">Edit</button>`
+              : `<button disabled title="Legacy record – cannot edit">Edit</button>`
+          }
+
+          <button onclick="deleteDonor('${r.id}')">Delete</button>
+        </td>
+      </tr>
+    `;
+  });
+}
 
 /* =========================================================
    HELPERS
