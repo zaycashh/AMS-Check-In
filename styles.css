@@ -859,18 +859,32 @@ body {
 }
 /* ===== FORCE SMALLER TEXT IN SERVICES MULTI-SELECT ===== */
 
-/* Text inside the closed Services box */
+/* ===== FORCE SMALL SERVICES TEXT (ABSOLUTE OVERRIDE) ===== */
+
+/* Closed display text */
 .edit-modal .multi-select-display {
   font-size: 12px !important;
+  line-height: 1.2;
 }
 
-/* Text inside the dropdown list */
+/* Entire dropdown container */
+.edit-modal .multi-select-options {
+  font-size: 11px !important;
+}
+
+/* Labels AND text nodes */
 .edit-modal .multi-select-options label {
   font-size: 11px !important;
   line-height: 1.25;
 }
 
-/* Optional: slightly smaller checkbox labels spacing */
-.edit-modal .multi-select-options label {
-  padding: 3px 2px !important;
+/* Checkbox text specifically */
+.edit-modal .multi-select-options label * {
+  font-size: 11px !important;
 }
+
+/* Checkbox itself slightly smaller */
+.edit-modal .multi-select-options input[type="checkbox"] {
+  transform: scale(0.9);
+}
+
