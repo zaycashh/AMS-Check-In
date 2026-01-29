@@ -422,52 +422,60 @@ function openEditModal(record) {
     <div class="edit-box">
       <h3>Edit Donor Record</h3>
 
+      <!-- INLINE ROW -->
       <div class="edit-row">
 
-  <div class="field company-field">
-    <label>Company</label>
-    <input
-      list="companyList"
-      id="editCompany"
-      value="${record.company || ""}"
-    />
-    <datalist id="companyList">
-      ${companies.map(c => `<option value="${c}">`).join("")}
-    </datalist>
-  </div>
+        <div class="field">
+          <label>Company</label>
+          <input
+            list="companyList"
+            id="editCompany"
+            value="${record.company || ""}"
+          />
+          <datalist id="companyList">
+            ${companies.map(c => `<option value="${c}">`).join("")}
+          </datalist>
+        </div>
 
-  <div class="field reason-field">
-    <label>Reason for Test</label>
-    <select id="editReason">
-      ${TEST_REASONS.map(r =>
-        `<option value="${r}" ${r === record.reason ? "selected" : ""}>
-          ${r}
-        </option>`
-      ).join("")}
-    </select>
-  </div>
+        <div class="field">
+          <label>Reason for Test</label>
+          <select id="editReason">
+            ${TEST_REASONS.map(r =>
+              `<option value="${r}" ${r === record.reason ? "selected" : ""}>
+                ${r}
+              </option>`
+            ).join("")}
+          </select>
+        </div>
 
-  <div class="field services-field">
-    <label>Services</label>
-    <div class="multi-select" id="serviceDropdown">
-      <div class="multi-select-display" id="serviceDisplay"></div>
+        <div class="field">
+          <label>Services</label>
+          <div class="multi-select" id="serviceDropdown">
+            <div class="multi-select-display" id="serviceDisplay"></div>
 
-      <div class="multi-select-options" id="serviceOptions">
-        ${SERVICE_OPTIONS.map(s => {
-          const checked = record.services?.includes(s);
-          return `
-            <label>
-              <input type="checkbox" value="${s}" ${checked ? "checked" : ""}>
-              ${s}
-            </label>
-          `;
-        }).join("")}
+            <div class="multi-select-options" id="serviceOptions">
+              ${SERVICE_OPTIONS.map(s => {
+                const checked = record.services?.includes(s);
+                return `
+                  <label>
+                    <input type="checkbox" value="${s}" ${checked ? "checked" : ""}>
+                    ${s}
+                  </label>
+                `;
+              }).join("")}
+            </div>
+          </div>
+        </div>
+
       </div>
+
+      <!-- ACTIONS -->
+      <div class="edit-actions">
+        <button id="saveEdit">Save</button>
+        <button id="cancelEdit">Cancel</button>
+      </div>
+
     </div>
-  </div>
-
-</div>
-
   `;
 
   document.body.appendChild(modal);
@@ -514,13 +522,14 @@ function openEditModal(record) {
   /* ================================
      ACTION BUTTONS
   ================================= */
-  document.getElementById("cancelEdit").onclick = () => {
-    modal.remove();
-  };
+  const saveBtn = modal.querySelector("#saveEdit");
+  const cancelBtn = modal.querySelector("#cancelEdit");
 
-  document.getElementById("saveEdit").onclick = async () => {
-    const company = document.getElementById("editCompany").value.trim();
-    const reason = document.getElementById("editReason").value;
+  cancelBtn.onclick = () => modal.remove();
+
+  saveBtn.onclick = async () => {
+    const company = modal.querySelector("#editCompany").value.trim();
+    const reason = modal.querySelector("#editReason").value;
 
     const services = Array.from(
       modal.querySelectorAll("#serviceOptions input:checked")
