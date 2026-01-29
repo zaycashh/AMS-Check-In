@@ -793,3 +793,27 @@ body {
 .multi-select.open .multi-select-options {
   display: block;
 }
+/* EDIT MODAL INLINE ROW */
+.edit-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+}
+
+.edit-row .field {
+  flex: 1;
+  min-width: 0;
+}
+
+.edit-row .field label {
+  display: block;
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
+/* Make services dropdown same height as selects */
+.multi-select-display {
+  height: 36px;
+  display: flex;
+  align-items: center;
+}
