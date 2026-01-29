@@ -852,3 +852,22 @@ body {
 .edit-modal .multi-select-options input[type="checkbox"] {
   transform: scale(0.9);
 }
+/* === FORCE SERVICES BOX TO MATCH INPUT/SELECT HEIGHT === */
+
+.edit-modal .multi-select-display {
+  height: 38px !important;          /* MATCH input/select */
+  padding: 8px 12px !important;     /* SAME inner spacing */
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+}
+
+/* Ensure input & select are same height too */
+.edit-modal input,
+.edit-modal select {
+  height: 38px;
+  box-sizing: border-box;
+}
