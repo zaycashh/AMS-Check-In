@@ -14,6 +14,7 @@ const SERVICE_OPTIONS = [
   "Vision Test",
   "DOT Alcohol Test"
   "NON-DOT Alcohol Test"
+  "DNA (Paternity Test)"
 ];
 
 /* =========================================================
