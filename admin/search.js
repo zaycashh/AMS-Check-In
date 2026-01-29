@@ -446,11 +446,9 @@ function openEditModal(record) {
       <!-- SERVICES -->
 <label>Services</label>
 <div class="multi-select" id="serviceDropdown">
-  <div class="multi-select-display" id="serviceDisplay">
-    Select services
-  </div>
+  <div class="multi-select-display" id="serviceDisplay"></div>
 
-  <div class="multi-select-options">
+  <div class="multi-select-options" id="serviceOptions">
     ${SERVICE_OPTIONS.map(s => {
       const checked = record.services?.includes(s);
       return `
@@ -469,20 +467,6 @@ function openEditModal(record) {
       </div>
     </div>
   `;
-function setupServiceMultiSelect(modal) {
-  const display = modal.querySelector("#serviceDisplay");
-  const options = modal.querySelector("#serviceOptions");
-
-  display.onclick = () => {
-    options.style.display =
-      options.style.display === "block" ? "none" : "block";
-  };
-
-  modal.addEventListener("click", e => {
-    if (!e.target.closest(".multi-select")) {
-      options.style.display = "none";
-    }
-  });
 
   options.querySelectorAll("input[type=checkbox]").forEach(cb => {
     cb.onchange = () => {
@@ -502,7 +486,8 @@ function setupServiceMultiSelect(modal) {
   // ===== SERVICES MULTI SELECT LOGIC =====
 const dropdown = modal.querySelector("#serviceDropdown");
 const display = modal.querySelector("#serviceDisplay");
-const checkboxes = dropdown.querySelectorAll("input[type=checkbox]");
+const options = modal.querySelector("#serviceOptions");
+const checkboxes = options.querySelectorAll("input[type=checkbox]");
 
 function updateServiceDisplay() {
   const selected = Array.from(checkboxes)
@@ -518,24 +503,22 @@ function updateServiceDisplay() {
 updateServiceDisplay();
 
 // Toggle dropdown
-display.onclick = () => {
+display.onclick = e => {
+  e.stopPropagation();
   dropdown.classList.toggle("open");
 };
 
-// Update text on change
+// Update on change
 checkboxes.forEach(cb => {
   cb.addEventListener("change", updateServiceDisplay);
 });
 
-// Close when clicking outside
-document.addEventListener("click", e => {
+// Close when clicking outside (SCOPED)
+modal.addEventListener("click", e => {
   if (!dropdown.contains(e.target)) {
     dropdown.classList.remove("open");
   }
 });
-
-
-  setupServiceMultiSelect(modal);
 
   document.getElementById("cancelEdit").onclick = () => modal.remove();
 
