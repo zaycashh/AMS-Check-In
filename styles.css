@@ -857,3 +857,12 @@ body {
   display: flex;
   align-items: center;
 }
+/* === SERVICES DROPDOWN: SMALLER TEXT === */
+.multi-select-display {
+  font-size: 13px;   /* was ~14–15 */
+}
+
+.multi-select-options label {
+  font-size: 12px;   /* dropdown items */
+  line-height: 1.3;
+}
