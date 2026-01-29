@@ -749,13 +749,14 @@ const updated = {
 };
 
   const res = await fetch(
-    `https://ams-checkin-api.josealfonsodejesus.workers.dev/logs/${id}`,
-    {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(updated)
-    }
-  );
+  `https://ams-checkin-api.josealfonsodejesus.workers.dev/logs/${id}`,
+  {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(updated)
+  }
+);
+
 
   if (!res.ok) {
     alert("Update failed");
