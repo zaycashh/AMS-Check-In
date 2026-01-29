@@ -497,6 +497,42 @@ function setupServiceMultiSelect(modal) {
 
   document.body.appendChild(modal);
 
+  // ===== SERVICES MULTI SELECT LOGIC =====
+const dropdown = modal.querySelector("#serviceDropdown");
+const display = modal.querySelector("#serviceDisplay");
+const checkboxes = dropdown.querySelectorAll("input[type=checkbox]");
+
+function updateServiceDisplay() {
+  const selected = Array.from(checkboxes)
+    .filter(cb => cb.checked)
+    .map(cb => cb.value);
+
+  display.textContent = selected.length
+    ? selected.join(", ")
+    : "Select services";
+}
+
+// Initial value
+updateServiceDisplay();
+
+// Toggle dropdown
+display.onclick = () => {
+  dropdown.classList.toggle("open");
+};
+
+// Update text on change
+checkboxes.forEach(cb => {
+  cb.addEventListener("change", updateServiceDisplay);
+});
+
+// Close when clicking outside
+document.addEventListener("click", e => {
+  if (!dropdown.contains(e.target)) {
+    dropdown.classList.remove("open");
+  }
+});
+
+
   setupServiceMultiSelect(modal);
 
   document.getElementById("cancelEdit").onclick = () => modal.remove();
