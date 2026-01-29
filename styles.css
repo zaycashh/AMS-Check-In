@@ -765,7 +765,6 @@ body {
   border-radius: 4px;
   background: #fff;
   cursor: pointer;
-  font-size: 14px;
 }
 
 .multi-select-options {
@@ -783,32 +782,8 @@ body {
   padding: 6px;
 }
 
-.multi-select-options label {
-  display: block;
-  font-size: 13px;
-  padding: 4px 2px;
-  cursor: pointer;
-}
-
 .multi-select.open .multi-select-options {
   display: block;
-}
-/* EDIT MODAL INLINE ROW — TIGHT SPACING */
-.edit-row {
-  display: flex;
-  gap: 6px;              /* ⬅️ was 12px */
-  align-items: flex-end;
-}
-
-.edit-row .field {
-  flex: 1;
-  min-width: 0;
-}
-
-.edit-row .field label {
-  display: block;
-  font-size: 13px;
-  margin-bottom: 4px;
 }
 
 /* Make services dropdown same height as selects */
@@ -832,6 +807,25 @@ body {
 /* Explicit widths (THIS is the key) */
 .edit-row .field:nth-child(1) {
   width: 260px; /* Company */
+}
+/* ===== FINAL SERVICES TEXT SIZE ===== */
+.edit-modal .multi-select-display {
+  font-size: 12px !important;
+  line-height: 1.2;
+}
+
+.edit-modal .multi-select-options {
+  font-size: 11px !important;
+}
+
+.edit-modal .multi-select-options label {
+  font-size: 11px !important;
+  line-height: 1.25;
+  padding: 3px 2px;
+}
+
+.edit-modal .multi-select-options input[type="checkbox"] {
+  transform: scale(0.9);
 }
 
 .edit-row .field:nth-child(2) {
