@@ -821,3 +821,34 @@ body {
 .edit-modal .multi-select-options input[type="checkbox"] {
   transform: scale(0.9);
 }
+/* ===============================
+   FIX SERVICES LAYOUT + FONT
+================================ */
+
+/* Closed Services field (match Reason for Test) */
+.edit-modal .multi-select-display {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  color: #111827;
+}
+
+/* Dropdown container */
+.edit-modal .multi-select-options {
+  font-size: 13px !important;
+}
+
+/* EACH SERVICE ROW — FIXED */
+.edit-modal .multi-select-options label {
+  display: flex;              /* checkbox + text */
+  align-items: center;
+  gap: 6px;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  white-space: normal;        /* ⬅️ THIS FIXES THE PARAGRAPH ISSUE */
+  padding: 4px 2px;
+}
+
+/* Checkbox size */
+.edit-modal .multi-select-options input[type="checkbox"] {
+  transform: scale(0.9);
+}
