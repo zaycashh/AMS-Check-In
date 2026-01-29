@@ -374,11 +374,10 @@ function renderSearchResults(results) {
     ? `<button onclick="editDonor('${r.id}')">Edit</button>`
     : `<button disabled title="Legacy record">Edit</button>`
 }
-          <button onclick="deleteDonor('${r.id}')">Delete</button>
-        </td>
-      </tr>
-    `;
-  });
+          ${
+  r.id
+    ? `<button onclick="deleteDonor('${r.id}')">Delete</button>`
+    : `<button disabled title="Legacy record">Delete</button>`
 }
 
 /* =========================================================
@@ -713,6 +712,13 @@ window.exportSearchLogExcel = function () {
 };
 
 async function editDonor(id) {
+
+// 🚫 STEP 3: BLOCK LEGACY / INVALID RECORDS
+  if (!id) {
+    alert("This record cannot be edited (legacy record).");
+    return;
+  }
+  
   const logs = await fetchLogsFromCloud();
   const record = logs.find(l => l.id === id);
   if (!record) {
