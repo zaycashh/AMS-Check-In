@@ -871,14 +871,21 @@ body {
   font-size: 11px !important;
   line-height: 1.25;
 }
+/* ===== FIX SERVICES CHECKBOX ALIGNMENT ===== */
 
-/* Checkbox text specifically */
-.edit-modal .multi-select-options label * {
+.edit-modal .multi-select-options label {
+  display: flex;                 /* 🔥 forces side-by-side */
+  align-items: center;           /* vertical alignment */
+  gap: 8px;                      /* space between checkbox & text */
   font-size: 11px !important;
+  line-height: 1.25;
+  white-space: nowrap;
 }
 
-/* Checkbox itself slightly smaller */
+/* Checkbox sizing (NO transform) */
 .edit-modal .multi-select-options input[type="checkbox"] {
-  transform: scale(0.9);
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  flex-shrink: 0;
 }
-
