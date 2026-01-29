@@ -4,7 +4,8 @@ const TEST_REASONS = [
   "Post-Accident",
   "Reasonable Suspicion",
   "Return-to-Duty",
-  "Follow-Up"
+  "Follow-Up",
+  "Other"
 ];
 
 const SERVICE_OPTIONS = [
@@ -15,6 +16,7 @@ const SERVICE_OPTIONS = [
   "DOT Alcohol Test",
   "NON-DOT Alcohol Test",
   "DNA (Paternity Test)",
+  "Other",
 ];
 
 /* =========================================================
