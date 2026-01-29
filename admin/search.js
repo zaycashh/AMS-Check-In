@@ -1,3 +1,20 @@
+const TEST_REASONS = [
+  "Pre-Employment",
+  "Random",
+  "Post-Accident",
+  "Reasonable Suspicion",
+  "Return-to-Duty",
+  "Follow-Up"
+];
+
+const SERVICE_OPTIONS = [
+  "DOT Drug Test",
+  "NON-DOT Drug Test",
+  "DOT Physical",
+  "Vision Test",
+  "Breath Alcohol Test"
+];
+
 /* =========================================================
    ADMIN SECURITY CONFIG
 ========================================================= */
@@ -377,15 +394,119 @@ function renderSearchResults(results) {
 
           ${
             r.id
-              ? `<button onclick="editDonor('${r.id}')">Edit</button>`
+              ? `<button onclick='openEditModal(${JSON.stringify(r)})'>Edit</button>`
               : `<button disabled title="Legacy record – cannot edit">Edit</button>`
           }
-
           <button onclick="deleteDonor('${r.id}')">Delete</button>
         </td>
       </tr>
     `;
   });
+}
+/* =========================================================
+   EDIT MODAL
+========================================================= */
+function openEditModal(record) {
+  const companies = JSON.parse(
+    localStorage.getItem("ams_companies") || "[]"
+  );
+
+  const modal = document.createElement("div");
+  modal.className = "edit-modal";
+
+  modal.innerHTML = `
+    <div class="edit-box">
+      <h3>Edit Donor Record</h3>
+
+      <!-- COMPANY -->
+      <label>Company</label>
+      <input
+        list="companyList"
+        id="editCompany"
+        value="${record.company || ""}"
+      />
+      <datalist id="companyList">
+        ${companies.map(c => `<option value="${c}">`).join("")}
+      </datalist>
+
+      <!-- REASON -->
+      <label>Reason for Test</label>
+      <select id="editReason">
+        ${TEST_REASONS.map(r =>
+          `<option value="${r}" ${r === record.reason ? "selected" : ""}>
+            ${r}
+          </option>`
+        ).join("")}
+      </select>
+
+      <!-- SERVICES -->
+      <label>Services</label>
+      <div class="service-grid">
+        ${SERVICE_OPTIONS.map(s => {
+          const checked = record.services?.includes(s);
+          return `
+            <label>
+              <input type="checkbox" value="${s}" ${checked ? "checked" : ""}>
+              ${s}
+            </label>
+          `;
+        }).join("")}
+      </div>
+
+      <div class="edit-actions">
+        <button id="saveEdit">Save</button>
+        <button id="cancelEdit">Cancel</button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  document.getElementById("cancelEdit").onclick = () => modal.remove();
+
+  document.getElementById("saveEdit").onclick = async () => {
+    const company = document.getElementById("editCompany").value.trim();
+    const reason = document.getElementById("editReason").value;
+
+    const services = Array.from(
+      modal.querySelectorAll("input[type=checkbox]:checked")
+    ).map(cb => cb.value);
+
+    if (!company || !reason || !services.length) {
+      alert("All fields are required.");
+      return;
+    }
+
+    await saveEdit(record.id, {
+      company,
+      reason,
+      services: services.join(", ")
+    });
+
+    modal.remove();
+  };
+}
+
+/* =========================================================
+   SAVE EDIT
+========================================================= */
+async function saveEdit(id, updated) {
+  const res = await fetch(
+    `https://ams-checkin-api.josealfonsodejesus.workers.dev/logs/${id}`,
+    {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(updated)
+    }
+  );
+
+  if (!res.ok) {
+    alert("Update failed");
+    return;
+  }
+
+  alert("Record updated successfully");
+  runSearch();
 }
 
 /* =========================================================
@@ -718,82 +839,6 @@ window.exportSearchLogExcel = function () {
     `AMS_Search_Log_${Date.now()}.xlsx`
   );
 };
-
-async function editDonor(id) {
-
-// 🚫 STEP 3: BLOCK LEGACY / INVALID RECORDS
-  if (!id) {
-    alert("This record cannot be edited (legacy record).");
-    return;
-  }
-  
-  const logs = await fetchLogsFromCloud();
-  const record = logs.find(l => l.id === id);
-  if (!record) {
-    alert("Record not found.");
-    return;
-  }
-
-  // 🔒 LOCKED RECORD → REQUIRE PIN
-  if (record.locked !== false) {
-    const pin = prompt(
-      "🔒 This record is LOCKED.\n\nEnter Admin PIN to edit:"
-    );
-
-    if (pin !== window.ADMIN_PIN) {
-      alert("Invalid PIN. Edit cancelled.");
-      return;
-    }
-
-    console.warn("🔐 ADMIN EDIT OVERRIDE", {
-      recordId: id,
-      action: "EDIT",
-      timestamp: new Date().toISOString()
-    });
-  }
-
-  const company = prompt("Edit Company:", record.company);
-if (company === null) return;
-
-const services = prompt("Edit Services:", record.services);
-if (services === null) return;
-
-const reason = prompt(
-  "Edit Reason for Testing:",
-  record.reason || ""
-);
-if (reason === null) return;
-
-const updated = {
-  company: company.trim(),
-  services: services.trim(),
-  reason: reason.trim()
-};
-
-  const res = await fetch(
-  `https://ams-checkin-api.josealfonsodejesus.workers.dev/logs/${id}`,
-  {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(updated)
-  }
-);
-
-
-  if (!res.ok) {
-    alert("Update failed");
-    return;
-  }
-
-  console.warn("✏️ ADMIN EDIT", {
-    recordId: id,
-    changes: updated,
-    timestamp: new Date().toISOString()
-  });
-
-  alert("Record updated successfully");
-  await runSearch();
-}
 
 /* =========================================================
    INIT
