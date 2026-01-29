@@ -804,19 +804,18 @@ body {
 .edit-row .field:nth-child(2) { width: 160px; }
 .edit-row .field:nth-child(3) { width: 240px; }
 
-/* ===== FINAL SERVICES FONT MATCH ===== */
+/* === FINAL FONT MATCH (1px BUMP) === */
+
+/* Services closed display */
 .edit-modal .multi-select-display {
-  font-size: 14px !important;
+  font-size: 15px !important;   /* ⬆️ from 14 → 15 */
   font-weight: 600 !important;
-  color: #111827;
 }
 
+/* Services dropdown text */
 .edit-modal .multi-select-options label {
-  font-size: 13px !important;
+  font-size: 14px !important;   /* ⬆️ from 13 → 14 */
   font-weight: 500 !important;
-  display: flex;
-  align-items: center;
-  gap: 8px;
 }
 
 .edit-modal .multi-select-options input[type="checkbox"] {
