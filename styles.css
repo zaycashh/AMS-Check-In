@@ -793,10 +793,10 @@ body {
 .multi-select.open .multi-select-options {
   display: block;
 }
-/* EDIT MODAL INLINE ROW */
+/* EDIT MODAL INLINE ROW — TIGHT SPACING */
 .edit-row {
   display: flex;
-  gap: 12px;
+  gap: 6px;              /* ⬅️ was 12px */
   align-items: flex-end;
 }
 
