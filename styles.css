@@ -817,3 +817,43 @@ body {
   display: flex;
   align-items: center;
 }
+/* === EDIT MODAL: TIGHT INLINE FIELDS === */
+.edit-row {
+  display: flex;
+  gap: 6px;                 /* VERY close spacing */
+  align-items: flex-end;
+}
+
+/* Stop fields from stretching */
+.edit-row .field {
+  flex: 0 0 auto;
+}
+
+/* Explicit widths (THIS is the key) */
+.edit-row .field:nth-child(1) {
+  width: 260px; /* Company */
+}
+
+.edit-row .field:nth-child(2) {
+  width: 160px; /* Reason */
+}
+
+.edit-row .field:nth-child(3) {
+  width: 240px; /* Services */
+}
+
+/* Inputs/selects fill their field only */
+.edit-row input,
+.edit-row select,
+.multi-select {
+  width: 100%;
+}
+
+/* Match heights perfectly */
+.multi-select-display,
+.edit-row select,
+.edit-row input {
+  height: 36px;
+  display: flex;
+  align-items: center;
+}
