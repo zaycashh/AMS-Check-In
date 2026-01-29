@@ -765,6 +765,9 @@ body {
   border-radius: 4px;
   background: #fff;
   cursor: pointer;
+  height: 36px;
+  display: flex;
+  align-items: center;
 }
 
 .multi-select-options {
@@ -786,120 +789,36 @@ body {
   display: block;
 }
 
-/* Make services dropdown same height as selects */
-.multi-select-display {
-  height: 36px;
-  display: flex;
-  align-items: center;
-}
-/* === EDIT MODAL: TIGHT INLINE FIELDS === */
+/* ===== EDIT MODAL INLINE ROW ===== */
 .edit-row {
   display: flex;
-  gap: 6px;                 /* VERY close spacing */
+  gap: 6px;
   align-items: flex-end;
 }
 
-/* Stop fields from stretching */
 .edit-row .field {
   flex: 0 0 auto;
 }
 
-/* Explicit widths (THIS is the key) */
-.edit-row .field:nth-child(1) {
-  width: 260px; /* Company */
-}
-/* ===== FINAL SERVICES TEXT SIZE ===== */
-.edit-modal .multi-select-display {
-  font-size: 12px !important;
-  line-height: 1.2;
-}
+.edit-row .field:nth-child(1) { width: 260px; }
+.edit-row .field:nth-child(2) { width: 160px; }
+.edit-row .field:nth-child(3) { width: 240px; }
 
-.edit-modal .multi-select-options {
-  font-size: 11px !important;
+/* ===== FINAL SERVICES FONT MATCH ===== */
+.edit-modal .multi-select-display {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  color: #111827;
 }
 
 .edit-modal .multi-select-options label {
-  font-size: 11px !important;
-  line-height: 1.25;
-  padding: 3px 2px;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .edit-modal .multi-select-options input[type="checkbox"] {
   transform: scale(0.9);
-}
-
-.edit-row .field:nth-child(2) {
-  width: 160px; /* Reason */
-}
-
-.edit-row .field:nth-child(3) {
-  width: 240px; /* Services */
-}
-
-/* Inputs/selects fill their field only */
-.edit-row input,
-.edit-row select,
-.multi-select {
-  width: 100%;
-}
-
-/* Match heights perfectly */
-.multi-select-display,
-.edit-row select,
-.edit-row input {
-  height: 36px;
-  display: flex;
-  align-items: center;
-}
-/* ===== FORCE SMALLER TEXT IN SERVICES MULTI-SELECT ===== */
-
-/* ===== FORCE SMALL SERVICES TEXT (ABSOLUTE OVERRIDE) ===== */
-
-/* Closed display text */
-.edit-modal .multi-select-display {
-  font-size: 12px !important;
-  line-height: 1.2;
-}
-
-/* Entire dropdown container */
-.edit-modal .multi-select-options {
-  font-size: 11px !important;
-}
-
-/* Labels AND text nodes */
-.edit-modal .multi-select-options label {
-  font-size: 11px !important;
-  line-height: 1.25;
-}
-/* ===== FIX SERVICES CHECKBOX ALIGNMENT ===== */
-
-.edit-modal .multi-select-options label {
-  display: flex;                 /* 🔥 forces side-by-side */
-  align-items: center;           /* vertical alignment */
-  gap: 8px;                      /* space between checkbox & text */
-  font-size: 11px !important;
-  line-height: 1.25;
-  white-space: nowrap;
-}
-
-/* Checkbox sizing (NO transform) */
-.edit-modal .multi-select-options input[type="checkbox"] {
-  width: 14px;
-  height: 14px;
-  margin: 0;
-  flex-shrink: 0;
-}
-/* ===== MATCH SERVICES TEXT TO REASON FOR TEST ===== */
-
-.edit-modal .multi-select-display {
-  font-size: 13px !important;     /* slightly smaller */
-  font-weight: 500 !important;    /* same weight as select */
-  color: #1f2937;
-}
-
-/* Dropdown option text */
-.edit-modal .multi-select-options label {
-  font-size: 12px !important;     /* tighter than before */
-  font-weight: 500 !important;
-  color: #1f2937;
 }
