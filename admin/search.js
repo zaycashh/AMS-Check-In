@@ -369,7 +369,11 @@ function renderSearchResults(results) {
                 ">🔒 LOCKED</span>`
               : ""
           }
-          <button onclick="editDonor('${r.id}')">Edit</button>
+          ${
+  r.id
+    ? `<button onclick="editDonor('${r.id}')">Edit</button>`
+    : `<button disabled title="Legacy record">Edit</button>`
+}
           <button onclick="deleteDonor('${r.id}')">Delete</button>
         </td>
       </tr>
