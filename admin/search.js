@@ -148,7 +148,11 @@ async function fetchLogsFromCloud() {
 
 function dedupeLogsById(logs) {
   return Array.from(
-    new Map(logs.map(l => [l.id || l.timestamp, l])).values()
+    new Map(
+      logs
+        .filter(l => l.id) // 🔒 ONLY REAL CLOUD RECORDS
+        .map(l => [l.id, l])
+    ).values()
   );
 }
 
