@@ -443,16 +443,16 @@ function openEditModal(record) {
 
       <!-- SERVICES -->
 <label>Services</label>
-<div class="multi-select" id="serviceSelect">
+<div class="multi-select" id="serviceDropdown">
   <div class="multi-select-display" id="serviceDisplay">
-    ${record.services || "Select services"}
+    Select services
   </div>
 
-  <div class="multi-select-options" id="serviceOptions">
+  <div class="multi-select-options">
     ${SERVICE_OPTIONS.map(s => {
       const checked = record.services?.includes(s);
       return `
-        <label class="multi-option">
+        <label>
           <input type="checkbox" value="${s}" ${checked ? "checked" : ""}>
           ${s}
         </label>
