@@ -444,22 +444,22 @@ function openEditModal(record) {
       </select>
 
       <!-- SERVICES -->
-<label>Services</label>
-<div class="multi-select" id="serviceDropdown">
-  <div class="multi-select-display" id="serviceDisplay"></div>
+      <label>Services</label>
+      <div class="multi-select" id="serviceDropdown">
+        <div class="multi-select-display" id="serviceDisplay"></div>
 
-  <div class="multi-select-options" id="serviceOptions">
-    ${SERVICE_OPTIONS.map(s => {
-      const checked = record.services?.includes(s);
-      return `
-        <label>
-          <input type="checkbox" value="${s}" ${checked ? "checked" : ""}>
-          ${s}
-        </label>
-      `;
-    }).join("")}
-  </div>
-</div>
+        <div class="multi-select-options" id="serviceOptions">
+          ${SERVICE_OPTIONS.map(s => {
+            const checked = record.services?.includes(s);
+            return `
+              <label>
+                <input type="checkbox" value="${s}" ${checked ? "checked" : ""}>
+                ${s}
+              </label>
+            `;
+          }).join("")}
+        </div>
+      </div>
 
       <div class="edit-actions">
         <button id="saveEdit">Save</button>
@@ -468,67 +468,61 @@ function openEditModal(record) {
     </div>
   `;
 
-  options.querySelectorAll("input[type=checkbox]").forEach(cb => {
-    cb.onchange = () => {
-      const selected = Array.from(
-        options.querySelectorAll("input:checked")
-      ).map(i => i.value);
-
-      display.textContent = selected.length
-        ? selected.join(", ")
-        : "Select services";
-    };
-  });
-}
-
   document.body.appendChild(modal);
 
-  // ===== SERVICES MULTI SELECT LOGIC =====
-const dropdown = modal.querySelector("#serviceDropdown");
-const display = modal.querySelector("#serviceDisplay");
-const options = modal.querySelector("#serviceOptions");
-const checkboxes = options.querySelectorAll("input[type=checkbox]");
+  /* ================================
+     SERVICES MULTI-SELECT LOGIC
+  ================================= */
+  const dropdown = modal.querySelector("#serviceDropdown");
+  const display = modal.querySelector("#serviceDisplay");
+  const options = modal.querySelector("#serviceOptions");
+  const checkboxes = options.querySelectorAll("input[type=checkbox]");
 
-function updateServiceDisplay() {
-  const selected = Array.from(checkboxes)
-    .filter(cb => cb.checked)
-    .map(cb => cb.value);
+  function updateServiceDisplay() {
+    const selected = Array.from(checkboxes)
+      .filter(cb => cb.checked)
+      .map(cb => cb.value);
 
-  display.textContent = selected.length
-    ? selected.join(", ")
-    : "Select services";
-}
-
-// Initial value
-updateServiceDisplay();
-
-// Toggle dropdown
-display.onclick = e => {
-  e.stopPropagation();
-  dropdown.classList.toggle("open");
-};
-
-// Update on change
-checkboxes.forEach(cb => {
-  cb.addEventListener("change", updateServiceDisplay);
-});
-
-// Close when clicking outside (SCOPED)
-modal.addEventListener("click", e => {
-  if (!dropdown.contains(e.target)) {
-    dropdown.classList.remove("open");
+    display.textContent = selected.length
+      ? selected.join(", ")
+      : "Select services";
   }
-});
 
-  document.getElementById("cancelEdit").onclick = () => modal.remove();
+  // Initial display
+  updateServiceDisplay();
+
+  // Toggle dropdown
+  display.onclick = e => {
+    e.stopPropagation();
+    dropdown.classList.toggle("open");
+  };
+
+  // Update display on change
+  checkboxes.forEach(cb => {
+    cb.addEventListener("change", updateServiceDisplay);
+  });
+
+  // Close dropdown when clicking outside
+  modal.addEventListener("click", e => {
+    if (!dropdown.contains(e.target)) {
+      dropdown.classList.remove("open");
+    }
+  });
+
+  /* ================================
+     ACTION BUTTONS
+  ================================= */
+  document.getElementById("cancelEdit").onclick = () => {
+    modal.remove();
+  };
 
   document.getElementById("saveEdit").onclick = async () => {
     const company = document.getElementById("editCompany").value.trim();
     const reason = document.getElementById("editReason").value;
 
     const services = Array.from(
-  modal.querySelectorAll("#serviceOptions input:checked")
-).map(cb => cb.value);
+      modal.querySelectorAll("#serviceOptions input:checked")
+    ).map(cb => cb.value);
 
     if (!company || !reason || !services.length) {
       alert("All fields are required.");
