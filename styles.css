@@ -752,3 +752,34 @@ body {
 .filter-bar label {
   margin-right: 4px;
 }
+.multi-select {
+  position: relative;
+}
+
+.multi-select-display {
+  border: 1px solid #ccc;
+  padding: 8px;
+  cursor: pointer;
+  background: #fff;
+}
+
+.multi-select-options {
+  display: none;
+  position: absolute;
+  z-index: 1000;
+  background: #fff;
+  border: 1px solid #ccc;
+  width: 100%;
+  max-height: 180px;
+  overflow-y: auto;
+}
+
+.multi-option {
+  display: block;
+  padding: 6px 8px;
+  cursor: pointer;
+}
+
+.multi-option:hover {
+  background: #f2f2f2;
+}
