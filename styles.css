@@ -889,3 +889,17 @@ body {
   margin: 0;
   flex-shrink: 0;
 }
+/* ===== MATCH SERVICES TEXT TO REASON FOR TEST ===== */
+
+.edit-modal .multi-select-display {
+  font-size: 13px !important;     /* slightly smaller */
+  font-weight: 500 !important;    /* same weight as select */
+  color: #1f2937;
+}
+
+/* Dropdown option text */
+.edit-modal .multi-select-options label {
+  font-size: 12px !important;     /* tighter than before */
+  font-weight: 500 !important;
+  color: #1f2937;
+}
