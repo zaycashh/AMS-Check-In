@@ -857,12 +857,20 @@ body {
   display: flex;
   align-items: center;
 }
-/* === SERVICES DROPDOWN: SMALLER TEXT === */
-.multi-select-display {
-  font-size: 13px;   /* was ~14–15 */
+/* ===== FORCE SMALLER TEXT IN SERVICES MULTI-SELECT ===== */
+
+/* Text inside the closed Services box */
+.edit-modal .multi-select-display {
+  font-size: 12px !important;
 }
 
-.multi-select-options label {
-  font-size: 12px;   /* dropdown items */
-  line-height: 1.3;
+/* Text inside the dropdown list */
+.edit-modal .multi-select-options label {
+  font-size: 11px !important;
+  line-height: 1.25;
+}
+
+/* Optional: slightly smaller checkbox labels spacing */
+.edit-modal .multi-select-options label {
+  padding: 3px 2px !important;
 }
