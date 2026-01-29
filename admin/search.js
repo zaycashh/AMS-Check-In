@@ -442,18 +442,17 @@ function openEditModal(record) {
       </select>
 
       <!-- SERVICES -->
-      <label>Services</label>
-      <div class="service-grid">
-        ${SERVICE_OPTIONS.map(s => {
-          const checked = record.services?.includes(s);
-          return `
-            <label>
-              <input type="checkbox" value="${s}" ${checked ? "checked" : ""}>
-              ${s}
-            </label>
-          `;
-        }).join("")}
-      </div>
+<label>Services</label>
+<select id="editServices" multiple size="5">
+  ${SERVICE_OPTIONS.map(s => {
+    const selected = record.services?.includes(s);
+    return `
+      <option value="${s}" ${selected ? "selected" : ""}>
+        ${s}
+      </option>
+    `;
+  }).join("")}
+</select>
 
       <div class="edit-actions">
         <button id="saveEdit">Save</button>
@@ -471,8 +470,8 @@ function openEditModal(record) {
     const reason = document.getElementById("editReason").value;
 
     const services = Array.from(
-      modal.querySelectorAll("input[type=checkbox]:checked")
-    ).map(cb => cb.value);
+  document.getElementById("editServices").selectedOptions
+).map(o => o.value);
 
     if (!company || !reason || !services.length) {
       alert("All fields are required.");
