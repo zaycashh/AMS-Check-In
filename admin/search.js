@@ -12,9 +12,9 @@ const SERVICE_OPTIONS = [
   "NON-DOT Drug Test",
   "DOT Physical",
   "Vision Test",
-  "DOT Alcohol Test"
-  "NON-DOT Alcohol Test"
-  "DNA (Paternity Test)"
+  "DOT Alcohol Test",
+  "NON-DOT Alcohol Test",
+  "DNA (Paternity Test)",
 ];
 
 /* =========================================================
