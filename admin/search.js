@@ -601,7 +601,7 @@ const cleanId = record.id.includes("log:")
   ? record.id.replace("log:", "")
   : record.id;
 
-await saveEdit(cleanId, updated);
+await saveEdit(record.id, updated);
 
 
   // ✅ CLOSE MODAL AFTER SUCCESS
@@ -613,13 +613,10 @@ await saveEdit(cleanId, updated);
 // ================================
 async function saveEdit(id, updates) {
   try {
-    // 🔑 STRIP log: PREFIX IF PRESENT
-    const cleanId = id.replace("log:", "");
-
     console.log("UPDATE PAYLOAD →", updates);
 
     const res = await fetch(
-      `https://ams-checkin-api.josealfonsodejesus.workers.dev/logs/${cleanId}`,
+      `https://ams-checkin-api.josealfonsodejesus.workers.dev/logs/${id}`,
       {
         method: "PUT",
         headers: {
@@ -630,27 +627,28 @@ async function saveEdit(id, updates) {
     );
 
     if (!res.ok) {
-      throw new Error(`Update failed: ${res.status}`);
+      const text = await res.text();
+      throw new Error(`Update failed: ${res.status} ${text}`);
     }
 
-    const data = await res.json();
-    console.log("UPDATE SUCCESS →", data);
+    const result = await res.json();
+    console.log("UPDATE SUCCESS →", result);
 
-    // ✅ Update in-memory search results (no re-search)
+    // 🔁 Update local search cache (NO re-search, NO UI wipe)
     const idx = window.searchResults.findIndex(r => r.id === id);
     if (idx !== -1) {
       window.searchResults[idx] = {
         ...window.searchResults[idx],
-        ...updates,
-        updatedAt: new Date().toISOString()
+        ...updates
       };
     }
 
-    return true;
+    return result;
+
   } catch (err) {
     console.error("SAVE EDIT ERROR:", err);
     alert("Save failed — check console");
-    return false;
+    throw err;
   }
 }
 /* =========================================================
