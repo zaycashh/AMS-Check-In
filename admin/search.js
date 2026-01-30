@@ -585,14 +585,17 @@ modal.addEventListener("click", e => {
   }
 
   const updated = {
-  company,
-  reason,
-  services // ✅ ARRAY — do NOT join
-};
+    company,
+    reason,
+    services
+  };
 
-console.log("UPDATE PAYLOAD", updated); // 👈 keep this for debugging
+  console.log("UPDATE PAYLOAD", updated);
 
-await saveEdit(record.id, updated);
+  await saveEdit(record.id, updated);
+
+  // ✅ CLOSE MODAL AFTER SUCCESS
+  modal.remove();
 };
 }
 /* =========================================================
