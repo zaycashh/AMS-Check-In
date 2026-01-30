@@ -312,6 +312,16 @@ function requestAdminEdit(record) {
   openEditModal(record);
 }
 
+/* ✅ ADD THIS IMMEDIATELY BELOW */
+function requestAdminEditById(id) {
+  const record = window.searchResults.find(r => r.id === id);
+  if (!record) {
+    alert("Record not found");
+    return;
+  }
+  requestAdminEdit(record);
+}
+
 function requestAdminDelete(id) {
   if (!requireAdminAccess()) return;
   deleteDonor(id);
@@ -419,7 +429,7 @@ function renderSearchResults(results) {
 
           ${
             r.id
-              ? `<button onclick='requestAdminEdit(${JSON.stringify(r)})'>Edit</button>`
+              ? `<button onclick="requestAdminEditById('${r.id}')">Edit</button>`
               : `<button disabled>Edit</button>`
           }
 
