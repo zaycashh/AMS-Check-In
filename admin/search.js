@@ -563,40 +563,46 @@ function openEditModal(record) {
   cancelBtn.onclick = () => modal.remove();
 
   saveBtn.onclick = async () => {
-    const company = modal.querySelector("#editCompany").value.trim();
-    const reason = modal.querySelector("#editReason").value;
+  const company = modal.querySelector("#editCompany").value.trim();
+  const reason = modal.querySelector("#editReason").value;
 
-    const services = Array.from(
-      modal.querySelectorAll("#serviceOptions input:checked")
-    ).map(cb => cb.value);
+  const services = Array.from(
+    modal.querySelectorAll("#serviceOptions input:checked")
+  ).map(cb => cb.value);
 
-    if (!company || !reason || !services.length) {
-      alert("All fields are required.");
-      return;
-    }
+  if (!company || !reason || !services.length) {
+    alert("All fields are required.");
+    return;
+  }
 
-    await saveEdit(record.id, {
-  company,
-  reason,
-  services // ✅ KEEP AS ARRAY
-});
-
-    modal.remove();
+  const updated = {
+    company,
+    reason,
+    services: services.join(", ")
   };
-}
+
+  console.log("UPDATE PAYLOAD", updated); // 👈 ADD THIS
+
+  await saveEdit(record.id, updated);
+};
 
 /* =========================================================
    SAVE EDIT
 ========================================================= */
 async function saveEdit(id, updated) {
-
   if (!id) {
     alert("Invalid record ID.");
     return;
   }
-  
-  // ✅ STEP 2 — DEBUG LOG (ADD THIS)
-  console.log("UPDATE PAYLOAD", { id, updated });
+
+  // ✅ FIX: normalize field names to match KV
+  const payload = {
+    company: updated.company,
+    reason: updated.reason,
+    services: updated.services
+  };
+
+  console.log("UPDATE PAYLOAD SENT TO API:", payload);
 
   try {
     const res = await fetch(
@@ -604,7 +610,7 @@ async function saveEdit(id, updated) {
       {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updated)
+        body: JSON.stringify(payload)
       }
     );
 
@@ -612,18 +618,17 @@ async function saveEdit(id, updated) {
       throw new Error("Cloud update failed");
     }
 
-    console.log("☁️ Cloud record updated:", id);
+    alert("Record updated successfully");
+
+    // 🔄 reload from cloud so UI matches KV
+    await fetchSearchLogs();
+    runSearch();
 
   } catch (err) {
-    alert("Update failed — record not saved.");
     console.error(err);
-    return;
+    alert("Update failed — record not saved.");
   }
-
-  alert("✅ Record updated successfully");
-  runSearch();
 }
-
 /* =========================================================
    HELPERS
 ========================================================= */
