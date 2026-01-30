@@ -597,7 +597,9 @@ modal.addEventListener("click", e => {
 };
 
   // 🔑 STRIP log: PREFIX IF PRESENT
-const cleanId = record.id.replace(/^log:/, "");
+const cleanId = record.id.includes("log:")
+  ? record.id.replace("log:", "")
+  : record.id;
 
 await saveEdit(cleanId, updated);
 
