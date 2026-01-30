@@ -585,10 +585,11 @@ modal.addEventListener("click", e => {
   }
 
   const updated = {
-    company,
-    reason,
-    services
-  };
+  company,
+  reason,
+  services,
+  locked: false
+};
 
   await saveEdit(record.id, updated);
 
