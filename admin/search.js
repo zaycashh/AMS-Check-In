@@ -603,12 +603,12 @@ modal.addEventListener("click", e => {
 };
 }
 // ================================
-// SAVE EDIT (FINAL – MATCHES WORKER ROUTES)
+// SAVE EDIT (FINAL – SAFE VERSION)
 // ================================
 window.saveEdit = async function (id, updates) {
   try {
     if (!id) {
-      alert("Missing record ID");
+      console.error("Missing record ID");
       return;
     }
 
@@ -623,9 +623,11 @@ window.saveEdit = async function (id, updates) {
       }
     );
 
-    if (!res.ok) throw new Error("Update failed");
+    if (!res.ok) {
+      throw new Error(`Update failed: ${res.status}`);
+    }
 
-    // 🔥 Update in-memory search results (NO re-search)
+    // ✅ Update in-memory results
     const idx = window.searchResults.findIndex(r => r.id === id);
     if (idx !== -1) {
       window.searchResults[idx] = {
@@ -635,10 +637,8 @@ window.saveEdit = async function (id, updates) {
       };
     }
 
-    // ✅ Re-render table ONLY from memory
+    // ✅ Re-render from memory ONLY
     renderSearchResults(window.searchResults);
-
-    closeEditModal?.();
 
     console.log("✅ Edit synced: KV + UI");
 
