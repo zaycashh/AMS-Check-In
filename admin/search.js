@@ -596,8 +596,11 @@ modal.addEventListener("click", e => {
   locked: false
 };
 
-  const cleanId = record.id.replace("log:", "");
-  await saveEdit(cleanId, updated)
+  // 🔑 STRIP log: PREFIX IF PRESENT
+const cleanId = record.id.replace(/^log:/, "");
+
+await saveEdit(cleanId, updated);
+
 
   // ✅ CLOSE MODAL AFTER SUCCESS
   modal.remove();
