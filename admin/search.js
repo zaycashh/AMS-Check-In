@@ -605,34 +605,32 @@ modal.addEventListener("click", e => {
 // ================================
 // SAVE EDIT (FINAL – SAFE VERSION)
 // ================================
-window.saveEdit = async function (id, updates) {
+async function saveEdit(id, updates) {
   try {
-    if (!id) {
-      console.error("Missing record ID");
-      return;
-    }
-
-    console.log("UPDATE PAYLOAD →", updates);
-    
+    // 🔑 STRIP log: PREFIX IF PRESENT
     const cleanId = id.replace("log:", "");
 
-await fetch(
-  `https://ams-checkin-api.josealfonsodejesus.workers.dev/logs/${cleanId}`,
-  {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify(updates)
-  }
-);
+    console.log("UPDATE PAYLOAD →", updates);
 
+    const res = await fetch(
+      `https://ams-checkin-api.josealfonsodejesus.workers.dev/logs/${cleanId}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(updates)
+      }
+    );
 
     if (!res.ok) {
       throw new Error(`Update failed: ${res.status}`);
     }
 
-    // ✅ Update in-memory results
+    const data = await res.json();
+    console.log("UPDATE SUCCESS →", data);
+
+    // ✅ Update in-memory search results (no re-search)
     const idx = window.searchResults.findIndex(r => r.id === id);
     if (idx !== -1) {
       window.searchResults[idx] = {
@@ -642,16 +640,13 @@ await fetch(
       };
     }
 
-    // ✅ Re-render from memory ONLY
-    renderSearchResults(window.searchResults);
-
-    console.log("✅ Edit synced: KV + UI");
-
+    return true;
   } catch (err) {
     console.error("SAVE EDIT ERROR:", err);
     alert("Save failed — check console");
+    return false;
   }
-};
+}
 /* =========================================================
    HELPERS
 ========================================================= */
