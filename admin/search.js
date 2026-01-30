@@ -1,4 +1,3 @@
-let adminUnlocked = false;
 const TEST_REASONS = [
   "Pre-Employment",
   "Random",
@@ -23,6 +22,8 @@ const SERVICE_OPTIONS = [
 /* =========================================================
    ADMIN SECURITY CONFIG
 ========================================================= */
+let ADMIN_SESSION_UNLOCKED = false;
+
 const ADMIN_PIN_VALUE = "2468"; // CHANGE THIS
 Object.defineProperty(window, "ADMIN_PIN", {
   value: ADMIN_PIN_VALUE,
@@ -31,6 +32,14 @@ Object.defineProperty(window, "ADMIN_PIN", {
 });
 
 console.log("Admin Search Module Loaded");
+
+function requireAdminAccess() {
+  if (ADMIN_SESSION_UNLOCKED) return true;
+
+  ADMIN_SESSION_UNLOCKED = true;
+  console.warn("🔓 ADMIN SESSION UNLOCKED", new Date().toISOString());
+  return true;
+}
 
 /* =========================================================
    RENDER SEARCH LOG UI (INJECT HTML)
@@ -317,12 +326,11 @@ function requestAdminEdit(record) {
 
   openEditModal(record);
 }
+
 function requestAdminDelete(id) {
-  // Already unlocked → proceed
-  if (adminUnlocked) {
-    deleteDonor(id);
-    return;
-  }
+  if (!requireAdminAccess()) return;
+  deleteDonor(id);
+}
 
   const pin = prompt(
     "🔒 Admin access required.\n\nEnter Admin PIN to delete records:"
@@ -345,37 +353,56 @@ function requestAdminDelete(id) {
 }
 
 async function deleteDonor(id) {
-  let logs = JSON.parse(localStorage.getItem("ams_logs") || "[]");
-  const log = logs.find(l => l.id === id);
 
-  if (!log) {
-    alert("Record not found.");
+  // 🔒 HARD GUARD — legacy / bad calls
+  if (!id) {
+    alert("This is a legacy record and cannot be deleted.");
     return;
   }
 
+  // 🔒 ADMIN PIN CHECK (locked records)
+  const pin = prompt("🔐 Enter Admin PIN to delete this record:");
+  if (pin !== window.ADMIN_PIN) {
+    alert("Invalid Admin PIN. Delete cancelled.");
+    return;
+  }
+
+  // 🔁 Confirm intent
   if (!confirm(
     "Are you sure you want to delete this donor record?\n\nThis cannot be undone."
   )) {
     return;
   }
 
-  // 1️⃣ Remove locally
+  // ☁️ CLOUD DELETE FIRST (SOURCE OF TRUTH)
+  try {
+    const res = await fetch(
+      `https://ams-checkin-api.josealfonsodejesus.workers.dev/logs/${id}`,
+      { method: "DELETE" }
+    );
+
+    if (!res.ok) {
+      throw new Error("Cloud delete failed");
+    }
+
+    console.log("☁️ Cloud record deleted:", id);
+
+  } catch (err) {
+    alert("Cloud delete failed. Record was NOT removed.");
+    console.error(err);
+    return;
+  }
+
+  // 🧹 LOCAL CLEANUP (only after cloud success)
+  let logs = JSON.parse(localStorage.getItem("ams_logs") || "[]");
   logs = logs.filter(l => l.id !== id);
   localStorage.setItem("ams_logs", JSON.stringify(logs));
 
-  // 2️⃣ Attempt cloud delete
-  try {
-    await fetch(
-      "https://ams-checkin-api.josealfonsodejesus.workers.dev/logs/" + id,
-      { method: "DELETE" }
-    );
-  } catch (err) {
-    console.warn("Cloud delete failed, local only", err);
-  }
-
-  // 3️⃣ Refresh UI
+  // 🔄 UI REFRESH
   window.searchResults = window.searchResults.filter(r => r.id !== id);
   renderSearchResults(window.searchResults);
+
+  alert("✅ Record deleted successfully");
 }
 
 /* =========================================================
@@ -418,31 +445,33 @@ function renderSearchResults(results) {
           }
         </td>
         <td style="white-space:nowrap;">
-          ${
-            r.locked !== false
-              ? `<span style="
-                  display:inline-block;
-                  padding:2px 6px;
-                  margin-right:6px;
-                  font-size:11px;
-                  background:#eee;
-                  border-radius:4px;
-                  font-weight:600;
-                ">🔒 LOCKED</span>`
-              : ""
-          }
+  ${
+    r.locked !== false
+      ? `<span style="
+          display:inline-block;
+          padding:2px 6px;
+          margin-right:6px;
+          font-size:11px;
+          background:#eee;
+          border-radius:4px;
+          font-weight:600;
+        ">🔒 LOCKED</span>`
+      : ""
+  }
 
-          ${
-            r.id
-              ? `<button onclick='requestAdminEdit(${JSON.stringify(r)})'>Edit</button>`
-              : `<button disabled title="Legacy record – cannot edit">Edit</button>`
-          }
-          <button onclick="requestAdminDelete('${r.id}')">Delete</button>
-        </td>
-      </tr>
-    `;
-  });
-}
+  ${
+    r.id
+      ? `<button onclick='requestAdminEdit(${JSON.stringify(r)})'>Edit</button>`
+      : `<button disabled title="Legacy record – cannot edit">Edit</button>`
+  }
+
+  ${
+    r.id
+      ? `<button onclick="requestAdminDelete('${r.id}')">Delete</button>`
+      : `<button disabled title="Legacy record – cannot delete">Delete</button>`
+  }
+</td>
+
 /* =========================================================
    EDIT MODAL
 ========================================================= */
@@ -590,21 +619,35 @@ function openEditModal(record) {
    SAVE EDIT
 ========================================================= */
 async function saveEdit(id, updated) {
-  const res = await fetch(
-    `https://ams-checkin-api.josealfonsodejesus.workers.dev/logs/${id}`,
-    {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(updated)
-    }
-  );
 
-  if (!res.ok) {
-    alert("Update failed");
+  if (!id) {
+    alert("Invalid record ID.");
     return;
   }
 
-  alert("Record updated successfully");
+  try {
+    const res = await fetch(
+      `https://ams-checkin-api.josealfonsodejesus.workers.dev/logs/${id}`,
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updated)
+      }
+    );
+
+    if (!res.ok) {
+      throw new Error("Cloud update failed");
+    }
+
+    console.log("☁️ Cloud record updated:", id);
+
+  } catch (err) {
+    alert("Update failed — record not saved.");
+    console.error(err);
+    return;
+  }
+
+  alert("✅ Record updated successfully");
   runSearch();
 }
 
