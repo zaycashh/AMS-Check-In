@@ -615,29 +615,32 @@ window.saveEdit = async function (id, updates) {
     console.log("UPDATE PAYLOAD →", updates);
 
     const res = await fetch(
-      `https://ams-checkin-api.josealfonsodejesus.workers.dev/logs/${id}`,
+      "https://ams-checkin-api.josealfonsodejesus.workers.dev/logs",
       {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updates)
+        body: JSON.stringify({ id, log: updates })
       }
     );
 
     if (!res.ok) throw new Error("Update failed");
-
-    alert("Record updated successfully");
 
     // 🔥 Update in-memory search results (NO re-search, NO lag)
     const idx = window.searchResults.findIndex(r => r.id === id);
     if (idx !== -1) {
       window.searchResults[idx] = {
         ...window.searchResults[idx],
-        ...updates
+        ...updates,
+        updatedAt: new Date().toISOString()
       };
     }
 
-    // Re-render table only
-    renderSearchResults(window.searchResults);
+    // ✅ Re-render table ONLY from memory
+    renderSearchTable(window.searchResults);
+
+    closeEditModal?.();
+
+    console.log("✅ Record updated: KV + UI synced");
 
   } catch (err) {
     console.error("SAVE EDIT ERROR:", err);
