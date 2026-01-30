@@ -613,15 +613,20 @@ window.saveEdit = async function (id, updates) {
     }
 
     console.log("UPDATE PAYLOAD →", updates);
+    
+    const cleanId = id.replace("log:", "");
 
-    const res = await fetch(
-      `https://ams-checkin-api.josealfonsodejesus.workers.dev/logs/${id}`,
-      {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updates)
-      }
-    );
+await fetch(
+  `https://ams-checkin-api.josealfonsodejesus.workers.dev/logs/${cleanId}`,
+  {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(updates)
+  }
+);
+
 
     if (!res.ok) {
       throw new Error(`Update failed: ${res.status}`);
