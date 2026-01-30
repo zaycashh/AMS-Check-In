@@ -200,7 +200,7 @@ function normalizeDateOnly(dateStr) {
    SEARCH
 ========================================================= */
 window.runSearch = async function () {
-  
+
   const counter = document.getElementById("searchResultCount");
   if (counter) counter.textContent = "Searching...";
    
@@ -428,7 +428,7 @@ function renderSearchResults(results) {
 
           ${
             r.id
-              ? `<button onclick="requestAdminEditById('${r.id}')">Edit</button>`
+              ? `<button onclick="requestAdminEdit('${r.id}')">Edit</button>`
               : `<button disabled>Edit</button>`
           }
 
