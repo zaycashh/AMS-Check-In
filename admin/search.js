@@ -603,7 +603,7 @@ modal.addEventListener("click", e => {
 };
 }
 // ================================
-// SAVE EDIT (FINAL – OPTION A FIXED)
+// SAVE EDIT (FINAL – MATCHES WORKER ROUTES)
 // ================================
 window.saveEdit = async function (id, updates) {
   try {
@@ -615,17 +615,17 @@ window.saveEdit = async function (id, updates) {
     console.log("UPDATE PAYLOAD →", updates);
 
     const res = await fetch(
-      "https://ams-checkin-api.josealfonsodejesus.workers.dev/logs",
+      `https://ams-checkin-api.josealfonsodejesus.workers.dev/logs/${id}`,
       {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, log: updates })
+        body: JSON.stringify(updates)
       }
     );
 
     if (!res.ok) throw new Error("Update failed");
 
-    // 🔥 Update in-memory search results (NO re-search, NO lag)
+    // 🔥 Update in-memory search results (NO re-search)
     const idx = window.searchResults.findIndex(r => r.id === id);
     if (idx !== -1) {
       window.searchResults[idx] = {
@@ -640,7 +640,7 @@ window.saveEdit = async function (id, updates) {
 
     closeEditModal?.();
 
-    console.log("✅ Record updated: KV + UI synced");
+    console.log("✅ Edit synced: KV + UI");
 
   } catch (err) {
     console.error("SAVE EDIT ERROR:", err);
