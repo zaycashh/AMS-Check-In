@@ -327,44 +327,43 @@ function requestAdminDelete(id) {
 }
 
 async function deleteDonor(id) {
+  if (!requireAdminAccess()) return;
 
-  // 🔒 HARD GUARD — legacy / bad calls
   if (!id) {
     alert("This is a legacy record and cannot be deleted.");
     return;
   }
 
-  // 🔁 Confirm intent
-  if (!confirm(
-    "Are you sure you want to delete this donor record?\n\nThis cannot be undone."
-  )) {
+  if (!confirm("Are you sure you want to delete this donor record?\n\nThis cannot be undone.")) {
     return;
   }
 
   const cleanId = id.replace(/^log:/, "");
 
-  const res = await fetch(
-  `https://ams-checkin-api.josealfonsodejesus.workers.dev/logs/${cleanId}`,
-  { method: "DELETE" }
-);
+  try {
+    const res = await fetch(
+      `https://ams-checkin-api.josealfonsodejesus.workers.dev/logs/${cleanId}`,
+      { method: "DELETE" }
+    );
 
-if (!res.ok) {
-  throw new Error("Cloud delete failed");
-}
+    if (!res.ok) {
+      throw new Error("Cloud delete failed");
+    }
 
-console.log("☁️ Cloud record deleted:", id);
+    console.log("☁️ Cloud record deleted:", cleanId);
 
-} catch (err) {
-  alert("Cloud delete failed. Record was NOT removed.");
-  console.error(err);
-  return;
-}
+  } catch (err) {
+    alert("Cloud delete failed. Record was NOT removed.");
+    console.error(err);
+    return;
+  }
 
-window.searchResults = window.searchResults.filter(
-  r => r.id.replace(/^log:/, "") !== cleanId
-);
+  // ✅ UI update ONLY after cloud success
+  window.searchResults = window.searchResults.filter(
+    r => r.id.replace(/^log:/, "") !== cleanId
+  );
 
-renderSearchResults(window.searchResults);
+  renderSearchResults(window.searchResults);
 
   alert("✅ Record deleted successfully");
 }
