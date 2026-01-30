@@ -602,38 +602,49 @@ modal.addEventListener("click", e => {
   modal.remove();
 };
 }
-/* =========================================================
-   SAVE EDIT
-========================================================= */
-async function saveEditedRecord(recordId, updatePayload) {
-  const res = await fetch(`${API_URL}/logs/${recordId}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(updatePayload)
-  });
+// ================================
+// SAVE EDIT (FINAL – OPTION A)
+// ================================
+window.saveEdit = async function (id, updates) {
+  try {
+    if (!id) {
+      alert("Missing record ID");
+      return;
+    }
 
-  if (!res.ok) {
-    alert("Failed to update record");
-    return;
-  }
+    console.log("UPDATE PAYLOAD →", updates);
 
-  // 🔥 PATCH IN-MEMORY CACHE (NO REFETCH, NO DATE RESET)
-  if (Array.isArray(searchCloudCache)) {
-    const idx = searchCloudCache.findIndex(r => r.id === recordId);
+    const res = await fetch(
+      `https://ams-checkin-api.josealfonsodejesus.workers.dev/logs/${id}`,
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updates)
+      }
+    );
+
+    if (!res.ok) throw new Error("Update failed");
+
+    alert("Record updated successfully");
+
+    // 🔥 Update in-memory cache (NO re-search, NO lag)
+    const idx = searchCloudCache.findIndex(r => r.id === id);
     if (idx !== -1) {
       searchCloudCache[idx] = {
         ...searchCloudCache[idx],
-        ...updatePayload,
-        updatedAt: new Date().toISOString()
+        ...updates
       };
     }
+
+    // Re-render table only
+    renderSearchResults(searchCloudCache);
+
+  } catch (err) {
+    console.error("SAVE EDIT ERROR:", err);
+    alert("Save failed — check console");
   }
+};
 
-  // 🔥 RE-RENDER TABLE ONLY
-  renderSearchResults(searchCloudCache);
-
-  alert("Record updated successfully");
-}
 /* =========================================================
    HELPERS
 ========================================================= */
