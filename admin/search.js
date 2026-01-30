@@ -576,15 +576,14 @@ function openEditModal(record) {
   }
 
   const updated = {
-    company,
-    reason,
-    services: services.join(", ")
-  };
-
-  console.log("UPDATE PAYLOAD", updated); // 👈 ADD THIS
-
-  await saveEdit(record.id, updated);
+  company,
+  reason,
+  services // ✅ ARRAY — do NOT join
 };
+
+console.log("UPDATE PAYLOAD", updated); // 👈 keep this for debugging
+
+await saveEdit(record.id, updated);
 
 /* =========================================================
    SAVE EDIT
@@ -595,14 +594,7 @@ async function saveEdit(id, updated) {
     return;
   }
 
-  // ✅ FIX: normalize field names to match KV
-  const payload = {
-    company: updated.company,
-    reason: updated.reason,
-    services: updated.services
-  };
-
-  console.log("UPDATE PAYLOAD SENT TO API:", payload);
+  console.log("UPDATE PAYLOAD →", updated);
 
   try {
     const res = await fetch(
@@ -610,7 +602,7 @@ async function saveEdit(id, updated) {
       {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(updated)
       }
     );
 
@@ -618,14 +610,20 @@ async function saveEdit(id, updated) {
       throw new Error("Cloud update failed");
     }
 
+    /* ✅ UPDATE LOCAL MEMORY COPY */
+    const index = window.searchResults.findIndex(r => r.id === id);
+    if (index !== -1) {
+      window.searchResults[index] = {
+        ...window.searchResults[index],
+        ...updated
+      };
+    }
+
+    renderSearchResults(window.searchResults);
+
     alert("Record updated successfully");
-
-    // 🔄 reload from cloud so UI matches KV
-    await fetchSearchLogs();
-    runSearch();
-
   } catch (err) {
-    console.error(err);
+    console.error("Update failed:", err);
     alert("Update failed — record not saved.");
   }
 }
