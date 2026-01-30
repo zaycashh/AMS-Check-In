@@ -201,6 +201,18 @@ function normalizeDateOnly(dateStr) {
 ========================================================= */
 window.runSearch = async function () {
 
+  function requestAdminEditById(id) {
+  if (!requireAdminAccess("EDIT")) return;
+
+  const record = window.searchResults.find(r => r.id === id);
+  if (!record) {
+    alert("Record not found in memory.");
+    return;
+  }
+
+  openEditModal(record);
+}
+
   const counter = document.getElementById("searchResultCount");
   if (counter) counter.textContent = "Searching...";
    
@@ -428,7 +440,7 @@ function renderSearchResults(results) {
 
           ${
             r.id
-              ? `<button onclick="requestAdminEdit('${r.id}')">Edit</button>`
+              ? `<button onclick="requestAdminEditById('${r.id}')">Edit</button>`
               : `<button disabled>Edit</button>`
           }
 
