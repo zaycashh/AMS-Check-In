@@ -33,11 +33,23 @@ Object.defineProperty(window, "ADMIN_PIN", {
 
 console.log("Admin Search Module Loaded");
 
-function requireAdminAccess() {
+function requireAdminAccess(action = "ADMIN") {
   if (ADMIN_SESSION_UNLOCKED) return true;
 
+  const pin = prompt(`🔐 ${action} access required.\n\nEnter Admin PIN:`);
+
+  if (pin !== window.ADMIN_PIN) {
+    alert("Invalid Admin PIN.");
+    return false;
+  }
+
   ADMIN_SESSION_UNLOCKED = true;
-  console.warn("🔓 ADMIN SESSION UNLOCKED", new Date().toISOString());
+
+  console.warn("🔓 ADMIN SESSION UNLOCKED", {
+    action,
+    timestamp: new Date().toISOString()
+  });
+
   return true;
 }
 
@@ -301,11 +313,9 @@ const results = logs.filter(l => {
 };
 
 function requestAdminEdit(record) {
-  // Already unlocked → open immediately
-  if (adminUnlocked) {
-    openEditModal(record);
-    return;
-  }
+  if (!requireAdminAccess("EDIT")) return;
+  openEditModal(record);
+}
 
   const pin = prompt(
     "🔒 Admin access required.\n\nEnter Admin PIN to edit records:"
@@ -332,38 +342,11 @@ function requestAdminDelete(id) {
   deleteDonor(id);
 }
 
-  const pin = prompt(
-    "🔒 Admin access required.\n\nEnter Admin PIN to delete records:"
-  );
-
-  if (pin !== window.ADMIN_PIN) {
-    alert("Invalid PIN. Delete cancelled.");
-    return;
-  }
-
-  // ✅ Unlock session
-  adminUnlocked = true;
-
-  console.warn("🔐 ADMIN SESSION UNLOCKED", {
-    action: "DELETE",
-    timestamp: new Date().toISOString()
-  });
-
-  deleteDonor(id);
-}
-
 async function deleteDonor(id) {
 
   // 🔒 HARD GUARD — legacy / bad calls
   if (!id) {
     alert("This is a legacy record and cannot be deleted.");
-    return;
-  }
-
-  // 🔒 ADMIN PIN CHECK (locked records)
-  const pin = prompt("🔐 Enter Admin PIN to delete this record:");
-  if (pin !== window.ADMIN_PIN) {
-    alert("Invalid Admin PIN. Delete cancelled.");
     return;
   }
 
