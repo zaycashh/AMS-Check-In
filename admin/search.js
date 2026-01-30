@@ -636,7 +636,7 @@ window.saveEdit = async function (id, updates) {
     }
 
     // ✅ Re-render table ONLY from memory
-    renderSearchTable(window.searchResults);
+    renderSearchResults(window.searchResults);
 
     closeEditModal?.();
 
