@@ -341,12 +341,12 @@ async function deleteDonor(id) {
     return;
   }
 
-  // ☁️ CLOUD DELETE FIRST (SOURCE OF TRUTH)
-  try {
-    const res = await fetch(
-      `https://ams-checkin-api.josealfonsodejesus.workers.dev/logs/${id}`,
-      { method: "DELETE" }
-    );
+  const cleanId = id.replace(/^log:/, "");
+
+const res = await fetch(
+  `https://ams-checkin-api.josealfonsodejesus.workers.dev/logs/${cleanId}`,
+  { method: "DELETE" }
+);
 
     if (!res.ok) {
       throw new Error("Cloud delete failed");
@@ -360,10 +360,10 @@ async function deleteDonor(id) {
     return;
   }
 
-  // 🧹 LOCAL CLEANUP (only after cloud success)
-  let logs = JSON.parse(localStorage.getItem("ams_logs") || "[]");
-  logs = logs.filter(l => l.id !== id);
-  localStorage.setItem("ams_logs", JSON.stringify(logs));
+  logs = logs.filter(l => l.id.replace(/^log:/, "") !== cleanId);
+window.searchResults = window.searchResults.filter(
+  r => r.id.replace(/^log:/, "") !== cleanId
+);
 
   // 🔄 UI REFRESH
   window.searchResults = window.searchResults.filter(r => r.id !== id);
@@ -595,12 +595,9 @@ modal.addEventListener("click", e => {
   locked: false
 };
 
-// 🔑 ALWAYS normalize to KV key format
-const kvId = record.id.startsWith("log:")
-  ? record.id
-  : `log:${record.id}`;
-
-await saveEdit(kvId, updated);
+// ALWAYS send RAW UUID to API
+const cleanId = record.id.replace(/^log:/, "");
+await saveEdit(cleanId, updated);
     
   // ✅ CLOSE MODAL AFTER SUCCESS
   modal.remove();
@@ -633,8 +630,9 @@ async function saveEdit(id, updates) {
     console.log("UPDATE SUCCESS →", result);
 
     // 🔁 Update local search cache (NO re-search, NO UI wipe)
-    const cleanId = id.replace(/^log:/, "");
-    const idx = window.searchResults.findIndex(r => r.id === cleanId);
+    const idx = window.searchResults.findIndex(
+  r => r.id.replace(/^log:/, "") === id
+);
     if (idx !== -1) {
       window.searchResults[idx] = {
         ...window.searchResults[idx],
