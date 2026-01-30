@@ -611,8 +611,6 @@ async function saveEdit(id, updated) {
     return;
   }
 
-  console.log("UPDATE PAYLOAD →", updated);
-
   try {
     const res = await fetch(
       `https://ams-checkin-api.josealfonsodejesus.workers.dev/logs/${id}`,
@@ -627,20 +625,29 @@ async function saveEdit(id, updated) {
       throw new Error("Cloud update failed");
     }
 
-    /* ✅ UPDATE LOCAL MEMORY COPY */
-    const index = window.searchResults.findIndex(r => r.id === id);
-    if (index !== -1) {
-      window.searchResults[index] = {
-        ...window.searchResults[index],
-        ...updated
-      };
-    }
+    // 🔥 FORCE CLOUD AS SOURCE OF TRUTH
+    const freshLogs = await fetchLogsFromCloud();
 
-    renderSearchResults(window.searchResults);
+    // 🔁 RE-RUN CURRENT SEARCH AGAINST CLOUD
+    const range = document.getElementById("filterDateRange").value || "";
+    const company =
+      document.getElementById("searchCompanyInput")?.value
+        .trim()
+        .toLowerCase();
+
+    const filtered = freshLogs.filter(l => {
+      if (!l || !l.id) return false;
+      if (company && !l.company?.toLowerCase().includes(company)) return false;
+      return true;
+    });
+
+    window.searchResults = filtered;
+    renderSearchResults(filtered);
 
     alert("Record updated successfully");
+
   } catch (err) {
-    console.error("Update failed:", err);
+    console.error(err);
     alert("Update failed — record not saved.");
   }
 }
