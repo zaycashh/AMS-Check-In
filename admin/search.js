@@ -605,44 +605,34 @@ modal.addEventListener("click", e => {
 /* =========================================================
    SAVE EDIT
 ========================================================= */
-async function saveEdit(id, updated) {
-  if (!id) {
-    alert("Invalid record ID.");
+async function saveEditedRecord(recordId, updatePayload) {
+  const res = await fetch(`${API_URL}/logs/${recordId}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(updatePayload)
+  });
+
+  if (!res.ok) {
+    alert("Failed to update record");
     return;
   }
 
-  console.log("UPDATE PAYLOAD →", updated);
-
-  try {
-    const res = await fetch(
-      `https://ams-checkin-api.josealfonsodejesus.workers.dev/logs/${id}`,
-      {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updated)
-      }
-    );
-
-    if (!res.ok) {
-      throw new Error("Cloud update failed");
-    }
-
-    /* ✅ UPDATE LOCAL MEMORY COPY */
-    const index = window.searchResults.findIndex(r => r.id === id);
-    if (index !== -1) {
-      window.searchResults[index] = {
-        ...window.searchResults[index],
-        ...updated
+  // 🔥 PATCH IN-MEMORY CACHE (NO REFETCH, NO DATE RESET)
+  if (Array.isArray(searchCloudCache)) {
+    const idx = searchCloudCache.findIndex(r => r.id === recordId);
+    if (idx !== -1) {
+      searchCloudCache[idx] = {
+        ...searchCloudCache[idx],
+        ...updatePayload,
+        updatedAt: new Date().toISOString()
       };
     }
-
-    renderSearchResults(window.searchResults);
-
-    alert("Record updated successfully");
-  } catch (err) {
-    console.error("Update failed:", err);
-    alert("Update failed — record not saved.");
   }
+
+  // 🔥 RE-RENDER TABLE ONLY
+  renderSearchResults(searchCloudCache);
+
+  alert("Record updated successfully");
 }
 /* =========================================================
    HELPERS
