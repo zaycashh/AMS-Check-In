@@ -189,6 +189,16 @@ async function fetchLogsFromCloud() {
   }
 }
 
+function dedupeLogsByKvKey(logs) {
+  return Array.from(
+    new Map(
+      logs
+        .filter(l => l._kvKey) // ✅ ONLY TRUST KV KEYS
+        .map(l => [l._kvKey, l])
+    ).values()
+  );
+}
+
 function normalizeDateOnly(dateStr) {
   if (!dateStr) return null;
   const d = new Date(dateStr + "T00:00:00");
@@ -204,7 +214,7 @@ window.runSearch = async function () {
   const counter = document.getElementById("searchResultCount");
   if (counter) counter.textContent = "Searching...";
    
-  const logs = await fetchLogsFromCloud();
+  const logs = dedupeLogsByKvKey(await fetchLogsFromCloud());
 
   const first = document.getElementById("filterFirstName").value.toLowerCase();
   const last = document.getElementById("filterLastName").value.toLowerCase();
@@ -280,24 +290,19 @@ switch (range) {
 }
 
 const results = logs.filter(l => {
-  if (!l || !l.id) return false;
-
-  // TEXT FILTERS
-  if (first && !l.first?.toLowerCase().includes(first)) return false;
-  if (last && !l.last?.toLowerCase().includes(last)) return false;
-  if (company && !l.company?.toLowerCase().includes(company)) return false;
-
-  // ✅ ALL DATES = NO DATE FILTERING
-  if (!range) return true;
-
   const logDate = normalizeDateOnly(l.date);
   if (!logDate) return false;
 
   if (startDate && logDate < startDate) return false;
   if (endDate && logDate > endDate) return false;
 
+  if (first && !l.first.toLowerCase().includes(first)) return false;
+  if (last && !l.last.toLowerCase().includes(last)) return false;
+  if (company && !l.company.toLowerCase().includes(company)) return false;
+
   return true;
 });
+
    
    results.sort((a, b) => {
   return (b.timestamp || 0) - (a.timestamp || 0);
@@ -307,16 +312,8 @@ const results = logs.filter(l => {
   renderSearchResults(results);
 };
 
-function requestAdminEdit(id) {
+function requestAdminEdit(record) {
   if (!requireAdminAccess("EDIT")) return;
-
-  const record = window.searchResults.find(r => r.id === id);
-
-  if (!record) {
-    alert("Record not found in current results.");
-    return;
-  }
-
   openEditModal(record);
 }
 
@@ -364,12 +361,11 @@ async function deleteDonor(id) {
   logs = logs.filter(l => l.id !== id);
   localStorage.setItem("ams_logs", JSON.stringify(logs));
 
-  // 🔄 RE-FETCH FROM CLOUD AFTER SAVE
-const freshLogs = await fetchLogsFromCloud();
-window.searchResults = freshLogs;
-renderSearchResults(window.searchResults);
+  // 🔄 UI REFRESH
+  window.searchResults = window.searchResults.filter(r => r.id !== id);
+  renderSearchResults(window.searchResults);
 
-alert("Record updated successfully");
+  alert("✅ Record deleted successfully");
 }
 
 /* =========================================================
@@ -428,7 +424,7 @@ function renderSearchResults(results) {
 
           ${
             r.id
-              ? `<button onclick="requestAdminEdit('${r.id}')">Edit</button>`
+              ? `<button onclick='requestAdminEdit(${JSON.stringify(r)})'>Edit</button>`
               : `<button disabled>Edit</button>`
           }
 
@@ -610,6 +606,8 @@ async function saveEdit(id, updated) {
     return;
   }
 
+  console.log("UPDATE PAYLOAD →", updated);
+
   try {
     const res = await fetch(
       `https://ams-checkin-api.josealfonsodejesus.workers.dev/logs/${id}`,
@@ -620,18 +618,24 @@ async function saveEdit(id, updated) {
       }
     );
 
-    if (!res.ok) throw new Error("Cloud update failed");
+    if (!res.ok) {
+      throw new Error("Cloud update failed");
+    }
 
-    // ✅ ALWAYS RE-FETCH FROM CLOUD
-    const freshLogs = await fetchLogsFromCloud();
+    /* ✅ UPDATE LOCAL MEMORY COPY */
+    const index = window.searchResults.findIndex(r => r.id === id);
+    if (index !== -1) {
+      window.searchResults[index] = {
+        ...window.searchResults[index],
+        ...updated
+      };
+    }
 
-    // 🔁 RE-RUN SEARCH LOGIC
-    window.searchResults = freshLogs;
-    renderSearchResults(freshLogs);
+    renderSearchResults(window.searchResults);
 
     alert("Record updated successfully");
   } catch (err) {
-    console.error(err);
+    console.error("Update failed:", err);
     alert("Update failed — record not saved.");
   }
 }
