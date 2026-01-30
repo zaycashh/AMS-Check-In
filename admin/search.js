@@ -290,24 +290,15 @@ switch (range) {
 }
 
 const results = logs.filter(l => {
-
-  // 🔹 BASIC SAFETY
-  if (!l || !l.id) return false;
-
-  // 🔹 TEXT FILTERS (ALWAYS APPLY)
-  if (first && !l.first?.toLowerCase().includes(first)) return false;
-  if (last && !l.last?.toLowerCase().includes(last)) return false;
-  if (company && !l.company?.toLowerCase().includes(company)) return false;
-
-  // 🔹 ALL DATES = NO DATE FILTERING AT ALL
-  if (!range) return true;
-
-  // 🔹 DATE FILTERING ONLY WHEN RANGE SELECTED
   const logDate = normalizeDateOnly(l.date);
   if (!logDate) return false;
 
   if (startDate && logDate < startDate) return false;
   if (endDate && logDate > endDate) return false;
+
+  if (first && !l.first.toLowerCase().includes(first)) return false;
+  if (last && !l.last.toLowerCase().includes(last)) return false;
+  if (company && !l.company.toLowerCase().includes(company)) return false;
 
   return true;
 });
