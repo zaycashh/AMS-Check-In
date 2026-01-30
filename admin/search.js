@@ -576,10 +576,10 @@ function openEditModal(record) {
     }
 
     await saveEdit(record.id, {
-      company,
-      reason,
-      services: services.join(", ")
-    });
+  company,
+  reason,
+  services // ✅ KEEP AS ARRAY
+});
 
     modal.remove();
   };
@@ -594,6 +594,9 @@ async function saveEdit(id, updated) {
     alert("Invalid record ID.");
     return;
   }
+  
+  // ✅ STEP 2 — DEBUG LOG (ADD THIS)
+  console.log("UPDATE PAYLOAD", { id, updated });
 
   try {
     const res = await fetch(
