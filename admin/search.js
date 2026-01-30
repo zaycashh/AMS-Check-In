@@ -317,26 +317,6 @@ function requestAdminEdit(record) {
   openEditModal(record);
 }
 
-  const pin = prompt(
-    "🔒 Admin access required.\n\nEnter Admin PIN to edit records:"
-  );
-
-  if (pin !== window.ADMIN_PIN) {
-    alert("Invalid PIN. Edit cancelled.");
-    return;
-  }
-
-  // ✅ Unlock for this session
-  adminUnlocked = true;
-
-  console.warn("🔐 ADMIN SESSION UNLOCKED", {
-    action: "EDIT",
-    timestamp: new Date().toISOString()
-  });
-
-  openEditModal(record);
-}
-
 function requestAdminDelete(id) {
   if (!requireAdminAccess()) return;
   deleteDonor(id);
@@ -429,7 +409,7 @@ function renderSearchResults(results) {
         </td>
         <td style="white-space:nowrap;">
   ${
-    r.locked !== false
+    r.locked === true
       ? `<span style="
           display:inline-block;
           padding:2px 6px;
@@ -454,6 +434,8 @@ function renderSearchResults(results) {
       : `<button disabled title="Legacy record – cannot delete">Delete</button>`
   }
 </td>
+</tr>
+`;
 
 /* =========================================================
    EDIT MODAL
