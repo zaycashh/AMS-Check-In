@@ -628,22 +628,16 @@ window.saveEdit = async function (id, updates) {
     alert("Record updated successfully");
 
     // 🔥 Update in-memory cache (NO re-search, NO lag)
-    const idx = searchCloudCache.findIndex(r => r.id === id);
-    if (idx !== -1) {
-      searchCloudCache[idx] = {
-        ...searchCloudCache[idx],
-        ...updates
-      };
-    }
+const idx = searchCloudCache.findIndex(r => r.id === id);
+if (idx !== -1) {
+  searchCloudCache[idx] = {
+    ...searchCloudCache[idx],
+    ...updates
+  };
+}
 
-    // Re-render table only
-    renderSearchResults(searchCloudCache);
-
-  } catch (err) {
-    console.error("SAVE EDIT ERROR:", err);
-    alert("Save failed — check console");
-  }
-};
+// Re-render table only
+renderSearchResults(searchCloudCache);
 
 /* =========================================================
    HELPERS
