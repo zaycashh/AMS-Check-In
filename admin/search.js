@@ -408,34 +408,36 @@ function renderSearchResults(results) {
           }
         </td>
         <td style="white-space:nowrap;">
-  ${
-    r.locked === true
-      ? `<span style="
-          display:inline-block;
-          padding:2px 6px;
-          margin-right:6px;
-          font-size:11px;
-          background:#eee;
-          border-radius:4px;
-          font-weight:600;
-        ">🔒 LOCKED</span>`
-      : ""
-  }
+          ${
+            r.locked === true
+              ? `<span style="
+                  display:inline-block;
+                  padding:2px 6px;
+                  margin-right:6px;
+                  font-size:11px;
+                  background:#eee;
+                  border-radius:4px;
+                  font-weight:600;
+                ">🔒 LOCKED</span>`
+              : ""
+          }
 
-  ${
-    r.id
-      ? `<button onclick='requestAdminEdit(${JSON.stringify(r)})'>Edit</button>`
-      : `<button disabled title="Legacy record – cannot edit">Edit</button>`
-  }
+          ${
+            r.id
+              ? `<button onclick='requestAdminEdit(${JSON.stringify(r)})'>Edit</button>`
+              : `<button disabled>Edit</button>`
+          }
 
-  ${
-    r.id
-      ? `<button onclick="requestAdminDelete('${r.id}')">Delete</button>`
-      : `<button disabled title="Legacy record – cannot delete">Delete</button>`
-  }
-</td>
-</tr>
-`;
+          ${
+            r.id
+              ? `<button onclick="requestAdminDelete('${r.id}')">Delete</button>`
+              : `<button disabled>Delete</button>`
+          }
+        </td>
+      </tr>
+    `;
+  });
+}
 
 /* =========================================================
    EDIT MODAL
