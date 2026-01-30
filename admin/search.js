@@ -590,8 +590,6 @@ modal.addEventListener("click", e => {
     services
   };
 
-  console.log("UPDATE PAYLOAD", updated);
-
   await saveEdit(record.id, updated);
 
   // ✅ CLOSE MODAL AFTER SUCCESS
