@@ -602,8 +602,7 @@ const cleanId = record.id.includes("log:")
   : record.id;
 
 await saveEdit(record.id, updated);
-
-
+    
   // ✅ CLOSE MODAL AFTER SUCCESS
   modal.remove();
 };
@@ -651,6 +650,7 @@ async function saveEdit(id, updates) {
     throw err;
   }
 }
+
 /* =========================================================
    HELPERS
 ========================================================= */
