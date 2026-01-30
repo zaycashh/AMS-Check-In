@@ -602,8 +602,6 @@ async function saveEdit(id, updated) {
     return;
   }
 
-  console.log("UPDATE PAYLOAD →", updated);
-
   try {
     const res = await fetch(
       `https://ams-checkin-api.josealfonsodejesus.workers.dev/logs/${id}`,
@@ -614,24 +612,18 @@ async function saveEdit(id, updated) {
       }
     );
 
-    if (!res.ok) {
-      throw new Error("Cloud update failed");
-    }
+    if (!res.ok) throw new Error("Cloud update failed");
 
-    /* ✅ UPDATE LOCAL MEMORY COPY */
-    const index = window.searchResults.findIndex(r => r.id === id);
-    if (index !== -1) {
-      window.searchResults[index] = {
-        ...window.searchResults[index],
-        ...updated
-      };
-    }
+    // ✅ ALWAYS RE-FETCH FROM CLOUD
+    const freshLogs = await fetchLogsFromCloud();
 
-    renderSearchResults(window.searchResults);
+    // 🔁 RE-RUN SEARCH LOGIC
+    window.searchResults = freshLogs;
+    renderSearchResults(freshLogs);
 
     alert("Record updated successfully");
   } catch (err) {
-    console.error("Update failed:", err);
+    console.error(err);
     alert("Update failed — record not saved.");
   }
 }
