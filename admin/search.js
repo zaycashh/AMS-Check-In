@@ -603,7 +603,7 @@ modal.addEventListener("click", e => {
 };
 }
 // ================================
-// SAVE EDIT (FINAL – OPTION A)
+// SAVE EDIT (FINAL – OPTION A FIXED)
 // ================================
 window.saveEdit = async function (id, updates) {
   try {
@@ -627,18 +627,23 @@ window.saveEdit = async function (id, updates) {
 
     alert("Record updated successfully");
 
-    // 🔥 Update in-memory cache (NO re-search, NO lag)
-const idx = searchCloudCache.findIndex(r => r.id === id);
-if (idx !== -1) {
-  searchCloudCache[idx] = {
-    ...searchCloudCache[idx],
-    ...updates
-  };
-}
+    // 🔥 Update in-memory search results (NO re-search, NO lag)
+    const idx = window.searchResults.findIndex(r => r.id === id);
+    if (idx !== -1) {
+      window.searchResults[idx] = {
+        ...window.searchResults[idx],
+        ...updates
+      };
+    }
 
-// Re-render table only
-renderSearchResults(searchCloudCache);
+    // Re-render table only
+    renderSearchResults(window.searchResults);
 
+  } catch (err) {
+    console.error("SAVE EDIT ERROR:", err);
+    alert("Save failed — check console");
+  }
+};
 /* =========================================================
    HELPERS
 ========================================================= */
