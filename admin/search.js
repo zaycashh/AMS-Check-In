@@ -189,12 +189,12 @@ async function fetchLogsFromCloud() {
   }
 }
 
-function dedupeLogsById(logs) {
+function dedupeLogsByKvKey(logs) {
   return Array.from(
     new Map(
       logs
-        .filter(l => l.id) // 🔒 ONLY REAL CLOUD RECORDS
-        .map(l => [l.id, l])
+        .filter(l => l._kvKey) // ✅ ONLY TRUST KV KEYS
+        .map(l => [l._kvKey, l])
     ).values()
   );
 }
@@ -214,7 +214,7 @@ window.runSearch = async function () {
   const counter = document.getElementById("searchResultCount");
   if (counter) counter.textContent = "Searching...";
    
-  const logs = dedupeLogsById(await fetchLogsFromCloud());
+  const logs = dedupeLogsByKvKey(await fetchLogsFromCloud());
 
   const first = document.getElementById("filterFirstName").value.toLowerCase();
   const last = document.getElementById("filterLastName").value.toLowerCase();
