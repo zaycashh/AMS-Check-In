@@ -443,6 +443,10 @@ function renderSearchResults(results) {
    EDIT MODAL
 ========================================================= */
 function openEditModal(record) {
+  
+  // 🧹 Remove existing modal if present
+  const existing = document.querySelector(".edit-modal");
+  if (existing) existing.remove();
   const companies = JSON.parse(
     localStorage.getItem("ams_companies") || "[]"
   );
@@ -514,6 +518,11 @@ function openEditModal(record) {
   `;
 
   document.body.appendChild(modal);
+  
+  /* ✅ CLOSE MODAL WHEN CLICKING OUTSIDE THE BOX */
+modal.addEventListener("click", e => {
+  if (e.target === modal) modal.remove();
+});
 
   /* ================================
      SERVICES MULTI-SELECT LOGIC
