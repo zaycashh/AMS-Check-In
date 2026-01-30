@@ -1,3 +1,4 @@
+let adminUnlocked = false;
 const TEST_REASONS = [
   "Pre-Employment",
   "Random",
@@ -290,6 +291,59 @@ const results = logs.filter(l => {
   renderSearchResults(results);
 };
 
+function requestAdminEdit(record) {
+  // Already unlocked → open immediately
+  if (adminUnlocked) {
+    openEditModal(record);
+    return;
+  }
+
+  const pin = prompt(
+    "🔒 Admin access required.\n\nEnter Admin PIN to edit records:"
+  );
+
+  if (pin !== window.ADMIN_PIN) {
+    alert("Invalid PIN. Edit cancelled.");
+    return;
+  }
+
+  // ✅ Unlock for this session
+  adminUnlocked = true;
+
+  console.warn("🔐 ADMIN SESSION UNLOCKED", {
+    action: "EDIT",
+    timestamp: new Date().toISOString()
+  });
+
+  openEditModal(record);
+}
+function requestAdminDelete(id) {
+  // Already unlocked → proceed
+  if (adminUnlocked) {
+    deleteDonor(id);
+    return;
+  }
+
+  const pin = prompt(
+    "🔒 Admin access required.\n\nEnter Admin PIN to delete records:"
+  );
+
+  if (pin !== window.ADMIN_PIN) {
+    alert("Invalid PIN. Delete cancelled.");
+    return;
+  }
+
+  // ✅ Unlock session
+  adminUnlocked = true;
+
+  console.warn("🔐 ADMIN SESSION UNLOCKED", {
+    action: "DELETE",
+    timestamp: new Date().toISOString()
+  });
+
+  deleteDonor(id);
+}
+
 async function deleteDonor(id) {
   let logs = JSON.parse(localStorage.getItem("ams_logs") || "[]");
   const log = logs.find(l => l.id === id);
@@ -297,24 +351,6 @@ async function deleteDonor(id) {
   if (!log) {
     alert("Record not found.");
     return;
-  }
-
-  // 🔒 LOCKED RECORD → REQUIRE PIN
-  if (log.locked !== false) {
-    const pin = prompt(
-      "🔒 This record is LOCKED.\n\nEnter Admin PIN to delete:"
-    );
-
-    if (pin !== window.ADMIN_PIN) {
-      alert("Invalid PIN. Delete cancelled.");
-      return;
-    }
-
-    console.warn("🔐 ADMIN DELETE OVERRIDE", {
-      recordId: id,
-      action: "DELETE",
-      timestamp: new Date().toISOString()
-    });
   }
 
   if (!confirm(
@@ -398,10 +434,10 @@ function renderSearchResults(results) {
 
           ${
             r.id
-              ? `<button onclick='openEditModal(${JSON.stringify(r)})'>Edit</button>`
+              ? `<button onclick='requestAdminEdit(${JSON.stringify(r)})'>Edit</button>`
               : `<button disabled title="Legacy record – cannot edit">Edit</button>`
           }
-          <button onclick="deleteDonor('${r.id}')">Delete</button>
+          <button onclick="requestAdminDelete('${r.id}')">Delete</button>
         </td>
       </tr>
     `;
