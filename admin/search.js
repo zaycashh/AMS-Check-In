@@ -356,11 +356,12 @@ async function deleteDonor(id) {
   logs = logs.filter(l => l.id !== id);
   localStorage.setItem("ams_logs", JSON.stringify(logs));
 
-  // 🔄 UI REFRESH
-  window.searchResults = window.searchResults.filter(r => r.id !== id);
-  renderSearchResults(window.searchResults);
+  // 🔄 RE-FETCH FROM CLOUD AFTER SAVE
+const freshLogs = await fetchLogsFromCloud();
+window.searchResults = freshLogs;
+renderSearchResults(window.searchResults);
 
-  alert("✅ Record deleted successfully");
+alert("Record updated successfully");
 }
 
 /* =========================================================
