@@ -596,7 +596,8 @@ modal.addEventListener("click", e => {
   locked: false
 };
 
-  await saveEdit(record.id, updated);
+  const cleanId = record.id.replace("log:", "");
+  await saveEdit(cleanId, updated)
 
   // ✅ CLOSE MODAL AFTER SUCCESS
   modal.remove();
