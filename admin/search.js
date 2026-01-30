@@ -189,16 +189,6 @@ async function fetchLogsFromCloud() {
   }
 }
 
-function dedupeLogsByKvKey(logs) {
-  return Array.from(
-    new Map(
-      logs
-        .filter(l => l._kvKey) // ✅ ONLY TRUST KV KEYS
-        .map(l => [l._kvKey, l])
-    ).values()
-  );
-}
-
 function normalizeDateOnly(dateStr) {
   if (!dateStr) return null;
   const d = new Date(dateStr + "T00:00:00");
@@ -214,7 +204,7 @@ window.runSearch = async function () {
   const counter = document.getElementById("searchResultCount");
   if (counter) counter.textContent = "Searching...";
    
-  const logs = dedupeLogsByKvKey(await fetchLogsFromCloud());
+  const logs = await fetchLogsFromCloud();
 
   const first = document.getElementById("filterFirstName").value.toLowerCase();
   const last = document.getElementById("filterLastName").value.toLowerCase();
@@ -290,19 +280,24 @@ switch (range) {
 }
 
 const results = logs.filter(l => {
+  if (!l || !l.id) return false;
+
+  // TEXT FILTERS
+  if (first && !l.first?.toLowerCase().includes(first)) return false;
+  if (last && !l.last?.toLowerCase().includes(last)) return false;
+  if (company && !l.company?.toLowerCase().includes(company)) return false;
+
+  // ✅ ALL DATES = NO DATE FILTERING
+  if (!range) return true;
+
   const logDate = normalizeDateOnly(l.date);
   if (!logDate) return false;
 
   if (startDate && logDate < startDate) return false;
   if (endDate && logDate > endDate) return false;
 
-  if (first && !l.first.toLowerCase().includes(first)) return false;
-  if (last && !l.last.toLowerCase().includes(last)) return false;
-  if (company && !l.company.toLowerCase().includes(company)) return false;
-
   return true;
 });
-
    
    results.sort((a, b) => {
   return (b.timestamp || 0) - (a.timestamp || 0);
