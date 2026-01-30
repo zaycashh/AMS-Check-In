@@ -585,7 +585,7 @@ console.log("UPDATE PAYLOAD", updated); // 👈 keep this for debugging
 
 await saveEdit(record.id, updated);
 };
-
+}
 /* =========================================================
    SAVE EDIT
 ========================================================= */
