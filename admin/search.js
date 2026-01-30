@@ -595,12 +595,12 @@ modal.addEventListener("click", e => {
   locked: false
 };
 
-  // 🔑 STRIP log: PREFIX IF PRESENT
-const cleanId = record.id.includes("log:")
-  ? record.id.replace("log:", "")
-  : record.id;
+// 🔑 ALWAYS normalize to KV key format
+const kvId = record.id.startsWith("log:")
+  ? record.id
+  : `log:${record.id}`;
 
-await saveEdit(record.id, updated);
+await saveEdit(kvId, updated);
     
   // ✅ CLOSE MODAL AFTER SUCCESS
   modal.remove();
@@ -633,7 +633,8 @@ async function saveEdit(id, updates) {
     console.log("UPDATE SUCCESS →", result);
 
     // 🔁 Update local search cache (NO re-search, NO UI wipe)
-    const idx = window.searchResults.findIndex(r => r.id === id);
+    const cleanId = id.replace(/^log:/, "");
+    const idx = window.searchResults.findIndex(r => r.id === cleanId);
     if (idx !== -1) {
       window.searchResults[idx] = {
         ...window.searchResults[idx],
