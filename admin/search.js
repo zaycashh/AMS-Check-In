@@ -307,8 +307,16 @@ const results = logs.filter(l => {
   renderSearchResults(results);
 };
 
-function requestAdminEdit(record) {
+function requestAdminEdit(id) {
   if (!requireAdminAccess("EDIT")) return;
+
+  const record = window.searchResults.find(r => r.id === id);
+
+  if (!record) {
+    alert("Record not found in current results.");
+    return;
+  }
+
   openEditModal(record);
 }
 
@@ -420,7 +428,7 @@ function renderSearchResults(results) {
 
           ${
             r.id
-              ? `<button onclick='requestAdminEdit(${JSON.stringify(r)})'>Edit</button>`
+              ? `<button onclick="requestAdminEdit('${r.id}')">Edit</button>`
               : `<button disabled>Edit</button>`
           }
 
