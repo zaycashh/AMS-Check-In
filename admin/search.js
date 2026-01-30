@@ -487,7 +487,10 @@ function openEditModal(record) {
 
             <div class="multi-select-options" id="serviceOptions">
               ${SERVICE_OPTIONS.map(s => {
-                const checked = record.services?.includes(s);
+                const checked =
+                typeof record.services === "string"
+                  ? record.services.split(", ").includes(s)
+                  : false;
                 return `
                   <label>
                     <input type="checkbox" value="${s}" ${checked ? "checked" : ""}>
