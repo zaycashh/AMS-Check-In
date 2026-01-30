@@ -871,3 +871,14 @@ body {
   height: 38px;
   box-sizing: border-box;
 }
+/* === SERVICES DISPLAY: MATCH REASON FOR TEST WEIGHT === */
+
+.edit-modal .multi-select-display {
+  font-weight: 500 !important;   /* semibold, not heavy */
+  color: #111827;                /* same dark tone as selects */
+}
+
+/* Dropdown options text */
+.edit-modal .multi-select-options label {
+  font-weight: 500;
+}
