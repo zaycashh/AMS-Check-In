@@ -343,31 +343,28 @@ async function deleteDonor(id) {
 
   const cleanId = id.replace(/^log:/, "");
 
-const res = await fetch(
+  const res = await fetch(
   `https://ams-checkin-api.josealfonsodejesus.workers.dev/logs/${cleanId}`,
   { method: "DELETE" }
 );
 
-    if (!res.ok) {
-      throw new Error("Cloud delete failed");
-    }
+if (!res.ok) {
+  throw new Error("Cloud delete failed");
+}
 
-    console.log("☁️ Cloud record deleted:", id);
+console.log("☁️ Cloud record deleted:", id);
 
-  } catch (err) {
-    alert("Cloud delete failed. Record was NOT removed.");
-    console.error(err);
-    return;
-  }
+} catch (err) {
+  alert("Cloud delete failed. Record was NOT removed.");
+  console.error(err);
+  return;
+}
 
-  logs = logs.filter(l => l.id.replace(/^log:/, "") !== cleanId);
 window.searchResults = window.searchResults.filter(
   r => r.id.replace(/^log:/, "") !== cleanId
 );
 
-  // 🔄 UI REFRESH
-  window.searchResults = window.searchResults.filter(r => r.id !== id);
-  renderSearchResults(window.searchResults);
+renderSearchResults(window.searchResults);
 
   alert("✅ Record deleted successfully");
 }
