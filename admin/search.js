@@ -607,11 +607,14 @@ await saveEdit(kvId, updated);
 // ================================
 async function saveEdit(id, updates) {
   try {
-    console.log("UPDATE PAYLOAD →", updates);
-    console.log("UPDATE ID →", id); // 🔍 keep this for testing
+    // 🔑 STRIP UI PREFIX
+    const cleanId = id.replace(/^log:/, "");
+
+    console.log("UPDATE ID →", id);
+    console.log("CLEAN ID →", cleanId);
 
     const res = await fetch(
-      `https://ams-checkin-api.josealfonsodejesus.workers.dev/logs/${id}`,
+      `https://ams-checkin-api.josealfonsodejesus.workers.dev/logs/${cleanId}`,
       {
         method: "PUT",
         headers: {
@@ -629,10 +632,9 @@ async function saveEdit(id, updates) {
     const result = await res.json();
     console.log("UPDATE SUCCESS →", result);
 
-    // 🔁 Update UI cache WITHOUT re-search
-    const rawId = id.replace(/^log:/, "");
+    // 🔁 Update in-memory results ONLY
     const idx = window.searchResults.findIndex(
-      r => r.id.replace(/^log:/, "") === rawId
+      r => r.id.replace(/^log:/, "") === cleanId
     );
 
     if (idx !== -1) {
@@ -650,7 +652,6 @@ async function saveEdit(id, updates) {
     throw err;
   }
 }
-
 /* =========================================================
    HELPERS
 ========================================================= */
