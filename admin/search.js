@@ -592,8 +592,11 @@ modal.addEventListener("click", e => {
 };
 
 // ALWAYS send RAW UUID to API
-const cleanId = record.id.replace(/^log:/, "");
-await saveEdit(cleanId, updated);
+const kvId = record.id.startsWith("log:")
+  ? record.id
+  : `log:${record.id}`;
+
+await saveEdit(kvId, updated);
     
   // ✅ CLOSE MODAL AFTER SUCCESS
   modal.remove();
@@ -605,6 +608,7 @@ await saveEdit(cleanId, updated);
 async function saveEdit(id, updates) {
   try {
     console.log("UPDATE PAYLOAD →", updates);
+    console.log("UPDATE ID →", id); // 🔍 keep this for testing
 
     const res = await fetch(
       `https://ams-checkin-api.josealfonsodejesus.workers.dev/logs/${id}`,
@@ -625,10 +629,12 @@ async function saveEdit(id, updates) {
     const result = await res.json();
     console.log("UPDATE SUCCESS →", result);
 
-    // 🔁 Update local search cache (NO re-search, NO UI wipe)
+    // 🔁 Update UI cache WITHOUT re-search
+    const rawId = id.replace(/^log:/, "");
     const idx = window.searchResults.findIndex(
-  r => r.id.replace(/^log:/, "") === id
-);
+      r => r.id.replace(/^log:/, "") === rawId
+    );
+
     if (idx !== -1) {
       window.searchResults[idx] = {
         ...window.searchResults[idx],
