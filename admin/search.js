@@ -1,3 +1,4 @@
+// trigger-pages-runner
 const TEST_REASONS = [
   "Pre-Employment",
   "Random",
@@ -602,24 +603,16 @@ await saveEdit(kvId, updated);
   modal.remove();
 };
 }
-// ================================
-// SAVE EDIT (FINAL – SAFE VERSION)
-// ================================
 async function saveEdit(id, updates) {
   try {
-    // 🔑 STRIP UI PREFIX
-    const cleanId = id.replace(/^log:/, "");
-
     console.log("UPDATE ID →", id);
-    console.log("CLEAN ID →", cleanId);
+    console.log("UPDATE PAYLOAD →", updates);
 
     const res = await fetch(
-      `https://ams-checkin-api.josealfonsodejesus.workers.dev/logs/${cleanId}`,
+      `https://ams-checkin-api.josealfonsodejesus.workers.dev/logs/${id}`,
       {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updates)
       }
     );
@@ -632,9 +625,9 @@ async function saveEdit(id, updates) {
     const result = await res.json();
     console.log("UPDATE SUCCESS →", result);
 
-    // 🔁 Update in-memory results ONLY
+    // Update UI cache only
     const idx = window.searchResults.findIndex(
-      r => r.id.replace(/^log:/, "") === cleanId
+      r => r.id.replace(/^log:/, "") === id
     );
 
     if (idx !== -1) {
@@ -645,7 +638,6 @@ async function saveEdit(id, updates) {
     }
 
     return result;
-
   } catch (err) {
     console.error("SAVE EDIT ERROR:", err);
     alert("Save failed — check console");
