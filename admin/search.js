@@ -359,10 +359,10 @@ async function deleteDonor(id) {
     console.log("☁️ Cloud record deleted:", cleanId);
 
   } catch (err) {
-    showToast("🗑️ Record deleted successfully");
-    console.error(err);
-    return;
-  }
+  showToast("❌ Delete failed", "error");
+  console.error(err);
+  return;
+}
 
   // ✅ UI update ONLY after cloud success
   window.searchResults = window.searchResults.filter(
@@ -659,6 +659,21 @@ async function saveEdit(record, updates) {
 /* =========================================================
    HELPERS
 ========================================================= */
+  function showToast(message, type = "success") {
+  const toast = document.createElement("div");
+  toast.className = `toast toast-${type}`;
+  toast.textContent = message;
+
+  document.body.appendChild(toast);
+
+  setTimeout(() => toast.classList.add("show"), 10);
+
+  setTimeout(() => {
+    toast.classList.remove("show");
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
+}
+
 function setupSearchCompanyAutocomplete() {
   const input = document.getElementById("searchCompanyInput");
   const box = document.getElementById("searchCompanySuggestions");
@@ -736,20 +751,6 @@ function exportSearchPdf() {
 
   const HEADER_BLUE = [25, 90, 140];
   const DARK_TEXT = [40, 40, 40];
-  
-  const toast = document.createElement("div");
-  toast.className = `toast toast-${type}`;
-  toast.textContent = message;
-
-  document.body.appendChild(toast);
-
-  setTimeout(() => toast.classList.add("show"), 10);
-
-  setTimeout(() => {
-    toast.classList.remove("show");
-    setTimeout(() => toast.remove(), 300);
-  }, 3000);
-}
 
   /* ===============================
      DATE RANGE LABEL
