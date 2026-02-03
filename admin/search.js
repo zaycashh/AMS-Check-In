@@ -532,6 +532,10 @@ function openEditModal(record) {
   `;
 
   document.body.appendChild(modal);
+  modal.scrollIntoView({
+  behavior: "smooth",
+  block: "center"
+});
   
   /* ✅ CLOSE MODAL WHEN CLICKING OUTSIDE THE BOX */
 modal.addEventListener("click", e => {
