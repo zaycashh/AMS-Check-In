@@ -634,21 +634,26 @@ modal.addEventListener("click", e => {
     locked: true
   };
 
-  try {
-    console.log("🟡 ATTEMPTING SAVE:", updated);
+  // Prevent double-clicks
+saveBtn.disabled = true;
+saveBtn.textContent = "Saving...";
 
-    await saveEdit(record, updated);
+// 🔥 INSTANT feedback
+showToast("💾 Saving changes...");
+modal.remove();
 
-    lockAdminSession();
-    showToast("✅ Record updated successfully");
+try {
+  console.log("🟡 ATTEMPTING SAVE:", updated);
 
-    modal.remove(); // ✅ close ONLY on success
+  await saveEdit(record, updated);
 
-  } catch (err) {
-    console.error("❌ SAVE FAILED IN MODAL:", err);
-    showToast("❌ Save failed — check console", "error");
-  }
-};
+  lockAdminSession();
+  showToast("✅ Record updated successfully");
+
+} catch (err) {
+  console.error("❌ SAVE FAILED IN MODAL:", err);
+  showToast("❌ Save failed — check console", "error");
+}
   
 async function saveEdit(record, updates) {
   try {
