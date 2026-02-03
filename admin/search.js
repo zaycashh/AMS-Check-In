@@ -594,30 +594,35 @@ modal.addEventListener("click", e => {
 
   try {
     // ✅ ONLY ONE SAVE
-    await saveEdit(record.id, updated);
-
-    // ✅ CLOSE MODAL AFTER SUCCESS
-    modal.remove();
+  await saveEdit(record, updated);
+  modal.remove();
+    
   } catch (err) {
     // ❌ keep modal open on failure
   }
 };
 }
 
-async function saveEdit(id, updates) {
+async function saveEdit(record, updates) {
   try {
-    // 🔒 SAFETY: force RAW UUID
-    const cleanId = id.replace(/^log:/, "");
+    if (!record.timestamp) {
+      throw new Error("Missing timestamp on record");
+    }
 
-    console.log("UPDATE ID →", cleanId);
-    console.log("UPDATE PAYLOAD →", updates);
+    const payload = {
+      ...updates,
+      timestamp: record.timestamp
+    };
+
+    console.log("UPDATE BY TIMESTAMP →", payload.timestamp);
+    console.log("UPDATE PAYLOAD →", payload);
 
     const res = await fetch(
-      `https://ams-checkin-api.josealfonsodejesus.workers.dev/logs/${cleanId}`,
+      "https://ams-checkin-api.josealfonsodejesus.workers.dev/logs-by-timestamp",
       {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updates)
+        body: JSON.stringify(payload)
       }
     );
 
@@ -626,22 +631,20 @@ async function saveEdit(id, updates) {
       throw new Error(`Update failed: ${res.status} ${text}`);
     }
 
-    const result = await res.json();
-    console.log("UPDATE SUCCESS →", result);
+    const updated = await res.json();
+    console.log("UPDATE SUCCESS →", updated);
 
-    // 🔁 Update UI cache ONLY
+    // ✅ Update UI cache without re-searching
     const idx = window.searchResults.findIndex(
-      r => r.id.replace(/^log:/, "") === cleanId
+      r => r.timestamp === updated.timestamp
     );
 
     if (idx !== -1) {
-      window.searchResults[idx] = {
-        ...window.searchResults[idx],
-        ...updates
-      };
+      window.searchResults[idx] = updated;
     }
 
-    return result;
+    renderSearchResults(window.searchResults);
+    return updated;
 
   } catch (err) {
     console.error("SAVE EDIT ERROR:", err);
