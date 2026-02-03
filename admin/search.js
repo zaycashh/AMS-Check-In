@@ -24,6 +24,11 @@ const SERVICE_OPTIONS = [
 ========================================================= */
 let ADMIN_SESSION_UNLOCKED = false;
 
+function lockAdminSession() {
+  ADMIN_SESSION_UNLOCKED = false;
+  console.warn("🔒 ADMIN SESSION RE-LOCKED");
+}
+
 const ADMIN_PIN_VALUE = "2468"; // CHANGE THIS
 Object.defineProperty(window, "ADMIN_PIN", {
   value: ADMIN_PIN_VALUE,
@@ -593,14 +598,17 @@ modal.addEventListener("click", e => {
 };
 
   try {
-    // ✅ ONLY ONE SAVE
+  // ✅ SAVE
   await saveEdit(record, updated);
+
+  // 🔒 AUTO-LOCK ADMIN AFTER SUCCESS
+  lockAdminSession();
+
+  // ✅ CLOSE MODAL
   modal.remove();
-    
-  } catch (err) {
-    // ❌ keep modal open on failure
-  }
-};
+
+} catch (err) {
+  // ❌ keep modal open on failure
 }
 
 async function saveEdit(record, updates) {
