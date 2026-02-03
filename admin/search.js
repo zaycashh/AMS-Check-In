@@ -589,8 +589,8 @@ modal.addEventListener("click", e => {
     company,
     reason,
     services,
-    locked: false
-  };
+    locked: true
+};
 
   try {
     // ✅ ONLY ONE SAVE
