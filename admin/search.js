@@ -897,7 +897,7 @@ const tableBody = rows.map(row =>
     { align: "right" }
   );
 
-  doc.save(`AMS_Search_Log_${Date.now()}.pdf`);
+    doc.save(`AMS_Search_Log_${Date.now()}.pdf`);
 }
 
 window.exportSearchLogExcel = function () {
