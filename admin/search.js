@@ -602,6 +602,7 @@ modal.addEventListener("click", e => {
     // ❌ keep modal open on failure
   }
 };
+}
 
 async function saveEdit(id, updates) {
   try {
