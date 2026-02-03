@@ -591,25 +591,20 @@ modal.addEventListener("click", e => {
   services,
   locked: false
 };
-
-// ALWAYS send RAW UUID to API
-const kvId = record.id.startsWith("log:")
-  ? record.id
-  : `log:${record.id}`;
-
-await saveEdit(kvId, updated);
-    
   // ✅ CLOSE MODAL AFTER SUCCESS
   modal.remove();
 };
 }
 async function saveEdit(id, updates) {
   try {
-    console.log("UPDATE ID →", id);
+    // 🔒 SAFETY: force RAW UUID
+    const cleanId = id.replace(/^log:/, "");
+
+    console.log("UPDATE ID →", cleanId);
     console.log("UPDATE PAYLOAD →", updates);
 
     const res = await fetch(
-      `https://ams-checkin-api.josealfonsodejesus.workers.dev/logs/${id}`,
+      `https://ams-checkin-api.josealfonsodejesus.workers.dev/logs/${cleanId}`,
       {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -625,9 +620,9 @@ async function saveEdit(id, updates) {
     const result = await res.json();
     console.log("UPDATE SUCCESS →", result);
 
-    // Update UI cache only
+    // 🔁 Update UI cache ONLY
     const idx = window.searchResults.findIndex(
-      r => r.id.replace(/^log:/, "") === id
+      r => r.id.replace(/^log:/, "") === cleanId
     );
 
     if (idx !== -1) {
@@ -638,6 +633,7 @@ async function saveEdit(id, updates) {
     }
 
     return result;
+
   } catch (err) {
     console.error("SAVE EDIT ERROR:", err);
     alert("Save failed — check console");
