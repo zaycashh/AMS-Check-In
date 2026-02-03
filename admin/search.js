@@ -586,28 +586,23 @@ modal.addEventListener("click", e => {
   }
 
   const updated = {
-  company,
-  reason,
-  services,
-  locked: false
+    company,
+    reason,
+    services,
+    locked: false
+  };
+
+  try {
+    // ✅ ONLY ONE SAVE
+    await saveEdit(record.id, updated);
+
+    // ✅ CLOSE MODAL AFTER SUCCESS
+    modal.remove();
+  } catch (err) {
+    // ❌ keep modal open on failure
+  }
 };
 
-try {
-  await saveEdit(record.id, updated);
-  modal.remove(); // close ONLY after success
-} catch (e) {
-  // keep modal open on failure
-}
-
-  // ✅ ALWAYS send RAW UUID
-  const cleanId = record.id.replace(/^log:/, "");
-
-  await saveEdit(cleanId, updated);
-
-  // ✅ CLOSE MODAL ONLY AFTER SUCCESS
-  modal.remove();
-};
-}
 async function saveEdit(id, updates) {
   try {
     // 🔒 SAFETY: force RAW UUID
