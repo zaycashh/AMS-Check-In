@@ -189,9 +189,10 @@ async function fetchLogsFromCloud() {
     return logs;
 
   } catch (err) {
-    console.warn("⚠️ Cloud unavailable, using local logs");
-    return getCachedLogs(); // fallback only
+    showToast("❌ Save failed", "error");
   }
+};
+
 }
 
 function normalizeDateOnly(dateStr) {
