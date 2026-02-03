@@ -322,6 +322,19 @@ function requestAdminEditById(id) {
     alert("Record not found");
     return;
   }
+
+  // 🔽 Scroll to donor row
+  const row = document.querySelector(
+    `button[onclick="requestAdminEditById('${id}')"]`
+  )?.closest("tr");
+
+  if (row) {
+    row.scrollIntoView({
+      behavior: "smooth",
+      block: "center"
+    });
+  }
+
   requestAdminEdit(record);
 }
 
