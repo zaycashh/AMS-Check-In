@@ -586,12 +586,18 @@ modal.addEventListener("click", e => {
   }
 
   const updated = {
-  company,
-  reason,
-  services,
-  locked: false
-};
-  // ✅ CLOSE MODAL AFTER SUCCESS
+    company,
+    reason,
+    services,
+    locked: false
+  };
+
+  // ✅ ALWAYS send RAW UUID
+  const cleanId = record.id.replace(/^log:/, "");
+
+  await saveEdit(cleanId, updated);
+
+  // ✅ CLOSE MODAL ONLY AFTER SUCCESS
   modal.remove();
 };
 }
