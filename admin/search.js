@@ -357,9 +357,10 @@ async function deleteDonor(id) {
     console.log("☁️ Cloud record deleted:", cleanId);
 
   } catch (err) {
-  showToast("❌ Delete failed", "error");
-  console.error(err);
-  return;
+    showToast("❌ Save failed", "error");
+  }
+};
+
 }
 
   // ✅ UI update ONLY after cloud success
