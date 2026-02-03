@@ -370,10 +370,10 @@ async function deleteDonor(id) {
     console.log("☁️ Cloud record deleted:", cleanId);
     
     // ✅ ALSO remove from local cache so it never comes back
-const cached = getCachedLogs().filter(
+const updatedCache = getCachedLogs().filter(
   r => r.id?.replace(/^log:/, "") !== cleanId
 );
-localStorage.setItem("ams_logs", JSON.stringify(cached));
+localStorage.setItem("ams_logs", JSON.stringify(updatedCache));
 
 
 // ✅ Remove from in-memory results
