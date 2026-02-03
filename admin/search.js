@@ -597,16 +597,14 @@ modal.addEventListener("click", e => {
     locked: true
 };
     try {
-  await saveEdit(record, updated);
-
-  lockAdminSession();
-
-  showToast("✅ Record updated successfully");
-
-  modal.remove();
-} catch (err) {
-  showToast("❌ Save failed", "error");
-}
+    await saveEdit(record, updated);
+    lockAdminSession();
+    showToast("✅ Record updated successfully");
+    modal.remove();
+  } catch (err) {
+    showToast("❌ Save failed", "error");
+  }
+};
 
 async function saveEdit(record, updates) {
   try {
@@ -739,7 +737,6 @@ function exportSearchPdf() {
   const HEADER_BLUE = [25, 90, 140];
   const DARK_TEXT = [40, 40, 40];
   
-  function showToast(message, type = "success") {
   const toast = document.createElement("div");
   toast.className = `toast toast-${type}`;
   toast.textContent = message;
