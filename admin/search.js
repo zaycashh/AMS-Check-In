@@ -532,6 +532,18 @@ modal.addEventListener("click", e => {
   const display = modal.querySelector("#serviceDisplay");
   const options = modal.querySelector("#serviceOptions");
   const checkboxes = options.querySelectorAll("input[type=checkbox]");
+  
+  // ✅ Normalize services (string OR array)
+  const initialServices = Array.isArray(record.services)
+    ? record.services
+    : typeof record.services === "string"
+      ? record.services.split(",").map(s => s.trim())
+      : [];
+
+  // ✅ Force checkbox state
+  checkboxes.forEach(cb => {
+    cb.checked = initialServices.includes(cb.value);
+});
 
   function updateServiceDisplay() {
     const selected = Array.from(checkboxes)
@@ -590,17 +602,24 @@ modal.addEventListener("click", e => {
     reason,
     services,
     locked: true
-};
-    try {
+  };
+
+  try {
+    console.log("🟡 ATTEMPTING SAVE:", updated);
+
     await saveEdit(record, updated);
+
     lockAdminSession();
     showToast("✅ Record updated successfully");
-    modal.remove();
+
+    modal.remove(); // ✅ close ONLY on success
+
   } catch (err) {
-    showToast("❌ Save failed", "error");
+    console.error("❌ SAVE FAILED IN MODAL:", err);
+    showToast("❌ Save failed — check console", "error");
   }
 };
-
+  
 async function saveEdit(record, updates) {
   try {
     if (!record.timestamp) {
