@@ -368,8 +368,8 @@ async function deleteDonor(id) {
     }
 
     console.log("☁️ Cloud record deleted:", cleanId);
-    
-    // ✅ ALSO remove from local cache so it never comes back
+
+// ✅ REMOVE FROM LOCAL CACHE (ONCE)
 {
   const updatedCache = getCachedLogs().filter(
     r => r.id?.replace(/^log:/, "") !== cleanId
@@ -377,20 +377,12 @@ async function deleteDonor(id) {
   localStorage.setItem("ams_logs", JSON.stringify(updatedCache));
 }
 
-
-// ✅ Remove from in-memory results
+// ✅ REMOVE FROM IN-MEMORY RESULTS
 window.searchResults = window.searchResults.filter(
   r => r.id.replace(/^log:/, "") !== cleanId
 );
 
-// ✅ REMOVE FROM LOCAL STORAGE CACHE
-const cached = JSON.parse(localStorage.getItem("ams_logs") || "[]");
-const updatedCache = cached.filter(
-  r => r.id?.replace(/^log:/, "") !== cleanId
-);
-localStorage.setItem("ams_logs", JSON.stringify(updatedCache));
-
-// ✅ Re-render UI
+// ✅ RE-RENDER UI
 renderSearchResults(window.searchResults);
 
 showToast("✅ Record deleted successfully");
