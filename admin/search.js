@@ -359,7 +359,7 @@ async function deleteDonor(id) {
     console.log("☁️ Cloud record deleted:", cleanId);
 
   } catch (err) {
-    alert("Cloud delete failed. Record was NOT removed.");
+    showToast("🗑️ Record deleted successfully");
     console.error(err);
     return;
   }
@@ -596,19 +596,16 @@ modal.addEventListener("click", e => {
     services,
     locked: true
 };
-
-  try {
-  // ✅ SAVE
+    try {
   await saveEdit(record, updated);
 
-  // 🔒 AUTO-LOCK ADMIN AFTER SUCCESS
   lockAdminSession();
 
-  // ✅ CLOSE MODAL
-  modal.remove();
+  showToast("✅ Record updated successfully");
 
+  modal.remove();
 } catch (err) {
-  // ❌ keep modal open on failure
+  showToast("❌ Save failed", "error");
 }
 
 async function saveEdit(record, updates) {
