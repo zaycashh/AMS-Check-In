@@ -586,11 +586,18 @@ modal.addEventListener("click", e => {
   }
 
   const updated = {
-    company,
-    reason,
-    services,
-    locked: false
-  };
+  company,
+  reason,
+  services,
+  locked: false
+};
+
+try {
+  await saveEdit(record.id, updated);
+  modal.remove(); // close ONLY after success
+} catch (e) {
+  // keep modal open on failure
+}
 
   // ✅ ALWAYS send RAW UUID
   const cleanId = record.id.replace(/^log:/, "");
