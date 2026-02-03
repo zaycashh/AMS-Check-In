@@ -541,10 +541,14 @@ function openEditModal(record) {
   `;
 
   document.body.appendChild(modal);
+  // 🧭 Auto-scroll to edit modal
+setTimeout(() => {
   modal.scrollIntoView({
-  behavior: "smooth",
-  block: "center"
-});
+    behavior: "smooth",
+    block: "center"
+  });
+}, 50);
+
   
   /* ✅ CLOSE MODAL WHEN CLICKING OUTSIDE THE BOX */
 modal.addEventListener("click", e => {
