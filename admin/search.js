@@ -356,23 +356,19 @@ async function deleteDonor(id) {
 
     console.log("☁️ Cloud record deleted:", cleanId);
 
+    // ✅ UI update ONLY after cloud success
+    window.searchResults = window.searchResults.filter(
+      r => r.id.replace(/^log:/, "") !== cleanId
+    );
+
+    renderSearchResults(window.searchResults);
+    showToast("✅ Record deleted successfully");
+
   } catch (err) {
-    showToast("❌ Save failed", "error");
+    console.error(err);
+    showToast("❌ Delete failed", "error");
   }
-};
-
 }
-
-  // ✅ UI update ONLY after cloud success
-  window.searchResults = window.searchResults.filter(
-    r => r.id.replace(/^log:/, "") !== cleanId
-  );
-
-  renderSearchResults(window.searchResults);
-
-  alert("✅ Record deleted successfully");
-}
-
 /* =========================================================
    RENDER RESULTS
 ========================================================= */
