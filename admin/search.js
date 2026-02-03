@@ -182,17 +182,14 @@ async function fetchLogsFromCloud() {
     if (!res.ok) throw new Error("Cloud fetch failed");
 
     const logs = await res.json();
-
     console.log("☁️ Logs loaded from cloud:", logs.length);
-
-    // ❌ DO NOT STORE IN LOCALSTORAGE (too large)
     return logs;
 
   } catch (err) {
-    showToast("❌ Save failed", "error");
+    console.warn("⚠️ Cloud unavailable, using local logs");
+    showToast("⚠️ Cloud unavailable — using local data", "error");
+    return getCachedLogs();
   }
-};
-
 }
 
 function normalizeDateOnly(dateStr) {
