@@ -190,7 +190,6 @@ async function fetchLogsFromCloud() {
     showToast("⚠️ Cloud unavailable — using local data", "error");
     return getCachedLogs();
   }
-}
 
 function normalizeDateOnly(dateStr) {
   if (!dateStr) return null;
