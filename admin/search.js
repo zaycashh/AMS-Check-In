@@ -369,13 +369,22 @@ async function deleteDonor(id) {
 
     console.log("☁️ Cloud record deleted:", cleanId);
 
-    // ✅ UI update ONLY after cloud success
-    window.searchResults = window.searchResults.filter(
-      r => r.id.replace(/^log:/, "") !== cleanId
-    );
+// ✅ Remove from in-memory results
+window.searchResults = window.searchResults.filter(
+  r => r.id.replace(/^log:/, "") !== cleanId
+);
 
-    renderSearchResults(window.searchResults);
-    showToast("✅ Record deleted successfully");
+// ✅ REMOVE FROM LOCAL STORAGE CACHE
+const cached = JSON.parse(localStorage.getItem("ams_logs") || "[]");
+const updatedCache = cached.filter(
+  r => r.id?.replace(/^log:/, "") !== cleanId
+);
+localStorage.setItem("ams_logs", JSON.stringify(updatedCache));
+
+// ✅ Re-render UI
+renderSearchResults(window.searchResults);
+
+showToast("✅ Record deleted successfully");
 
   } catch (err) {
     console.error(err);
