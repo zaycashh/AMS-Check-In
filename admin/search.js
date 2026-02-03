@@ -368,6 +368,13 @@ async function deleteDonor(id) {
     }
 
     console.log("☁️ Cloud record deleted:", cleanId);
+    
+    // ✅ ALSO remove from local cache so it never comes back
+const cached = getCachedLogs().filter(
+  r => r.id?.replace(/^log:/, "") !== cleanId
+);
+localStorage.setItem("ams_logs", JSON.stringify(cached));
+
 
 // ✅ Remove from in-memory results
 window.searchResults = window.searchResults.filter(
