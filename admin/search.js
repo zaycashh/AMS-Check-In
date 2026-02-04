@@ -379,7 +379,7 @@ async function deleteDonor(id) {
 
 // ✅ REMOVE FROM IN-MEMORY RESULTS
 window.searchResults = window.searchResults.filter(
-  r => r.id.replace(/^log:/, "") !== cleanId
+  r => r.id && r.id.replace(/^log:/, "") !== cleanId
 );
 
 // ✅ RE-RENDER UI
@@ -468,10 +468,10 @@ function renderSearchResults(results) {
    EDIT MODAL
 ========================================================= */
 function openEditModal(record) {
-  
   // 🧹 Remove existing modal if present
   const existing = document.querySelector(".edit-modal");
   if (existing) existing.remove();
+
   const companies = JSON.parse(
     localStorage.getItem("ams_companies") || "[]"
   );
@@ -483,16 +483,11 @@ function openEditModal(record) {
     <div class="edit-box">
       <h3>Edit Donor Record</h3>
 
-      <!-- INLINE ROW -->
       <div class="edit-row">
 
         <div class="field">
           <label>Company</label>
-          <input
-            list="companyList"
-            id="editCompany"
-            value="${record.company || ""}"
-          />
+          <input list="companyList" id="editCompany" value="${record.company || ""}">
           <datalist id="companyList">
             ${companies.map(c => `<option value="${c}">`).join("")}
           </datalist>
@@ -502,9 +497,7 @@ function openEditModal(record) {
           <label>Reason for Test</label>
           <select id="editReason">
             ${TEST_REASONS.map(r =>
-              `<option value="${r}" ${r === record.reason ? "selected" : ""}>
-                ${r}
-              </option>`
+              `<option value="${r}" ${r === record.reason ? "selected" : ""}>${r}</option>`
             ).join("")}
           </select>
         </div>
@@ -513,13 +506,12 @@ function openEditModal(record) {
           <label>Services</label>
           <div class="multi-select" id="serviceDropdown">
             <div class="multi-select-display" id="serviceDisplay"></div>
-
             <div class="multi-select-options" id="serviceOptions">
               ${SERVICE_OPTIONS.map(s => {
                 const checked =
-                typeof record.services === "string"
-                  ? record.services.split(", ").includes(s)
-                  : false;
+                  typeof record.services === "string"
+                    ? record.services.split(", ").includes(s)
+                    : false;
                 return `
                   <label>
                     <input type="checkbox" value="${s}" ${checked ? "checked" : ""}>
@@ -533,29 +525,24 @@ function openEditModal(record) {
 
       </div>
 
-      <!-- ACTIONS -->
       <div class="edit-actions">
         <button id="saveEdit">Save</button>
         <button id="cancelEdit">Cancel</button>
       </div>
-
     </div>
   `;
 
   document.body.appendChild(modal);
-  // 🧭 Auto-scroll to edit modal
-setTimeout(() => {
-  modal.scrollIntoView({
-    behavior: "smooth",
-    block: "center"
-  });
-}, 50);
 
-  
-  /* ✅ CLOSE MODAL WHEN CLICKING OUTSIDE THE BOX */
-modal.addEventListener("click", e => {
-  if (e.target === modal) modal.remove();
-});
+  // 🧭 Auto-scroll to modal
+  setTimeout(() => {
+    modal.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, 50);
+
+  // Close on backdrop click
+  modal.addEventListener("click", e => {
+    if (e.target === modal) modal.remove();
+  });
 
   /* ================================
      SERVICES MULTI-SELECT LOGIC
@@ -564,48 +551,37 @@ modal.addEventListener("click", e => {
   const display = modal.querySelector("#serviceDisplay");
   const options = modal.querySelector("#serviceOptions");
   const checkboxes = options.querySelectorAll("input[type=checkbox]");
-  
-  // ✅ Normalize services (string OR array)
+
   const initialServices = Array.isArray(record.services)
     ? record.services
     : typeof record.services === "string"
       ? record.services.split(",").map(s => s.trim())
       : [];
 
-  // ✅ Force checkbox state
   checkboxes.forEach(cb => {
     cb.checked = initialServices.includes(cb.value);
-});
+  });
 
   function updateServiceDisplay() {
     const selected = Array.from(checkboxes)
       .filter(cb => cb.checked)
       .map(cb => cb.value);
-
-    display.textContent = selected.length
-      ? selected.join(", ")
-      : "Select services";
+    display.textContent = selected.length ? selected.join(", ") : "Select services";
   }
 
-  // Initial display
   updateServiceDisplay();
 
-  // Toggle dropdown
   display.onclick = e => {
     e.stopPropagation();
     dropdown.classList.toggle("open");
   };
 
-  // Update display on change
   checkboxes.forEach(cb => {
     cb.addEventListener("change", updateServiceDisplay);
   });
 
-  // Close dropdown when clicking outside
   modal.addEventListener("click", e => {
-    if (!dropdown.contains(e.target)) {
-      dropdown.classList.remove("open");
-    }
+    if (!dropdown.contains(e.target)) dropdown.classList.remove("open");
   });
 
   /* ================================
@@ -636,77 +612,72 @@ modal.addEventListener("click", e => {
     locked: true
   };
 
-  // Prevent double-clicks
+  // 🔒 Prevent double-clicks
   saveBtn.disabled = true;
   saveBtn.textContent = "Saving...";
 
-  showToast("💾 Saving changes...");
-  modal.remove();
+  // 🔥 Immediate feedback
+  showToast("💾 Saving changes...", "info");
 
   try {
-    console.log("🟡 ATTEMPTING SAVE:", updated);
-
     await saveEdit(record, updated);
 
     lockAdminSession();
     showToast("✅ Record updated successfully");
 
-  } catch (err) {
-    console.error("❌ SAVE FAILED IN MODAL:", err);
-    showToast("❌ Save failed — check console", "error");
-  }
-}; // ✅ ← THIS WAS MISSING
-  
-async function saveEdit(record, updates) {
-  try {
-    if (!record.timestamp) {
-      throw new Error("Missing timestamp on record");
-    }
-
-    const payload = {
-      ...updates,
-      timestamp: record.timestamp
-    };
-
-    console.log("UPDATE BY TIMESTAMP →", payload.timestamp);
-    console.log("UPDATE PAYLOAD →", payload);
-
-    const res = await fetch(
-      "https://ams-checkin-api.josealfonsodejesus.workers.dev/logs-by-timestamp",
-      {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      }
-    );
-
-    if (!res.ok) {
-      const text = await res.text();
-      throw new Error(`Update failed: ${res.status} ${text}`);
-    }
-
-    const updated = await res.json();
-    console.log("UPDATE SUCCESS →", updated);
-
-    // ✅ Update UI cache without re-searching
-    const idx = window.searchResults.findIndex(
-      r => r.timestamp === updated.timestamp
-    );
-
-    if (idx !== -1) {
-      window.searchResults[idx] = updated;
-    }
-
-    renderSearchResults(window.searchResults);
-    return updated;
+    modal.remove(); // ✅ CLOSE ONLY AFTER SUCCESS
 
   } catch (err) {
-    console.error("SAVE EDIT ERROR:", err);
-    alert("Save failed — check console");
-    throw err;
+    console.error("SAVE FAILED:", err);
+
+    showToast("❌ Save failed — try again", "error");
+
+    // 🔓 Allow retry
+    saveBtn.disabled = false;
+    saveBtn.textContent = "Save";
   }
+};
 }
-  
+
+/* =========================================================
+   SAVE EDIT (OUTSIDE MODAL — CORRECT)
+========================================================= */
+async function saveEdit(record, updates) {
+  if (!record.timestamp) {
+    throw new Error("Missing timestamp on record");
+  }
+
+  const payload = {
+    ...updates,
+    timestamp: record.timestamp
+  };
+
+  const res = await fetch(
+    "https://ams-checkin-api.josealfonsodejesus.workers.dev/logs-by-timestamp",
+    {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    }
+  );
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || "Update failed");
+  }
+
+  const updated = await res.json();
+
+  const idx = window.searchResults.findIndex(
+    r => r.timestamp === updated.timestamp
+  );
+
+  if (idx !== -1) {
+    window.searchResults[idx] = updated;
+  }
+
+  renderSearchResults(window.searchResults);
+  return updated;
 }
 
 /* =========================================================
