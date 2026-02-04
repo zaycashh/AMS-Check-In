@@ -346,52 +346,61 @@ function requestAdminDelete(id) {
 async function deleteDonor(id) {
   if (!requireAdminAccess()) return;
 
-  if (!id) {
-    alert("This is a legacy record and cannot be deleted.");
+  // 🔍 Find record from current results
+  const record = window.searchResults.find(r => r.id === id);
+
+  if (!record || !record.timestamp) {
+    alert("This record cannot be deleted (legacy or missing timestamp).");
     return;
   }
 
-  if (!confirm("Are you sure you want to delete this donor record?\n\nThis cannot be undone.")) {
+  if (!confirm(
+    "Are you sure you want to delete this donor record?\n\nThis cannot be undone."
+  )) {
     return;
   }
-
-  const cleanId = id.replace(/^log:/, "");
 
   try {
+    // ☁️ DELETE FROM CLOUD (BY TIMESTAMP — CORRECT)
     const res = await fetch(
-      `https://ams-checkin-api.josealfonsodejesus.workers.dev/logs/${cleanId}`,
-      { method: "DELETE" }
+      "https://ams-checkin-api.josealfonsodejesus.workers.dev/logs-by-timestamp",
+      {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          timestamp: record.timestamp
+        })
+      }
     );
 
     if (!res.ok) {
-      throw new Error("Cloud delete failed");
+      const text = await res.text();
+      throw new Error(text || "Cloud delete failed");
     }
 
-    console.log("☁️ Cloud record deleted:", cleanId);
+    console.log("☁️ Cloud record deleted:", record.timestamp);
 
-// ✅ REMOVE FROM LOCAL CACHE (ONCE)
-{
-  const updatedCache = getCachedLogs().filter(
-    r => r.id?.replace(/^log:/, "") !== cleanId
-  );
-  localStorage.setItem("ams_logs", JSON.stringify(updatedCache));
-}
+    // 💾 REMOVE FROM LOCAL CACHE
+    const updatedCache = getCachedLogs().filter(
+      r => r.timestamp !== record.timestamp
+    );
+    localStorage.setItem("ams_logs", JSON.stringify(updatedCache));
 
-// ✅ REMOVE FROM IN-MEMORY RESULTS
-window.searchResults = window.searchResults.filter(
-  r => r.id && r.id.replace(/^log:/, "") !== cleanId
-);
+    // 🧠 REMOVE FROM IN-MEMORY RESULTS
+    window.searchResults = window.searchResults.filter(
+      r => r.timestamp !== record.timestamp
+    );
 
-// ✅ RE-RENDER UI
-renderSearchResults(window.searchResults);
+    // 🔄 RE-RENDER UI
+    renderSearchResults(window.searchResults);
 
-showToast("✅ Record deleted successfully");
+    showToast("✅ Record deleted successfully");
 
   } catch (err) {
-    console.error(err);
+    console.error("DELETE ERROR:", err);
     showToast("❌ Delete failed", "error");
   }
-};
+}
 
 /* =========================================================
    RENDER RESULTS
