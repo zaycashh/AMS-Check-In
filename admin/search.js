@@ -391,7 +391,8 @@ showToast("✅ Record deleted successfully");
     console.error(err);
     showToast("❌ Delete failed", "error");
   }
-}
+};
+
 /* =========================================================
    RENDER RESULTS
 ========================================================= */
@@ -636,25 +637,25 @@ modal.addEventListener("click", e => {
   };
 
   // Prevent double-clicks
-saveBtn.disabled = true;
-saveBtn.textContent = "Saving...";
+  saveBtn.disabled = true;
+  saveBtn.textContent = "Saving...";
 
-// 🔥 INSTANT feedback
-showToast("💾 Saving changes...");
-modal.remove();
+  showToast("💾 Saving changes...");
+  modal.remove();
 
-try {
-  console.log("🟡 ATTEMPTING SAVE:", updated);
+  try {
+    console.log("🟡 ATTEMPTING SAVE:", updated);
 
-  await saveEdit(record, updated);
+    await saveEdit(record, updated);
 
-  lockAdminSession();
-  showToast("✅ Record updated successfully");
+    lockAdminSession();
+    showToast("✅ Record updated successfully");
 
-} catch (err) {
-  console.error("❌ SAVE FAILED IN MODAL:", err);
-  showToast("❌ Save failed — check console", "error");
-}
+  } catch (err) {
+    console.error("❌ SAVE FAILED IN MODAL:", err);
+    showToast("❌ Save failed — check console", "error");
+  }
+}; // ✅ ← THIS WAS MISSING
   
 async function saveEdit(record, updates) {
   try {
