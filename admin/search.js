@@ -1038,17 +1038,6 @@ window.exportSearchLogExcel = function () {
 /* =========================================================
    INIT
 ========================================================= */
-document.addEventListener("DOMContentLoaded", async () => {
-  try {
-    // ☁️ Always pull fresh logs from cloud on load
-    const logs = await fetchLogsFromCloud();
-
-    // 💾 Sync local cache so deleted records stay deleted
-    localStorage.setItem("ams_logs", JSON.stringify(logs));
-  } catch (err) {
-    console.warn("Init cloud sync failed, using local cache");
-  }
-
-  // 🧱 Render UI AFTER data is synced
+document.addEventListener("DOMContentLoaded", () => {
   renderSearchUI();
 });
