@@ -648,6 +648,3 @@ function openEditModal(record) {
     }
   };
 }
-
-/* =========================================================
-   SAVE EDIT (OUTSIDE MODAL — COR
