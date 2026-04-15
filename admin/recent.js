@@ -41,7 +41,6 @@ async function fetchRecentLogs() {
 
 console.log("Admin Recent Check-Ins Module Loaded");
 
-
 /* =========================================================
    RENDER HELPERS
 ========================================================= */
@@ -71,6 +70,7 @@ function normalizeTimestamp(log) {
 }
 
 function dedupeById(logs) {
+  if (!Array.isArray(logs)) return [];
   return Array.from(
     new Map(
       logs
@@ -84,7 +84,7 @@ function dedupeById(logs) {
    PAINT UI (NO FETCHING HERE)
 ========================================================= */
 
-function paintRecent(container, logs) {
+function paintRecent(container, logs, targetDate) {
   const uniqueLogs = dedupeById(logs);
 
   if (!uniqueLogs.length) {
@@ -93,7 +93,12 @@ function paintRecent(container, logs) {
     return;
   }
 
-  const { start, end } = getTodayRange();
+  // ✅ Use targetDate if provided, otherwise default to today
+  const start = new Date(targetDate || new Date());
+  start.setHours(0, 0, 0, 0);
+
+  const end = new Date(targetDate || new Date());
+  end.setHours(23, 59, 59, 999);
 
   const recent = uniqueLogs
     .map(log => {
@@ -109,6 +114,10 @@ function paintRecent(container, logs) {
     .sort((a, b) => b._ts - a._ts)
     .slice(0, 20);
 
+  // ✅ Format the date for the header
+  const label = targetDate
+    ? new Date(targetDate + "T12:00:00").toLocaleDateString()
+    : "Today";
   const todayCount = recent.length;
 
   let html = `
@@ -122,7 +131,7 @@ function paintRecent(container, logs) {
         font-size:0.85rem;
         font-weight:600;
       ">
-        Today: ${todayCount}
+        ${label}: ${todayCount}
       </span>
     </h2>
 
@@ -187,7 +196,7 @@ function paintRecent(container, logs) {
    MAIN ENTRY (INSTANT + BACKGROUND SYNC)
 ========================================================= */
 
-async function renderRecentCheckIns() {
+async function renderRecentCheckIns(targetDate) {
   const container = document.getElementById("tabRecent");
   if (!container) return;
 
@@ -195,10 +204,11 @@ async function renderRecentCheckIns() {
   const localLogs = JSON.parse(
     localStorage.getItem("ams_logs") || "[]"
   );
-  paintRecent(container, localLogs);
+  paintRecent(container, localLogs, targetDate);
 
   // ✅ Background cloud sync (does NOT block UI)
   fetchRecentLogs().then(cloudLogs => {
-    paintRecent(container, cloudLogs);
+    paintRecent(container, cloudLogs, targetDate);
   });
 }
+
