@@ -21,7 +21,10 @@ async function fetchRecentLogs() {
 
     if (!res.ok) return localLogs;
 
-    const logs = await res.json();
+    const data = await res.json();
+
+    // ✅ GUARD: API must return an array
+    const logs = Array.isArray(data) ? data : localLogs;
 
     // ✅ Cache once
     recentCloudCache = logs;
@@ -37,6 +40,7 @@ async function fetchRecentLogs() {
 }
 
 console.log("Admin Recent Check-Ins Module Loaded");
+
 
 /* =========================================================
    RENDER HELPERS
