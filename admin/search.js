@@ -181,8 +181,16 @@ async function fetchLogsFromCloud() {
 
     if (!res.ok) throw new Error("Cloud fetch failed");
 
-    const logs = await res.json();
+    const data = await res.json();
+
+    // ✅ GUARD: API must return an array
+    const logs = Array.isArray(data) ? data : getCachedLogs();
+
     console.log("☁️ Logs loaded from cloud:", logs.length);
+
+    // ✅ Save to localStorage for other modules
+    localStorage.setItem("ams_logs", JSON.stringify(logs));
+
     return logs;
 
   } catch (err) {
@@ -190,7 +198,7 @@ async function fetchLogsFromCloud() {
     showToast("⚠️ Cloud unavailable — using local data", "error");
     return getCachedLogs();
   }
-} // ✅ CLOSE fetchLogsFromCloud
+}
 
 function normalizeDateOnly(dateStr) {
   if (!dateStr) return null;
