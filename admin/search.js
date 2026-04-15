@@ -648,3 +648,330 @@ function openEditModal(record) {
     }
   };
 }
+/* =========================================================
+   SAVE EDIT (OUTSIDE MODAL — CORRECT)
+========================================================= */
+async function saveEdit(record, updates) {
+  if (!record.timestamp) {
+    throw new Error("Missing timestamp on record");
+  }
+
+  const payload = {
+    ...updates,
+    timestamp: record.timestamp
+  };
+
+  const res = await fetch(
+    "https://ams-checkin-api.josealfonsodejesus.workers.dev/logs-by-timestamp",
+    {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    }
+  );
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || "Update failed");
+  }
+
+  const updated = await res.json();
+
+  const idx = window.searchResults.findIndex(
+    r => r.timestamp === updated.timestamp
+  );
+
+  if (idx !== -1) {
+    window.searchResults[idx] = updated;
+  }
+
+  renderSearchResults(window.searchResults);
+  return updated;
+}
+
+/* =========================================================
+   HELPERS
+========================================================= */
+function showToast(message, type = "success") {
+  const toast = document.createElement("div");
+  toast.className = `toast toast-${type}`;
+  toast.textContent = message;
+
+  document.body.appendChild(toast);
+
+  setTimeout(() => toast.classList.add("show"), 10);
+
+  setTimeout(() => {
+    toast.classList.remove("show");
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
+}
+
+function setupSearchCompanyAutocomplete() {
+  const input = document.getElementById("searchCompanyInput");
+  const box = document.getElementById("searchCompanySuggestions");
+  if (!input || !box) return;
+
+  const companies = JSON.parse(
+    localStorage.getItem("ams_companies") || "[]"
+  );
+
+  input.addEventListener("input", () => {
+    const val = input.value.trim().toLowerCase();
+    box.innerHTML = "";
+
+    if (!val) {
+      box.style.display = "none";
+      return;
+    }
+
+    const matches = companies.filter(c =>
+      c.toLowerCase().includes(val)
+    );
+
+    if (!matches.length) {
+      box.style.display = "none";
+      return;
+    }
+
+    matches.slice(0, 8).forEach(c => {
+      const div = document.createElement("div");
+      div.textContent = c;
+      div.className = "company-suggestion";
+      div.onclick = () => {
+        input.value = c;
+        box.style.display = "none";
+      };
+      box.appendChild(div);
+    });
+
+    box.style.display = "block";
+  });
+
+  document.addEventListener("click", e => {
+    if (!box.contains(e.target) && e.target !== input) {
+      box.style.display = "none";
+    }
+  });
+}
+
+window.clearSearch = function () {
+  renderSearchUI();
+  toggleCustomDateRange("");
+};
+
+function toggleCustomDateRange(value) {
+  const box = document.getElementById("customDateRange");
+  if (!box) return;
+
+  box.style.display = value === "custom" ? "block" : "none";
+}
+
+function clearSearchTable() {
+  const t = document.getElementById("searchResultsTable");
+  if (t) t.innerHTML = `<tr><td colspan="9" style="text-align:center;opacity:.6;">Run a search</td></tr>`;
+}
+
+function exportSearchPdf() {
+  if (!window.searchResults || !window.searchResults.length) {
+    alert("No search results to export.");
+    return;
+  }
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF("landscape");
+
+  const HEADER_BLUE = [25, 90, 140];
+  const DARK_TEXT = [40, 40, 40];
+
+  const range = document.getElementById("filterDateRange")?.value || "";
+  const start = document.getElementById("filterStartDate")?.value;
+  const end = document.getElementById("filterEndDate")?.value;
+
+  let rangeLabel = "ALL DATES";
+
+  if (range === "today") rangeLabel = "TODAY";
+  if (range === "yesterday") rangeLabel = "YESTERDAY";
+  if (range === "thisWeek") rangeLabel = "THIS WEEK";
+  if (range === "lastWeek") rangeLabel = "LAST WEEK";
+  if (range === "thisMonth") rangeLabel = "THIS MONTH";
+  if (range === "lastMonth") rangeLabel = "LAST MONTH";
+  if (range === "thisYear") rangeLabel = "THIS YEAR";
+  if (range === "lastYear") rangeLabel = "LAST YEAR";
+
+  if (range === "custom" && start && end) {
+    rangeLabel = `CUSTOM: ${start} – ${end}`;
+  }
+
+  doc.setFillColor(...HEADER_BLUE);
+  doc.rect(0, 0, 297, 44, "F");
+
+  const logoImg = document.getElementById("amsLogoBase64");
+  if (logoImg?.src) {
+    doc.addImage(logoImg.src, "PNG", 14, 9, 34, 16);
+  }
+
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(18);
+  doc.text("AMS Search Log Report", 148, 18, { align: "center" });
+
+  doc.setFontSize(11);
+  doc.text(rangeLabel, 148, 26, { align: "center" });
+  doc.setFontSize(10);
+  doc.text(
+    `Total Records: ${window.searchResults.length}`,
+    148,
+    32,
+    { align: "center" }
+  );
+
+  doc.setTextColor(...DARK_TEXT);
+
+  const rows = Array.from(
+    document.querySelectorAll("#searchResultsTable tr.export-row")
+  );
+
+  const tableBody = rows.map(row =>
+    Array.from(row.children)
+      .slice(0, 8)
+      .map((td, index) => {
+        if (index === 1) {
+          return td.innerText.replace(/\s+/g, " ").trim();
+        }
+        return td.innerText.trim();
+      })
+  );
+
+  doc.autoTable({
+    startY: 48,
+    tableWidth: "auto",
+    head: [[
+      "Date", "Time", "First", "Last",
+      "Company", "Reason", "Services", "Signature"
+    ]],
+    body: tableBody,
+    styles: {
+      font: "helvetica",
+      fontSize: 10,
+      cellPadding: 5,
+      valign: "middle",
+      overflow: "linebreak",
+      lineWidth: 0.1
+    },
+    rowPageBreak: "avoid",
+    headStyles: {
+      fillColor: HEADER_BLUE,
+      textColor: 255,
+      fontStyle: "bold"
+    },
+    columnStyles: {
+      1: {
+        cellWidth: 32,
+        overflow: "visible",
+        whiteSpace: "nowrap"
+      }
+    },
+    didDrawCell(data) {
+      if (data.column.index === 7 && data.cell.section === "body") {
+        const row = rows[data.row.index];
+        const img = row?.querySelector("img");
+        const sig = img?.src;
+
+        if (sig) {
+          doc.addImage(sig, "PNG", data.cell.x + 3, data.cell.y + 2, 22, 8);
+        }
+      }
+    }
+  });
+
+  doc.setFontSize(9);
+  doc.text(
+    `Generated: ${new Date().toLocaleString()}`,
+    290,
+    200,
+    { align: "right" }
+  );
+
+  doc.save(`AMS_Search_Log_${Date.now()}.pdf`);
+}
+
+window.exportSearchLogExcel = function () {
+  if (!window.searchResults || !window.searchResults.length) {
+    alert("No search results to export.");
+    return;
+  }
+
+  const range = document.getElementById("filterDateRange")?.value || "";
+  const start = document.getElementById("filterStartDate")?.value;
+  const end = document.getElementById("filterEndDate")?.value;
+
+  let rangeLabel = "ALL DATES";
+
+  if (range === "today") rangeLabel = "TODAY";
+  if (range === "yesterday") rangeLabel = "YESTERDAY";
+  if (range === "thisWeek") rangeLabel = "THIS WEEK";
+  if (range === "lastWeek") rangeLabel = "LAST WEEK";
+  if (range === "thisMonth") rangeLabel = "THIS MONTH";
+  if (range === "lastMonth") rangeLabel = "LAST MONTH";
+  if (range === "thisYear") rangeLabel = "THIS YEAR";
+  if (range === "lastYear") rangeLabel = "LAST YEAR";
+
+  if (range === "custom" && start && end) {
+    rangeLabel = `CUSTOM: ${start} – ${end}`;
+  }
+
+  const sheetData = [
+    ["AMS Search Log Report"],
+    [`Date Range: ${rangeLabel}`],
+    [`Total Records: ${window.searchResults.length}`],
+    [`Generated: ${new Date().toLocaleString()}`],
+    [],
+    ["Date", "Time", "First", "Last", "Company", "Reason", "Services", "Signature"]
+  ];
+
+  window.searchResults.forEach(r => {
+    sheetData.push([
+      r.date || "",
+      r.time || "",
+      r.first || "",
+      r.last || "",
+      r.company || "",
+      r.reason || "",
+      r.services || "",
+      r.signature ? "SIGNED" : ""
+    ]);
+  });
+
+  const ws = XLSX.utils.aoa_to_sheet(sheetData);
+
+  ws["!merges"] = [
+    { s: { r: 0, c: 0 }, e: { r: 0, c: 7 } },
+    { s: { r: 1, c: 0 }, e: { r: 1, c: 7 } },
+    { s: { r: 2, c: 0 }, e: { r: 2, c: 7 } },
+    { s: { r: 3, c: 0 }, e: { r: 3, c: 7 } },
+    { s: { r: 4, c: 0 }, e: { r: 4, c: 7 } }
+  ];
+
+  ws["!cols"] = [
+    { wch: 12 },
+    { wch: 10 },
+    { wch: 14 },
+    { wch: 14 },
+    { wch: 22 },
+    { wch: 18 },
+    { wch: 30 },
+    { wch: 12 }
+  ];
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Search Log");
+
+  XLSX.writeFile(wb, `AMS_Search_Log_${Date.now()}.xlsx`);
+};
+
+/* =========================================================
+   INIT
+========================================================= */
+document.addEventListener("DOMContentLoaded", () => {
+  renderSearchUI();
+});
