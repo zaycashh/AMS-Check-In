@@ -156,26 +156,32 @@ function renderSearchUI() {
   `;
 
   // 🔒 FORCE EMPTY STATE — NOTHING RENDERS UNTIL SEARCH
-window.searchResults = [];
-clearSearchTable();
+  window.searchResults = [];
+  clearSearchTable();
 
-const counter = document.getElementById("searchResultCount");
-if (counter) counter.textContent = "";
+  const counter = document.getElementById("searchResultCount");
+  if (counter) counter.textContent = "";
 
-setupSearchCompanyAutocomplete();
+  setupSearchCompanyAutocomplete();
 }
 
 /* =========================================================
    DATA HELPERS
 ========================================================= */
 function getCachedLogs() {
-  return JSON.parse(localStorage.getItem("ams_logs") || "[]");
+  try {
+    const data = JSON.parse(localStorage.getItem("ams_logs") || "[]");
+    // ✅ GUARD: cached data must be an array
+    return Array.isArray(data) ? data : [];
+  } catch {
+    return [];
+  }
 }
 
 async function fetchLogsFromCloud() {
   try {
     const res = await fetch(
-      "https://ams-checkin-api.josealfonsodejesus.workers.dev/logs",
+      "https://ams-checkin-api.josealfonsodejesus.workers.dev/logs?limit=2000",
       { cache: "no-store" }
     );
 
@@ -214,7 +220,7 @@ window.runSearch = async function () {
 
   const counter = document.getElementById("searchResultCount");
   if (counter) counter.textContent = "Searching...";
-   
+
   const logs = await fetchLogsFromCloud();
 
   const first = document.getElementById("filterFirstName").value.toLowerCase();
@@ -309,7 +315,7 @@ const results = logs.filter(l => {
 
   return true;
 });
-   
+
    results.sort((a, b) => {
   return (b.timestamp || 0) - (a.timestamp || 0);
 });
@@ -323,7 +329,6 @@ function requestAdminEdit(record) {
   openEditModal(record);
 }
 
-/* ✅ ADD THIS IMMEDIATELY BELOW */
 function requestAdminEditById(id) {
   const record = window.searchResults.find(r => r.id === id);
   if (!record) {
@@ -331,7 +336,6 @@ function requestAdminEditById(id) {
     return;
   }
 
-  // 🔽 Scroll to donor row
   const row = document.querySelector(
     `button[onclick="requestAdminEditById('${id}')"]`
   )?.closest("tr");
@@ -354,7 +358,6 @@ function requestAdminDelete(id) {
 async function deleteDonor(id) {
   if (!requireAdminAccess()) return;
 
-  // 🔍 Find record from current results
   const record = window.searchResults.find(r => r.id === id);
 
   if (!record || !record.timestamp) {
@@ -369,7 +372,6 @@ async function deleteDonor(id) {
   }
 
   try {
-    // ☁️ DELETE FROM CLOUD (BY TIMESTAMP — CORRECT)
     const res = await fetch(
       "https://ams-checkin-api.josealfonsodejesus.workers.dev/logs-by-timestamp",
       {
@@ -388,18 +390,15 @@ async function deleteDonor(id) {
 
     console.log("☁️ Cloud record deleted:", record.timestamp);
 
-    // 💾 REMOVE FROM LOCAL CACHE
     const updatedCache = getCachedLogs().filter(
       r => r.timestamp !== record.timestamp
     );
     localStorage.setItem("ams_logs", JSON.stringify(updatedCache));
 
-    // 🧠 REMOVE FROM IN-MEMORY RESULTS
     window.searchResults = window.searchResults.filter(
       r => r.timestamp !== record.timestamp
     );
 
-    // 🔄 RE-RENDER UI
     renderSearchResults(window.searchResults);
 
     showToast("✅ Record deleted successfully");
@@ -485,7 +484,6 @@ function renderSearchResults(results) {
    EDIT MODAL
 ========================================================= */
 function openEditModal(record) {
-  // 🧹 Remove existing modal if present
   const existing = document.querySelector(".edit-modal");
   if (existing) existing.remove();
 
@@ -551,12 +549,10 @@ function openEditModal(record) {
 
   document.body.appendChild(modal);
 
-  // 🧭 Auto-scroll to modal
   setTimeout(() => {
     modal.scrollIntoView({ behavior: "smooth", block: "center" });
   }, 50);
 
-  // Close on backdrop click
   modal.addEventListener("click", e => {
     if (e.target === modal) modal.remove();
   });
@@ -610,442 +606,48 @@ function openEditModal(record) {
   cancelBtn.onclick = () => modal.remove();
 
   saveBtn.onclick = async () => {
-  const company = modal.querySelector("#editCompany").value.trim();
-  const reason = modal.querySelector("#editReason").value;
+    const company = modal.querySelector("#editCompany").value.trim();
+    const reason = modal.querySelector("#editReason").value;
 
-  const services = Array.from(
-    modal.querySelectorAll("#serviceOptions input:checked")
-  ).map(cb => cb.value);
+    const services = Array.from(
+      modal.querySelectorAll("#serviceOptions input:checked")
+    ).map(cb => cb.value);
 
-  if (!company || !reason || !services.length) {
-    alert("All fields are required.");
-    return;
-  }
-
-  const updated = {
-    company,
-    reason,
-    services,
-    locked: true
-  };
-
-  // 🔒 Prevent double-clicks
-  saveBtn.disabled = true;
-  saveBtn.textContent = "Saving...";
-
-  // 🔥 Immediate feedback
-  showToast("💾 Saving changes...", "info");
-
-  try {
-    await saveEdit(record, updated);
-
-    lockAdminSession();
-    showToast("✅ Record updated successfully");
-
-    modal.remove(); // ✅ CLOSE ONLY AFTER SUCCESS
-
-  } catch (err) {
-    console.error("SAVE FAILED:", err);
-
-    showToast("❌ Save failed — try again", "error");
-
-    // 🔓 Allow retry
-    saveBtn.disabled = false;
-    saveBtn.textContent = "Save";
-  }
-};
-}
-
-/* =========================================================
-   SAVE EDIT (OUTSIDE MODAL — CORRECT)
-========================================================= */
-async function saveEdit(record, updates) {
-  if (!record.timestamp) {
-    throw new Error("Missing timestamp on record");
-  }
-
-  const payload = {
-    ...updates,
-    timestamp: record.timestamp
-  };
-
-  const res = await fetch(
-    "https://ams-checkin-api.josealfonsodejesus.workers.dev/logs-by-timestamp",
-    {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    }
-  );
-
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(text || "Update failed");
-  }
-
-  const updated = await res.json();
-
-  const idx = window.searchResults.findIndex(
-    r => r.timestamp === updated.timestamp
-  );
-
-  if (idx !== -1) {
-    window.searchResults[idx] = updated;
-  }
-
-  renderSearchResults(window.searchResults);
-  return updated;
-}
-
-/* =========================================================
-   HELPERS
-========================================================= */
-  function showToast(message, type = "success") {
-  const toast = document.createElement("div");
-  toast.className = `toast toast-${type}`;
-  toast.textContent = message;
-
-  document.body.appendChild(toast);
-
-  setTimeout(() => toast.classList.add("show"), 10);
-
-  setTimeout(() => {
-    toast.classList.remove("show");
-    setTimeout(() => toast.remove(), 300);
-  }, 3000);
-}
-
-function setupSearchCompanyAutocomplete() {
-  const input = document.getElementById("searchCompanyInput");
-  const box = document.getElementById("searchCompanySuggestions");
-  if (!input || !box) return;
-
-  const companies = JSON.parse(
-    localStorage.getItem("ams_companies") || "[]"
-  );
-
-  input.addEventListener("input", () => {
-    const val = input.value.trim().toLowerCase();
-    box.innerHTML = "";
-
-    if (!val) {
-      box.style.display = "none";
+    if (!company || !reason || !services.length) {
+      alert("All fields are required.");
       return;
     }
 
-    const matches = companies.filter(c =>
-      c.toLowerCase().includes(val)
-    );
+    const updated = {
+      company,
+      reason,
+      services,
+      locked: true
+    };
 
-    if (!matches.length) {
-      box.style.display = "none";
-      return;
+    saveBtn.disabled = true;
+    saveBtn.textContent = "Saving...";
+
+    showToast("💾 Saving changes...", "info");
+
+    try {
+      await saveEdit(record, updated);
+
+      lockAdminSession();
+      showToast("✅ Record updated successfully");
+
+      modal.remove();
+
+    } catch (err) {
+      console.error("SAVE FAILED:", err);
+
+      showToast("❌ Save failed — try again", "error");
+
+      saveBtn.disabled = false;
+      saveBtn.textContent = "Save";
     }
-
-    matches.slice(0, 8).forEach(c => {
-      const div = document.createElement("div");
-      div.textContent = c;
-      div.className = "company-suggestion";
-      div.onclick = () => {
-        input.value = c;
-        box.style.display = "none";
-      };
-      box.appendChild(div);
-    });
-
-    box.style.display = "block";
-  });
-
-  document.addEventListener("click", e => {
-    if (!box.contains(e.target) && e.target !== input) {
-      box.style.display = "none";
-    }
-  });
+  };
 }
-
-
-window.clearSearch = function () {
-  renderSearchUI();
-  toggleCustomDateRange(""); // hide custom date inputs
-};
-
-function toggleCustomDateRange(value) {
-  const box = document.getElementById("customDateRange");
-  if (!box) return;
-
-  box.style.display = value === "custom" ? "block" : "none";
-}
-
-function clearSearchTable() {
-  const t = document.getElementById("searchResultsTable");
-  if (t) t.innerHTML = `<tr><td colspan="9" style="text-align:center;opacity:.6;">Run a search</td></tr>`;
-}
-
-function exportSearchPdf() {
-  if (!window.searchResults || !window.searchResults.length) {
-    alert("No search results to export.");
-    return;
-  }
-
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF("landscape");
-
-  const HEADER_BLUE = [25, 90, 140];
-  const DARK_TEXT = [40, 40, 40];
-
-  /* ===============================
-     DATE RANGE LABEL
-  =============================== */
-  const range = document.getElementById("filterDateRange")?.value || "";
-  const start = document.getElementById("filterStartDate")?.value;
-  const end = document.getElementById("filterEndDate")?.value;
-
-  let rangeLabel = "ALL DATES";
-
-  if (range === "today") rangeLabel = "TODAY";
-  if (range === "yesterday") rangeLabel = "YESTERDAY";
-  if (range === "thisWeek") rangeLabel = "THIS WEEK";
-  if (range === "lastWeek") rangeLabel = "LAST WEEK";
-  if (range === "thisMonth") rangeLabel = "THIS MONTH";
-  if (range === "lastMonth") rangeLabel = "LAST MONTH";
-  if (range === "thisYear") rangeLabel = "THIS YEAR";
-  if (range === "lastYear") rangeLabel = "LAST YEAR";
-
-  if (range === "custom" && start && end) {
-    rangeLabel = `CUSTOM: ${start} – ${end}`;
-  }
-
-  /* ===============================
-     HEADER BAR
-  =============================== */
-  doc.setFillColor(...HEADER_BLUE);
-  doc.rect(0, 0, 297, 44, "F");
-
-  /* ===============================
-     LOGO (DRAW AFTER HEADER)
-  =============================== */
-  const logoImg = document.getElementById("amsLogoBase64");
-  if (logoImg?.src) {
-    doc.addImage(logoImg.src, "PNG", 14, 9, 34, 16);
-  }
-
-  /* ===============================
-     TITLE
-  =============================== */
-  doc.setTextColor(255, 255, 255);
-  doc.setFontSize(18);
-  doc.text("AMS Search Log Report", 148, 18, { align: "center" });
-
-  doc.setFontSize(11);
-  doc.text(rangeLabel, 148, 26, { align: "center" });
-  doc.setFontSize(10);
-  doc.text(
-  `Total Records: ${window.searchResults.length}`,
-  148,
-  32,
-  { align: "center" }
-);
-
-
-  doc.setTextColor(...DARK_TEXT);
-
-  /* ===============================
-   TABLE DATA (EXPORT ONLY REAL ROWS)
-=============================== */
-const rows = Array.from(
-  document.querySelectorAll("#searchResultsTable tr.export-row")
-);
-
-const tableBody = rows.map(row =>
-  Array.from(row.children)
-    .slice(0, 8)
-    .map((td, index) => {
-      // 🔧 FIX TIME COLUMN (index 1)
-      if (index === 1) {
-        return td.innerText.replace(/\s+/g, " ").trim();
-      }
-      return td.innerText.trim();
-    })
-);
-
-  /* ===============================
-     TABLE
-  =============================== */
-  doc.autoTable({
-  startY: 48,
-  tableWidth: "auto",
-  head: [[
-    "Date",
-    "Time",
-    "First",
-    "Last",
-    "Company",
-    "Reason",
-    "Services",
-    "Signature"
-  ]],
-  body: tableBody,
-  styles: {
-    font: "helvetica",
-    fontSize: 10,
-    cellPadding: 5,
-    valign: "middle",
-    overflow: "linebreak",
-    lineWidth: 0.1
-  },
-  rowPageBreak: "avoid",
-  headStyles: {
-    fillColor: HEADER_BLUE,
-    textColor: 255,
-    fontStyle: "bold"
-  },
-  columnStyles: {
-  1: {
-    cellWidth: 32,
-    overflow: "visible",
-    whiteSpace: "nowrap"
-  }
-},
-
-  didDrawCell(data) {
-    if (data.column.index === 7 && data.cell.section === "body") {
-      const row = rows[data.row.index];
-      const img = row?.querySelector("img");
-      const sig = img?.src;
-
-      if (sig) {
-        doc.addImage(
-          sig,
-          "PNG",
-          data.cell.x + 3,
-          data.cell.y + 2,
-          22,
-          8
-        );
-      }
-    }
-  }
-});
-
-  /* ===============================
-     FOOTER (BOTTOM-RIGHT)
-  =============================== */
-  doc.setFontSize(9);
-  doc.text(
-    `Generated: ${new Date().toLocaleString()}`,
-    290,
-    200,
-    { align: "right" }
-  );
-
-    doc.save(`AMS_Search_Log_${Date.now()}.pdf`);
-}
-
-window.exportSearchLogExcel = function () {
-  if (!window.searchResults || !window.searchResults.length) {
-    alert("No search results to export.");
-    return;
-  }
-
-  /* ===============================
-     DATE RANGE LABEL (MATCH PDF)
-  =============================== */
-  const range = document.getElementById("filterDateRange")?.value || "";
-  const start = document.getElementById("filterStartDate")?.value;
-  const end = document.getElementById("filterEndDate")?.value;
-
-  let rangeLabel = "ALL DATES";
-
-  if (range === "today") rangeLabel = "TODAY";
-  if (range === "yesterday") rangeLabel = "YESTERDAY";
-  if (range === "thisWeek") rangeLabel = "THIS WEEK";
-  if (range === "lastWeek") rangeLabel = "LAST WEEK";
-  if (range === "thisMonth") rangeLabel = "THIS MONTH";
-  if (range === "lastMonth") rangeLabel = "LAST MONTH";
-  if (range === "thisYear") rangeLabel = "THIS YEAR";
-  if (range === "lastYear") rangeLabel = "LAST YEAR";
-
-  if (range === "custom" && start && end) {
-    rangeLabel = `CUSTOM: ${start} – ${end}`;
-  }
-
-  /* ===============================
-     BUILD SHEET (TITLE + META)
-  =============================== */
-  const sheetData = [
-  ["AMS Search Log Report"],
-  [`Date Range: ${rangeLabel}`],
-  [`Total Records: ${window.searchResults.length}`],
-  [`Generated: ${new Date().toLocaleString()}`],
-  [],
-  [
-    "Date",
-    "Time",
-    "First",
-    "Last",
-    "Company",
-    "Reason",
-    "Services",
-    "Signature"
-  ]
-];
-
-
-  /* ===============================
-     DATA ROWS
-  =============================== */
-  window.searchResults.forEach(r => {
-    sheetData.push([
-      r.date || "",
-      r.time || "",
-      r.first || "",
-      r.last || "",
-      r.company || "",
-      r.reason || "",
-      r.services || "",
-      r.signature ? "SIGNED" : ""
-    ]);
-  });
-
-  /* ===============================
-     CREATE WORKBOOK
-  =============================== */
-  const ws = XLSX.utils.aoa_to_sheet(sheetData);
-
-  // Merge title & meta rows
-  ws["!merges"] = [
-  { s: { r: 0, c: 0 }, e: { r: 0, c: 7 } }, // Title
-  { s: { r: 1, c: 0 }, e: { r: 1, c: 7 } }, // Date Range
-  { s: { r: 2, c: 0 }, e: { r: 2, c: 7 } }, // Total Records
-  { s: { r: 3, c: 0 }, e: { r: 3, c: 7 } }, // Generated
-  { s: { r: 4, c: 0 }, e: { r: 4, c: 7 } }  // Spacer
-];
-
-
-  // Column widths
-  ws["!cols"] = [
-    { wch: 12 }, // Date
-    { wch: 10 }, // Time
-    { wch: 14 }, // First
-    { wch: 14 }, // Last
-    { wch: 22 }, // Company
-    { wch: 18 }, // Reason
-    { wch: 30 }, // Services
-    { wch: 12 }  // Signature
-  ];
-
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "Search Log");
-
-  XLSX.writeFile(
-    wb,
-    `AMS_Search_Log_${Date.now()}.xlsx`
-  );
-};
 
 /* =========================================================
-   INIT
-========================================================= */
-document.addEventListener("DOMContentLoaded", () => {
-  renderSearchUI();
-});
+   SAVE EDIT (OUTSIDE MODAL — COR
