@@ -185,18 +185,47 @@ async function fetchLogsFromCloud() {
       { cache: "no-store" }
     );
 
+  async function fetchLogsFromCloud() {
+  try {
+    const res = await fetch(
+      "https://ams-checkin-api.josealfonsodejesus.workers.dev/logs?limit=2000",
+      { cache: "no-store" }
+    );
+
     if (!res.ok) throw new Error("Cloud fetch failed");
 
     const data = await res.json();
-
-    // ✅ GUARD: API must return an array
     const logs = Array.isArray(data) ? data : getCachedLogs();
 
     console.log("☁️ Logs loaded from cloud:", logs.length);
 
-    // ✅ Save to localStorage for other modules
-    localStorage.setItem("ams_logs", JSON.stringify(logs));
+    // Fetch signatures for records that don't have them
+    const missingSig = logs.filter(l => l.id && !l.signature);
+    if (missingSig.length > 0) {
+      console.log("Fetching signatures for", missingSig.length, "records...");
+      
+      // Fetch signatures in batches of 20
+      for (let i = 0; i < missingSig.length; i += 20) {
+        const batch = missingSig.slice(i, i + 20);
+        const results = await Promise.allSettled(
+          batch.map(async (r) => {
+            try {
+              const sigRes = await fetch(
+                `https://ams-checkin-api.josealfonsodejesus.workers.dev/signature?id=${encodeURIComponent(r.id)}`
+              );
+              if (sigRes.ok) {
+                const sigData = await sigRes.json();
+                if (sigData.signature) r.signature = sigData.signature;
+              }
+            } catch(e) {}
+          })
+        );
+      }
+      
+      console.log("✅ Signatures loaded");
+    }
 
+    localStorage.setItem("ams_logs", JSON.stringify(logs));
     return logs;
 
   } catch (err) {
