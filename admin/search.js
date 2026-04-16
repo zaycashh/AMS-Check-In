@@ -171,14 +171,13 @@ function renderSearchUI() {
 function getCachedLogs() {
   try {
     const data = JSON.parse(localStorage.getItem("ams_logs") || "[]");
-    // ✅ GUARD: cached data must be an array
     return Array.isArray(data) ? data : [];
   } catch {
     return [];
   }
 }
 
-  async function fetchLogsFromCloud() {
+async function fetchLogsFromCloud() {
   try {
     const res = await fetch(
       "https://ams-checkin-api.josealfonsodejesus.workers.dev/logs?limit=2000",
@@ -192,15 +191,12 @@ function getCachedLogs() {
 
     console.log("☁️ Logs loaded from cloud:", logs.length);
 
-    // Fetch signatures for records that don't have them
     const missingSig = logs.filter(l => l.id && !l.signature);
     if (missingSig.length > 0) {
       console.log("Fetching signatures for", missingSig.length, "records...");
-      
-      // Fetch signatures in batches of 20
       for (let i = 0; i < missingSig.length; i += 20) {
         const batch = missingSig.slice(i, i + 20);
-        const results = await Promise.allSettled(
+        await Promise.allSettled(
           batch.map(async (r) => {
             try {
               const sigRes = await fetch(
@@ -214,7 +210,6 @@ function getCachedLogs() {
           })
         );
       }
-      
       console.log("✅ Signatures loaded");
     }
 
