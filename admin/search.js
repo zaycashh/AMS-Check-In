@@ -224,8 +224,17 @@ async function fetchLogsFromCloud() {
       console.log("✅ Signatures loaded");
     }
 
-    localStorage.setItem("ams_logs", JSON.stringify(logs));
+        try {
+      const lite = logs.map(l => {
+        const { signature, ...rest } = l;
+        return rest;
+      });
+      localStorage.setItem("ams_logs", JSON.stringify(lite));
+    } catch(e) {
+      console.warn("⚠️ localStorage full, skipping cache");
+    }
     return logs;
+
 
   } catch (err) {
     console.warn("⚠️ Cloud unavailable, using local logs");
