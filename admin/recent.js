@@ -65,7 +65,7 @@ async function fetchRecentLogs() {
       console.warn("⚠️ localStorage full, skipping cache");
     }
 
-     return logs;
+    return logs;
     
      } catch {
        return localLogs;
