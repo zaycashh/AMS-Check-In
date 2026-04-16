@@ -178,13 +178,6 @@ function getCachedLogs() {
   }
 }
 
-async function fetchLogsFromCloud() {
-  try {
-    const res = await fetch(
-      "https://ams-checkin-api.josealfonsodejesus.workers.dev/logs?limit=2000",
-      { cache: "no-store" }
-    );
-
   async function fetchLogsFromCloud() {
   try {
     const res = await fetch(
