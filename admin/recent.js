@@ -55,7 +55,8 @@ async function fetchRecentLogs() {
     }
 
     recentCloudCache = logs;
-        try {
+
+         try {
       const lite = logs.map(l => {
         const { signature, ...rest } = l;
         return rest;
@@ -64,8 +65,7 @@ async function fetchRecentLogs() {
     } catch(e) {
       console.warn("⚠️ localStorage full, skipping cache");
     }
-     
-    return logs;
+ 
   } catch {
     return localLogs;
   }
