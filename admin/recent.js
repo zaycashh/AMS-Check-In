@@ -5,10 +5,12 @@
 let recentCloudCache = null;
 
 async function fetchRecentLogs() {
+  // ✅ Always have instant local fallback
   const localLogs = JSON.parse(
     localStorage.getItem("ams_logs") || "[]"
   );
 
+  // ✅ Prevent multiple cloud calls
   if (recentCloudCache) return recentCloudCache;
 
   try {
@@ -19,58 +21,20 @@ async function fetchRecentLogs() {
 
     if (!res.ok) return localLogs;
 
-    const data = await res.json();
-    const logs = Array.isArray(data) ? data : localLogs;
+    const logs = await res.json();
 
-    // ✅ BATCH: Fetch missing signatures in batches of 200
-    const missingSig = logs.filter(l => l.id && !l.signature);
-    if (missingSig.length > 0) {
-      console.log("Recent: Fetching signatures for", missingSig.length, "records...");
-      for (let i = 0; i < missingSig.length; i += 200) {
-        const batch = missingSig.slice(i, i + 200);
-        const ids = batch.map(r => r.id);
+    // ✅ Cache once
+    recentCloudCache = logs;
 
-        try {
-          const sigRes = await fetch(
-            "https://ams-checkin-api.josealfonsodejesus.workers.dev/signatures",
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ ids })
-            }
-          );
-
-          if (sigRes.ok) {
-            const sigData = await sigRes.json();
-            sigData.forEach(sig => {
-              const record = batch.find(r => r.id === sig.id);
-              if (record && sig.signature) record.signature = sig.signature;
-            });
-          }
-        } catch(e) {
-          console.warn("Recent: Batch signature fetch failed:", e);
-        }
-      }
-      console.log("✅ Recent: Signatures loaded");
-    }
-
-           recentCloudCache = logs;
-    try {
-      const lite = logs.map(l => {
-        const { signature, ...rest } = l;
-        return rest;
-      });
-      localStorage.setItem("ams_logs", JSON.stringify(lite));
-    } catch(e) {
-      console.warn("⚠️ localStorage full, skipping cache");
-    }
+    // ✅ Save for all devices + all modules
+    localStorage.setItem("ams_logs", JSON.stringify(logs));
 
     return logs;
-    
-     } catch {
-       return localLogs;
-     }
-   }
+  } catch {
+    // ✅ Silent fallback (no console errors)
+    return localLogs;
+  }
+}
 
 console.log("Admin Recent Check-Ins Module Loaded");
 
@@ -93,6 +57,7 @@ function normalizeTimestamp(log) {
 
   let ts = log.timestamp;
 
+  // 🔁 Backward compatibility
   if (!ts && log.date) {
     const t = log.time || "00:00";
     ts = new Date(`${log.date} ${t}`).getTime();
@@ -102,7 +67,6 @@ function normalizeTimestamp(log) {
 }
 
 function dedupeById(logs) {
-  if (!Array.isArray(logs)) return [];
   return Array.from(
     new Map(
       logs
@@ -116,7 +80,7 @@ function dedupeById(logs) {
    PAINT UI (NO FETCHING HERE)
 ========================================================= */
 
-function paintRecent(container, logs, targetDate) {
+function paintRecent(container, logs) {
   const uniqueLogs = dedupeById(logs);
 
   if (!uniqueLogs.length) {
@@ -125,11 +89,7 @@ function paintRecent(container, logs, targetDate) {
     return;
   }
 
-  const start = new Date(targetDate || new Date());
-  start.setHours(0, 0, 0, 0);
-
-  const end = new Date(targetDate || new Date());
-  end.setHours(23, 59, 59, 999);
+  const { start, end } = getTodayRange();
 
   const recent = uniqueLogs
     .map(log => {
@@ -145,9 +105,6 @@ function paintRecent(container, logs, targetDate) {
     .sort((a, b) => b._ts - a._ts)
     .slice(0, 20);
 
-  const label = targetDate
-    ? new Date(targetDate + "T12:00:00").toLocaleDateString()
-    : "Today";
   const todayCount = recent.length;
 
   let html = `
@@ -161,7 +118,7 @@ function paintRecent(container, logs, targetDate) {
         font-size:0.85rem;
         font-weight:600;
       ">
-        ${label}: ${todayCount}
+        Today: ${todayCount}
       </span>
     </h2>
 
@@ -226,7 +183,7 @@ function paintRecent(container, logs, targetDate) {
    MAIN ENTRY (INSTANT + BACKGROUND SYNC)
 ========================================================= */
 
-async function renderRecentCheckIns(targetDate) {
+async function renderRecentCheckIns() {
   const container = document.getElementById("tabRecent");
   if (!container) return;
 
@@ -234,10 +191,10 @@ async function renderRecentCheckIns(targetDate) {
   const localLogs = JSON.parse(
     localStorage.getItem("ams_logs") || "[]"
   );
-  paintRecent(container, localLogs, targetDate);
+  paintRecent(container, localLogs);
 
   // ✅ Background cloud sync (does NOT block UI)
   fetchRecentLogs().then(cloudLogs => {
-    paintRecent(container, cloudLogs, targetDate);
+    paintRecent(container, cloudLogs);
   });
 }
