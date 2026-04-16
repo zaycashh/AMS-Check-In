@@ -55,8 +55,16 @@ async function fetchRecentLogs() {
     }
 
     recentCloudCache = logs;
-    localStorage.setItem("ams_logs", JSON.stringify(logs));
-
+        try {
+      const lite = logs.map(l => {
+        const { signature, ...rest } = l;
+        return rest;
+      });
+      localStorage.setItem("ams_logs", JSON.stringify(lite));
+    } catch(e) {
+      console.warn("⚠️ localStorage full, skipping cache");
+    }
+     
     return logs;
   } catch {
     return localLogs;
