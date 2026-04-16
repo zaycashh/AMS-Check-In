@@ -156,91 +156,47 @@ function renderSearchUI() {
   `;
 
   // 🔒 FORCE EMPTY STATE — NOTHING RENDERS UNTIL SEARCH
-  window.searchResults = [];
-  clearSearchTable();
+window.searchResults = [];
+clearSearchTable();
 
-  const counter = document.getElementById("searchResultCount");
-  if (counter) counter.textContent = "";
+const counter = document.getElementById("searchResultCount");
+if (counter) counter.textContent = "";
 
-  setupSearchCompanyAutocomplete();
+setupSearchCompanyAutocomplete();
 }
 
 /* =========================================================
    DATA HELPERS
 ========================================================= */
 function getCachedLogs() {
-  try {
-    const data = JSON.parse(localStorage.getItem("ams_logs") || "[]");
-    return Array.isArray(data) ? data : [];
-  } catch {
-    return [];
-  }
+  return JSON.parse(localStorage.getItem("ams_logs") || "[]");
 }
 
 async function fetchLogsFromCloud() {
   try {
     const res = await fetch(
-      "https://ams-checkin-api.josealfonsodejesus.workers.dev/logs?limit=2000",
+      "https://ams-checkin-api.josealfonsodejesus.workers.dev/logs",
       { cache: "no-store" }
     );
 
     if (!res.ok) throw new Error("Cloud fetch failed");
 
-    const data = await res.json();
-    const logs = Array.isArray(data) ? data : getCachedLogs();
-
+    const logs = await res.json();
     console.log("☁️ Logs loaded from cloud:", logs.length);
-
-    const missingSig = logs.filter(l => l.id && !l.signature);
-    if (missingSig.length > 0) {
-      console.log("Fetching signatures for", missingSig.length, "records...");
-      
-      // ✅ BATCH: Send up to 200 IDs at once
-      for (let i = 0; i < missingSig.length; i += 200) {
-        const batch = missingSig.slice(i, i + 200);
-        const ids = batch.map(r => r.id);
-        
-        try {
-          const sigRes = await fetch(
-            "https://ams-checkin-api.josealfonsodejesus.workers.dev/signatures",
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ ids })
-            }
-          );
-          
-          if (sigRes.ok) {
-            const sigData = await sigRes.json();
-            sigData.forEach(sig => {
-              const record = batch.find(r => r.id === sig.id);
-              if (record && sig.signature) record.signature = sig.signature;
-            });
-          }
-        } catch(e) {
-          console.warn("Batch signature fetch failed:", e);
-        }
-      }
-      console.log("✅ Signatures loaded");
-    }
-
-        try {
-      const lite = logs.map(l => {
-        const { signature, ...rest } = l;
-        return rest;
-      });
-      localStorage.setItem("ams_logs", JSON.stringify(lite));
-    } catch(e) {
-      console.warn("⚠️ localStorage full, skipping cache");
-    }
     return logs;
-
 
   } catch (err) {
     console.warn("⚠️ Cloud unavailable, using local logs");
     showToast("⚠️ Cloud unavailable — using local data", "error");
     return getCachedLogs();
   }
+} // ✅ CLOSE fetchLogsFromCloud
+
+function normalizeDateOnly(dateStr) {
+  if (!dateStr) return null;
+  const d = new Date(dateStr + "T00:00:00");
+  d.setHours(0, 0, 0, 0);
+  return d;
 }
 
 /* =========================================================
@@ -250,7 +206,7 @@ window.runSearch = async function () {
 
   const counter = document.getElementById("searchResultCount");
   if (counter) counter.textContent = "Searching...";
-
+   
   const logs = await fetchLogsFromCloud();
 
   const first = document.getElementById("filterFirstName").value.toLowerCase();
@@ -345,7 +301,7 @@ const results = logs.filter(l => {
 
   return true;
 });
-
+   
    results.sort((a, b) => {
   return (b.timestamp || 0) - (a.timestamp || 0);
 });
@@ -359,6 +315,7 @@ function requestAdminEdit(record) {
   openEditModal(record);
 }
 
+/* ✅ ADD THIS IMMEDIATELY BELOW */
 function requestAdminEditById(id) {
   const record = window.searchResults.find(r => r.id === id);
   if (!record) {
@@ -366,6 +323,7 @@ function requestAdminEditById(id) {
     return;
   }
 
+  // 🔽 Scroll to donor row
   const row = document.querySelector(
     `button[onclick="requestAdminEditById('${id}')"]`
   )?.closest("tr");
@@ -388,6 +346,7 @@ function requestAdminDelete(id) {
 async function deleteDonor(id) {
   if (!requireAdminAccess()) return;
 
+  // 🔍 Find record from current results
   const record = window.searchResults.find(r => r.id === id);
 
   if (!record || !record.timestamp) {
@@ -402,6 +361,7 @@ async function deleteDonor(id) {
   }
 
   try {
+    // ☁️ DELETE FROM CLOUD (BY TIMESTAMP — CORRECT)
     const res = await fetch(
       "https://ams-checkin-api.josealfonsodejesus.workers.dev/logs-by-timestamp",
       {
@@ -420,15 +380,18 @@ async function deleteDonor(id) {
 
     console.log("☁️ Cloud record deleted:", record.timestamp);
 
+    // 💾 REMOVE FROM LOCAL CACHE
     const updatedCache = getCachedLogs().filter(
       r => r.timestamp !== record.timestamp
     );
     localStorage.setItem("ams_logs", JSON.stringify(updatedCache));
 
+    // 🧠 REMOVE FROM IN-MEMORY RESULTS
     window.searchResults = window.searchResults.filter(
       r => r.timestamp !== record.timestamp
     );
 
+    // 🔄 RE-RENDER UI
     renderSearchResults(window.searchResults);
 
     showToast("✅ Record deleted successfully");
@@ -514,6 +477,7 @@ function renderSearchResults(results) {
    EDIT MODAL
 ========================================================= */
 function openEditModal(record) {
+  // 🧹 Remove existing modal if present
   const existing = document.querySelector(".edit-modal");
   if (existing) existing.remove();
 
@@ -579,10 +543,12 @@ function openEditModal(record) {
 
   document.body.appendChild(modal);
 
+  // 🧭 Auto-scroll to modal
   setTimeout(() => {
     modal.scrollIntoView({ behavior: "smooth", block: "center" });
   }, 50);
 
+  // Close on backdrop click
   modal.addEventListener("click", e => {
     if (e.target === modal) modal.remove();
   });
@@ -636,48 +602,52 @@ function openEditModal(record) {
   cancelBtn.onclick = () => modal.remove();
 
   saveBtn.onclick = async () => {
-    const company = modal.querySelector("#editCompany").value.trim();
-    const reason = modal.querySelector("#editReason").value;
+  const company = modal.querySelector("#editCompany").value.trim();
+  const reason = modal.querySelector("#editReason").value;
 
-    const services = Array.from(
-      modal.querySelectorAll("#serviceOptions input:checked")
-    ).map(cb => cb.value);
+  const services = Array.from(
+    modal.querySelectorAll("#serviceOptions input:checked")
+  ).map(cb => cb.value);
 
-    if (!company || !reason || !services.length) {
-      alert("All fields are required.");
-      return;
-    }
+  if (!company || !reason || !services.length) {
+    alert("All fields are required.");
+    return;
+  }
 
-    const updated = {
-      company,
-      reason,
-      services,
-      locked: true
-    };
-
-    saveBtn.disabled = true;
-    saveBtn.textContent = "Saving...";
-
-    showToast("💾 Saving changes...", "info");
-
-    try {
-      await saveEdit(record, updated);
-
-      lockAdminSession();
-      showToast("✅ Record updated successfully");
-
-      modal.remove();
-
-    } catch (err) {
-      console.error("SAVE FAILED:", err);
-
-      showToast("❌ Save failed — try again", "error");
-
-      saveBtn.disabled = false;
-      saveBtn.textContent = "Save";
-    }
+  const updated = {
+    company,
+    reason,
+    services,
+    locked: true
   };
+
+  // 🔒 Prevent double-clicks
+  saveBtn.disabled = true;
+  saveBtn.textContent = "Saving...";
+
+  // 🔥 Immediate feedback
+  showToast("💾 Saving changes...", "info");
+
+  try {
+    await saveEdit(record, updated);
+
+    lockAdminSession();
+    showToast("✅ Record updated successfully");
+
+    modal.remove(); // ✅ CLOSE ONLY AFTER SUCCESS
+
+  } catch (err) {
+    console.error("SAVE FAILED:", err);
+
+    showToast("❌ Save failed — try again", "error");
+
+    // 🔓 Allow retry
+    saveBtn.disabled = false;
+    saveBtn.textContent = "Save";
+  }
+};
 }
+
 /* =========================================================
    SAVE EDIT (OUTSIDE MODAL — CORRECT)
 ========================================================= */
@@ -722,15 +692,7 @@ async function saveEdit(record, updates) {
 /* =========================================================
    HELPERS
 ========================================================= */
-function normalizeDateOnly(input) {
-  if (!input) return null;
-  const d = new Date(input);
-  if (isNaN(d.getTime())) return null;
-  d.setHours(0, 0, 0, 0);
-  return d;
-}
-
-function showToast(message, type = "success") {
+  function showToast(message, type = "success") {
   const toast = document.createElement("div");
   toast.className = `toast toast-${type}`;
   toast.textContent = message;
@@ -793,9 +755,10 @@ function setupSearchCompanyAutocomplete() {
   });
 }
 
+
 window.clearSearch = function () {
   renderSearchUI();
-  toggleCustomDateRange("");
+  toggleCustomDateRange(""); // hide custom date inputs
 };
 
 function toggleCustomDateRange(value) {
@@ -822,6 +785,9 @@ function exportSearchPdf() {
   const HEADER_BLUE = [25, 90, 140];
   const DARK_TEXT = [40, 40, 40];
 
+  /* ===============================
+     DATE RANGE LABEL
+  =============================== */
   const range = document.getElementById("filterDateRange")?.value || "";
   const start = document.getElementById("filterStartDate")?.value;
   const end = document.getElementById("filterEndDate")?.value;
@@ -841,14 +807,23 @@ function exportSearchPdf() {
     rangeLabel = `CUSTOM: ${start} – ${end}`;
   }
 
+  /* ===============================
+     HEADER BAR
+  =============================== */
   doc.setFillColor(...HEADER_BLUE);
   doc.rect(0, 0, 297, 44, "F");
 
+  /* ===============================
+     LOGO (DRAW AFTER HEADER)
+  =============================== */
   const logoImg = document.getElementById("amsLogoBase64");
   if (logoImg?.src) {
     doc.addImage(logoImg.src, "PNG", 14, 9, 34, 16);
   }
 
+  /* ===============================
+     TITLE
+  =============================== */
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(18);
   doc.text("AMS Search Log Report", 148, 18, { align: "center" });
@@ -857,71 +832,96 @@ function exportSearchPdf() {
   doc.text(rangeLabel, 148, 26, { align: "center" });
   doc.setFontSize(10);
   doc.text(
-    `Total Records: ${window.searchResults.length}`,
-    148,
-    32,
-    { align: "center" }
-  );
+  `Total Records: ${window.searchResults.length}`,
+  148,
+  32,
+  { align: "center" }
+);
+
 
   doc.setTextColor(...DARK_TEXT);
 
-  const rows = Array.from(
-    document.querySelectorAll("#searchResultsTable tr.export-row")
-  );
+  /* ===============================
+   TABLE DATA (EXPORT ONLY REAL ROWS)
+=============================== */
+const rows = Array.from(
+  document.querySelectorAll("#searchResultsTable tr.export-row")
+);
 
-  const tableBody = rows.map(row =>
-    Array.from(row.children)
-      .slice(0, 8)
-      .map((td, index) => {
-        if (index === 1) {
-          return td.innerText.replace(/\s+/g, " ").trim();
-        }
-        return td.innerText.trim();
-      })
-  );
-
-  doc.autoTable({
-    startY: 48,
-    tableWidth: "auto",
-    head: [[
-      "Date", "Time", "First", "Last",
-      "Company", "Reason", "Services", "Signature"
-    ]],
-    body: tableBody,
-    styles: {
-      font: "helvetica",
-      fontSize: 10,
-      cellPadding: 5,
-      valign: "middle",
-      overflow: "linebreak",
-      lineWidth: 0.1
-    },
-    rowPageBreak: "avoid",
-    headStyles: {
-      fillColor: HEADER_BLUE,
-      textColor: 255,
-      fontStyle: "bold"
-    },
-    columnStyles: {
-      1: {
-        cellWidth: 32,
-        overflow: "visible",
-        whiteSpace: "nowrap"
+const tableBody = rows.map(row =>
+  Array.from(row.children)
+    .slice(0, 8)
+    .map((td, index) => {
+      // 🔧 FIX TIME COLUMN (index 1)
+      if (index === 1) {
+        return td.innerText.replace(/\s+/g, " ").trim();
       }
-    },
-    didDrawCell(data) {
-      if (data.column.index === 7 && data.cell.section === "body") {
-        const row = rows[data.row.index];
-        const img = row?.querySelector("img");
-        const sig = img?.src;
+      return td.innerText.trim();
+    })
+);
 
-        if (sig) {
-          doc.addImage(sig, "PNG", data.cell.x + 3, data.cell.y + 2, 22, 8);
-        }
+  /* ===============================
+     TABLE
+  =============================== */
+  doc.autoTable({
+  startY: 48,
+  tableWidth: "auto",
+  head: [[
+    "Date",
+    "Time",
+    "First",
+    "Last",
+    "Company",
+    "Reason",
+    "Services",
+    "Signature"
+  ]],
+  body: tableBody,
+  styles: {
+    font: "helvetica",
+    fontSize: 10,
+    cellPadding: 5,
+    valign: "middle",
+    overflow: "linebreak",
+    lineWidth: 0.1
+  },
+  rowPageBreak: "avoid",
+  headStyles: {
+    fillColor: HEADER_BLUE,
+    textColor: 255,
+    fontStyle: "bold"
+  },
+  columnStyles: {
+  1: {
+    cellWidth: 32,
+    overflow: "visible",
+    whiteSpace: "nowrap"
+  }
+},
+
+  didDrawCell(data) {
+    if (data.column.index === 7 && data.cell.section === "body") {
+      const row = rows[data.row.index];
+      const img = row?.querySelector("img");
+      const sig = img?.src;
+
+      if (sig) {
+        doc.addImage(
+          sig,
+          "PNG",
+          data.cell.x + 3,
+          data.cell.y + 2,
+          22,
+          8
+        );
       }
     }
-  });
+  }
+});
 
+  /* ===============================
+     FOOTER (BOTTOM-RIGHT)
+  =============================== */
   doc.setFontSize(9);
   doc.text(
     `Generated: ${new Date().toLocaleString()}`,
@@ -930,7 +930,7 @@ function exportSearchPdf() {
     { align: "right" }
   );
 
-  doc.save(`AMS_Search_Log_${Date.now()}.pdf`);
+    doc.save(`AMS_Search_Log_${Date.now()}.pdf`);
 }
 
 window.exportSearchLogExcel = function () {
@@ -939,6 +939,9 @@ window.exportSearchLogExcel = function () {
     return;
   }
 
+  /* ===============================
+     DATE RANGE LABEL (MATCH PDF)
+  =============================== */
   const range = document.getElementById("filterDateRange")?.value || "";
   const start = document.getElementById("filterStartDate")?.value;
   const end = document.getElementById("filterEndDate")?.value;
@@ -958,15 +961,31 @@ window.exportSearchLogExcel = function () {
     rangeLabel = `CUSTOM: ${start} – ${end}`;
   }
 
+  /* ===============================
+     BUILD SHEET (TITLE + META)
+  =============================== */
   const sheetData = [
-    ["AMS Search Log Report"],
-    [`Date Range: ${rangeLabel}`],
-    [`Total Records: ${window.searchResults.length}`],
-    [`Generated: ${new Date().toLocaleString()}`],
-    [],
-    ["Date", "Time", "First", "Last", "Company", "Reason", "Services", "Signature"]
-  ];
+  ["AMS Search Log Report"],
+  [`Date Range: ${rangeLabel}`],
+  [`Total Records: ${window.searchResults.length}`],
+  [`Generated: ${new Date().toLocaleString()}`],
+  [],
+  [
+    "Date",
+    "Time",
+    "First",
+    "Last",
+    "Company",
+    "Reason",
+    "Services",
+    "Signature"
+  ]
+];
 
+
+  /* ===============================
+     DATA ROWS
+  =============================== */
   window.searchResults.forEach(r => {
     sheetData.push([
       r.date || "",
@@ -980,31 +999,40 @@ window.exportSearchLogExcel = function () {
     ]);
   });
 
+  /* ===============================
+     CREATE WORKBOOK
+  =============================== */
   const ws = XLSX.utils.aoa_to_sheet(sheetData);
 
+  // Merge title & meta rows
   ws["!merges"] = [
-    { s: { r: 0, c: 0 }, e: { r: 0, c: 7 } },
-    { s: { r: 1, c: 0 }, e: { r: 1, c: 7 } },
-    { s: { r: 2, c: 0 }, e: { r: 2, c: 7 } },
-    { s: { r: 3, c: 0 }, e: { r: 3, c: 7 } },
-    { s: { r: 4, c: 0 }, e: { r: 4, c: 7 } }
-  ];
+  { s: { r: 0, c: 0 }, e: { r: 0, c: 7 } }, // Title
+  { s: { r: 1, c: 0 }, e: { r: 1, c: 7 } }, // Date Range
+  { s: { r: 2, c: 0 }, e: { r: 2, c: 7 } }, // Total Records
+  { s: { r: 3, c: 0 }, e: { r: 3, c: 7 } }, // Generated
+  { s: { r: 4, c: 0 }, e: { r: 4, c: 7 } }  // Spacer
+];
 
+
+  // Column widths
   ws["!cols"] = [
-    { wch: 12 },
-    { wch: 10 },
-    { wch: 14 },
-    { wch: 14 },
-    { wch: 22 },
-    { wch: 18 },
-    { wch: 30 },
-    { wch: 12 }
+    { wch: 12 }, // Date
+    { wch: 10 }, // Time
+    { wch: 14 }, // First
+    { wch: 14 }, // Last
+    { wch: 22 }, // Company
+    { wch: 18 }, // Reason
+    { wch: 30 }, // Services
+    { wch: 12 }  // Signature
   ];
 
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Search Log");
 
-  XLSX.writeFile(wb, `AMS_Search_Log_${Date.now()}.xlsx`);
+  XLSX.writeFile(
+    wb,
+    `AMS_Search_Log_${Date.now()}.xlsx`
+  );
 };
 
 /* =========================================================
