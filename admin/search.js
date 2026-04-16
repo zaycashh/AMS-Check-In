@@ -371,14 +371,6 @@ function requestAdminEditById(id) {
   requestAdminEdit(record);
 }
 
-function normalizeDateOnly(input) {
-  if (!input) return null;
-  const d = new Date(input);
-  if (isNaN(d.getTime())) return null;
-  d.setHours(0, 0, 0, 0);
-  return d;
-}
-
 function requestAdminDelete(id) {
   if (!requireAdminAccess()) return;
   deleteDonor(id);
@@ -721,6 +713,14 @@ async function saveEdit(record, updates) {
 /* =========================================================
    HELPERS
 ========================================================= */
+function normalizeDateOnly(input) {
+  if (!input) return null;
+  const d = new Date(input);
+  if (isNaN(d.getTime())) return null;
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
 function showToast(message, type = "success") {
   const toast = document.createElement("div");
   toast.className = `toast toast-${type}`;
