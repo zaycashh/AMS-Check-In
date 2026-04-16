@@ -5,12 +5,10 @@
 let recentCloudCache = null;
 
 async function fetchRecentLogs() {
-  // ✅ Always have instant local fallback
   const localLogs = JSON.parse(
     localStorage.getItem("ams_logs") || "[]"
   );
 
-  // ✅ Prevent multiple cloud calls
   if (recentCloudCache) return recentCloudCache;
 
   try {
@@ -22,19 +20,36 @@ async function fetchRecentLogs() {
     if (!res.ok) return localLogs;
 
     const data = await res.json();
-
-    // ✅ GUARD: API must return an array
     const logs = Array.isArray(data) ? data : localLogs;
 
-    // ✅ Cache once
-    recentCloudCache = logs;
+    // ✅ Fetch missing signatures in batches of 20
+    const missingSig = logs.filter(l => l.id && !l.signature);
+    if (missingSig.length > 0) {
+      console.log("Recent: Fetching signatures for", missingSig.length, "records...");
+      for (let i = 0; i < missingSig.length; i += 20) {
+        const batch = missingSig.slice(i, i + 20);
+        await Promise.allSettled(
+          batch.map(async (r) => {
+            try {
+              const sigRes = await fetch(
+                `https://ams-checkin-api.josealfonsodejesus.workers.dev/signature?id=${encodeURIComponent(r.id)}`
+              );
+              if (sigRes.ok) {
+                const sigData = await sigRes.json();
+                if (sigData.signature) r.signature = sigData.signature;
+              }
+            } catch(e) {}
+          })
+        );
+      }
+      console.log("✅ Recent: Signatures loaded");
+    }
 
-    // ✅ Save for all devices + all modules
+    recentCloudCache = logs;
     localStorage.setItem("ams_logs", JSON.stringify(logs));
 
     return logs;
   } catch {
-    // ✅ Silent fallback (no console errors)
     return localLogs;
   }
 }
@@ -60,7 +75,6 @@ function normalizeTimestamp(log) {
 
   let ts = log.timestamp;
 
-  // 🔁 Backward compatibility
   if (!ts && log.date) {
     const t = log.time || "00:00";
     ts = new Date(`${log.date} ${t}`).getTime();
@@ -93,7 +107,6 @@ function paintRecent(container, logs, targetDate) {
     return;
   }
 
-  // ✅ Use targetDate if provided, otherwise default to today
   const start = new Date(targetDate || new Date());
   start.setHours(0, 0, 0, 0);
 
@@ -114,7 +127,6 @@ function paintRecent(container, logs, targetDate) {
     .sort((a, b) => b._ts - a._ts)
     .slice(0, 20);
 
-  // ✅ Format the date for the header
   const label = targetDate
     ? new Date(targetDate + "T12:00:00").toLocaleDateString()
     : "Today";
@@ -211,4 +223,3 @@ async function renderRecentCheckIns(targetDate) {
     paintRecent(container, cloudLogs, targetDate);
   });
 }
-
