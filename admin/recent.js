@@ -22,25 +22,34 @@ async function fetchRecentLogs() {
     const data = await res.json();
     const logs = Array.isArray(data) ? data : localLogs;
 
-    // ✅ Fetch missing signatures in batches of 20
+    // ✅ BATCH: Fetch missing signatures in batches of 200
     const missingSig = logs.filter(l => l.id && !l.signature);
     if (missingSig.length > 0) {
       console.log("Recent: Fetching signatures for", missingSig.length, "records...");
-      for (let i = 0; i < missingSig.length; i += 20) {
-        const batch = missingSig.slice(i, i + 20);
-        await Promise.allSettled(
-          batch.map(async (r) => {
-            try {
-              const sigRes = await fetch(
-                `https://ams-checkin-api.josealfonsodejesus.workers.dev/signature?id=${encodeURIComponent(r.id)}`
-              );
-              if (sigRes.ok) {
-                const sigData = await sigRes.json();
-                if (sigData.signature) r.signature = sigData.signature;
-              }
-            } catch(e) {}
-          })
-        );
+      for (let i = 0; i < missingSig.length; i += 200) {
+        const batch = missingSig.slice(i, i + 200);
+        const ids = batch.map(r => r.id);
+
+        try {
+          const sigRes = await fetch(
+            "https://ams-checkin-api.josealfonsodejesus.workers.dev/signatures",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ ids })
+            }
+          );
+
+          if (sigRes.ok) {
+            const sigData = await sigRes.json();
+            sigData.forEach(sig => {
+              const record = batch.find(r => r.id === sig.id);
+              if (record && sig.signature) record.signature = sig.signature;
+            });
+          }
+        } catch(e) {
+          console.warn("Recent: Batch signature fetch failed:", e);
+        }
       }
       console.log("✅ Recent: Signatures loaded");
     }
