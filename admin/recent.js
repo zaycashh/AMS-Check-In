@@ -54,9 +54,8 @@ async function fetchRecentLogs() {
       console.log("✅ Recent: Signatures loaded");
     }
 
-    recentCloudCache = logs;
-
-         try {
+           recentCloudCache = logs;
+    try {
       const lite = logs.map(l => {
         const { signature, ...rest } = l;
         return rest;
@@ -65,11 +64,11 @@ async function fetchRecentLogs() {
     } catch(e) {
       console.warn("⚠️ localStorage full, skipping cache");
     }
- 
-  } catch {
-    return localLogs;
-  }
-}
+    
+     } catch {
+       return localLogs;
+     }
+   }
 
 console.log("Admin Recent Check-Ins Module Loaded");
 
