@@ -371,6 +371,14 @@ function requestAdminEditById(id) {
   requestAdminEdit(record);
 }
 
+function normalizeDateOnly(input) {
+  if (!input) return null;
+  const d = new Date(input);
+  if (isNaN(d.getTime())) return null;
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
 function requestAdminDelete(id) {
   if (!requireAdminAccess()) return;
   deleteDonor(id);
