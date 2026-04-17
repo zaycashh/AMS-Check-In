@@ -230,11 +230,13 @@ window.__submitting = true;
   const last = document.getElementById("lastName").value.trim();
   const companyValue = document.getElementById("companyInput").value.trim();
 
-  if (!first || !last) return alert("Please enter first and last name.");
   if (!companyValue) {
-  return alert("Please enter a company.");
+  alert("Please enter a company.");
+  unlockSubmit();
+  return;
+}
 
-  const finalCompany = companyValue;
+const finalCompany = companyValue;
 
 
   const reasonSelect = document.getElementById("reasonSelect").value;
