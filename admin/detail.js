@@ -21,7 +21,6 @@ async function fetchDetailLogs() {
 
     console.log("☁️ Detail logs loaded from cloud:", logs.length);
 
-    // ✅ DO NOT write to localStorage (prevents quota issues)
     return logs;
 
   } catch (err) {
@@ -37,7 +36,7 @@ let amsLogoBase64 = null;
 
 (function loadLogo() {
   const img = new Image();
-  img.src = "logo.png"; // adjust path if needed
+  img.src = "logo.png";
   img.onload = function () {
     const canvas = document.createElement("canvas");
     canvas.width = img.width;
@@ -78,20 +77,14 @@ function loadDetailCompanyReport() {
     <label style="margin-left:12px;">Date Range:</label>
     <select id="detailDateRange">
   <option value="">All Dates</option>
-
-  <!-- CURRENT -->
   <option value="today">Today</option>
   <option value="thisWeek">This Week</option>
   <option value="thisMonth">This Month</option>
   <option value="thisYear">This Year</option>
-
-  <!-- PAST -->
   <option value="yesterday">Yesterday</option>
   <option value="lastWeek">Last Week</option>
   <option value="lastMonth">Last Month</option>
   <option value="lastYear">Last Year</option>
-
-  <!-- CUSTOM -->
   <option value="custom">Custom</option>
 </select>
     <span id="detailCustomDates" style="display:none;margin-left:8px;">
@@ -99,7 +92,6 @@ function loadDetailCompanyReport() {
       <input type="date" id="detailEndDate">
     </span>
 
-    <!-- ✅ THIS WAS MISSING -->
     <span id="detailDonorCount"
           style="margin-left:12px;font-weight:600;">
       Total Records: 0
@@ -131,12 +123,10 @@ function loadDetailCompanyReport() {
   </div>
 `;
 
-  // Silent cloud refresh
   fetchDetailLogs();
-
-   bindDetailActionButtons();
-   bindDetailCompanyButtons();
-   setupDetailCompanyAutocomplete();
+  bindDetailActionButtons();
+  bindDetailCompanyButtons();
+  setupDetailCompanyAutocomplete();
 }
 
 /* =========================================================
@@ -156,7 +146,6 @@ function bindDetailActionButtons() {
     clearBtn.onclick = () => {
       document.getElementById("detailCompanyInput").value = "";
       document.getElementById("detailCompanySuggestions").style.display = "none";
-
       document.getElementById("detailDateRange").value = "";
       document.getElementById("detailStartDate").value = "";
       document.getElementById("detailEndDate").value = "";
@@ -171,8 +160,9 @@ function bindDetailActionButtons() {
     };
   }
 }
+
 /* =========================================================
-   DATE FILTER (TIMESTAMP SAFE)
+   DATE FILTER (TIMESTAMP SAFE) — ✅ FIXED
 ========================================================= */
 function filterByDateRange(records) {
   const range = document.getElementById("detailDateRange")?.value;
@@ -186,72 +176,71 @@ function filterByDateRange(records) {
   const now = Date.now();
 
   switch (range) {
-  case "today": {
-    const d = new Date();
-    d.setHours(0, 0, 0, 0);
-    startTs = d.getTime();
-    endTs = startTs + 86400000 - 1;
-    break;
+    case "today": {
+      const d = new Date();
+      d.setHours(0, 0, 0, 0);
+      startTs = d.getTime();
+      endTs = startTs + 86400000 - 1;
+      break;
+    }
+    case "yesterday": {
+      const d = new Date();
+      d.setHours(0, 0, 0, 0);
+      endTs = d.getTime() - 1;
+      startTs = endTs - 86400000 + 1;
+      break;
+    }
+    case "thisWeek": {
+      const d = new Date();
+      d.setHours(0, 0, 0, 0);
+      startTs = d.getTime() - d.getDay() * 86400000;
+      endTs = now;
+      break;
+    }
+    case "lastWeek": {
+      const d = new Date();
+      d.setHours(0, 0, 0, 0);
+      endTs = d.getTime() - d.getDay() * 86400000 - 1;
+      startTs = endTs - 7 * 86400000 + 1;
+      break;
+    }
+    case "thisMonth": {
+      const d = new Date();
+      startTs = new Date(d.getFullYear(), d.getMonth(), 1).getTime();
+      endTs = now;
+      break;
+    }
+    case "lastMonth": {
+      const d = new Date();
+      startTs = new Date(d.getFullYear(), d.getMonth() - 1, 1).getTime();
+      endTs = new Date(d.getFullYear(), d.getMonth(), 0, 23, 59, 59).getTime();
+      break;
+    }
+    case "thisYear": {
+      const d = new Date();
+      startTs = new Date(d.getFullYear(), 0, 1).getTime();
+      endTs = now;
+      break;
+    }
+    case "lastYear": {
+      const y = new Date().getFullYear() - 1;
+      startTs = new Date(y, 0, 1).getTime();
+      endTs = new Date(y, 11, 31, 23, 59, 59).getTime();
+      break;
+    }
   }
-
-  case "yesterday": {
-    const d = new Date();
-    d.setHours(0, 0, 0, 0);
-    endTs = d.getTime() - 1;
-    startTs = endTs - 86400000 + 1;
-    break;
-  }
-
-  case "thisWeek": {
-    const d = new Date();
-    d.setHours(0, 0, 0, 0);
-    startTs = d.getTime() - d.getDay() * 86400000;
-    endTs = now;
-    break;
-  }
-
-  case "lastWeek": {
-    const d = new Date();
-    d.setHours(0, 0, 0, 0);
-    endTs = d.getTime() - d.getDay() * 86400000 - 1;
-    startTs = endTs - 7 * 86400000 + 1;
-    break;
-  }
-
-  case "thisMonth": {
-    const d = new Date();
-    startTs = new Date(d.getFullYear(), d.getMonth(), 1).getTime();
-    endTs = now;
-    break;
-  }
-
-  case "lastMonth": {
-    const d = new Date();
-    startTs = new Date(d.getFullYear(), d.getMonth() - 1, 1).getTime();
-    endTs = new Date(d.getFullYear(), d.getMonth(), 0, 23, 59, 59).getTime();
-    break;
-  }
-
-  case "thisYear": {
-    const d = new Date();
-    startTs = new Date(d.getFullYear(), 0, 1).getTime();
-    endTs = now;
-    break;
-  }
-
-  case "lastYear": {
-    const y = new Date().getFullYear() - 1;
-    startTs = new Date(y, 0, 1).getTime();
-    endTs = new Date(y, 11, 31, 23, 59, 59).getTime();
-    break;
-  }
-}
 
   if (startInput) startTs = new Date(startInput).getTime();
   if (endInput) endTs = new Date(endInput).getTime() + 86400000 - 1;
 
   return records.filter(r => {
     let ts = r.timestamp;
+    if (ts) {
+      if (typeof ts === "string") {
+        const num = Number(ts);
+        ts = isNaN(num) ? new Date(ts).getTime() : num;
+      }
+    }
     if (!ts && r.date) {
       const time = r.time || "00:00";
       ts = new Date(`${r.date} ${time}`).getTime();
@@ -262,32 +251,48 @@ function filterByDateRange(records) {
     return true;
   });
 }
+
 /* =========================================================
    SORT RECORDS (NEWEST → OLDEST)
 ========================================================= */
 function sortByNewest(records) {
   return records.sort((a, b) => {
-    const ta =
-      a.timestamp ||
-      new Date(`${a.date} ${a.time || "00:00"}`).getTime();
+    let ta = a.timestamp;
+    if (ta) {
+      if (typeof ta === "string") {
+        const num = Number(ta);
+        ta = isNaN(num) ? new Date(ta).getTime() : num;
+      }
+    }
+    if (!ta && a.date) {
+      ta = new Date(`${a.date} ${a.time || "00:00"}`).getTime();
+    }
 
-    const tb =
-      b.timestamp ||
-      new Date(`${b.date} ${b.time || "00:00"}`).getTime();
+    let tb = b.timestamp;
+    if (tb) {
+      if (typeof tb === "string") {
+        const num = Number(tb);
+        tb = isNaN(num) ? new Date(tb).getTime() : num;
+      }
+    }
+    if (!tb && b.date) {
+      tb = new Date(`${b.date} ${b.time || "00:00"}`).getTime();
+    }
 
-    return tb - ta; // newest first
+    return (tb || 0) - (ta || 0);
   });
 }
+
 /* =========================================================
    RENDER TABLE
 ========================================================= */
 function renderCompanyDetailTable() {
   const tbody = document.getElementById("companyDetailBody");
   const companyName =
-  document.getElementById("detailCompanyInput")?.value.trim();
+    document.getElementById("detailCompanyInput")?.value.trim();
 
   if (!tbody || !companyName) {
-    tbody.innerHTML = "";
+    if (tbody) tbody.innerHTML = "";
     return;
   }
 
@@ -295,16 +300,17 @@ function renderCompanyDetailTable() {
 
   let records = logs.filter(
     r =>
-  (r.company || "").trim().toLowerCase() ===
-  companyName.toLowerCase()
+      (r.company || "").trim().toLowerCase() ===
+      companyName.toLowerCase()
   );
 
   records = filterByDateRange(records);
   records = sortByNewest(records);
-   const countEl = document.getElementById("detailDonorCount");
-if (countEl) {
-  countEl.textContent = `Total Donors: ${records.length}`;
-}
+
+  const countEl = document.getElementById("detailDonorCount");
+  if (countEl) {
+    countEl.textContent = `Total Donors: ${records.length}`;
+  }
 
   tbody.innerHTML = "";
 
@@ -346,6 +352,7 @@ function getServicesText(r) {
   if (r.alcohol) list.push("Alcohol Test");
   return list.join(", ");
 }
+
 /* =========================================================
    EXPORT BUTTONS
 ========================================================= */
@@ -388,7 +395,7 @@ function getDetailDateRangeLabel() {
 
 function exportCompanyExcel() {
   const companyName =
-  document.getElementById("detailCompanyInput")?.value.trim();
+    document.getElementById("detailCompanyInput")?.value.trim();
 
   if (!companyName) {
     alert("Please select a company first.");
@@ -396,12 +403,12 @@ function exportCompanyExcel() {
   }
 
   const records = sortByNewest(
-  filterByDateRange(
-    (detailCloudCache || getLocalDetailLogs()).filter(
-      r => (r.company || "").toUpperCase() === companyName.toUpperCase()
+    filterByDateRange(
+      (detailCloudCache || getLocalDetailLogs()).filter(
+        r => (r.company || "").toUpperCase() === companyName.toUpperCase()
+      )
     )
-  )
-);
+  );
 
   if (!records.length) {
     alert("No records found for this company.");
@@ -409,57 +416,57 @@ function exportCompanyExcel() {
   }
 
   const header = [
-  ["AMS Detail Company Report"],
-  [`Company: ${companyName}`],
-  [`Date Range: ${getDetailDateRangeLabel()}`],
-  [`Total Donors: ${records.length}`],
-  [`Generated: ${new Date().toLocaleString()}`],
-  [],
-  ["Date", "Time", "First", "Last", "Reason", "Services", "Signed"]
-];
+    ["AMS Detail Company Report"],
+    [`Company: ${companyName}`],
+    [`Date Range: ${getDetailDateRangeLabel()}`],
+    [`Total Donors: ${records.length}`],
+    [`Generated: ${new Date().toLocaleString()}`],
+    [],
+    ["Date", "Time", "First", "Last", "Reason", "Services", "Signed"]
+  ];
 
   const rows = records.map(r => [
-  r.date || "",
-  r.time || "",
-  r.first || r.firstName || "",
-  r.last || r.lastName || "",
-  r.reason || "",
-  getServicesText(r),
-  r.signature ? "YES" : "NO"   // ✅ SIGNED COLUMN
-]);
+    r.date || "",
+    r.time || "",
+    r.first || r.firstName || "",
+    r.last || r.lastName || "",
+    r.reason || "",
+    getServicesText(r),
+    r.signature ? "YES" : "NO"
+  ]);
 
   const ws = XLSX.utils.aoa_to_sheet([...header, ...rows]);
   const wb = XLSX.utils.book_new();
 
   ws["!merges"] = [
-  { s: { r: 0, c: 0 }, e: { r: 0, c: 6 } }, // Title
-  { s: { r: 1, c: 0 }, e: { r: 1, c: 6 } }, // Company
-  { s: { r: 2, c: 0 }, e: { r: 2, c: 6 } }, // Date Range
-  { s: { r: 3, c: 0 }, e: { r: 3, c: 6 } }, // Total Records
-  { s: { r: 4, c: 0 }, e: { r: 4, c: 6 } }, // Generated
-  { s: { r: 5, c: 0 }, e: { r: 5, c: 6 } }  // Spacer
-];
+    { s: { r: 0, c: 0 }, e: { r: 0, c: 6 } },
+    { s: { r: 1, c: 0 }, e: { r: 1, c: 6 } },
+    { s: { r: 2, c: 0 }, e: { r: 2, c: 6 } },
+    { s: { r: 3, c: 0 }, e: { r: 3, c: 6 } },
+    { s: { r: 4, c: 0 }, e: { r: 4, c: 6 } },
+    { s: { r: 5, c: 0 }, e: { r: 5, c: 6 } }
+  ];
 
-   ws["!cols"] = [
-  { wch: 14 }, // Date
-  { wch: 10 }, // Time
-  { wch: 14 }, // First
-  { wch: 14 }, // Last
-  { wch: 20 }, // Reason
-  { wch: 30 }, // Services
-  { wch: 10 }  // Signed
-];
+  ws["!cols"] = [
+    { wch: 14 },
+    { wch: 10 },
+    { wch: 14 },
+    { wch: 14 },
+    { wch: 20 },
+    { wch: 30 },
+    { wch: 10 }
+  ];
 
   XLSX.utils.book_append_sheet(wb, ws, "Detail Company");
   XLSX.writeFile(wb, `AMS_Detail_Company_${companyName}.xlsx`);
 }
 
 /* =========================================================
-   EXPORT PDF (MATCH SEARCH LOG)
+   EXPORT PDF
 ========================================================= */
 function exportCompanyPdf() {
   const companyName =
-  document.getElementById("detailCompanyInput")?.value.trim();
+    document.getElementById("detailCompanyInput")?.value.trim();
 
   if (!companyName) {
     alert("Please select a company first.");
@@ -467,12 +474,12 @@ function exportCompanyPdf() {
   }
 
   const records = sortByNewest(
-  filterByDateRange(
-    (detailCloudCache || getLocalDetailLogs()).filter(
-      r => (r.company || "").toUpperCase() === companyName.toUpperCase()
+    filterByDateRange(
+      (detailCloudCache || getLocalDetailLogs()).filter(
+        r => (r.company || "").toUpperCase() === companyName.toUpperCase()
+      )
     )
-  )
-);
+  );
 
   if (!records.length) {
     alert("No records found for this company.");
@@ -482,25 +489,15 @@ function exportCompanyPdf() {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF("landscape");
   const HEADER_BLUE = [25, 90, 140];
-
   const PAGE_WIDTH = doc.internal.pageSize.width;
 
-  /* ===============================
-   HEADER BAR (MATCH SEARCH LOG)
-=============================== */
-doc.setFillColor(...HEADER_BLUE);
-doc.rect(0, 0, 297, 44, "F");
+  doc.setFillColor(...HEADER_BLUE);
+  doc.rect(0, 0, 297, 44, "F");
 
-  /* ===============================
-     LOGO
-  =============================== */
   if (amsLogoBase64) {
     doc.addImage(amsLogoBase64, "PNG", 10, 8, 28, 18);
   }
 
-  /* ===============================
-     TITLE
-  =============================== */
   doc.setTextColor(255);
   doc.setFontSize(16);
   doc.text(
@@ -510,38 +507,31 @@ doc.rect(0, 0, 297, 44, "F");
     { align: "center" }
   );
 
-  /* ===============================
-     COMPANY LABEL (RESTORED)
-  =============================== */
   doc.setFontSize(11);
-doc.text(
-  `Company: ${companyName}`,
-  PAGE_WIDTH / 2,
-  24,
-  { align: "center" }
-);
+  doc.text(
+    `Company: ${companyName}`,
+    PAGE_WIDTH / 2,
+    24,
+    { align: "center" }
+  );
 
-doc.setFontSize(10);
-doc.text(
-  `Date Range: ${getDetailDateRangeLabel()}`,
-  PAGE_WIDTH / 2,
-  31,
-  { align: "center" }
-);
+  doc.setFontSize(10);
+  doc.text(
+    `Date Range: ${getDetailDateRangeLabel()}`,
+    PAGE_WIDTH / 2,
+    31,
+    { align: "center" }
+  );
 
-doc.text(
-  `Total Records: ${records.length}`,
-  PAGE_WIDTH / 2,
-  37,
-  { align: "center" }
-);
-
+  doc.text(
+    `Total Records: ${records.length}`,
+    PAGE_WIDTH / 2,
+    37,
+    { align: "center" }
+  );
 
   doc.setTextColor(0);
 
-  /* ===============================
-     TABLE DATA
-  =============================== */
   const rows = records.map(r => [
     r.date || "",
     r.time || "",
@@ -552,59 +542,53 @@ doc.text(
     ""
   ]);
 
-  /* ===============================
-     TABLE
-  =============================== */
-   doc.autoTable({
-  startY: 48,
-  tableWidth: "auto",
-  head: [[
-    "Date",
-    "Time",
-    "First",
-    "Last",
-    "Reason",
-    "Services",
-    "Signature"
-  ]],
-  body: rows,
-  styles: {
-    font: "helvetica",
-    fontSize: 10,
-    cellPadding: 5,
-    valign: "middle",
-    overflow: "linebreak",
-    lineWidth: 0.1
-  },
-  rowPageBreak: "avoid",
-  headStyles: {
-    fillColor: HEADER_BLUE,
-    textColor: 255,
-    fontStyle: "bold"
-  },
-  columnStyles: {
-    6: { cellWidth: 28 }
-  },
-  didDrawCell(data) {
-    if (data.column.index === 6 && data.cell.section === "body") {
-      const sig = records[data.row.index]?.signature;
-      if (sig) {
-        doc.addImage(
-          sig,
-          "PNG",
-          data.cell.x + 3,
-          data.cell.y + 2,
-          22,
-          8
-        );
+  doc.autoTable({
+    startY: 48,
+    tableWidth: "auto",
+    head: [[
+      "Date",
+      "Time",
+      "First",
+      "Last",
+      "Reason",
+      "Services",
+      "Signature"
+    ]],
+    body: rows,
+    styles: {
+      font: "helvetica",
+      fontSize: 10,
+      cellPadding: 5,
+      valign: "middle",
+      overflow: "linebreak",
+      lineWidth: 0.1
+    },
+    rowPageBreak: "avoid",
+    headStyles: {
+      fillColor: HEADER_BLUE,
+      textColor: 255,
+      fontStyle: "bold"
+    },
+    columnStyles: {
+      6: { cellWidth: 28 }
+    },
+    didDrawCell(data) {
+      if (data.column.index === 6 && data.cell.section === "body") {
+        const sig = records[data.row.index]?.signature;
+        if (sig) {
+          doc.addImage(
+            sig,
+            "PNG",
+            data.cell.x + 3,
+            data.cell.y + 2,
+            22,
+            8
+          );
+        }
       }
     }
-  }
-});
+  });
 
-  /* ===============================
-     FOOTER — GENERATED TIME (RESTORED)
-  =============================== */
   doc.setFontSize(9);
   doc.setTextColor(100);
   doc.text(
@@ -616,6 +600,7 @@ doc.text(
 
   doc.save(`AMS_Detail_Company_${companyName}_${Date.now()}.pdf`);
 }
+
 /* =========================================================
    TAB HANDLER
 ========================================================= */
@@ -639,7 +624,8 @@ document.addEventListener("change", e => {
     }
   }
 });
-     /* =========================================================
+
+/* =========================================================
    DETAIL COMPANY AUTOCOMPLETE (TYPE-AHEAD)
 ========================================================= */
 function setupDetailCompanyAutocomplete() {
@@ -704,3 +690,4 @@ function setupDetailCompanyAutocomplete() {
 document.addEventListener("DOMContentLoaded", () => {
   setupDetailCompanyAutocomplete();
 });
+
