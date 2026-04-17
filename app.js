@@ -236,7 +236,7 @@ window.__submitting = true;
   return;
 }
 
-const finalCompany = companyValue;
+  const finalCompany = companyValue;
 
 
   const reasonSelect = document.getElementById("reasonSelect").value;
