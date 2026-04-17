@@ -1,6 +1,25 @@
 console.log("General Report Module Loaded");
 
-function initGeneralReport() {
+let generalCloudCache = null;
+
+async function fetchGeneralLogs() {
+  try {
+    const res = await fetch(
+      "https://ams-checkin-api.josealfonsodejesus.workers.dev/logs",
+      { cache: "no-store" }
+    );
+    if (!res.ok) throw new Error("Cloud fetch failed");
+    const logs = await res.json();
+    generalCloudCache = logs;
+    console.log("☁️ General logs loaded from cloud:", logs.length);
+    return logs;
+  } catch (err) {
+    console.warn("⚠️ Cloud unavailable, using local logs");
+    return JSON.parse(localStorage.getItem("ams_logs") || "[]");
+  }
+}
+
+async function initGeneralReport() {
   const container = document.getElementById("tabGeneral");
   if (!container) {
     console.warn("General tab container not found");
@@ -16,22 +35,22 @@ function initGeneralReport() {
     <div class="report-cards">
       <div class="report-card">
         <h3>Total Check-Ins</h3>
-        <p id="totalCount">0</p>
+        <p id="totalCount">...</p>
       </div>
 
       <div class="report-card">
         <h3>Today</h3>
-        <p id="todayCount">0</p>
+        <p id="todayCount">...</p>
       </div>
 
       <div class="report-card">
         <h3>This Month</h3>
-        <p id="monthCount">0</p>
+        <p id="monthCount">...</p>
       </div>
 
       <div class="report-card">
         <h3>Companies</h3>
-        <p id="companyCount">0</p>
+        <p id="companyCount">...</p>
       </div>
     </div>
 
@@ -59,9 +78,9 @@ function initGeneralReport() {
   `;
 
   /* ===============================
-     LOAD DATA
+     LOAD DATA FROM CLOUD
   =============================== */
-  const logs = JSON.parse(localStorage.getItem("ams_logs") || "[]");
+  const logs = await fetchGeneralLogs();
 
   const today = new Date().toISOString().split("T")[0];
   const currentMonth = today.slice(0, 7);
@@ -75,7 +94,7 @@ function initGeneralReport() {
     logs.filter(l => l.date?.startsWith(currentMonth)).length;
 
   document.getElementById("companyCount").textContent =
-    new Set(logs.map(l => l.company)).size;
+    new Set(logs.map(l => l.company).filter(Boolean)).size;
 
   /* ===============================
      DAILY ACTIVITY
@@ -119,3 +138,4 @@ function initGeneralReport() {
     companyBody.appendChild(tr);
   });
 }
+
