@@ -230,14 +230,19 @@ window.__submitting = true;
   const last = document.getElementById("lastName").value.trim();
   const companyValue = document.getElementById("companyInput").value.trim();
 
-  if (!companyValue) {
+  if (!first || !last) {
+  alert("Please enter first and last name.");
+  unlockSubmit();
+  return;
+}
+
+if (!companyValue) {
   alert("Please enter a company.");
   unlockSubmit();
   return;
 }
 
-  const finalCompany = companyValue;
-
+const finalCompany = companyValue;
 
   const reasonSelect = document.getElementById("reasonSelect").value;
   const otherReason = document.getElementById("otherReasonInput").value.trim();
