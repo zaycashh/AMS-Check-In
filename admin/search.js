@@ -773,11 +773,59 @@ function clearSearchTable() {
   if (t) t.innerHTML = `<tr><td colspan="9" style="text-align:center;opacity:.6;">Run a search</td></tr>`;
 }
 
-function exportSearchPdf() {
+async function loadSignaturesForPdf(records) {
+  const batchSize = 25;
+
+  for (let start = 0; start < records.length; start += batchSize) {
+    const batch = records.slice(start, start + batchSize);
+    const ids = batch
+      .map(record => record.id)
+      .filter(Boolean);
+
+    if (ids.length === 0) {
+      continue;
+    }
+
+    const response = await fetch(
+      "https://ams-checkin-api.josealfonsodejesus.workers.dev/signatures",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ ids })
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Could not load signatures for the PDF.");
+    }
+
+    const payload = await response.json();
+    const signatures = payload.signatures || {};
+
+    for (const record of batch) {
+      record.signature = signatures[record.id] || "";
+    }
+  }
+
+  return records;
+}
+  
+async function exportSearchPdf() {
   if (!window.searchResults || !window.searchResults.length) {
     alert("No search results to export.");
     return;
   }
+
+  try {
+  await loadSignaturesForPdf(window.searchResults);
+  renderSearchResults(window.searchResults);
+} catch (error) {
+  console.error("PDF signature load failed:", error);
+  alert("Could not load signatures for the PDF. Please try again.");
+  return;
+}
 
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF("landscape");
