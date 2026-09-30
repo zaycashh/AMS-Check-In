@@ -914,3 +914,379 @@ body {
 .toast-warning {
   background: #f39c12;
 }
+/* ===============================================================
+   AMS COMPLIANCE BRAND REFRESH — VISUAL ONLY
+   No Worker, API, D1, R2, signature, report, or form logic changes.
+=============================================================== */
+
+:root {
+  --ams-navy: #061d4e;
+  --ams-navy-deep: #04163b;
+  --ams-navy-soft: #0a2d69;
+  --ams-green: #0c5017;
+  --ams-green-hover: #083f12;
+  --ams-green-soft: #eaf4ea;
+  --ams-white: #ffffff;
+  --ams-surface: #f4f7fa;
+  --ams-surface-alt: #edf2f6;
+  --ams-border: #d5dee8;
+  --ams-text: #17233d;
+  --ams-muted: #637083;
+  --ams-danger: #b42318;
+}
+
+/* Base page */
+body {
+  background:
+    linear-gradient(180deg, rgba(6, 29, 78, 0.05) 0, transparent 260px),
+    var(--ams-surface);
+  color: var(--ams-text);
+  padding-bottom: 0;
+}
+
+/* Public header */
+.main-header {
+  min-height: 104px;
+  padding: 12px clamp(18px, 4vw, 46px);
+  background: var(--ams-white);
+  border-bottom: 4px solid var(--ams-green);
+  box-shadow: 0 3px 18px rgba(4, 22, 59, 0.10);
+}
+
+.header-left {
+  gap: 18px;
+  min-width: 0;
+}
+
+/*
+  This uploaded logo includes the complete AMS Compliance artwork.
+  Keep it wide enough to remain legible; object-fit prevents distortion.
+*/
+.header-logo {
+  width: clamp(155px, 25vw, 255px);
+  height: 78px;
+  object-fit: contain;
+  object-position: left center;
+  flex: 0 0 auto;
+}
+
+.header-brand-copy {
+  min-width: 0;
+  padding-left: 18px;
+  border-left: 1px solid rgba(12, 80, 23, 0.55);
+}
+
+.header-title {
+  margin: 0;
+  color: var(--ams-navy);
+  font-size: clamp(20px, 2.3vw, 30px);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.header-tagline {
+  margin: 4px 0 0;
+  color: var(--ams-green);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Check-in surface */
+.section-card {
+  position: relative;
+  max-width: 900px;
+  margin: 42px auto;
+  padding: clamp(26px, 5vw, 48px);
+  overflow: hidden;
+  background: var(--ams-white);
+  border: 1px solid var(--ams-border);
+  border-radius: 16px;
+  box-shadow: 0 18px 42px rgba(4, 22, 59, 0.12);
+}
+
+.section-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: linear-gradient(
+    90deg,
+    var(--ams-navy) 0 42%,
+    var(--ams-green) 42% 58%,
+    var(--ams-navy) 58% 100%
+  );
+}
+
+.section-title {
+  margin-bottom: 30px;
+  color: var(--ams-navy);
+  font-size: clamp(26px, 3vw, 32px);
+  font-weight: 800;
+}
+
+.section-subtitle {
+  color: var(--ams-navy);
+  font-weight: 800;
+}
+
+.section-divider {
+  height: 1px;
+  margin: 32px 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(12, 80, 23, 0.45),
+    transparent
+  );
+}
+
+/* Forms */
+.form-row label {
+  color: var(--ams-navy);
+  font-size: 14px;
+  font-weight: 750;
+  letter-spacing: 0.01em;
+}
+
+.form-row input,
+.form-row select {
+  color: var(--ams-text);
+  background: var(--ams-white);
+  border: 1px solid var(--ams-border);
+  border-radius: 9px;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.form-row input:focus,
+.form-row select:focus {
+  outline: none;
+  border-color: var(--ams-green);
+  box-shadow: 0 0 0 4px rgba(12, 80, 23, 0.12);
+}
+
+.form-row input::placeholder {
+  color: #8a96a8;
+}
+
+/* Services */
+.services-group {
+  gap: 14px 48px;
+}
+
+.service-item {
+  color: var(--ams-text);
+  font-weight: 550;
+}
+
+.service-item input[type="checkbox"] {
+  accent-color: var(--ams-green);
+}
+
+/* Signature */
+.signature-pad-wrapper {
+  border: 2px dashed rgba(6, 29, 78, 0.40);
+  border-radius: 12px;
+  background:
+    linear-gradient(135deg, rgba(6, 29, 78, 0.025), rgba(12, 80, 23, 0.025)),
+    var(--ams-white);
+}
+
+.sig-placeholder {
+  color: var(--ams-muted);
+}
+
+/* Buttons */
+.primary-btn {
+  background: linear-gradient(135deg, var(--ams-green), #0a4213);
+  box-shadow: 0 8px 18px rgba(12, 80, 23, 0.22);
+  font-weight: 750;
+  letter-spacing: 0.01em;
+  transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
+}
+
+.primary-btn:hover {
+  background: linear-gradient(135deg, var(--ams-green-hover), #06310d);
+  box-shadow: 0 10px 22px rgba(12, 80, 23, 0.28);
+  transform: translateY(-1px);
+}
+
+.primary-btn:focus-visible,
+.secondary-btn:focus-visible,
+.dropdown-toggle:focus-visible,
+.tab:focus-visible {
+  outline: 3px solid rgba(12, 80, 23, 0.30);
+  outline-offset: 2px;
+}
+
+.secondary-btn {
+  color: var(--ams-white);
+  background: var(--ams-navy);
+  font-weight: 700;
+  transition: background 160ms ease, transform 160ms ease;
+}
+
+.secondary-btn:hover {
+  background: var(--ams-navy-deep);
+  transform: translateY(-1px);
+}
+
+/* Keep reset visibly distinct */
+#resetFormBtn {
+  background: var(--ams-danger) !important;
+}
+
+#resetFormBtn:hover {
+  background: #8f1c13 !important;
+}
+
+/* Autocomplete */
+.company-suggestions {
+  border: 1px solid var(--ams-border);
+  border-radius: 9px;
+  box-shadow: 0 10px 24px rgba(4, 22, 59, 0.14);
+}
+
+.company-suggestions div:hover,
+.company-suggestion:hover,
+.company-suggestion-item:hover {
+  background: var(--ams-green-soft);
+  color: var(--ams-navy);
+}
+
+/* Admin navigation and controls */
+.admin-topbar {
+  margin: 22px auto 14px;
+  max-width: 1180px;
+  padding: 14px 18px;
+  background: var(--ams-white);
+  border: 1px solid var(--ams-border);
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(4, 22, 59, 0.08);
+}
+
+.dropdown-toggle {
+  background: var(--ams-navy);
+  border-radius: 7px;
+}
+
+.dropdown-toggle:hover {
+  background: var(--ams-navy-deep);
+}
+
+.dropdown-menu {
+  border-color: var(--ams-border);
+}
+
+.dropdown-menu .tab:hover {
+  background: var(--ams-green-soft);
+  color: var(--ams-navy);
+}
+
+/* Tables and report-facing screen elements */
+.results-table,
+.log-table,
+.report-table {
+  border-color: var(--ams-border);
+  background: var(--ams-white);
+}
+
+.results-table thead th,
+.log-table th,
+.report-table th {
+  color: var(--ams-white);
+  background: var(--ams-navy);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+.results-table tbody td,
+.log-table td,
+.report-table td {
+  border-color: var(--ams-border);
+}
+
+.results-table tbody tr:hover {
+  background: var(--ams-green-soft);
+}
+
+/* Modals */
+.modal-box {
+  border: 1px solid var(--ams-border);
+  box-shadow: 0 22px 48px rgba(0, 0, 0, 0.25);
+}
+
+.modal-box h3 {
+  color: var(--ams-navy);
+}
+
+/* Provider credit */
+.platform-footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 74px;
+  margin-top: 16px;
+  padding: 20px 24px;
+  color: rgba(255, 255, 255, 0.86);
+  background: linear-gradient(100deg, var(--ams-navy-deep), var(--ams-navy));
+  border-top: 4px solid var(--ams-green);
+  text-align: center;
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: 0.035em;
+}
+
+/* Responsive header */
+@media (max-width: 680px) {
+  .main-header {
+    min-height: auto;
+    padding: 14px 18px;
+  }
+
+  .header-left {
+    width: 100%;
+    gap: 12px;
+  }
+
+  .header-logo {
+    width: 146px;
+    height: 66px;
+  }
+
+  .header-brand-copy {
+    padding-left: 12px;
+  }
+
+  .header-title {
+    font-size: 19px;
+  }
+
+  .header-tagline {
+    font-size: 10px;
+    line-height: 1.35;
+  }
+
+  .section-card {
+    width: calc(100% - 28px);
+    margin: 24px auto;
+    border-radius: 13px;
+  }
+}
+
+@media (max-width: 430px) {
+  .header-brand-copy {
+    display: none;
+  }
+
+  .header-logo {
+    width: min(255px, 78vw);
+    height: 76px;
+  }
+
+  .services-group {
+    gap: 12px;
+  }
+}
