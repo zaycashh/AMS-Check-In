@@ -5,15 +5,17 @@
 
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="AMS Check-In">
+  <meta name="apple-mobile-web-app-title" content="AMS Compliance Check-In">
 
-  <link rel="apple-touch-icon" href="logo.png">
-  <link rel="apple-touch-icon" sizes="180x180" href="logo.png">
+  <link rel="apple-touch-icon" href="AMS_Compliance_FINAL_FRONT_3.5x2_Print-V2.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="AMS_Compliance_FINAL_FRONT_3.5x2_Print-V2.png">
 
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+  >
 
-  <title>AMS Check-In System</title>
+  <title>AMS Compliance Check-In</title>
 
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -22,8 +24,16 @@
 
 <header class="main-header">
   <div class="header-left">
-    <img src="logo.png" alt="Logo" class="header-logo">
-    <h1 class="header-title">AMS Check-In System</h1>
+    <img
+      src="AMS_Compliance_FINAL_FRONT_3.5x2_Print-V2.png"
+      alt="AMS Compliance"
+      class="header-logo"
+    >
+
+    <div class="header-brand-copy">
+      <h1 class="header-title">AMS Compliance Check-In</h1>
+      <p class="header-tagline">Your Partner in DOT/FAA Compliance</p>
+    </div>
   </div>
 
   <button id="toggleAdminBtn" class="admin-btn" style="display:none;" tabindex="-1">
@@ -47,7 +57,12 @@
 
   <div class="form-row company-autocomplete">
     <label>Company</label>
-    <input id="companyInput" type="text" placeholder="Start typing company name…" autocomplete="off">
+    <input
+      id="companyInput"
+      type="text"
+      placeholder="Start typing company name…"
+      autocomplete="off"
+    >
     <div id="companySuggestions" class="company-suggestions"></div>
   </div>
 
@@ -64,33 +79,65 @@
       <option value="other">Other</option>
     </select>
   </div>
-  
-  <div id="otherReasonWrapper" class="form-row" style="display:none;">
-  <label>Enter Reason</label>
-  <input id="otherReasonInput" type="text">
-</div>
 
+  <div id="otherReasonWrapper" class="form-row" style="display:none;">
+    <label>Enter Reason</label>
+    <input id="otherReasonInput" type="text">
+  </div>
 
   <div class="section-divider"></div>
+
   <h3 class="section-subtitle">Services</h3>
 
   <div class="services-group">
-    <label class="service-item"><input type="checkbox" name="services" value="DOT Drug Test"> DOT Drug Test</label>
-    <label class="service-item"><input type="checkbox" name="services" value="Vision Test"> Vision Test</label>
-    <label class="service-item"><input type="checkbox" name="services" value="NON-DOT Drug Test"> NON-DOT Drug Test</label>
-    <label class="service-item"><input type="checkbox" name="services" value="DNA (Paternity Test)"> DNA (Paternity Test)</label>
-    <label class="service-item"><input type="checkbox" name="services" value="DOT Alcohol Test"> DOT Alcohol Test</label>
-    <label class="service-item"><input type="checkbox" name="services" value="DOT Physical"> DOT Physical</label>
-    <label class="service-item"><input type="checkbox" name="services" value="NON-DOT Alcohol Test"> NON-DOT Alcohol Test</label>
-    <label class="service-item"><input type="checkbox" name="services" value="Other"> Other</label>
+    <label class="service-item">
+      <input type="checkbox" name="services" value="DOT Drug Test">
+      DOT Drug Test
+    </label>
+
+    <label class="service-item">
+      <input type="checkbox" name="services" value="Vision Test">
+      Vision Test
+    </label>
+
+    <label class="service-item">
+      <input type="checkbox" name="services" value="NON-DOT Drug Test">
+      NON-DOT Drug Test
+    </label>
+
+    <label class="service-item">
+      <input type="checkbox" name="services" value="DNA (Paternity Test)">
+      DNA (Paternity Test)
+    </label>
+
+    <label class="service-item">
+      <input type="checkbox" name="services" value="DOT Alcohol Test">
+      DOT Alcohol Test
+    </label>
+
+    <label class="service-item">
+      <input type="checkbox" name="services" value="DOT Physical">
+      DOT Physical
+    </label>
+
+    <label class="service-item">
+      <input type="checkbox" name="services" value="NON-DOT Alcohol Test">
+      NON-DOT Alcohol Test
+    </label>
+
+    <label class="service-item">
+      <input type="checkbox" name="services" value="Other">
+      Other
+    </label>
   </div>
-  
+
   <div id="otherServiceWrapper" class="form-row" style="display:none;">
-  <label>Other Service</label>
-  <input id="srvOtherText" type="text" placeholder="Enter other service">
-</div>
+    <label>Other Service</label>
+    <input id="srvOtherText" type="text" placeholder="Enter other service">
+  </div>
 
   <div class="section-divider"></div>
+
   <h3 class="section-subtitle">Signature</h3>
 
   <div class="signature-pad-wrapper">
@@ -101,12 +148,12 @@
   <button id="clearSigBtn" class="secondary-btn">Clear Signature</button>
 
   <div class="btn-row">
-  <button id="submitBtn" class="primary-btn">Submit Check-In</button>
-</div>
+    <button id="submitBtn" class="primary-btn">Submit Check-In</button>
+  </div>
 
   <div style="display:flex; justify-content:flex-end; margin-top:10px;">
-  <button id="resetFormBtn" class="secondary-btn">Reset Form</button>
-</div>
+    <button id="resetFormBtn" class="secondary-btn">Reset Form</button>
+  </div>
 
 </section>
 
@@ -114,25 +161,26 @@
 
   <div class="admin-topbar">
 
-  <div class="admin-nav">
-    <div class="admin-dropdown">
-      <button class="dropdown-toggle" type="button">Reports ▾</button>
-      <div class="dropdown-menu">
-        <button class="tab" data-tab="tabSearch">Search Log</button>
-        <button class="tab" data-tab="tabGeneral">General Report</button>
-        <button class="tab" data-tab="tabCompany">Detail Company Report</button>
+    <div class="admin-nav">
+      <div class="admin-dropdown">
+        <button class="dropdown-toggle" type="button">Reports ▾</button>
+
+        <div class="dropdown-menu">
+          <button class="tab" data-tab="tabSearch">Search Log</button>
+          <button class="tab" data-tab="tabGeneral">General Report</button>
+          <button class="tab" data-tab="tabCompany">Detail Company Report</button>
+        </div>
       </div>
+
+      <button class="tab" data-tab="tabRecent">Recent Check-Ins</button>
+      <button class="tab" data-tab="tabCompanies">Manage Companies</button>
     </div>
 
-    <button class="tab" data-tab="tabRecent">Recent Check-Ins</button>
-    <button class="tab" data-tab="tabCompanies">Manage Companies</button>
+    <button id="exitAdminBtn" class="secondary-btn">
+      Exit Admin Mode
+    </button>
+
   </div>
-
-  <button id="exitAdminBtn" class="secondary-btn">
-    Exit Admin Mode
-  </button>
-
-</div>
 
   <div id="tabSearch" class="tab-content" style="display:none;"></div>
   <div id="tabGeneral" class="tab-content" style="display:none;"></div>
@@ -141,6 +189,10 @@
   <div id="tabCompanies" class="tab-content" style="display:none;"></div>
 
 </section>
+
+<footer class="platform-footer">
+  Platform provided by De Jesus Platform Works, LLC.
+</footer>
 
 <div id="signatureModal" class="modal-bg">
   <div class="modal-box">
@@ -166,7 +218,12 @@
 <script src="admin/detail.js"></script>
 <script src="admin/manageCompanies.js"></script>
 
-<img id="amsLogoBase64" src="logo.png" style="display:none">
+<img
+  id="amsLogoBase64"
+  src="AMS_Compliance_FINAL_FRONT_3.5x2_Print-V2.png"
+  alt=""
+  style="display:none"
+>
 
 </body>
 </html>
