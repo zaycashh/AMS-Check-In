@@ -1225,6 +1225,8 @@ body {
 /* Provider credit */
 .platform-footer {
   display: flex;
+  flex-direction: column;
+  gap: 4px;
   justify-content: center;
   align-items: center;
   min-height: 74px;
@@ -1288,5 +1290,157 @@ body {
 
   .services-group {
     gap: 12px;
+  }
+}
+
+/* ===============================================================
+   ADMIN CONTROLS ONLY
+   Keep tables, donor form, footer, and application logic unchanged.
+=============================================================== */
+#adminArea :is(
+  .admin-nav > .tab,
+  .admin-nav .dropdown-toggle,
+  #tabSearch .export-bar > button,
+  #tabSearch .search-actions > button,
+  #tabCompany .export-right > button,
+  #tabCompany .detail-actions > button
+) {
+  min-height: 36px;
+  padding: 8px 14px;
+  border: 1px solid var(--ams-navy);
+  border-radius: 7px;
+  background: var(--ams-navy);
+  color: var(--ams-white);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 18px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 160ms ease, border-color 160ms ease;
+}
+
+#adminArea :is(
+  .admin-nav > .tab,
+  .admin-nav .dropdown-toggle,
+  #tabSearch .export-bar > button,
+  #tabSearch .search-actions > button,
+  #tabCompany .export-right > button,
+  #tabCompany .detail-actions > button
+):hover {
+  background: var(--ams-navy-deep);
+  border-color: var(--ams-navy-deep);
+}
+
+#adminArea :is(
+  .admin-nav > .tab,
+  .admin-nav .dropdown-toggle,
+  #tabSearch .export-bar > button,
+  #tabSearch .search-actions > button,
+  #tabCompany .export-right > button,
+  #tabCompany .detail-actions > button
+):focus-visible {
+  outline: 3px solid rgba(12, 80, 23, 0.45);
+  outline-offset: 2px;
+}
+
+#adminArea .admin-topbar,
+#adminArea .admin-nav {
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* Shorter filter fields, not narrower result tables. */
+#tabSearch .search-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 14px 16px;
+}
+
+#tabSearch .search-form > .form-row {
+  flex: 0 1 180px;
+  min-width: 0;
+  max-width: 100%;
+  margin: 0;
+}
+
+#tabSearch .search-form > .form-row:nth-child(3) {
+  flex-basis: 280px;
+}
+
+#tabSearch .search-form input,
+#tabSearch .search-form select,
+#tabCompany .filter-bar input,
+#tabCompany .filter-bar select {
+  height: 38px;
+  min-width: 0 !important;
+  padding: 8px 12px;
+  border: 1px solid var(--ams-border);
+  border-radius: 7px;
+  background: var(--ams-white);
+  color: var(--ams-text);
+  font-family: inherit;
+  font-size: 14px;
+  line-height: normal;
+}
+
+#tabSearch .search-form input,
+#tabSearch .search-form select {
+  width: 100%;
+}
+
+#tabCompany .filter-bar > .form-row {
+  max-width: 100%;
+}
+
+#detailCompanyInput {
+  width: 280px;
+  max-width: 100%;
+}
+
+#detailDateRange {
+  width: 180px;
+  max-width: 100%;
+}
+
+#tabCompany .filter-bar input:focus,
+#tabCompany .filter-bar select:focus {
+  outline: none;
+  border-color: var(--ams-green);
+  box-shadow: 0 0 0 4px rgba(12, 80, 23, 0.12);
+}
+
+#tabSearch .search-actions,
+#tabSearch .export-bar,
+#tabCompany .export-right,
+#tabCompany .detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+@media (max-width: 600px) {
+  #tabSearch .search-form > .form-row {
+    flex-basis: calc(50% - 8px);
+  }
+
+  #tabSearch .search-form > .form-row:nth-child(3) {
+    flex-basis: 100%;
+  }
+
+  #tabSearch .search-actions {
+    flex-basis: 100%;
+  }
+
+  #tabCompany .filter-bar > label,
+  #tabCompany #detailCustomDates {
+    margin-left: 0 !important;
+  }
+
+  #tabCompany #detailCustomDates input {
+    width: 145px;
+    max-width: 100%;
   }
 }
