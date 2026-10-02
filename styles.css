@@ -1162,10 +1162,10 @@ body {
   margin: 22px auto 14px;
   max-width: 1180px;
   padding: 14px 18px;
-  background: var(--ams-white);
-  border: 1px solid var(--ams-border);
+  background: transparent;
+  border: 1px solid transparent;
   border-radius: 12px;
-  box-shadow: 0 8px 20px rgba(4, 22, 59, 0.08);
+  box-shadow: none;
 }
 
 .dropdown-toggle {
