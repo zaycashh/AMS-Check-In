@@ -364,26 +364,7 @@ function getDetailDateRangeLabel() {
   const range = document.getElementById("detailDateRange")?.value;
   const start = document.getElementById("detailStartDate")?.value;
   const end = document.getElementById("detailEndDate")?.value;
-
-  if (!range) return "ALL DATES";
-
-  switch (range) {
-    case "today": return "TODAY";
-    case "yesterday": return "YESTERDAY";
-    case "thisWeek": return "THIS WEEK";
-    case "lastWeek": return "LAST WEEK";
-    case "thisMonth": return "THIS MONTH";
-    case "lastMonth": return "LAST MONTH";
-    case "thisYear": return "THIS YEAR";
-    case "lastYear": return "LAST YEAR";
-    case "custom":
-      if (start && end) {
-        return `CUSTOM: ${start} – ${end}`;
-      }
-      return "CUSTOM RANGE";
-    default:
-      return "ALL DATES";
-  }
+  return window.amsExactDateRangeLabel(range || "", start, end);
 }
 
 function exportCompanyExcel() {

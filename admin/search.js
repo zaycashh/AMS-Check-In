@@ -166,6 +166,36 @@ setupSearchCompanyAutocomplete();
 }
 
 /* =========================================================
+   EXACT DATE RANGE LABEL (for PDF / Excel exports)
+========================================================= */
+window.amsExactDateRangeLabel = function (range, start, end) {
+  const fmt = d =>
+    `${String(d.getMonth() + 1).padStart(2, "0")}/${String(d.getDate()).padStart(2, "0")}/${d.getFullYear()}`;
+  const fromInput = s => (s ? new Date(s + "T00:00:00") : null);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  let s = null, e = null;
+
+  switch (range) {
+    case "today": s = new Date(today); e = new Date(today); break;
+    case "yesterday": s = new Date(today); s.setDate(s.getDate() - 1); e = new Date(s); break;
+    case "thisWeek": s = new Date(today); s.setDate(s.getDate() - s.getDay()); e = new Date(today); break;
+    case "lastWeek": s = new Date(today); s.setDate(s.getDate() - s.getDay() - 7); e = new Date(s); e.setDate(e.getDate() + 6); break;
+    case "thisMonth": s = new Date(today.getFullYear(), today.getMonth(), 1); e = new Date(today); break;
+    case "lastMonth": s = new Date(today.getFullYear(), today.getMonth() - 1, 1); e = new Date(today.getFullYear(), today.getMonth(), 0); break;
+    case "thisYear": s = new Date(today.getFullYear(), 0, 1); e = new Date(today); break;
+    case "lastYear": s = new Date(today.getFullYear() - 1, 0, 1); e = new Date(today.getFullYear() - 1, 11, 31); break;
+    case "custom": s = fromInput(start); e = fromInput(end); break;
+    default: return "ALL DATES";
+  }
+
+  if (s && e) return fmt(s) === fmt(e) ? fmt(s) : `${fmt(s)} - ${fmt(e)}`;
+  if (s) return `FROM ${fmt(s)}`;
+  if (e) return `THROUGH ${fmt(e)}`;
+  return "ALL DATES";
+};
+
+/* =========================================================
    LOAD ALL LOGS IN PAGES (API returns max 250 per request)
 ========================================================= */
 window.fetchAllAmsLogs = async function () {
@@ -855,20 +885,7 @@ async function exportSearchPdf() {
   const start = document.getElementById("filterStartDate")?.value;
   const end = document.getElementById("filterEndDate")?.value;
 
-  let rangeLabel = "ALL DATES";
-
-  if (range === "today") rangeLabel = "TODAY";
-  if (range === "yesterday") rangeLabel = "YESTERDAY";
-  if (range === "thisWeek") rangeLabel = "THIS WEEK";
-  if (range === "lastWeek") rangeLabel = "LAST WEEK";
-  if (range === "thisMonth") rangeLabel = "THIS MONTH";
-  if (range === "lastMonth") rangeLabel = "LAST MONTH";
-  if (range === "thisYear") rangeLabel = "THIS YEAR";
-  if (range === "lastYear") rangeLabel = "LAST YEAR";
-
-  if (range === "custom" && start && end) {
-    rangeLabel = `CUSTOM: ${start} – ${end}`;
-  }
+  const rangeLabel = window.amsExactDateRangeLabel(range, start, end);
 
   /* ===============================
      HEADER BAR
@@ -1009,20 +1026,7 @@ window.exportSearchLogExcel = function () {
   const start = document.getElementById("filterStartDate")?.value;
   const end = document.getElementById("filterEndDate")?.value;
 
-  let rangeLabel = "ALL DATES";
-
-  if (range === "today") rangeLabel = "TODAY";
-  if (range === "yesterday") rangeLabel = "YESTERDAY";
-  if (range === "thisWeek") rangeLabel = "THIS WEEK";
-  if (range === "lastWeek") rangeLabel = "LAST WEEK";
-  if (range === "thisMonth") rangeLabel = "THIS MONTH";
-  if (range === "lastMonth") rangeLabel = "LAST MONTH";
-  if (range === "thisYear") rangeLabel = "THIS YEAR";
-  if (range === "lastYear") rangeLabel = "LAST YEAR";
-
-  if (range === "custom" && start && end) {
-    rangeLabel = `CUSTOM: ${start} – ${end}`;
-  }
+  const rangeLabel = window.amsExactDateRangeLabel(range, start, end);
 
   /* ===============================
      BUILD SHEET (TITLE + META)
