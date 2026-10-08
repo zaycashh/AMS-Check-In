@@ -166,6 +166,28 @@ setupSearchCompanyAutocomplete();
 }
 
 /* =========================================================
+   LOAD ALL LOGS IN PAGES (API returns max 250 per request)
+========================================================= */
+window.fetchAllAmsLogs = async function () {
+  const base = "https://ams-checkin-api.josealfonsodejesus.workers.dev/logs";
+  const pageSize = 250;
+  const all = [];
+  const seen = new Set();
+  for (let offset = 0; offset < 100000; offset += pageSize) {
+    const res = await fetch(`${base}?limit=${pageSize}&offset=${offset}`, { cache: "no-store" });
+    if (!res.ok) throw new Error("Cloud fetch failed");
+    const page = await res.json();
+    if (!Array.isArray(page)) throw new Error("Unexpected logs response");
+    for (const row of page) {
+      const key = row && row.id ? row.id : JSON.stringify(row);
+      if (!seen.has(key)) { seen.add(key); all.push(row); }
+    }
+    if (page.length < pageSize) break;
+  }
+  return all;
+};
+
+/* =========================================================
    DATA HELPERS
 ========================================================= */
 function getCachedLogs() {
@@ -174,14 +196,7 @@ function getCachedLogs() {
 
 async function fetchLogsFromCloud() {
   try {
-    const res = await fetch(
-      "https://ams-checkin-api.josealfonsodejesus.workers.dev/logs",
-      { cache: "no-store" }
-    );
-
-    if (!res.ok) throw new Error("Cloud fetch failed");
-
-    const logs = await res.json();
+    const logs = await window.fetchAllAmsLogs();
     console.log("☁️ Logs loaded from cloud:", logs.length);
     return logs;
 

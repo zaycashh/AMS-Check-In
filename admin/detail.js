@@ -9,14 +9,7 @@ function getLocalDetailLogs() {
 
 async function fetchDetailLogs() {
   try {
-    const res = await fetch(
-      "https://ams-checkin-api.josealfonsodejesus.workers.dev/logs",
-      { cache: "no-store" }
-    );
-
-    if (!res.ok) throw new Error("Cloud fetch failed");
-
-    const logs = await res.json();
+    const logs = await window.fetchAllAmsLogs();
     detailCloudCache = logs;
 
     console.log("☁️ Detail logs loaded from cloud:", logs.length);
