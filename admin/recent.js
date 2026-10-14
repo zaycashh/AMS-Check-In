@@ -10,9 +10,6 @@ async function fetchRecentLogs() {
     localStorage.getItem("ams_logs") || "[]"
   );
 
-  // ✅ Prevent multiple cloud calls
-  if (recentCloudCache) return recentCloudCache;
-
   try {
     const res = await fetch(
       "https://ams-checkin-api.josealfonsodejesus.workers.dev/logs",
@@ -197,4 +194,31 @@ async function renderRecentCheckIns() {
   fetchRecentLogs().then(cloudLogs => {
     paintRecent(container, cloudLogs);
   });
+
+  startRecentAutoRefresh();
+}
+
+/* =========================================================
+   AUTO-REFRESH (new check-ins appear without reloading)
+========================================================= */
+
+const RECENT_REFRESH_MS = 15000;
+let recentRefreshTimer = null;
+
+function isRecentTabVisible() {
+  const container = document.getElementById("tabRecent");
+  return !!container && container.offsetParent !== null && !document.hidden;
+}
+
+async function refreshRecentIfVisible() {
+  if (!isRecentTabVisible()) return;
+  const container = document.getElementById("tabRecent");
+  const cloudLogs = await fetchRecentLogs();
+  if (isRecentTabVisible()) paintRecent(container, cloudLogs);
+}
+
+function startRecentAutoRefresh() {
+  if (recentRefreshTimer) return;
+  recentRefreshTimer = setInterval(refreshRecentIfVisible, RECENT_REFRESH_MS);
+  document.addEventListener("visibilitychange", refreshRecentIfVisible);
 }
